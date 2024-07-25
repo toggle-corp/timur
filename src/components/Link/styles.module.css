@@ -1,0 +1,43 @@
+.link {
+    --decoration: none;
+
+    display: inline-flex;
+    align-items: flex-start;
+    flex-wrap: nowrap;
+    width: fit-content;
+
+    &:not(.non-link) {
+        /*
+        font-weight: var(--go-ui-font-weight-medium);
+        */
+
+        &.underline {
+            --decoration: underline;
+        }
+    }
+
+    &:not(.disabled):not(.non-link) {
+        cursor: pointer;
+
+        &:hover {
+            --decoration: underline;
+        }
+    }
+
+    &.disabled {
+        pointer-events: none;
+    }
+
+    .link-element {
+        display: inline-flex;
+        align-items: center;
+        flex-grow: 1;
+        text-decoration: var(--decoration);
+
+        /*
+        &:focus-visible {
+            outline: var(--go-ui-width-separator-thin) dashed var(--go-ui-color-gray-40);
+        }
+        */
+    }
+}

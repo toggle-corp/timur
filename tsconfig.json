@@ -1,0 +1,34 @@
+{
+    "compilerOptions": {
+        "paths": {
+            "#generated/*": ["./generated/*"],
+            "#components/*": ["./src/components/*"],
+            "#config": ["./src/config"],
+            "#contexts/*": ["./src/contexts/*"],
+            "#hooks/*": ["./src/hooks/*"],
+            "#utils/*": ["./src/utils/*"],
+            "#views/*": ["./src/views/*"]
+        },
+
+        "target": "ESNext",
+        "lib": ["DOM", "DOM.Iterable", "ESNext"],
+        "module": "ESNext",
+        "skipLibCheck": true,
+
+        /* Bundler mode */
+        "moduleResolution": "bundler",
+        "allowImportingTsExtensions": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "noEmit": true,
+        "jsx": "react-jsx",
+
+        /* Linting */
+        "strict": true,
+        "types": ["vite-plugin-svgr/client", "node"],
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true
+    },
+    "include": ["src", "env.ts"]
+}
