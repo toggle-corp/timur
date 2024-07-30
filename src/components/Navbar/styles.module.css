@@ -1,0 +1,11 @@
+.navbar {
+    box-shadow: var(--box-shadow-md);
+    background-color: var(--color-foreground);
+    padding: var(--spacing-md);
+
+    .brand {
+        color: var(--color-primary);
+        font-size: var(--font-size-xl);
+        font-weight: var(--font-weight-bold);
+    }
+}

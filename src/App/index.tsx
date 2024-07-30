@@ -28,6 +28,7 @@ function App() {
     const [userAuth, setUserAuth] = useState<UserAuth>();
 
     const hydrateUserAuth = useCallback(() => {
+        // eslint-disable-next-line no-console
         console.warn('We do not have any mechanism to hydrate authentication');
     }, []);
 

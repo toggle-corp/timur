@@ -1,0 +1,19 @@
+.popup {
+    padding: var(--spacing-sm) 0;
+
+    .list {
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+
+        .list-item {
+            flex-shrink: 0;
+        }
+    }
+
+    .info-message {
+        padding: var(--spacing-sm);
+        text-align: center;
+        color: var(--color-text-light);
+    }
+}

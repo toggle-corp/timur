@@ -7,10 +7,6 @@
     width: fit-content;
 
     &:not(.non-link) {
-        /*
-        font-weight: var(--go-ui-font-weight-medium);
-        */
-
         &.underline {
             --decoration: underline;
         }
@@ -34,10 +30,8 @@
         flex-grow: 1;
         text-decoration: var(--decoration);
 
-        /*
         &:focus-visible {
-            outline: var(--go-ui-width-separator-thin) dashed var(--go-ui-color-gray-40);
+            outline: var(--width-separator-sm) dashed var(--color-separator);
         }
-        */
     }
 }

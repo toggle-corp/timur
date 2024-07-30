@@ -1,0 +1,21 @@
+.page {
+    display: flex;
+    flex-grow: 1;
+
+    .aside {
+        box-shadow: var(--box-shadow-md);
+        background-color: var(--color-background);
+        width: 10rem;
+    }
+
+    .main {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        padding: var(--spacing-lg);
+
+        .content {
+            flex-grow: 1;
+        }
+    }
+}

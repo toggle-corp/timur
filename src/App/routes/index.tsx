@@ -57,7 +57,7 @@ const home = customWrapRoute({
     parent: rootLayout,
     index: true,
     component: {
-        render: () => import('#components/TemplateView'),
+        render: () => import('#views/Home'),
         props: {
             title: 'Home',
         },

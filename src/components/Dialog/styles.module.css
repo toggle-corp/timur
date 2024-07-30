@@ -1,0 +1,35 @@
+.dialog {
+    &.open {
+        display: flex;
+        flex-direction: column;
+        border: none;
+        border-radius: var(--border-radius-xl);
+        box-shadow: var(--box-shadow-xl);
+        padding: var(--spacing-md);
+        width: 40rem;
+        gap: var(--spacing-md);
+
+        .header {
+            display: flex;
+
+            .heading {
+                flex-grow: 1;
+            }
+
+            .close-button {
+                flex-shrink: 0;
+                font-size: var(--font-size-xl);
+            }
+        }
+
+        .content {
+            flex-grow: 1;
+            overflow: auto;
+        }
+
+        &::backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+    }
+}
+

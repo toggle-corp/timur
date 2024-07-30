@@ -1,0 +1,12 @@
+.list {
+    position: relative;
+    min-height: var(--height-content--min);
+
+    &.compact {
+        min-height: unset;
+
+        &.pending {
+            min-height: var(--height-compact-content--min);
+        }
+    }
+}

@@ -2,9 +2,7 @@ import './index.css';
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import {
-    isNotDefined,
-} from '@togglecorp/fujs';
+import { isNotDefined } from '@togglecorp/fujs';
 
 import App from './App/index.tsx';
 

@@ -4,34 +4,10 @@ import {
 } from 'react-router-dom';
 import { _cs } from '@togglecorp/fujs';
 
+import Navbar from '#components/Navbar';
 import useDebouncedValue from '#hooks/useDebouncedValue';
 
 import styles from './styles.module.css';
-
-interface NavbarProps {
-    className?: string;
-}
-function Navbar(props: NavbarProps) {
-    const { className } = props;
-    return (
-        <div className={className}>
-            Navbar
-        </div>
-    );
-}
-
-interface GlobalFooterProps {
-    className?: string;
-}
-
-function GlobalFooter(props: GlobalFooterProps) {
-    const { className } = props;
-    return (
-        <div className={className}>
-            Footer
-        </div>
-    );
-}
 
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
@@ -53,7 +29,6 @@ export function Component() {
             <div className={styles.pageContent}>
                 <Outlet />
             </div>
-            <GlobalFooter className={styles.footer} />
         </div>
     );
 }
