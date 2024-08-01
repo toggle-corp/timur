@@ -4,6 +4,8 @@ export type SpacingVariant = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export interface Client {
     id: number;
     title: string;
+    abbvr?: string;
+    description?: string;
 
     // projects: Project[];
 }
@@ -40,7 +42,7 @@ export interface WorkItem {
     task: Task['id'];
     // taskDetails: Task
     description?: string,
-    hour?: number;
+    hours?: number;
     startTime?: number;
     type: WorkItemType;
     date: string;

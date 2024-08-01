@@ -1,4 +1,5 @@
 import {
+    useCallback,
     useEffect,
     useRef,
 } from 'react';
@@ -41,10 +42,15 @@ function Dialog(props: Props) {
         [open],
     );
 
+    const handleClose = useCallback(() => {
+        onClose(false);
+    }, [onClose]);
+
     return (
         <dialog
             ref={dialogRef}
             className={_cs(styles.dialog, open && styles.open, className)}
+            onClose={handleClose}
         >
             <header className={styles.header}>
                 <h2 className={styles.heading}>

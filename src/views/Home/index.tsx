@@ -2,7 +2,9 @@
 /* eslint-disable max-len */
 import {
     useCallback,
+    useEffect,
     useMemo,
+    useRef,
     useState,
 } from 'react';
 import {
@@ -13,6 +15,7 @@ import {
 import {
     encodeDate,
     isDefined,
+    isFalsyString,
     isNotDefined,
     listToGroupList,
     listToMap,
@@ -29,15 +32,24 @@ import SelectInput from '#components/SelectInput';
 import TextInput from '#components/TextInput';
 import { rankedSearchOnList } from '#utils/common';
 import {
-    Client,
-    Contract,
-    Project,
-    Task,
+    getFromStorage,
+    setToStorage,
+} from '#utils/localStorage';
+import {
     WorkItem,
     WorkItemType,
 } from '#utils/types';
 
+import {
+    clientList,
+    contractList,
+    projectList,
+    taskList,
+} from './data';
+
 import styles from './styles.module.css';
+
+const { APP_VERSION } = import.meta.env;
 
 function numericIdSelector({ id }: { id: number }) {
     return id;
@@ -47,176 +59,14 @@ function stringTitleSelector({ title }: { title: string }) {
     return title;
 }
 
-const togglecorp: Client = {
-    id: 1,
-    title: 'Togglecorp',
-};
-const ifrc: Client = {
-    id: 2,
-    title: 'IFRC',
-};
-
-const clientList: Client[] = [
-    togglecorp,
-    ifrc,
-];
 const clientById = listToMap(clientList, ({ id }) => id);
-
-const timur: Project = {
-    id: 1,
-    title: 'Timur Development',
-    client: togglecorp.id,
-};
-const go: Project = {
-    id: 2,
-    title: 'GO',
-    client: ifrc.id,
-};
-
-const projectList: Project[] = [
-    timur,
-    go,
-];
 const projectById = listToMap(projectList, ({ id }) => id);
-
-const phaseOneDevelopment: Contract = {
-    id: 1,
-    title: 'Phase I Development',
-    project: timur.id,
-};
-const drefDevelopment: Contract = {
-    id: 2,
-    title: 'DREF',
-    project: go.id,
-};
-const opsLearning: Contract = {
-    id: 3,
-    title: 'Ops. learning',
-    project: go.id,
-};
-
-const contractList: Contract[] = [
-    phaseOneDevelopment,
-    drefDevelopment,
-    opsLearning,
-];
-
 const contractById = listToMap(contractList, ({ id }) => id);
-
-const uiSetup: Task = {
-    id: 1,
-    title: 'Setup UI',
-    contract: phaseOneDevelopment.id,
-};
-const templateSchema: Task = {
-    id: 2,
-    title: 'Template Schema',
-    contract: drefDevelopment.id,
-};
-const importTemplate: Task = {
-    id: 3,
-    title: 'Import from template',
-    contract: drefDevelopment.id,
-};
-const uiUpdate: Task = {
-    id: 4,
-    title: 'Update UI',
-    contract: drefDevelopment.id,
-};
-const openAiSetup: Task = {
-    id: 5,
-    title: 'Setup connection to OpenAI',
-    contract: opsLearning.id,
-};
-
-const taskList: Task[] = [
-    uiSetup,
-    templateSchema,
-    importTemplate,
-    uiUpdate,
-    openAiSetup,
-];
-
 const taskById = listToMap(taskList, ({ id }) => id);
 
 function getNewId() {
     return Math.round(Math.random() * 10000);
 }
-
-const userWorkItems: WorkItem[] = [
-    {
-        id: 1,
-        task: uiSetup.id,
-        hour: 5,
-        description: 'Discuss about the implementation',
-        type: 'internal-discussion',
-        date: '2024-08-01',
-    },
-    {
-        id: 2,
-        task: uiSetup.id,
-        hour: 2,
-        type: 'development',
-        description: 'Add basic UI components',
-        date: '2024-08-01',
-    },
-    {
-        id: 3,
-        task: templateSchema.id,
-        hour: 1,
-        type: 'internal-discussion',
-        description: 'Discuss with Safar about the schema for template generation',
-        date: '2024-08-01',
-    },
-    {
-        id: 4,
-        task: templateSchema.id,
-        hour: 8,
-        type: 'development',
-        description: 'Add typings for template schema',
-        date: '2024-08-01',
-    },
-    {
-        id: getNewId(),
-        task: templateSchema.id,
-        hour: 8,
-        type: 'development',
-        description: 'Add typings for template schema',
-        date: '2024-07-30',
-    },
-    {
-        id: 5,
-        task: templateSchema.id,
-        hour: 4,
-        type: 'development',
-        description: 'Add fields for the import template',
-        date: '2024-08-01',
-    },
-    {
-        id: 6,
-        task: importTemplate.id,
-        hour: 10,
-        type: 'development',
-        description: 'Create a function to transform imported xlsx to the form fields',
-        date: '2024-08-01',
-    },
-    {
-        id: 7,
-        task: uiUpdate.id,
-        hour: 2,
-        type: 'development',
-        description: 'Add download button and modal to import the template',
-        date: '2024-08-01',
-    },
-    {
-        id: 8,
-        task: openAiSetup.id,
-        hour: 6,
-        type: 'development',
-        description: 'Establish connection with OpenAI server',
-        date: '2024-08-01',
-    },
-];
 
 type WorkItemTypeOption = { id: WorkItemType, title: string };
 const typeOptions: WorkItemTypeOption[] = [
@@ -229,12 +79,37 @@ const typeOptions: WorkItemTypeOption[] = [
     { id: 'internal-discussion', title: 'Internal discussion' },
 ];
 
+const KEY_DATA_STORAGE = 'timur';
+
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
-    const [workItems, setWorkItems] = useState<WorkItem[] | undefined>(userWorkItems);
+    const [workItems, setWorkItems] = useState<WorkItem[] | undefined>(
+        () => getFromStorage<{ appVersion: string, workItems: WorkItem[] }>(KEY_DATA_STORAGE)?.workItems,
+    );
     const [showAddWorkItemDialog, setShowAddWorkItemDialog] = useState(false);
     const [selectedDate, setSelectedDate] = useState<string | undefined>(() => encodeDate(new Date()));
     const [searchText, setSearchText] = useState<string | undefined>();
+
+    const syncTimeoutRef = useRef<number | undefined>();
+
+    useEffect(() => {
+        function updateLocalstorage() {
+            setToStorage(
+                KEY_DATA_STORAGE,
+                {
+                    appVersion: APP_VERSION,
+                    workItems,
+                },
+            );
+        }
+
+        window.clearTimeout(syncTimeoutRef.current);
+
+        syncTimeoutRef.current = window.setTimeout(
+            updateLocalstorage,
+            500,
+        );
+    }, [workItems]);
 
     const getWorkItemUpdateFunction = useCallback((workItemId: number | undefined) => {
         function updateWorkItem(newValue: WorkItemType, name: 'type'): void
@@ -326,10 +201,12 @@ export function Component() {
             const targetItem = {
                 ...oldWorkItems[sourceItemIndex],
                 id: getNewId(),
+                description: undefined,
+                hours: undefined,
             };
 
             const newWorkItems = [...oldWorkItems];
-            newWorkItems.splice(sourceItemIndex, 0, targetItem);
+            newWorkItems.splice(sourceItemIndex + 1, 0, targetItem);
 
             return newWorkItems;
         });
@@ -353,6 +230,25 @@ export function Component() {
         });
     }, []);
 
+    const handleCopyTextClick = useCallback(() => {
+        function toSubItem(subItem: string | undefined) {
+            return `  - ${subItem ?? '??'}`;
+        }
+
+        const text = groupedWorkItems?.map((projectGrouped) => {
+            const { project, contracts } = projectGrouped;
+            const currentWorkItems = contracts.flatMap(({ workItems: contractGroupedWorkItems }) => contractGroupedWorkItems);
+
+            return `- ${project.title}\n${currentWorkItems.map((workItem) => toSubItem(workItem.description)).join('\n')}`;
+        }).join('\n');
+
+        if (isFalsyString(text)) {
+            return;
+        }
+
+        window.navigator.clipboard.writeText(text);
+    }, [groupedWorkItems]);
+
     return (
         <Page
             documentTitle="Timur - Home"
@@ -360,12 +256,30 @@ export function Component() {
             contentClassName={styles.content}
         >
             <div className={styles.pageHeader}>
-                <DateInput
-                    label="Date"
-                    name={undefined}
-                    value={selectedDate}
-                    onChange={setSelectedDate}
-                />
+                <div className={styles.headerContent}>
+                    <DateInput
+                        // label="Date"
+                        className={styles.dateInput}
+                        name={undefined}
+                        value={selectedDate}
+                        onChange={setSelectedDate}
+                    />
+                </div>
+                <div className={styles.actions}>
+                    <Button
+                        name={undefined}
+                        onClick={handleCopyTextClick}
+                        variant="secondary"
+                    >
+                        Copy standup text
+                    </Button>
+                    <Button
+                        name
+                        onClick={setShowAddWorkItemDialog}
+                    >
+                        Add workitem
+                    </Button>
+                </div>
             </div>
             <div
                 role="list"
@@ -431,6 +345,7 @@ export function Component() {
                                                                 onChange={setFieldValue}
                                                                 value={workItem.task}
                                                                 nonClearable
+                                                                autoFocus
                                                             />
                                                             <SelectInput<WorkItemType, 'type', WorkItemTypeOption, never>
                                                                 name="type"
@@ -451,7 +366,7 @@ export function Component() {
                                                             <NumberInput
                                                                 name="hours"
                                                                 label="Hours"
-                                                                value={workItem.hour}
+                                                                value={workItem.hours}
                                                                 onChange={setFieldValue}
                                                             />
                                                             <div className={styles.actions}>
@@ -485,14 +400,6 @@ export function Component() {
                         </section>
                     );
                 })}
-            </div>
-            <div>
-                <Button
-                    name
-                    onClick={setShowAddWorkItemDialog}
-                >
-                    Add workitem
-                </Button>
             </div>
             {/* TODO: Move to separate component */}
             <Dialog

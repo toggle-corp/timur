@@ -17,6 +17,25 @@
 
     .page-header {
         display: flex;
+        align-items: center;
+
+        .header-content {
+            display: flex;
+            flex-grow: 1;
+
+            .date-input {
+                input {
+                    font-size: var(--font-size-2xl);
+                    font-weight: var(--font-weight-bold);
+                }
+            }
+        }
+
+        .actions {
+            display: flex;
+            gap: var(--spacing-md);
+            flex-shrink: 0;
+        }
     }
 
     .content {
@@ -71,7 +90,7 @@
 
                     .actions {
                         display: flex;
-                        align-items: flex-end;
+                        align-items: center;
                         flex-wrap: wrap;
                         gap: var(--spacing-xs);
                     }
