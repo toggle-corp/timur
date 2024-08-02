@@ -10,13 +10,14 @@
 
     .main {
         display: flex;
-        flex-direction: column;
         align-items: center;
+        flex-direction: column;
         flex-grow: 1;
         padding: var(--spacing-lg);
 
         .content {
             flex-grow: 1;
+            width: 100%;
             max-width: var(--width-page-content--max);
         }
     }

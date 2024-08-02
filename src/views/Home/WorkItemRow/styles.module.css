@@ -1,6 +1,6 @@
 .work-item-row {
     display: grid;
-    grid-template-columns: 3fr 3fr 7fr 6rem 6rem;
+    grid-template-columns: 3fr 3fr 7fr 6rem 7rem;
     gap: 0 var(--spacing-xs);
 
     .actions {

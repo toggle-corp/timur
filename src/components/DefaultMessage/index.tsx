@@ -1,11 +1,10 @@
 import { useMemo } from 'react';
-import { IoTimerOutline } from 'react-icons/io5';
+import { GiShrug } from 'react-icons/gi';
 import { _cs } from '@togglecorp/fujs';
 
 import Message from '#components/Message';
 
 import styles from './styles.module.css';
-import { GiShrug } from 'react-icons/gi';
 
 interface Props {
     className?: string;

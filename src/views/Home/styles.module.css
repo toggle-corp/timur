@@ -23,7 +23,6 @@
 
             .date-input {
                 input {
-                    color: var(--color-primary);
                     font-size: var(--font-size-xl);
                     font-weight: var(--font-weight-bold);
                 }

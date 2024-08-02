@@ -28,6 +28,7 @@ function TextInput<const T>(props: Props<T>) {
         variant,
         withAsterisk,
         type = 'text',
+        inputElementRef,
         ...otherInputProps
     } = props;
 
@@ -59,6 +60,7 @@ function TextInput<const T>(props: Props<T>) {
                     disabled={disabled}
                     className={inputClassName}
                     type={type}
+                    elementRef={inputElementRef}
                 />
             )}
         />

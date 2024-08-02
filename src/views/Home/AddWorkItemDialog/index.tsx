@@ -1,6 +1,7 @@
 import {
     useCallback,
     useEffect,
+    useRef,
     useState,
 } from 'react';
 import { IoAddSharp } from 'react-icons/io5';
@@ -42,6 +43,7 @@ function AddWorkItemDialog(props: Props) {
 
     const [showAddWorkItemDialog, setShowAddWorkItemDialog] = useState(false);
     const [searchText, setSearchText] = useState<string | undefined>();
+    const titleInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         dialogOpenTriggerRef.current = () => {
@@ -73,11 +75,13 @@ function AddWorkItemDialog(props: Props) {
             heading="Add new work item"
             contentClassName={styles.modalContent}
             className={styles.addWorkItemDialog}
+            focusElementRef={titleInputRef}
         >
             <div>
                 Please select a task to add the workitems
             </div>
             <TextInput
+                inputElementRef={titleInputRef}
                 label="Search by title"
                 name={undefined}
                 value={searchText}

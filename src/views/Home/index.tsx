@@ -63,6 +63,7 @@ export function Component() {
             // eslint-disable-next-line no-console
             console.info('Handler not attached');
         });
+
     const syncTimeoutRef = useRef<number | undefined>();
 
     useEffect(() => {
@@ -137,10 +138,6 @@ export function Component() {
                         name={undefined}
                         value={selectedDate}
                         onChange={setSelectedDate}
-                        actions={(
-                            <>
-                            </>
-                        )}
                     />
                     {isDefined(selectedDate) && (
                         <Button

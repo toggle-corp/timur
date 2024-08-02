@@ -5,11 +5,11 @@
         border: none;
         border-radius: var(--border-radius-xl);
         box-shadow: var(--box-shadow-xl);
+        background-color: var(--color-foreground);
         padding: var(--spacing-md);
         width: 40rem;
         height: 90vh;
         gap: var(--spacing-md);
-        background-color: var(--color-foreground);
         overflow: auto;
 
         .header {

@@ -1,10 +1,11 @@
+import { listToMap } from '@togglecorp/fujs';
+
 import {
     Client,
     Contract,
     Project,
     Task,
 } from '#utils/types';
-import { listToMap } from '@togglecorp/fujs';
 
 const togglecorp: Client = {
     id: 1,

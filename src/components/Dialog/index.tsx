@@ -1,4 +1,5 @@
 import {
+    RefObject,
     useCallback,
     useEffect,
     useRef,
@@ -17,6 +18,8 @@ export interface Props {
     children: React.ReactNode;
     heading?: React.ReactNode;
     contentClassName?: string;
+
+    focusElementRef?: RefObject<HTMLElement>;
 }
 
 function Dialog(props: Props) {
@@ -27,6 +30,7 @@ function Dialog(props: Props) {
         children,
         heading,
         contentClassName,
+        focusElementRef,
     } = props;
 
     const dialogRef = useRef<HTMLDialogElement>(null);
@@ -35,11 +39,12 @@ function Dialog(props: Props) {
         () => {
             if (open) {
                 dialogRef.current?.showModal();
+                focusElementRef?.current?.focus();
             } else {
                 dialogRef.current?.close();
             }
         },
-        [open],
+        [open, focusElementRef],
     );
 
     const handleClose = useCallback(() => {
@@ -52,23 +57,23 @@ function Dialog(props: Props) {
             className={_cs(styles.dialog, open && styles.open, className)}
             onClose={handleClose}
         >
-          <header className={styles.header}>
-              <h2 className={styles.heading}>
-                  {heading}
-              </h2>
-              <Button
-                  className={styles.closeButton}
-                  name={false}
-                  onClick={onClose}
-                  title="Close"
-                  variant="tertiary"
-              >
-                  <IoCloseSharp />
-              </Button>
-          </header>
-          <div className={_cs(styles.content, contentClassName)}>
-              {children}
-          </div>
+            <header className={styles.header}>
+                <h2 className={styles.heading}>
+                    {heading}
+                </h2>
+                <Button
+                    className={styles.closeButton}
+                    name={false}
+                    onClick={onClose}
+                    title="Close"
+                    variant="tertiary"
+                >
+                    <IoCloseSharp />
+                </Button>
+            </header>
+            <div className={_cs(styles.content, contentClassName)}>
+                {children}
+            </div>
         </dialog>
     );
 }
