@@ -4,7 +4,18 @@ import {
     isFalsyString,
 } from '@togglecorp/fujs';
 
-// eslint-disable-next-line import/prefer-default-export
+export function getNewId() {
+    return Math.round(Math.random() * 9999999);
+}
+
+export function numericIdSelector({ id }: { id: number }) {
+    return id;
+}
+
+export function stringTitleSelector({ title }: { title: string }) {
+    return title;
+}
+
 export function rankedSearchOnList<T>(
     list: T[],
     searchString: string | undefined,

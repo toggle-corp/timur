@@ -3,9 +3,11 @@
     position: relative;
     border: var(--width-separator-md) solid transparent;
     padding: var(--spacing-xs) 0;
+    filter: grayscale(70%);
 
     &:focus-within {
         border-color: var(--color-secondary);
+        filter: grayscale(0%);
     }
 
     .input-section {

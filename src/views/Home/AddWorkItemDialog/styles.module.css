@@ -1,0 +1,41 @@
+.add-work-item-dialog {
+    border: 1px solid red;
+
+    .modal-content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-md);
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+
+            .task {
+                display: flex;
+                gap: var(--spacing-sm);
+                text-align: left;
+
+                .details {
+                    flex-grow: 1;
+
+                    .meta {
+                        display: flex;
+                        color: var(--color-text-light);
+                        font-size: var(--font-size-xs);
+                        gap: var(--spacing-sm);
+                    }
+                }
+
+                .icon {
+                    flex-shrink: 0;
+                    font-size: var(--font-size-lg);
+                }
+
+                &:hover {
+                    background-color: var(--color-background);
+                }
+            }
+        }
+    }
+}

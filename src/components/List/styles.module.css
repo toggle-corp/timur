@@ -9,4 +9,10 @@
             min-height: var(--height-compact-content--min);
         }
     }
+
+    .separator {
+        margin: 0;
+        border: none;
+        border-bottom: var(--width-separator-sm) solid var(--color-separator);
+    }
 }

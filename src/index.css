@@ -5,16 +5,16 @@
 :root {
     --font-family-sans-serif: "Assistant", sans-serif;
 
-    --color-primary: #c46349;
+    --color-primary: #c45332;
     --color-secondary: #9cb56e;
     --color-tertiary: #f2fde1;
-    --color-quaternary: #faf8e1;
+    --color-quaternary: #f2f2d0;
 
-    --color-background: #fbf9e7;
+    --color-background: #fafaf0;
     --color-foreground: #ffffff;
 
     --color-text: rgba(0, 0, 0, .8);
-    --color-text-light: rgba(0, 0, 0, .5);
+    --color-text-light: rgba(0, 0, 0, .6);
     --color-text-on-dark: #ffffff;
 
     --color-separator: rgba(0, 0, 0, 0.1);
@@ -89,6 +89,8 @@
     --width-separator-lg: 4pt;
     --width-separator-xl: 8pt;
 
+    --width-page-content--max: 76rem;
+
     --border-radius-none: 0;
     --border-radius-sm: 0.125rem;
     --border-radius-md: 0.25rem;
@@ -118,8 +120,8 @@
     --opacity-disabled-element: 0.5;
     --opacity-message: 0.6;
 
-    --height-content--min: 6rem;
-    --height-compact-content--min: 2rem;
+    --height-content--min: 16rem;
+    --height-compact-content--min: 1rem;
 }
 
 html {

@@ -52,11 +52,11 @@
         }
 
         &.condensed-spacing {
-            --padding: var(--spacing-2xs) var(--spacing-sm);
+            --padding: var(--spacing-4xs) var(--spacing-2xs);
         }
 
         &.compact-spacing {
-            --padding: var(--spacing-2xs) var(--spacing-xs);
+            --padding: var(--spacing-3xs) var(--spacing-xs);
         }
 
         &.cozy-spacing {
@@ -64,11 +64,11 @@
         }
 
         &.default-spacing {
-            --padding: var(--spacing-xs) var(--spacing-sm);
+            --padding: var(--spacing-xs) var(--spacing-md);
         }
 
         &.comfortable-spacing {
-            --padding: var(--spacing-2xs) var(--spacing-lg);
+            --padding: var(--spacing-xs) var(--spacing-lg);
         }
 
         &.relaxed-spacing {
@@ -97,9 +97,9 @@
     }
 
     &.secondary {
-        --color-border: var(--color-primary);
-        --color-background: var(--color-text-on-dark);
-        --color-text: var(--color-primary);
+        --color-border: var(--color-quaternary);
+        --color-background: var(--color-quaternary);
+        --color-text: var(--color-text-light);
 
         &.disabled {
             filter: saturate(50%);

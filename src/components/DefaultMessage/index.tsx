@@ -5,6 +5,7 @@ import { _cs } from '@togglecorp/fujs';
 import Message from '#components/Message';
 
 import styles from './styles.module.css';
+import { GiShrug } from 'react-icons/gi';
 
 interface Props {
     className?: string;
@@ -44,7 +45,7 @@ function DefaultMessage(props: Props) {
             }
 
             if (errored) {
-                return errorMessage ?? 'Data is not available!';
+                return errorMessage ?? 'Failed to fetch data!';
             }
 
             if (filtered) {
@@ -52,7 +53,7 @@ function DefaultMessage(props: Props) {
             }
 
             if (empty) {
-                return emptyMessage ?? 'Failed to fetch data!';
+                return emptyMessage ?? 'Data is not available!';
             }
 
             return null;
@@ -80,7 +81,7 @@ function DefaultMessage(props: Props) {
                 pending && overlayPending && styles.overlay,
                 className,
             )}
-            icon={<IoTimerOutline />}
+            icon={<GiShrug />}
             compact={compact}
             title={messageTitle}
             pending={pending}

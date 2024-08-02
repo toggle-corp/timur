@@ -9,23 +9,22 @@
         margin: 0;
     }
 
-    .separator {
-        margin: 0;
-        border: none;
-        border-bottom: var(--width-separator-sm) solid var(--color-separator);
-    }
-
     .page-header {
         display: flex;
         align-items: center;
+        flex-wrap: wrap;
+        gap: var(--spacing-md);
 
         .header-content {
             display: flex;
+            align-items: center;
             flex-grow: 1;
+            gap: var(--spacing-sm);
 
             .date-input {
                 input {
-                    font-size: var(--font-size-2xl);
+                    color: var(--color-primary);
+                    font-size: var(--font-size-xl);
                     font-weight: var(--font-weight-bold);
                 }
             }
@@ -42,104 +41,5 @@
         display: flex;
         flex-direction: column;
         gap: var(--spacing-lg);
-    }
-
-    .project-grouped-list {
-        display: flex;
-        flex-direction: column;
-
-        .project-grouped-item {
-            display: flex;
-            flex-direction: column;
-            background-color: var(--color-foreground);
-            padding: var(--spacing-md) 0;
-            gap: var(--spacing-md);
-
-            .project-title {
-                padding: 0 var(--spacing-md);
-            }
-
-            .contract-grouped-list {
-                display: flex;
-                flex-direction: column;
-                padding: 0 var(--spacing-md);
-                gap: var(--spacing-md);
-
-                .contract-grouped-item {
-                    display: flex;
-                    flex-direction: column;
-                    gap: var(--spacing-md);
-
-                    .contract-title {
-                        color: var(--color-secondary);
-                        font-size: var(--font-size-md);
-                    }
-                }
-            }
-
-
-            .work-item-list {
-                display: flex;
-                flex-direction: column;
-                gap: var(--spacing-sm);
-
-                .work-item {
-                    display: grid;
-                    grid-template-columns: 2fr 2fr 4fr 1fr 1fr;
-                    gap: var(--spacing-xs);
-
-                    .actions {
-                        display: flex;
-                        align-items: center;
-                        flex-wrap: wrap;
-                        gap: var(--spacing-xs);
-                    }
-
-                    &:focus-within {
-                        background-color: var(--color-background);
-                    }
-                }
-            }
-        }
-    }
-
-    .new-work-item-dialog {
-        .modal-content {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-md);
-
-            .task-list {
-                display: flex;
-                flex-direction: column;
-                gap: var(--spacing-sm);
-
-                .task {
-                    display: flex;
-                    gap: var(--spacing-sm);
-                    text-align: left;
-
-                    .details {
-                        flex-grow: 1;
-
-                        .meta {
-                            display: flex;
-                            color: var(--color-text-light);
-                            font-size: var(--font-size-xs);
-                            gap: var(--spacing-sm);
-                        }
-                    }
-
-                    .icon {
-                        flex-shrink: 0;
-                        font-size: var(--font-size-lg);
-                    }
-
-                    &:hover {
-                        background-color: var(--color-background);
-                    }
-                }
-            }
-        }
     }
 }

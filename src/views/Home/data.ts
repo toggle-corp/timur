@@ -4,6 +4,7 @@ import {
     Project,
     Task,
 } from '#utils/types';
+import { listToMap } from '@togglecorp/fujs';
 
 const togglecorp: Client = {
     id: 1,
@@ -204,3 +205,8 @@ export const taskList = [
     nasaAptMaintenance,
     tcManagementMeeting,
 ];
+
+export const clientById = listToMap(clientList, ({ id }) => id);
+export const projectById = listToMap(projectList, ({ id }) => id);
+export const contractById = listToMap(contractList, ({ id }) => id);
+export const taskById = listToMap(taskList, ({ id }) => id);

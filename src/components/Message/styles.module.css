@@ -6,13 +6,14 @@
     justify-content: center;
     opacity: var(--opacity-message);
     background-color: var(--color-foreground);
-    padding: var(--spacing-md);
+    padding: var(--spacing-lg);
     min-height: var(--height-content--min);
     text-align: center;
 
     .icon {
+        line-height: 0;
         color: var(--color-text-light);
-        font-size: 2rem;
+        font-size: 4rem;
 
         .spinner {
             font-size: 2rem;
@@ -21,7 +22,7 @@
 
     .title {
         color: var(--color-text-light);
-        font-size: var(--font-size-2xl);
+        font-size: var(--font-size-lg);
     }
 
     &.errored {
@@ -39,10 +40,10 @@
         }
 
         .icon {
-            font-size: var(--font-size-2xl);
+            font-size: 1rem;
 
             .spinner {
-                font-size: var(--font-size-xl);
+                font-size: 1rem;
             }
         }
     }

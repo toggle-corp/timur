@@ -1,0 +1,11 @@
+.contract-grouped-view {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+
+    .work-item-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-xs);
+    }
+}

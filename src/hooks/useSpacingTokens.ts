@@ -33,17 +33,17 @@ function useSpacingTokens(props: Props) {
     useEffect(
         () => {
             const spacingTokens = [
-                'var(--go-ui-spacing-4xs)',
-                'var(--go-ui-spacing-3xs)',
-                'var(--go-ui-spacing-2xs)',
-                'var(--go-ui-spacing-xs)',
-                'var(--go-ui-spacing-sm)',
-                'var(--go-ui-spacing-md)',
-                'var(--go-ui-spacing-lg)',
-                'var(--go-ui-spacing-xl)',
-                'var(--go-ui-spacing-2xl)',
-                'var(--go-ui-spacing-3xl)',
-                'var(--go-ui-spacing-4xl)',
+                'var(--spacing-4xs)',
+                'var(--spacing-3xs)',
+                'var(--spacing-2xs)',
+                'var(--spacing-xs)',
+                'var(--spacing-sm)',
+                'var(--spacing-md)',
+                'var(--spacing-lg)',
+                'var(--spacing-xl)',
+                'var(--spacing-2xl)',
+                'var(--spacing-3xl)',
+                'var(--spacing-4xl)',
             ] as const;
 
             let spacingValue = '0';

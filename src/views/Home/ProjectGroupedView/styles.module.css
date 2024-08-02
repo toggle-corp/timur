@@ -1,0 +1,20 @@
+.project-grouped-view {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    background-color: var(--color-foreground);
+    padding: var(--spacing-lg);
+
+    .heading-separator {
+        margin: 0;
+        border: none;
+        border-bottom: var(--width-separator-sm) solid var(--color-separator);
+    }
+
+    .contract-grouped-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-md);
+        padding: var(--spacing-sm);
+    }
+}

@@ -30,6 +30,7 @@ export interface Props<
 
     compact?: boolean;
     withoutMessage?: boolean;
+    showSeparator?: boolean;
 }
 
 function List<DATUM, KEY extends ListKey, RENDERER_PROPS>(
@@ -54,6 +55,7 @@ function List<DATUM, KEY extends ListKey, RENDERER_PROPS>(
         compact,
         withoutMessage = false,
         messageClassName,
+        showSeparator,
     } = props;
 
     const isEmpty = isNotDefined(data) || data.length === 0;
@@ -72,6 +74,7 @@ function List<DATUM, KEY extends ListKey, RENDERER_PROPS>(
                 keySelector={keySelector}
                 renderer={renderer}
                 rendererParams={rendererParams}
+                separator={showSeparator && <hr className={styles.separator} />}
             />
             {!withoutMessage && (
                 <DefaultMessage
