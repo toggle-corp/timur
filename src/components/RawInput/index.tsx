@@ -43,7 +43,10 @@ function RawInput<const N>(props: Props<N>) {
 
     const handleFocus: React.FocusEventHandler<HTMLInputElement> = React.useCallback((e) => {
         const input = e.target;
-        input.setSelectionRange(input.value.length, input.value.length);
+        // NOTE: start and end are equal if input is focused by mouse click
+        if (input.selectionStart !== input.selectionEnd) {
+            input.setSelectionRange(input.value.length, input.value.length);
+        }
         if (onFocus) {
             onFocus(e);
         }

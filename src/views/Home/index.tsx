@@ -140,7 +140,11 @@ export function Component() {
 
     const handleCopyTextClick = useCallback(() => {
         function toSubItem(subItem: string | undefined) {
-            return `  - ${subItem ?? '??'}`;
+            const safeSubItem = subItem ?? '??';
+            return safeSubItem
+                .split('\n')
+                .map((item, i) => (i === 0 ? `  - ${item}` : `    ${item}`))
+                .join('\n');
         }
 
         const groupedWorkItems = mapToList(

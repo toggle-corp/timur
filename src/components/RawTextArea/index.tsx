@@ -54,7 +54,12 @@ function RawTextArea<N>(props: Props<N>) {
 
     const handleFocus: React.FocusEventHandler<HTMLTextAreaElement> = React.useCallback((e) => {
         const input = e.target;
-        input.setSelectionRange(input.value.length, input.value.length);
+        // NOTE: By default, the cursor is at the start.
+        // FIXME: This introduces and error if user clicks on the first
+        // character and tries to focus on the input
+        if (input.selectionStart === 0 && input.selectionEnd === 0) {
+            input.setSelectionRange(input.value.length, input.value.length);
+        }
         if (onFocus) {
             onFocus(e);
         }
