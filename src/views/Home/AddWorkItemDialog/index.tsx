@@ -105,6 +105,7 @@ function AddWorkItemDialog(props: Props) {
                             contractObj?.title,
                             projectObj?.title,
                             clientObj?.title,
+                            clientObj?.abbvr,
                         ].filter(isDefined).join(' - ');
                     },
                 ).map((task) => {
