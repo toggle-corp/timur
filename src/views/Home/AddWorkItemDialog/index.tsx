@@ -72,7 +72,7 @@ function AddWorkItemDialog(props: Props) {
         <Dialog
             open={showAddWorkItemDialog}
             onClose={handleModalClose}
-            heading="Add new work item"
+            heading="Add new entry"
             contentClassName={styles.modalContent}
             className={styles.addWorkItemDialog}
             focusElementRef={titleInputRef}

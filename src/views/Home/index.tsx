@@ -7,6 +7,7 @@ import {
 } from 'react';
 import {
     IoChevronBackSharp,
+    IoChevronDown,
     IoChevronForwardSharp,
 } from 'react-icons/io5';
 import {
@@ -47,6 +48,28 @@ function addDays(dateStr: string, numDays: number) {
     return encodeDate(date);
 }
 
+const dateFormatter = new Intl.DateTimeFormat(
+    [],
+    {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        weekday: 'long',
+    },
+);
+
+function useKeybind(callback: (event: KeyboardEvent) => void) {
+    useEffect(
+        () => {
+            document.addEventListener('keydown', callback);
+            return () => {
+                document.removeEventListener('keydown', callback);
+            };
+        },
+        [callback],
+    );
+}
+
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
     const [workItems, setWorkItems] = useState<WorkItem[]>(
@@ -57,6 +80,8 @@ export function Component() {
     const [selectedDate, setSelectedDate] = useState<string | undefined>(
         () => encodeDate(new Date()),
     );
+
+    const dateInputRef = useRef<HTMLInputElement>(null);
 
     const dialogOpenTriggerRef = useRef<(() => void) | undefined>(
         () => () => {
@@ -124,6 +149,27 @@ export function Component() {
         }
     }, []);
 
+    const handleDateClick = useCallback(() => {
+        dateInputRef.current?.showPicker();
+    }, []);
+
+    const formattedDate = dateFormatter.format(
+        selectedDate
+            ? new Date(selectedDate)
+            : undefined,
+    );
+
+    const handleCtrlSpace = useCallback(
+        (event: KeyboardEvent) => {
+            if (event.ctrlKey && event.code === 'Space') {
+                handleAddWorkItemClick();
+            }
+        },
+        [handleAddWorkItemClick],
+    );
+
+    useKeybind(handleCtrlSpace);
+
     return (
         <Page
             documentTitle="Timur - Home"
@@ -132,13 +178,6 @@ export function Component() {
         >
             <div className={styles.pageHeader}>
                 <div className={styles.headerContent}>
-                    <DateInput
-                        // label="Date"
-                        className={styles.dateInput}
-                        name={undefined}
-                        value={selectedDate}
-                        onChange={setSelectedDate}
-                    />
                     {isDefined(selectedDate) && (
                         <Button
                             name={addDays(selectedDate, -1)}
@@ -159,6 +198,22 @@ export function Component() {
                             <IoChevronForwardSharp />
                         </Button>
                     )}
+                    <DateInput
+                        inputElementRef={dateInputRef}
+                        className={styles.dateInput}
+                        name={undefined}
+                        value={selectedDate}
+                        onChange={setSelectedDate}
+                    />
+                    <Button
+                        className={styles.dateButton}
+                        name={undefined}
+                        variant="tertiary"
+                        onClick={handleDateClick}
+                        actions={<IoChevronDown />}
+                    >
+                        {formattedDate}
+                    </Button>
                 </div>
                 <div className={styles.actions}>
                     <Button
@@ -173,7 +228,7 @@ export function Component() {
                         name
                         onClick={handleAddWorkItemClick}
                     >
-                        Add workitem
+                        Add entry
                     </Button>
                 </div>
             </div>

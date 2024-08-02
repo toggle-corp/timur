@@ -149,7 +149,7 @@ function WorkItemRow(props: Props) {
                 onChange={setFieldValue}
                 value={workItem.task}
                 nonClearable
-                autoFocus
+                // autoFocus
                 icons="🧘"
             />
             <SelectInput<WorkItemType, 'type', WorkItemTypeOption, never>

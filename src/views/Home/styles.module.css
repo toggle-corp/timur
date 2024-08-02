@@ -22,10 +22,14 @@
             gap: var(--spacing-sm);
 
             .date-input {
-                input {
-                    font-size: var(--font-size-xl);
-                    font-weight: var(--font-weight-bold);
-                }
+                visibility: hidden;
+                width: 0;
+                height: 0;
+            }
+
+            .date-button {
+                font-size: var(--font-size-2xl);
+                font-weight: var(--font-weight-bold);
             }
         }
 

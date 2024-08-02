@@ -26,6 +26,7 @@ function DateInput<const T>(props: Props<T>) {
         labelClassName,
         required,
         variant,
+        inputElementRef,
         ...otherInputProps
     } = props;
 
@@ -56,6 +57,7 @@ function DateInput<const T>(props: Props<T>) {
                     disabled={disabled}
                     className={inputClassName}
                     type="date"
+                    elementRef={inputElementRef}
                 />
             )}
         />

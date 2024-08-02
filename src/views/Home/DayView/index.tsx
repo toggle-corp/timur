@@ -82,7 +82,24 @@ function DayView(props: Props) {
             keySelector={({ project }) => project.id}
             renderer={ProjectGroupedView}
             rendererParams={rendererParams}
-            emptyMessage="No workitems here!"
+            emptyMessage={(
+                <div className={styles.emptyMessage}>
+                    <div className={styles.title}>
+                        No entries here!
+                    </div>
+                    <div>
+                        Click on
+                        {' '}
+                        <code>Add entry</code>
+                        {' '}
+                        button or hit
+                        {' '}
+                        <code>Ctrl+Space</code>
+                        {' '}
+                        to add a new entry.
+                    </div>
+                </div>
+            )}
         />
     );
 }
