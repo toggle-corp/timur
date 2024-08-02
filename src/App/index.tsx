@@ -67,7 +67,7 @@ function App() {
                                 alt="Timur Icon"
                                 src={timurLogo}
                             />
-                            Timur Loading...
+                            Timur loading...
                         </div>
                     )}
                 />

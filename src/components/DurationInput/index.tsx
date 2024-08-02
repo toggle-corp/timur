@@ -4,13 +4,14 @@ import {
     useId,
     useState,
 } from 'react';
-import {
-    isDefined,
-    isNotDefined,
-} from '@togglecorp/fujs';
+import { isDefined } from '@togglecorp/fujs';
 
 import InputContainer, { Props as InputContainerProps } from '#components/InputContainer';
 import RawInput, { Props as RawInputProps } from '#components/RawInput';
+import {
+    getDurationNumber,
+    getDurationString,
+} from '#utils/common';
 
 type InheritedProps<T> = (Omit<InputContainerProps, 'input' | 'htmlFor'> & Omit<RawInputProps<T>, 'onChange' | 'value' | 'id'>);
 
@@ -25,7 +26,7 @@ export interface Props<T> extends InheritedProps<T> {
   ) => void;
 }
 
-function NumberInput<const T>(props: Props<T>) {
+function DurationInput<const T>(props: Props<T>) {
     const {
         className,
         actions,
@@ -45,33 +46,46 @@ function NumberInput<const T>(props: Props<T>) {
         variant,
         onChange,
         inputElementRef,
+        name,
         ...otherInputProps
     } = props;
 
     const inputId = useId();
 
-    const [tempValue, setTempValue] = useState<string | undefined>(String(valueFromProps ?? ''));
+    // NOTE: We want to re-calculate the tempValue onBlur so we use counter to
+    // reset it
+    const [counter, setCounter] = useState(0);
+
+    const [tempValue, setTempValue] = useState<string | undefined>(
+        isDefined(valueFromProps)
+            ? getDurationString(valueFromProps)
+            : undefined,
+    );
 
     useEffect(() => {
-        setTempValue(String(valueFromProps ?? ''));
-    }, [valueFromProps]);
+        setTempValue(
+            isDefined(valueFromProps)
+                ? getDurationString(valueFromProps)
+                : undefined,
+        );
+    }, [valueFromProps, counter]);
 
-    const handleChange: RawInputProps<T>['onChange'] = useCallback((v, n, e) => {
-        setTempValue(v);
+    const handleChange: RawInputProps<T>['onChange'] = useCallback((v) => {
+        // TODO: Also call onChange if v is valid
+        if (!v || v.match(/^\d{1,2}:?\d{0,2}$/) || v.match(/^\d{1,4}$/)) {
+            setTempValue(v);
+        }
+    }, []);
 
-        if (isNotDefined(onChange)) {
-            return;
+    const handleBlur = useCallback(() => {
+        const newValue = getDurationNumber(tempValue);
+
+        if (newValue !== null && onChange) {
+            onChange(newValue, name);
         }
 
-        if (isDefined(v)) {
-            const floatValue = +v;
-            if (!Number.isNaN(floatValue)) {
-                onChange(floatValue, n, e);
-            }
-        } else {
-            onChange(undefined, n, e);
-        }
-    }, [onChange]);
+        setCounter((oldVal) => (oldVal + 1));
+    }, [name, tempValue, onChange]);
 
     return (
         <InputContainer
@@ -93,13 +107,15 @@ function NumberInput<const T>(props: Props<T>) {
             input={(
                 <RawInput
                     {...otherInputProps} /* eslint-disable-line react/jsx-props-no-spreading */
+                    name={name}
                     id={inputId}
                     readOnly={readOnly}
                     disabled={disabled}
                     className={inputClassName}
                     value={tempValue}
                     onChange={handleChange}
-                    type="number"
+                    onBlur={handleBlur}
+                    type="text"
                     elementRef={inputElementRef}
                 />
             )}
@@ -107,4 +123,4 @@ function NumberInput<const T>(props: Props<T>) {
     );
 }
 
-export default NumberInput;
+export default DurationInput;

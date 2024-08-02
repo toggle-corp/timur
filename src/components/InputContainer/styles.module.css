@@ -3,20 +3,28 @@
     position: relative;
     border: var(--width-separator-md) solid transparent;
     padding: var(--spacing-xs) 0;
-    filter: grayscale(70%);
-
-    &:focus-within {
-        border-color: var(--color-secondary);
-        filter: grayscale(0%);
-    }
 
     .input-section {
-        align-items: center;
+        align-items: baseline;
         border-bottom: var(--width-separator-sm) solid transparent;
         padding: 0 var(--spacing-sm);
 
         .input {
             padding: 0;
+        }
+
+        .icons-container {
+            filter: grayscale(70%);
+        }
+    }
+
+    &:focus-within {
+        border-color: var(--color-secondary);
+
+        .input-section {
+            .icons-container {
+                filter: unset;
+            }
         }
     }
 

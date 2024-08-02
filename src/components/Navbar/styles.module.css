@@ -1,7 +1,14 @@
 .navbar {
+    display: flex;
+    align-items: center;
     box-shadow: var(--box-shadow-md);
     background-color: var(--color-foreground);
     padding: var(--spacing-md);
+    gap: var(--spacing-sm);
+
+    .app-logo {
+        height: 1.4rem;
+    }
 
     .brand {
         color: var(--color-primary);

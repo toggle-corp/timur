@@ -13,9 +13,9 @@ import {
 } from '@togglecorp/fujs';
 
 import Button from '#components/Button';
-import NumberInput from '#components/NumberInput';
+import DurationInput from '#components/DurationInput';
 import SelectInput from '#components/SelectInput';
-import TextInput from '#components/TextInput';
+import TextArea from '#components/TextArea';
 import {
     getNewId,
     numericIdSelector,
@@ -163,7 +163,7 @@ function WorkItemRow(props: Props) {
                 nonClearable
                 icons="📐"
             />
-            <TextInput<'description'>
+            <TextArea<'description'>
                 name="description"
                 title="Description"
                 value={workItem.description}
@@ -171,13 +171,13 @@ function WorkItemRow(props: Props) {
                 icons="🗒️"
                 placeholder="Description"
             />
-            <NumberInput
+            <DurationInput
                 name="hours"
                 title="Hours"
                 value={workItem.hours}
                 onChange={setFieldValue}
                 icons="⏱️"
-                placeholder="hrs"
+                placeholder="hh:mm"
             />
             <div className={styles.actions}>
                 <Button

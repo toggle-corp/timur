@@ -1,11 +1,28 @@
-.raw-input {
-    margin: 0;
-    outline: 0;
-    border: 0;
-    background-color: transparent;
-    padding: 0;
-    width: 100%;
-    color: inherit;
-    font-family: inherit;
-    font-size: inherit;
+.grow-wrap {
+    display: grid;
+
+    &::after {
+        visibility: hidden;
+        white-space: pre-wrap;
+        content: attr(data-replicated-value) " ";
+    }
+
+    .raw-input {
+        margin: 0;
+        outline: 0;
+        border: 0;
+        background-color: transparent;
+        padding: 0;
+        width: 100%;
+        overflow: hidden;
+        resize: none;
+        color: inherit;
+        font-family: inherit;
+        font-size: inherit;
+    }
+
+    .raw-input, &::after {
+        font: inherit;
+        grid-area: 1 / 1 / 2 / 2;
+    }
 }

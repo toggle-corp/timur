@@ -1,6 +1,5 @@
 import {
     useCallback,
-    useEffect,
     useMemo,
     useRef,
     useState,
@@ -16,15 +15,18 @@ import {
     isFalsyString,
     listToGroupList,
     mapToList,
+    sum,
 } from '@togglecorp/fujs';
 
 import Button from '#components/Button';
 import DateInput from '#components/DateInput';
 import Page from '#components/Page';
+import useKeybind from '#hooks/useKeybind';
+import useLocalStorage from '#hooks/useLocalStorage';
 import {
-    getFromStorage,
-    setToStorage,
-} from '#utils/localStorage';
+    addDays,
+    getDurationString,
+} from '#utils/common';
 import { WorkItem } from '#utils/types';
 
 import AddWorkItemDialog from './AddWorkItemDialog';
@@ -41,13 +43,6 @@ const { APP_VERSION } = import.meta.env;
 
 const KEY_DATA_STORAGE = 'timur';
 
-function addDays(dateStr: string, numDays: number) {
-    const date = new Date(dateStr);
-    date.setDate(date.getDate() + numDays);
-
-    return encodeDate(date);
-}
-
 const dateFormatter = new Intl.DateTimeFormat(
     [],
     {
@@ -58,61 +53,90 @@ const dateFormatter = new Intl.DateTimeFormat(
     },
 );
 
-function useKeybind(callback: (event: KeyboardEvent) => void) {
-    useEffect(
-        () => {
-            document.addEventListener('keydown', callback);
-            return () => {
-                document.removeEventListener('keydown', callback);
-            };
-        },
-        [callback],
-    );
-}
+const today = new Date();
+const emptyArray: unknown[] = [];
 
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
-    const [workItems, setWorkItems] = useState<WorkItem[]>(
-        () => getFromStorage<{ appVersion: string, workItems: WorkItem[] }>(
-            KEY_DATA_STORAGE,
-        )?.workItems ?? [],
-    );
-    const [selectedDate, setSelectedDate] = useState<string | undefined>(
-        () => encodeDate(new Date()),
+    const [storedState, setStoredState] = useLocalStorage<{
+        appVersion: string,
+        workItems: WorkItem[],
+
+        configDefaultTaskType: string,
+        configAllowMultipleEntry: boolean;
+    }>(
+        KEY_DATA_STORAGE,
+        {
+            appVersion: APP_VERSION,
+            workItems: [],
+            configDefaultTaskType: 'development',
+            configAllowMultipleEntry: false,
+        },
     );
 
+    const [
+        selectedDate,
+        setSelectedDate,
+    ] = useState<string | undefined>(
+        () => encodeDate(today),
+    );
+
+    // NOTE: We are hiding the native dateinput and triggering calender popup
+    // using a separate button
     const dateInputRef = useRef<HTMLInputElement>(null);
 
+    // NOTE: We are opening the dialog from this parent component
     const dialogOpenTriggerRef = useRef<(() => void) | undefined>(
         () => () => {
             // eslint-disable-next-line no-console
             console.info('Handler not attached');
         });
 
-    const syncTimeoutRef = useRef<number | undefined>();
+    const workItems = storedState.workItems ?? emptyArray;
+    const configDefaultTaskType = storedState.configDefaultTaskType ?? 'development';
+    const configAllowMultipleEntry = storedState.configAllowMultipleEntry ?? false;
 
-    useEffect(() => {
-        function updateLocalstorage() {
-            setToStorage(
-                KEY_DATA_STORAGE,
-                {
-                    appVersion: APP_VERSION,
-                    workItems,
-                },
-            );
-        }
-
-        window.clearTimeout(syncTimeoutRef.current);
-
-        syncTimeoutRef.current = window.setTimeout(
-            updateLocalstorage,
-            500,
-        );
-    }, [workItems]);
+    const setWorkItems: React.Dispatch<React.SetStateAction<WorkItem[]>> = useCallback(
+        (func) => {
+            setStoredState((oldValue) => ({
+                ...oldValue,
+                workItems: typeof func === 'function'
+                    ? func(oldValue.workItems)
+                    : func,
+            }));
+        },
+        [setStoredState],
+    );
+    const setDefaultTaskType: React.Dispatch<React.SetStateAction<string>> = useCallback(
+        (func) => {
+            setStoredState((oldValue) => ({
+                ...oldValue,
+                configDefaultTaskType: typeof func === 'function'
+                    ? func(oldValue.configDefaultTaskType)
+                    : func,
+            }));
+        },
+        [setStoredState],
+    );
+    const setAllowMultipleEntryChange: React.Dispatch<React.SetStateAction<boolean>> = useCallback(
+        (func) => {
+            setStoredState((oldValue) => ({
+                ...oldValue,
+                configAllowMultipleEntry: typeof func === 'function'
+                    ? func(oldValue.configAllowMultipleEntry)
+                    : func,
+            }));
+        },
+        [setStoredState],
+    );
 
     const currentWorkItems = useMemo(() => (
         workItems.filter(({ date }) => date === selectedDate)
     ), [workItems, selectedDate]);
+
+    const totalHours = sum(
+        currentWorkItems.map((item) => item.hours).filter(isDefined),
+    );
 
     const handleCopyTextClick = useCallback(() => {
         function toSubItem(subItem: string | undefined) {
@@ -207,6 +231,7 @@ export function Component() {
                     />
                     <Button
                         className={styles.dateButton}
+                        actionsContainerClassName={styles.buttonActions}
                         name={undefined}
                         variant="tertiary"
                         onClick={handleDateClick}
@@ -214,6 +239,11 @@ export function Component() {
                     >
                         {formattedDate}
                     </Button>
+                    <div>
+                        ⏱️
+                        {' '}
+                        {getDurationString(totalHours)}
+                    </div>
                 </div>
                 <div className={styles.actions}>
                     <Button
@@ -241,6 +271,10 @@ export function Component() {
                 selectedDate={selectedDate}
                 setWorkItems={setWorkItems}
                 dialogOpenTriggerRef={dialogOpenTriggerRef}
+                defaultTaskType={configDefaultTaskType}
+                allowMultipleEntry={configAllowMultipleEntry}
+                onDefaultTaskTypeChange={setDefaultTaskType}
+                onAllowMultipleEntryChange={setAllowMultipleEntryChange}
             />
         </Page>
     );

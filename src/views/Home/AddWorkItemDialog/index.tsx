@@ -32,6 +32,10 @@ interface Props {
     selectedDate: string | undefined;
     setWorkItems: React.Dispatch<React.SetStateAction<WorkItem[]>>;
     dialogOpenTriggerRef: React.MutableRefObject<(() => void) | undefined>;
+    defaultTaskType: string;
+    allowMultipleEntry: boolean;
+    onDefaultTaskTypeChange: React.Dispatch<React.SetStateAction<string>>
+    onAllowMultipleEntryChange: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 function AddWorkItemDialog(props: Props) {
@@ -39,6 +43,10 @@ function AddWorkItemDialog(props: Props) {
         selectedDate,
         setWorkItems,
         dialogOpenTriggerRef,
+        defaultTaskType,
+        allowMultipleEntry,
+        onDefaultTaskTypeChange,
+        onAllowMultipleEntryChange,
     } = props;
 
     const [showAddWorkItemDialog, setShowAddWorkItemDialog] = useState(false);

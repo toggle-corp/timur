@@ -15,13 +15,14 @@ export interface Props<NAME> extends Omit<React.HTMLProps<HTMLInputElement>, 're
         name: NAME,
         e?: React.FormEvent<HTMLInputElement> | undefined,
     ) => void;
-    elementRef?: React.Ref<HTMLInputElement>;
+    elementRef?: React.RefObject<HTMLInputElement>;
 }
 
 function RawInput<const N>(props: Props<N>) {
     const {
         className,
         onChange,
+        onFocus,
         elementRef,
         value,
         name,
@@ -40,6 +41,14 @@ function RawInput<const N>(props: Props<N>) {
         }
     }, [name, onChange]);
 
+    const handleFocus: React.FocusEventHandler<HTMLInputElement> = React.useCallback((e) => {
+        const input = e.target;
+        input.setSelectionRange(input.value.length, input.value.length);
+        if (onFocus) {
+            onFocus(e);
+        }
+    }, [onFocus]);
+
     return (
         <input
             // eslint-disable-next-line react/jsx-props-no-spreading
@@ -53,6 +62,7 @@ function RawInput<const N>(props: Props<N>) {
             name={isDefined(name) ? String(name) : undefined}
             onChange={handleChange}
             value={value ?? ''}
+            onFocus={handleFocus}
         />
     );
 }

@@ -5,6 +5,10 @@
     background-color: unset;
     padding: unset;
     width: 100%;
+    overflow: hidden;
+
+    text-overflow:ellipsis;
+    white-space: nowrap;
     color: inherit;
     font-family: inherit;
     font-size: inherit;

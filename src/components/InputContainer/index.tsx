@@ -67,7 +67,7 @@ function InputContainer(props: Props) {
     } = useBasicLayout({
         className: _cs(styles.inputSection, inputSectionClassName),
         icons,
-        iconsContainerClassName,
+        iconsContainerClassName: _cs(iconsContainerClassName, styles.iconsContainer),
         actions,
         actionsContainerClassName,
         children: input,

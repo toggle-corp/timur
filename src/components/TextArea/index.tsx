@@ -7,7 +7,7 @@ import RawTextArea, { Props as RawTextAreaProps } from '../RawTextArea';
 const BULLET = '•';
 const KEY_ENTER = 'Enter';
 
-type InheritedProps<N> = (Omit<InputContainerProps, 'input'> & Omit<RawTextAreaProps<N>, 'type' | 'id'>);
+type InheritedProps<N> = (Omit<InputContainerProps, 'input' | 'htmlFor'> & Omit<RawTextAreaProps<N>, 'type' | 'id'>);
 export interface Props<T> extends InheritedProps<T> {
   inputElementRef?: React.RefObject<HTMLInputElement>;
   autoBullets?: boolean;
