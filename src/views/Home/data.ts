@@ -12,73 +12,101 @@ const togglecorp: Client = {
     title: 'Togglecorp',
     abbvr: 'TC',
 };
-
 const ifrc: Client = {
     id: 2,
     title: 'International Federation of Red Cross and Red Crescent Societies',
     abbvr: 'IFRC',
 };
-
 const idmc: Client = {
     id: 3,
     title: 'Internal Displacement Monitoring Center',
     abbvr: 'IDMC',
 };
-
-const mapSwipeCommunity: Client = {
+const americanRedCross: Client = {
     id: 4,
-    title: 'MapSwipe Community',
+    title: 'American Red Cross',
+    abbvr: 'ARC',
 };
-
-const deepBoard: Client = {
-    id: 5,
-    title: 'Deep Board',
-};
-
 const devSeed: Client = {
     id: 6,
     title: 'Development Seed',
     abbvr: 'DevSeed',
+};
+const dfs: Client = {
+    id: 7,
+    title: 'Data Friendly Space',
+    abbvr: 'DFS',
+};
+const nasa: Client = {
+    id: 8,
+    title: 'National Aeronautics and Space Administration',
+    abbvr: 'NASA',
 };
 
 export const clientList = [
     togglecorp,
     ifrc,
     idmc,
-    mapSwipeCommunity,
-    deepBoard,
+    americanRedCross,
+    dfs,
     devSeed,
+    dfs,
+    nasa,
 ];
 
 const timur: Project = {
     id: 1,
     title: 'Timur',
     client: togglecorp.id,
+    contractor: togglecorp.id,
 };
 const go: Project = {
     id: 2,
     title: 'GO',
     client: ifrc.id,
+    contractor: dfs.id,
 };
 const helix: Project = {
     id: 3,
     title: 'Helix',
     client: idmc.id,
+    contractor: dfs.id,
 };
 const deep: Project = {
     id: 4,
     title: 'Deep',
-    client: deepBoard.id,
+    client: dfs.id,
+    contractor: dfs.id,
 };
-const nasa: Project = {
+const snwg: Project = {
     id: 5,
-    title: 'NASA',
-    client: devSeed.id,
+    title: 'SNWG',
+    client: nasa.id,
+    contractor: devSeed.id,
 };
-const tcManagement: Project = {
+const tcWork: Project = {
     id: 6,
     title: 'Togglecorp',
     client: togglecorp.id,
+    contractor: togglecorp.id,
+};
+const apt: Project = {
+    id: 7,
+    title: 'APT',
+    client: nasa.id,
+    contractor: devSeed.id,
+};
+const mapSwipe: Project = {
+    id: 8,
+    title: 'MapSwipe',
+    client: americanRedCross.id,
+    contractor: americanRedCross.id,
+};
+const alertHub: Project = {
+    id: 9,
+    title: 'AlertHub',
+    client: ifrc.id,
+    contractor: dfs.id,
 };
 
 export const projectList: Project[] = [
@@ -86,125 +114,260 @@ export const projectList: Project[] = [
     go,
     helix,
     deep,
-    nasa,
-    tcManagement,
+    snwg,
+    tcWork,
+    apt,
+    mapSwipe,
+    alertHub,
 ];
 
+// Contracts
 const timurPhaseOneDevelopment: Contract = {
-    id: 10001,
-    title: 'Development - Phase 1',
+    id: 10101,
+    title: 'MVP-0',
     project: timur.id,
 };
-const goDref: Contract = {
-    id: 11001,
-    title: 'DREF',
+const goTwentyFourQ3: Contract = {
+    id: 10201,
+    title: '2024 Q3',
     project: go.id,
 };
-const goLocalUnits: Contract = {
-    id: 11002,
-    title: 'Local Units',
-    project: go.id,
+const helixSupport: Contract = {
+    id: 10301,
+    title: 'Support and Maintenance',
+    project: helix.id,
 };
-const goGuestUser: Contract = {
-    id: 11003,
-    title: 'Guest User',
-    project: go.id,
+const mapSwipeSupport2024And2025: Contract = {
+    id: 10801,
+    title: 'Support and Maintenance 2024/25',
+    project: mapSwipe.id,
 };
-const opsLearning: Contract = {
-    id: 11004,
-    title: 'Operational Learning',
-    project: go.id,
+const snwgSupportJuly2024November2024: Contract = {
+    id: 10501,
+    title: 'SNWG Support (2024, July-10 to 2024, November 8)',
+    project: snwg.id,
 };
-const goMaintenance: Contract = {
-    id: 11005,
-    title: 'Maintenance',
-    project: go.id,
-};
-const nasaSupportJuly2024November2024: Contract = {
-    id: 15001,
-    title: 'Support (2024, July-10 to 2024, November 8)',
-    project: nasa.id,
+const aptSupportJuly2024November2024: Contract = {
+    id: 10502,
+    title: 'APT Support (2024, July-10 to 2024, November 8)',
+    project: apt.id,
 };
 const tcGeneral: Contract = {
-    id: 16001,
+    id: 10601,
     title: 'TC General',
-    project: tcManagement.id,
+    project: tcWork.id,
+};
+const alertHubPhaseTwo: Contract = {
+    id: 10901,
+    title: 'Phase 2',
+    project: alertHub.id,
+};
+const deepMaintence: Contract = {
+    id: 10401,
+    title: 'Support and maintenance',
+    project: deep.id,
 };
 
-export const contractList = [
+const contractList = [
     timurPhaseOneDevelopment,
-    goDref,
-    goLocalUnits,
-    goGuestUser,
-    opsLearning,
-    goMaintenance,
-    nasaSupportJuly2024November2024,
+    goTwentyFourQ3,
+    helixSupport,
+    mapSwipeSupport2024And2025,
+    snwgSupportJuly2024November2024,
+    aptSupportJuly2024November2024,
     tcGeneral,
+    alertHubPhaseTwo,
+    deepMaintence,
 ];
 
+// TC tasks
+const tcWebsite: Task = {
+    id: 10601001,
+    title: 'Togglecorp Website',
+    contract: tcGeneral.id,
+};
+const tcProjectPortfolio: Task = {
+    id: 10601002,
+    title: 'Project Portfolio',
+    contract: tcGeneral.id,
+};
+
+// Deep tasks
+const deepAnalysisModule: Task = {
+    id: 10401001,
+    title: 'Analysis Module',
+    contract: deepMaintence.id,
+};
+const deepOcr: Task = {
+    id: 10401002,
+    title: 'OCR',
+    contract: deepMaintence.id,
+};
+
+// AlertHub tasks
+const alertHubLogin: Task = {
+    id: 10901001,
+    title: 'Login',
+    contract: alertHubPhaseTwo.id,
+};
+const alertHubSubscription: Task = {
+    id: 10901002,
+    title: 'Subscription',
+    contract: alertHubPhaseTwo.id,
+};
+const alertHubSupport: Task = {
+    id: 10901003,
+    title: 'Support and maintenance',
+    contract: alertHubPhaseTwo.id,
+};
+const alertHubGoogleAnalytics: Task = {
+    id: 10901004,
+    title: 'Google Analytics',
+    contract: alertHubPhaseTwo.id,
+};
+
+// SNWG tasks
+const snwgFargetIntegration: Task = {
+    id: 10501001,
+    title: 'Farget integration',
+    contract: snwgSupportJuly2024November2024.id,
+};
+const snwgAsanaSync: Task = {
+    id: 10501002,
+    title: 'ASANA sync',
+    contract: snwgSupportJuly2024November2024.id,
+};
+const snwgAssessmentCycle: Task = {
+    id: 10501003,
+    title: 'Assessment cycle management',
+    contract: snwgSupportJuly2024November2024.id,
+};
+
+const snwgReportVersion: Task = {
+    id: 10501004,
+    title: 'Report & ReportVersion refactor',
+    contract: snwgSupportJuly2024November2024.id,
+};
+
+// APT tasks
+const aptBugFixes: Task = {
+    id: 10502001,
+    title: 'Bug fixes',
+    contract: aptSupportJuly2024November2024.id,
+};
+
+// Helix tasks
+const helixAwsAccount: Task = {
+    id: 10301001,
+    title: 'AWS accounts',
+    contract: helixSupport.id,
+};
+const helixUpdateTextCases: Task = {
+    id: 10301002,
+    title: 'Update test cases',
+    contract: helixSupport.id,
+};
+
+// MapSwipe tasks
+const mapSwipeAccessibility: Task = {
+    id: 10801001,
+    title: 'Accessibility',
+    contract: mapSwipeSupport2024And2025.id,
+};
+const mapSwipeBugFixes: Task = {
+    id: 10801002,
+    title: 'Bug fixes',
+    contract: mapSwipeSupport2024And2025.id,
+};
+const mapSwipeEnhancements: Task = {
+    id: 10801003,
+    title: 'Enhancements',
+    contract: mapSwipeSupport2024And2025.id,
+};
+
+// Timur tasks
 const timurUi: Task = {
     id: 10001001,
     title: 'User Interface Development',
     contract: timurPhaseOneDevelopment.id,
 };
 
-const goDrefImportTemplate: Task = {
-    id: 11001001,
-    title: 'DREF Application Import Template',
-    contract: goDref.id,
+// GO tasks
+const goCountryPages: Task = {
+    id: 11001,
+    title: 'Country Pages',
+    contract: goTwentyFourQ3.id,
 };
-const goMaintenanceWork: Task = {
-    id: 11001002,
-    title: 'Maintenance',
-    contract: goMaintenance.id,
+const goOpsLearning: Task = {
+    id: 11002,
+    title: 'Ops. Learning',
+    contract: goTwentyFourQ3.id,
 };
-const nasaRgtAssessmentCycle: Task = {
-    id: 15001001,
-    title: 'RGT: Implement Assessment Cycle',
-    contract: nasaSupportJuly2024November2024.id,
+const goDref: Task = {
+    id: 11003,
+    title: 'DREF',
+    contract: goTwentyFourQ3.id,
 };
-const nasaRgtFilter: Task = {
-    id: 15001002,
-    title: 'RGT: Improve Filtering',
-    contract: nasaSupportJuly2024November2024.id,
+const goDrefImport: Task = {
+    id: 11004,
+    title: 'DREF Import',
+    contract: goTwentyFourQ3.id,
 };
-const nasaRgtBugFixes: Task = {
-    id: 15001003,
-    title: 'RGT: Bug fixes',
-    contract: nasaSupportJuly2024November2024.id,
+const goGuestUser: Task = {
+    id: 11005,
+    title: 'Gues User Permission',
+    contract: goTwentyFourQ3.id,
 };
-const nasaRgtMaintenance: Task = {
-    id: 15001004,
-    title: 'RGT: Maintenance',
-    contract: nasaSupportJuly2024November2024.id,
+const goPlaywrightIntegration: Task = {
+    id: 11006,
+    title: 'Playwright Integration',
+    contract: goTwentyFourQ3.id,
 };
-const nasaAptBugFixes: Task = {
-    id: 15002001,
-    title: 'APT: Bug fixes',
-    contract: nasaSupportJuly2024November2024.id,
+const goRiskModule: Task = {
+    id: 11007,
+    title: 'Risk Module',
+    contract: goTwentyFourQ3.id,
 };
-const nasaAptMaintenance: Task = {
-    id: 15002002,
-    title: 'APT: Maintenance',
-    contract: nasaSupportJuly2024November2024.id,
+const goSiteImprovements: Task = {
+    id: 11008,
+    title: 'Site Improvements',
+    contract: goTwentyFourQ3.id,
 };
-const tcManagementMeeting: Task = {
-    id: 16001001,
-    title: 'Management Meeting',
-    contract: tcGeneral.id,
+const goStorybook: Task = {
+    id: 11009,
+    title: 'Storybook',
+    contract: goTwentyFourQ3.id,
 };
 
 export const taskList = [
+    tcWebsite,
+    tcProjectPortfolio,
+    deepAnalysisModule,
+    deepOcr,
+    alertHubLogin,
+    alertHubSubscription,
+    alertHubSupport,
+    alertHubGoogleAnalytics,
+    snwgFargetIntegration,
+    snwgAsanaSync,
+    snwgAssessmentCycle,
+    snwgReportVersion,
+    aptBugFixes,
+    helixAwsAccount,
+    helixUpdateTextCases,
+    mapSwipeAccessibility,
+    mapSwipeBugFixes,
+    mapSwipeEnhancements,
     timurUi,
-    goDrefImportTemplate,
-    goMaintenanceWork,
-    nasaRgtFilter,
-    nasaRgtAssessmentCycle,
-    nasaRgtBugFixes,
-    nasaRgtMaintenance,
-    nasaAptBugFixes,
-    nasaAptMaintenance,
-    tcManagementMeeting,
+    goCountryPages,
+    goOpsLearning,
+    goDref,
+    goDrefImport,
+    goGuestUser,
+    goPlaywrightIntegration,
+    goRiskModule,
+    goSiteImprovements,
+    goStorybook,
 ];
 
 export const clientById = listToMap(clientList, ({ id }) => id);

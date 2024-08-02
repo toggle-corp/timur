@@ -14,6 +14,7 @@ export interface Project {
     id: number;
     title: string;
     client: Client['id'];
+    contractor: Client['id'];
     // clientDetails: Client;
 
     // contracts: Contract[];
