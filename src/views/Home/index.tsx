@@ -249,6 +249,11 @@ export function Component() {
         window.navigator.clipboard.writeText(text);
     }, [groupedWorkItems]);
 
+    const handleModalClose = useCallback(() => {
+        setShowAddWorkItemDialog(false);
+        setSearchText(undefined);
+    }, []);
+
     return (
         <Page
             documentTitle="Timur - Home"
@@ -404,7 +409,7 @@ export function Component() {
             {/* TODO: Move to separate component */}
             <Dialog
                 open={showAddWorkItemDialog}
-                onClose={setShowAddWorkItemDialog}
+                onClose={handleModalClose}
                 heading="Add new work item"
                 contentClassName={styles.modalContent}
                 className={styles.newWorkItemDialog}
@@ -423,7 +428,22 @@ export function Component() {
                     className={styles.taskList}
                 >
                     {/* TODO: useMemo for search, use List form mapping */}
-                    {rankedSearchOnList(taskList, searchText, ({ title }) => title).map((task) => {
+                    {rankedSearchOnList(
+                        taskList,
+                        searchText,
+                        ({ title, contract }) => {
+                            const contractObj = contractById[contract];
+                            const projectObj = projectById[contractObj.project];
+                            const clientObj = clientById[projectObj.client];
+
+                            return [
+                                title,
+                                contractObj?.title,
+                                projectObj?.title,
+                                clientObj?.title,
+                            ].filter(isDefined).join(' - ');
+                        },
+                    ).map((task) => {
                         const contract = contractById[task.contract];
                         const project = projectById[contract.project];
                         const client = clientById[project.client];

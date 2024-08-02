@@ -52,23 +52,23 @@ function Dialog(props: Props) {
             className={_cs(styles.dialog, open && styles.open, className)}
             onClose={handleClose}
         >
-            <header className={styles.header}>
-                <h2 className={styles.heading}>
-                    {heading}
-                </h2>
-                <Button
-                    className={styles.closeButton}
-                    name={false}
-                    onClick={onClose}
-                    title="Close"
-                    variant="tertiary"
-                >
-                    <IoCloseSharp />
-                </Button>
-            </header>
-            <div className={_cs(styles.content, contentClassName)}>
-                {children}
-            </div>
+          <header className={styles.header}>
+              <h2 className={styles.heading}>
+                  {heading}
+              </h2>
+              <Button
+                  className={styles.closeButton}
+                  name={false}
+                  onClick={onClose}
+                  title="Close"
+                  variant="tertiary"
+              >
+                  <IoCloseSharp />
+              </Button>
+          </header>
+          <div className={_cs(styles.content, contentClassName)}>
+              {children}
+          </div>
         </dialog>
     );
 }
