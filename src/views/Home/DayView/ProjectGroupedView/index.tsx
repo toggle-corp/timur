@@ -8,7 +8,7 @@ import {
     WorkItem,
 } from '#utils/types';
 
-import ContractGroupedView, { Props as ContractGroupedViewProps } from '../ContractGroupedView';
+import ContractGroupedView, { Props as ContractGroupedViewProps } from './ContractGroupedView';
 
 import styles from './styles.module.css';
 

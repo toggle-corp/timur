@@ -21,7 +21,7 @@ enum Keys {
 - Handles setting value of focusedKey exclusively
 */
 
-const specialKeys = [Keys.Up, Keys.Down, Keys.Enter, Keys.Backspace];
+const specialKeys = [Keys.Enter, Keys.Backspace];
 
 function getOptionIndex<T, Q extends OptionKey>(
     key: Q | undefined,
@@ -81,7 +81,7 @@ function useKeyboard<T, Q extends OptionKey>(
                 e.stopPropagation();
                 e.preventDefault();
                 onShowOptions();
-            } else if (keyCode === Keys.Enter) {
+            } else if (isOptionsShown && keyCode === Keys.Enter) {
                 if (isDefined(myKey)) {
                     e.stopPropagation();
                     e.preventDefault();
@@ -98,12 +98,12 @@ function useKeyboard<T, Q extends OptionKey>(
                         onEnterWithoutOption();
                     }
                 }
-            } else if (keyCode === Keys.Up) {
+            } else if (isOptionsShown && keyCode === Keys.Up) {
                 e.stopPropagation();
                 e.preventDefault();
                 const newFocusedKey = getNewKey(myKey, 1, options, keySelector);
                 onFocusChange(newFocusedKey ? { key: newFocusedKey } : undefined);
-            } else if (keyCode === Keys.Down) {
+            } else if (isOptionsShown && keyCode === Keys.Down) {
                 e.stopPropagation();
                 e.preventDefault();
                 const newFocusedKey = getNewKey(myKey, -1, options, keySelector);

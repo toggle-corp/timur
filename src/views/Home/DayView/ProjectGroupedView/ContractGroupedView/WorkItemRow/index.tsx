@@ -27,7 +27,7 @@ import {
     WorkItemType,
 } from '#utils/types';
 
-import { taskList } from '../data';
+import { taskList } from '../../../../data';
 
 import styles from './styles.module.css';
 

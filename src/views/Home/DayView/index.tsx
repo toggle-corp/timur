@@ -17,8 +17,7 @@ import {
     projectById,
     taskById,
 } from '../data';
-import ProjectGroupedView, { Props as ProjectGroupedViewProps } from '../ProjectGroupedView';
-
+import ProjectGroupedView, { Props as ProjectGroupedViewProps } from './ProjectGroupedView';
 import styles from './styles.module.css';
 
 interface Props {

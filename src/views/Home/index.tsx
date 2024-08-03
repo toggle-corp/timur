@@ -47,9 +47,9 @@ const dateFormatter = new Intl.DateTimeFormat(
     [],
     {
         year: 'numeric',
-        month: 'long',
+        month: 'short',
         day: 'numeric',
-        weekday: 'long',
+        weekday: 'short',
     },
 );
 

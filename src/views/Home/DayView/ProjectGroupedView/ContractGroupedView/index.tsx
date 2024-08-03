@@ -7,7 +7,7 @@ import {
     WorkItem,
 } from '#utils/types';
 
-import WorkItemRow, { Props as WorkItemRowProps } from '../WorkItemRow';
+import WorkItemRow, { Props as WorkItemRowProps } from './WorkItemRow';
 
 import styles from './styles.module.css';
 
