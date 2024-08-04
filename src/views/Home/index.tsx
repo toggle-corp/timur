@@ -24,6 +24,8 @@ import {
 import Button from '#components/Button';
 import DateInput from '#components/DateInput';
 import Page from '#components/Page';
+import FocusContext from '#contexts/focus';
+import { useFocusManager } from '#hooks/useFocus';
 import useKeybind from '#hooks/useKeybind';
 import useLocalStorage from '#hooks/useLocalStorage';
 import {
@@ -81,6 +83,12 @@ export function Component() {
             configAllowMultipleEntry: false,
         },
     );
+
+    const {
+        focus,
+        register,
+        unregister,
+    } = useFocusManager();
 
     const [
         selectedDate,
@@ -154,21 +162,24 @@ export function Component() {
 
     const handleWorkItemCreate = useCallback(
         (taskId: number) => {
+            const newId = getNewId();
             setWorkItems((oldWorkItems = []) => ([
                 ...oldWorkItems,
                 {
-                    id: getNewId(),
+                    id: newId,
                     task: taskId,
                     type: configDefaultTaskType,
                     date: selectedDate,
                 },
             ]));
+            focus(String(newId));
         },
-        [setWorkItems, selectedDate, configDefaultTaskType],
+        [setWorkItems, selectedDate, configDefaultTaskType, focus],
     );
 
     const handleWorkItemClone = useCallback(
         (workItemId: number) => {
+            const newId = getNewId();
             setWorkItems((oldWorkItems) => {
                 if (isNotDefined(oldWorkItems)) {
                     return oldWorkItems;
@@ -182,7 +193,7 @@ export function Component() {
 
                 const targetItem = {
                     ...oldWorkItems[sourceItemIndex],
-                    id: getNewId(),
+                    id: newId,
                     description: undefined,
                     hours: undefined,
                 };
@@ -192,8 +203,9 @@ export function Component() {
 
                 return newWorkItems;
             });
+            focus(String(newId));
         },
-        [setWorkItems],
+        [setWorkItems, focus],
     );
 
     const handleWorkItemDelete = useCallback(
@@ -319,6 +331,14 @@ export function Component() {
         [currentWorkItems],
     );
 
+    const focusContextValue = useMemo(
+        () => ({
+            register,
+            unregister,
+        }),
+        [register, unregister],
+    );
+
     return (
         <Page
             documentTitle="Timur - Home"
@@ -383,12 +403,16 @@ export function Component() {
                     </Button>
                 </div>
             </div>
-            <DayView
-                workItems={currentWorkItems}
-                onWorkItemClone={handleWorkItemClone}
-                onWorkItemChange={handleWorkItemChange}
-                onWorkItemDelete={handleWorkItemDelete}
-            />
+            <FocusContext.Provider
+                value={focusContextValue}
+            >
+                <DayView
+                    workItems={currentWorkItems}
+                    onWorkItemClone={handleWorkItemClone}
+                    onWorkItemChange={handleWorkItemChange}
+                    onWorkItemDelete={handleWorkItemDelete}
+                />
+            </FocusContext.Provider>
             <AddWorkItemDialog
                 dialogOpenTriggerRef={dialogOpenTriggerRef}
                 workItems={currentWorkItems}

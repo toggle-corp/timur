@@ -12,6 +12,7 @@ import Button from '#components/Button';
 import DurationInput from '#components/DurationInput';
 import SelectInput from '#components/SelectInput';
 import TextArea from '#components/TextArea';
+import { useFocusClient } from '#hooks/useFocus';
 import {
     Contract,
     EntriesAsList,
@@ -62,6 +63,8 @@ function WorkItemRow(props: Props) {
         onChange,
     } = props;
 
+    const inputRef = useFocusClient<HTMLTextAreaElement>(String(workItem.id));
+
     const setFieldValue = useCallback(
         (...entries: EntriesAsList<WorkItem>) => {
             onChange(workItem.id, ...entries);
@@ -100,6 +103,7 @@ function WorkItemRow(props: Props) {
                 icons="📐"
             />
             <TextArea<'description'>
+                elementRef={inputRef}
                 name="description"
                 title="Description"
                 value={workItem.description}

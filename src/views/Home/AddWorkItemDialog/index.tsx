@@ -201,14 +201,14 @@ function AddWorkItemDialog(props: Props) {
                             <div className={styles.details}>
                                 {task.title}
                                 <div className={styles.meta}>
-                                    <div>
-                                        {contract.title}
+                                    <div className={styles.badge}>
+                                        {client.abbvr ?? client.title}
                                     </div>
-                                    <div>
+                                    <div className={styles.badge}>
                                         {project.title}
                                     </div>
-                                    <div>
-                                        {client.title}
+                                    <div className={styles.badge}>
+                                        {contract.title}
                                     </div>
                                 </div>
                             </div>
