@@ -12,14 +12,14 @@ type WorkItemTypeOption = { id: WorkItemType, title: string };
 export const typeOptions: WorkItemTypeOption[] = [
     { id: 'design', title: 'Design' },
     { id: 'development', title: 'Development' },
-    { id: 'qa', title: 'QA' },
     { id: 'devops', title: 'DevOps' },
     { id: 'documentation', title: 'Documentation' },
-    { id: 'meeting', title: 'Meeting' },
     { id: 'internal-discussion', title: 'Internal discussion' },
+    { id: 'meeting', title: 'Meeting' },
+    { id: 'qa', title: 'QA' },
 ];
 
-const togglecorp: Client = {
+const tc: Client = {
     id: 1,
     title: 'Togglecorp',
     abbvr: 'TC',
@@ -34,7 +34,7 @@ const idmc: Client = {
     title: 'Internal Displacement Monitoring Center',
     abbvr: 'IDMC',
 };
-const americanRedCross: Client = {
+const arc: Client = {
     id: 4,
     title: 'American Red Cross',
     abbvr: 'ARC',
@@ -56,10 +56,10 @@ const nasa: Client = {
 };
 
 export const clientList = [
-    togglecorp,
+    tc,
     ifrc,
     idmc,
-    americanRedCross,
+    arc,
     dfs,
     devSeed,
     dfs,
@@ -69,8 +69,8 @@ export const clientList = [
 const timur: Project = {
     id: 1,
     title: 'Timur',
-    client: togglecorp.id,
-    contractor: togglecorp.id,
+    client: tc.id,
+    contractor: tc.id,
 };
 const go: Project = {
     id: 2,
@@ -99,8 +99,8 @@ const snwg: Project = {
 const tcWork: Project = {
     id: 6,
     title: 'Togglecorp',
-    client: togglecorp.id,
-    contractor: togglecorp.id,
+    client: tc.id,
+    contractor: tc.id,
 };
 const apt: Project = {
     id: 7,
@@ -111,8 +111,8 @@ const apt: Project = {
 const mapSwipe: Project = {
     id: 8,
     title: 'MapSwipe',
-    client: americanRedCross.id,
-    contractor: americanRedCross.id,
+    client: arc.id,
+    contractor: arc.id,
 };
 const alertHub: Project = {
     id: 9,
@@ -123,14 +123,14 @@ const alertHub: Project = {
 
 export const projectList: Project[] = [
     timur,
+    tcWork,
     go,
+    alertHub,
     helix,
     deep,
     snwg,
-    tcWork,
     apt,
     mapSwipe,
-    alertHub,
 ];
 
 // Contracts
@@ -352,25 +352,9 @@ const goStorybook: Task = {
 };
 
 export const taskList = [
+    timurUi,
     tcWebsite,
     tcProjectPortfolio,
-    deepAnalysisModule,
-    deepOcr,
-    alertHubLogin,
-    alertHubSubscription,
-    alertHubSupport,
-    alertHubGoogleAnalytics,
-    snwgFargetIntegration,
-    snwgAsanaSync,
-    snwgAssessmentCycle,
-    snwgReportVersion,
-    aptBugFixes,
-    helixAwsAccount,
-    helixUpdateTextCases,
-    mapSwipeAccessibility,
-    mapSwipeBugFixes,
-    mapSwipeEnhancements,
-    timurUi,
     goCountryPages,
     goOpsLearning,
     goDref,
@@ -380,6 +364,22 @@ export const taskList = [
     goRiskModule,
     goSiteImprovements,
     goStorybook,
+    alertHubSubscription,
+    alertHubSupport,
+    alertHubGoogleAnalytics,
+    alertHubLogin,
+    helixAwsAccount,
+    helixUpdateTextCases,
+    deepAnalysisModule,
+    deepOcr,
+    snwgFargetIntegration,
+    snwgAsanaSync,
+    snwgAssessmentCycle,
+    snwgReportVersion,
+    aptBugFixes,
+    mapSwipeAccessibility,
+    mapSwipeBugFixes,
+    mapSwipeEnhancements,
 ];
 
 export const clientById = listToMap(clientList, ({ id }) => id);
