@@ -15,6 +15,13 @@
         display: flex;
         align-items: center;
         flex-wrap: wrap;
+        gap: var(--spacing-sm);
+    }
+
+    .day-header {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
         gap: var(--spacing-md);
 
         .header-content {
@@ -23,18 +30,23 @@
             flex-grow: 1;
             gap: var(--spacing-sm);
 
-            .date-input {
-                visibility: hidden;
-                width: 0;
-                height: 0;
-            }
+            .date-container {
+                display: flex;
+                position: relative;
 
-            .date-button {
-                font-size: var(--font-size-2xl);
-                font-weight: var(--font-weight-bold);
+                .date-input {
+                    position: absolute;
+                    bottom: 0;
+                    visibility: hidden;
+                }
 
-                .button-actions {
-                    font-size: var(--font-size-lg);
+                .date-button {
+                    font-size: var(--font-size-2xl);
+                    font-weight: var(--font-weight-bold);
+
+                    .button-actions {
+                        font-size: var(--font-size-lg);
+                    }
                 }
             }
         }
@@ -51,6 +63,5 @@
         display: flex;
         flex-direction: column;
         gap: var(--spacing-lg);
-        padding: var(--spacing-lg) 0;
     }
 }

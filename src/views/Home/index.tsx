@@ -22,8 +22,8 @@ import {
 } from '@togglecorp/fujs';
 
 import Button from '#components/Button';
-import DateInput from '#components/DateInput';
 import Page from '#components/Page';
+import RawInput from '#components/RawInput';
 import FocusContext from '#contexts/focus';
 import { useFocusManager } from '#hooks/useFocus';
 import useKeybind from '#hooks/useKeybind';
@@ -346,40 +346,56 @@ export function Component() {
             contentClassName={styles.content}
         >
             <div className={styles.pageHeader}>
+                <Button
+                    name={addDays(selectedDate, -1)}
+                    onClick={handleDateSelection}
+                    variant="secondary"
+                    title="Previous day"
+                    spacing="sm"
+                >
+                    <IoChevronBackSharp />
+                </Button>
+                <Button
+                    name={addDays(selectedDate, 1)}
+                    onClick={handleDateSelection}
+                    variant="secondary"
+                    title="Next day"
+                    spacing="sm"
+                >
+                    <IoChevronForwardSharp />
+                </Button>
+                <Button
+                    name={encodeDate(today)}
+                    onClick={handleDateSelection}
+                    variant="secondary"
+                    disabled={selectedDate === encodeDate(today)}
+                    spacing="sm"
+                >
+                    Today
+                </Button>
+            </div>
+            <div className={styles.dayHeader}>
                 <div className={styles.headerContent}>
-                    <Button
-                        name={addDays(selectedDate, -1)}
-                        onClick={handleDateSelection}
-                        variant="secondary"
-                        title="Previous day"
-                    >
-                        <IoChevronBackSharp />
-                    </Button>
-                    <Button
-                        name={addDays(selectedDate, 1)}
-                        onClick={handleDateSelection}
-                        variant="secondary"
-                        title="Next day"
-                    >
-                        <IoChevronForwardSharp />
-                    </Button>
-                    <DateInput
-                        inputElementRef={dateInputRef}
-                        className={styles.dateInput}
-                        name={undefined}
-                        value={selectedDate}
-                        onChange={handleDateSelection}
-                    />
-                    <Button
-                        className={styles.dateButton}
-                        actionsContainerClassName={styles.buttonActions}
-                        name={undefined}
-                        variant="tertiary"
-                        onClick={handleDateButtonClick}
-                        actions={<IoChevronDown />}
-                    >
-                        {formattedDate}
-                    </Button>
+                    <div className={styles.dateContainer}>
+                        <RawInput
+                            elementRef={dateInputRef}
+                            type="date"
+                            className={styles.dateInput}
+                            name={undefined}
+                            value={selectedDate}
+                            onChange={handleDateSelection}
+                        />
+                        <Button
+                            className={styles.dateButton}
+                            actionsContainerClassName={styles.buttonActions}
+                            name={undefined}
+                            variant="tertiary"
+                            onClick={handleDateButtonClick}
+                            actions={<IoChevronDown />}
+                        >
+                            {formattedDate}
+                        </Button>
+                    </div>
                     <div>
                         ⏱️
                         {' '}
