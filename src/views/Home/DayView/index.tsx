@@ -10,7 +10,12 @@ import {
 } from '@togglecorp/fujs';
 
 import List from '#components/List';
-import { WorkItem } from '#utils/types';
+import {
+    Contract,
+    EntriesAsList,
+    Project,
+    WorkItem,
+} from '#utils/types';
 
 import {
     contractById,
@@ -18,25 +23,40 @@ import {
     taskById,
 } from '../data';
 import ProjectGroupedView, { Props as ProjectGroupedViewProps } from './ProjectGroupedView';
+
 import styles from './styles.module.css';
+
+interface ProjectGroupedWorkItem {
+    project: Project,
+    contracts: {
+        contract: Contract,
+        workItems: WorkItem[],
+    }[],
+}
+
+function getId(item: ProjectGroupedWorkItem) {
+    return item.project.id;
+}
 
 interface Props {
     className?: string;
-    date: string | undefined;
     workItems: WorkItem[] | undefined;
-    setWorkItems: React.Dispatch<React.SetStateAction<WorkItem[]>>;
+    onWorkItemClone: (id: number) => void;
+    onWorkItemChange: (id: number, ...entries: EntriesAsList<WorkItem>) => void;
+    onWorkItemDelete: (id: number) => void;
 }
 
 function DayView(props: Props) {
     const {
         className,
-        date,
         workItems,
-        setWorkItems,
+        onWorkItemClone,
+        onWorkItemChange,
+        onWorkItemDelete,
     } = props;
 
     const groupedWorkItems = useMemo(
-        () => {
+        (): ProjectGroupedWorkItem[] | undefined => {
             if (isNotDefined(workItems)) {
                 return undefined;
             }
@@ -45,7 +65,7 @@ function DayView(props: Props) {
                 listToGroupList(
                     mapToList(
                         listToGroupList(
-                            workItems.filter((workItem) => workItem.date === date),
+                            workItems,
                             (workItem) => contractById[taskById[workItem.task].contract].id,
                         ),
                         (list) => ({
@@ -61,15 +81,25 @@ function DayView(props: Props) {
                 }),
             );
         },
-        [workItems, date],
+        [workItems],
     );
 
     type GroupedWorkItem = NonNullable<(typeof groupedWorkItems)>[number];
 
-    const rendererParams = useCallback((_: number, item: GroupedWorkItem) => ({
-        groupedWorkItem: item,
-        setWorkItems,
-    } satisfies ProjectGroupedViewProps), [setWorkItems]);
+    const rendererParams = useCallback(
+        (_: number, item: GroupedWorkItem): ProjectGroupedViewProps => ({
+            contracts: item.contracts,
+            project: item.project,
+            onWorkItemClone,
+            onWorkItemChange,
+            onWorkItemDelete,
+        }),
+        [
+            onWorkItemClone,
+            onWorkItemChange,
+            onWorkItemDelete,
+        ],
+    );
 
     return (
         <List
@@ -78,7 +108,7 @@ function DayView(props: Props) {
             errored={false}
             filtered={false}
             data={groupedWorkItems}
-            keySelector={({ project }) => project.id}
+            keySelector={getId}
             renderer={ProjectGroupedView}
             rendererParams={rendererParams}
             emptyMessage={(

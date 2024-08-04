@@ -6,5 +6,7 @@
     .work-item-list {
         display: flex;
         flex-direction: column;
+        background-color: var(--color-foreground);
+        border-radius: var(--border-radius-lg);
     }
 }

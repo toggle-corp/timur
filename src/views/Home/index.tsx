@@ -1,4 +1,6 @@
 import {
+    type Dispatch,
+    type SetStateAction,
     useCallback,
     useMemo,
     useRef,
@@ -13,6 +15,7 @@ import {
     encodeDate,
     isDefined,
     isFalsyString,
+    isNotDefined,
     listToGroupList,
     mapToList,
     sum,
@@ -26,8 +29,12 @@ import useLocalStorage from '#hooks/useLocalStorage';
 import {
     addDays,
     getDurationString,
+    getNewId,
 } from '#utils/common';
-import { WorkItem } from '#utils/types';
+import {
+    EntriesAsList,
+    WorkItem,
+} from '#utils/types';
 
 import AddWorkItemDialog from './AddWorkItemDialog';
 import {
@@ -84,19 +91,16 @@ export function Component() {
     // NOTE: We are hiding the native dateinput and triggering calender popup
     // using a separate button
     const dateInputRef = useRef<HTMLInputElement>(null);
-
     // NOTE: We are opening the dialog from this parent component
-    const dialogOpenTriggerRef = useRef<(() => void) | undefined>(
-        () => () => {
-            // eslint-disable-next-line no-console
-            console.info('Handler not attached');
-        });
+    const dialogOpenTriggerRef = useRef<(() => void) | undefined>();
 
+    // Read state from the stored state
     const workItems = storedState.workItems ?? emptyArray;
     const configDefaultTaskType = storedState.configDefaultTaskType ?? 'development';
     const configAllowMultipleEntry = storedState.configAllowMultipleEntry ?? false;
 
-    const setWorkItems: React.Dispatch<React.SetStateAction<WorkItem[]>> = useCallback(
+    // Write to stored state
+    const setWorkItems: Dispatch<SetStateAction<WorkItem[]>> = useCallback(
         (func) => {
             setStoredState((oldValue) => ({
                 ...oldValue,
@@ -107,7 +111,7 @@ export function Component() {
         },
         [setStoredState],
     );
-    const setDefaultTaskType: React.Dispatch<React.SetStateAction<string>> = useCallback(
+    const setDefaultTaskType: Dispatch<SetStateAction<string>> = useCallback(
         (func) => {
             setStoredState((oldValue) => ({
                 ...oldValue,
@@ -118,7 +122,7 @@ export function Component() {
         },
         [setStoredState],
     );
-    const setAllowMultipleEntryChange: React.Dispatch<React.SetStateAction<boolean>> = useCallback(
+    const setAllowMultipleEntryChange: Dispatch<SetStateAction<boolean>> = useCallback(
         (func) => {
             setStoredState((oldValue) => ({
                 ...oldValue,
@@ -130,64 +134,145 @@ export function Component() {
         [setStoredState],
     );
 
-    const currentWorkItems = useMemo(() => (
-        workItems.filter(({ date }) => date === selectedDate)
-    ), [workItems, selectedDate]);
-
-    const totalHours = sum(
-        currentWorkItems.map((item) => item.hours).filter(isDefined),
+    const currentWorkItems = useMemo(
+        () => (
+            workItems.filter(({ date }) => date === selectedDate)
+        ),
+        [workItems, selectedDate],
     );
 
-    const handleCopyTextClick = useCallback(() => {
-        function toSubItem(subItem: string | undefined) {
-            const safeSubItem = subItem ?? '??';
-            return safeSubItem
-                .split('\n')
-                .map((item, i) => (i === 0 ? `  - ${item}` : `    ${item}`))
-                .join('\n');
-        }
+    const handleWorkItemClone = useCallback(
+        (workItemId: number) => {
+            setWorkItems((oldWorkItems) => {
+                if (isNotDefined(oldWorkItems)) {
+                    return oldWorkItems;
+                }
 
-        const groupedWorkItems = mapToList(
-            listToGroupList(
-                currentWorkItems,
-                (workItem) => contractById[taskById[workItem.task].contract].project,
-            ),
-            (list, projectId) => ({
-                project: projectById[Number(projectId)],
-                workItems: list,
-            }),
-        );
+                const sourceItemIndex = oldWorkItems
+                    .findIndex(({ id }) => workItemId === id);
+                if (sourceItemIndex === -1) {
+                    return oldWorkItems;
+                }
 
-        const text = groupedWorkItems.map((projectGrouped) => {
-            const { project, workItems: projectWorkItems } = projectGrouped;
+                const targetItem = {
+                    ...oldWorkItems[sourceItemIndex],
+                    id: getNewId(),
+                    description: undefined,
+                    hours: undefined,
+                };
 
-            return `- ${project.title}\n${projectWorkItems.map((workItem) => toSubItem(workItem.description)).join('\n')}`;
-        }).join('\n');
+                const newWorkItems = [...oldWorkItems];
+                newWorkItems.splice(sourceItemIndex + 1, 0, targetItem);
 
-        if (isFalsyString(text)) {
-            return;
-        }
-
-        window.navigator.clipboard.writeText(text);
-    }, [currentWorkItems]);
-
-    const handleAddWorkItemClick = useCallback(() => {
-        if (dialogOpenTriggerRef.current) {
-            dialogOpenTriggerRef.current();
-        }
-    }, []);
-
-    const handleDateClick = useCallback(() => {
-        dateInputRef.current?.showPicker();
-    }, []);
-
-    const formattedDate = dateFormatter.format(
-        selectedDate
-            ? new Date(selectedDate)
-            : undefined,
+                return newWorkItems;
+            });
+        },
+        [setWorkItems],
     );
 
-    const handleCtrlSpace = useCallback(
+    const handleWorkItemDelete = useCallback(
+        (workItemId: number) => {
+            setWorkItems((oldWorkItems) => {
+                if (isNotDefined(oldWorkItems)) {
+                    return oldWorkItems;
+                }
+
+                const sourceItemIndex = oldWorkItems
+                    .findIndex(({ id }) => workItemId === id);
+                if (sourceItemIndex === -1) {
+                    return oldWorkItems;
+                }
+
+                const newWorkItems = [...oldWorkItems];
+                newWorkItems.splice(sourceItemIndex, 1);
+
+                return newWorkItems;
+            });
+        },
+        [setWorkItems],
+    );
+
+    const handleWorkItemChange = useCallback(
+        (workItemId: number, ...entries: EntriesAsList<WorkItem>) => {
+            setWorkItems((oldWorkItems) => {
+                if (isNotDefined(oldWorkItems)) {
+                    return oldWorkItems;
+                }
+
+                const sourceItemIndex = oldWorkItems
+                    .findIndex(({ id }) => workItemId === id);
+                if (sourceItemIndex === -1) {
+                    return oldWorkItems;
+                }
+
+                const obsoleteWorkItem = oldWorkItems[sourceItemIndex];
+
+                const newWorkItems = [...oldWorkItems];
+                newWorkItems.splice(
+                    sourceItemIndex,
+                    1,
+                    { ...obsoleteWorkItem, [entries[1]]: entries[0] },
+                );
+
+                return newWorkItems;
+            });
+        },
+        [setWorkItems],
+    );
+
+    const handleCopyTextButtonClick = useCallback(
+        () => {
+            function toSubItem(subItem: string | undefined) {
+                const safeSubItem = subItem ?? '??';
+                return safeSubItem
+                    .split('\n')
+                    .map((item, i) => (i === 0 ? `  - ${item}` : `    ${item}`))
+                    .join('\n');
+            }
+
+            const groupedWorkItems = mapToList(
+                listToGroupList(
+                    currentWorkItems,
+                    (workItem) => contractById[taskById[workItem.task].contract].project,
+                ),
+                (list, projectId) => ({
+                    project: projectById[Number(projectId)],
+                    workItems: list,
+                }),
+            );
+
+            const text = groupedWorkItems.map((projectGrouped) => {
+                const { project, workItems: projectWorkItems } = projectGrouped;
+
+                return `- ${project.title}\n${projectWorkItems.map((workItem) => toSubItem(workItem.description)).join('\n')}`;
+            }).join('\n');
+
+            if (isFalsyString(text)) {
+                return;
+            }
+
+            window.navigator.clipboard.writeText(text);
+        },
+        [currentWorkItems],
+    );
+
+    const handleAddWorkItemClick = useCallback(
+        () => {
+            if (dialogOpenTriggerRef.current) {
+                dialogOpenTriggerRef.current();
+            }
+        },
+        [],
+    );
+
+    const handleDateButtonClick = useCallback(
+        () => {
+            dateInputRef.current?.showPicker();
+        },
+        [],
+    );
+
+    const handleCtrlSpacePress = useCallback(
         (event: KeyboardEvent) => {
             if (event.ctrlKey && event.code === 'Space') {
                 handleAddWorkItemClick();
@@ -196,7 +281,18 @@ export function Component() {
         [handleAddWorkItemClick],
     );
 
-    useKeybind(handleCtrlSpace);
+    useKeybind(handleCtrlSpacePress);
+
+    const formattedDate = dateFormatter.format(
+        selectedDate ? new Date(selectedDate) : undefined,
+    );
+
+    const totalHours = useMemo(
+        () => (
+            sum(currentWorkItems.map((item) => item.hours).filter(isDefined))
+        ),
+        [currentWorkItems],
+    );
 
     return (
         <Page
@@ -238,7 +334,7 @@ export function Component() {
                         actionsContainerClassName={styles.buttonActions}
                         name={undefined}
                         variant="tertiary"
-                        onClick={handleDateClick}
+                        onClick={handleDateButtonClick}
                         actions={<IoChevronDown />}
                     >
                         {formattedDate}
@@ -252,7 +348,7 @@ export function Component() {
                 <div className={styles.actions}>
                     <Button
                         name={undefined}
-                        onClick={handleCopyTextClick}
+                        onClick={handleCopyTextButtonClick}
                         variant="secondary"
                         disabled={currentWorkItems.length === 0}
                     >
@@ -267,9 +363,10 @@ export function Component() {
                 </div>
             </div>
             <DayView
-                date={selectedDate}
-                workItems={workItems}
-                setWorkItems={setWorkItems}
+                workItems={currentWorkItems}
+                onWorkItemClone={handleWorkItemClone}
+                onWorkItemChange={handleWorkItemChange}
+                onWorkItemDelete={handleWorkItemDelete}
             />
             <AddWorkItemDialog
                 selectedDate={selectedDate}

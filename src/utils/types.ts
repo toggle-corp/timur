@@ -1,3 +1,7 @@
+export type EntriesAsList<T> = {
+    [K in keyof T]-?: [T[K], K, ...unknown[]];
+}[keyof T];
+
 export type SpacingType = 'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 export type SpacingVariant = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 

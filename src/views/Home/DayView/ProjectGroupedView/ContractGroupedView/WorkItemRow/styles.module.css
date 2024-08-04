@@ -11,9 +11,11 @@
         padding: var(--spacing-xs);
     }
 
+    /*
     &:focus-within {
         background-color: var(--color-background);
     }
+    */
 
     @media screen and (max-width: 60rem) {
         grid-template-columns: auto;

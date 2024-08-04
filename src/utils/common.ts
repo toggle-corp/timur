@@ -9,11 +9,13 @@ export function getNewId() {
     return Math.round(Math.random() * 9999999);
 }
 
-export function numericIdSelector({ id }: { id: number }) {
+export function numericIdSelector<T extends { id: number }>({ id }: T) {
     return id;
 }
-
-export function stringTitleSelector({ title }: { title: string }) {
+export function stringIdSelector<Q extends string, T extends { id: Q }>({ id }: T) {
+    return id;
+}
+export function stringTitleSelector<T extends { title: string }>({ title }: T) {
     return title;
 }
 

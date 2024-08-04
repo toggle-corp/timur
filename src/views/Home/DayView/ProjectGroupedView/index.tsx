@@ -4,6 +4,7 @@ import { _cs } from '@togglecorp/fujs';
 import List from '#components/List';
 import {
     Contract,
+    EntriesAsList,
     Project,
     WorkItem,
 } from '#utils/types';
@@ -12,50 +13,63 @@ import ContractGroupedView, { Props as ContractGroupedViewProps } from './Contra
 
 import styles from './styles.module.css';
 
+type ContractGroupedWorkItem = {
+    contract: Contract;
+    workItems: WorkItem[];
+};
+
+function getId(item: ContractGroupedWorkItem) {
+    return item.contract.id;
+}
+
 export interface Props {
     className?: string;
-    groupedWorkItem: {
-        project: Project;
-        contracts: {
-            contract: Contract;
-            workItems: WorkItem[];
-        }[];
-    };
-    setWorkItems: React.Dispatch<React.SetStateAction<WorkItem[]>>;
+    project: Project;
+    contracts: ContractGroupedWorkItem[];
+    onWorkItemClone: (id: number) => void;
+    onWorkItemChange: (id: number, ...entries: EntriesAsList<WorkItem>) => void;
+    onWorkItemDelete: (id: number) => void;
 }
 
 function ProjectGroupedView(props: Props) {
     const {
         className,
-        groupedWorkItem,
-        setWorkItems,
+        project,
+        contracts,
+        onWorkItemClone,
+        onWorkItemChange,
+        onWorkItemDelete,
     } = props;
 
-    type ContractGroupedWorkItem = (typeof groupedWorkItem)['contracts'][number];
-
-    const rendererParams = useCallback((_: number, item: ContractGroupedWorkItem) => ({
-        groupedWorkItem: item,
-        setWorkItems,
-    } satisfies ContractGroupedViewProps), [setWorkItems]);
+    const rendererParams = useCallback(
+        (_: number, item: ContractGroupedWorkItem): ContractGroupedViewProps => ({
+            project,
+            contract: item.contract,
+            workItems: item.workItems,
+            onWorkItemClone,
+            onWorkItemChange,
+            onWorkItemDelete,
+        }),
+        [
+            project,
+            onWorkItemClone,
+            onWorkItemChange,
+            onWorkItemDelete,
+        ],
+    );
 
     return (
-        <div className={_cs(styles.projectGroupedView, className)}>
-            <h2>
-                {groupedWorkItem.project.title}
-            </h2>
-            <hr className={styles.headingSeparator} />
-            <List
-                className={styles.contractGroupedList}
-                pending={false}
-                errored={false}
-                filtered={false}
-                data={groupedWorkItem.contracts}
-                keySelector={({ contract }) => contract.id}
-                renderer={ContractGroupedView}
-                rendererParams={rendererParams}
-                compact
-            />
-        </div>
+        <List
+            className={_cs(styles.contractGroupedList, className)}
+            pending={false}
+            errored={false}
+            filtered={false}
+            data={contracts}
+            keySelector={getId}
+            renderer={ContractGroupedView}
+            rendererParams={rendererParams}
+            compact
+        />
     );
 }
 

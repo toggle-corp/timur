@@ -2,8 +2,11 @@ import { useCallback } from 'react';
 import { _cs } from '@togglecorp/fujs';
 
 import List from '#components/List';
+import { numericIdSelector } from '#utils/common';
 import {
     Contract,
+    EntriesAsList,
+    Project,
     WorkItem,
 } from '#utils/types';
 
@@ -13,38 +16,55 @@ import styles from './styles.module.css';
 
 export interface Props {
     className?: string;
-    groupedWorkItem: {
-        contract: Contract;
-        workItems: WorkItem[];
-    };
-    setWorkItems: React.Dispatch<React.SetStateAction<WorkItem[]>>;
+    contract: Contract;
+    project: Project;
+    workItems: WorkItem[];
+    onWorkItemClone: (id: number) => void;
+    onWorkItemChange: (id: number, ...entries: EntriesAsList<WorkItem>) => void;
+    onWorkItemDelete: (id: number) => void;
 }
 
 function ContractGroupedView(props: Props) {
     const {
         className,
-        groupedWorkItem,
-        setWorkItems,
+        contract,
+        project,
+        workItems,
+        onWorkItemClone,
+        onWorkItemChange,
+        onWorkItemDelete,
     } = props;
 
-    const rendererParams = useCallback((_: number, item: WorkItem) => ({
-        workItem: item,
-        setWorkItems,
-        contract: groupedWorkItem.contract,
-    } satisfies WorkItemRowProps), [setWorkItems, groupedWorkItem]);
+    const rendererParams = useCallback(
+        (_: number, item: WorkItem): WorkItemRowProps => ({
+            workItem: item,
+            onClone: onWorkItemClone,
+            onChange: onWorkItemChange,
+            onDelete: onWorkItemDelete,
+            contract,
+        }),
+        [
+            onWorkItemClone,
+            onWorkItemChange,
+            onWorkItemDelete,
+            contract,
+        ],
+    );
 
     return (
         <div className={_cs(styles.contractGroupedView, className)}>
             <h3>
-                {groupedWorkItem.contract.title}
+                {project.title}
+                {' › '}
+                {contract.title}
             </h3>
             <List
                 className={styles.workItemList}
                 pending={false}
                 errored={false}
                 filtered={false}
-                data={groupedWorkItem.workItems}
-                keySelector={({ id }) => id}
+                data={workItems}
+                keySelector={numericIdSelector}
                 renderer={WorkItemRow}
                 rendererParams={rendererParams}
                 compact

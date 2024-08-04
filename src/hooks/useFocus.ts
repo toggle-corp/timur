@@ -1,4 +1,10 @@
-import { useEffect, useRef, useContext, useCallback } from 'react';
+import {
+    useCallback,
+    useContext,
+    useEffect,
+    useRef,
+} from 'react';
+
 import FocusContext from '#contexts/focus';
 
 export function useFocusManager() {
@@ -25,7 +31,7 @@ export function useFocusManager() {
 
     const unregister = useCallback(
         (key: string) => {
-            delete data.current[key]
+            delete data.current[key];
         },
         [],
     );
@@ -34,7 +40,7 @@ export function useFocusManager() {
         focus,
         register,
         unregister,
-    }
+    };
 }
 
 export function useFocusClient(key: string) {
@@ -46,9 +52,9 @@ export function useFocusClient(key: string) {
             register(key, inputRef);
             return () => {
                 unregister(key);
-            }
+            };
         },
-        [key],
+        [key, register, unregister],
     );
 
     return inputRef;
