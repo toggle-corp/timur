@@ -13,31 +13,34 @@ import DurationInput from '#components/DurationInput';
 import SelectInput from '#components/SelectInput';
 import TextArea from '#components/TextArea';
 import {
-    numericIdSelector,
-    stringIdSelector,
-    stringTitleSelector,
-} from '#utils/common';
-import {
     Contract,
     EntriesAsList,
+    Task,
     WorkItem,
     WorkItemType,
 } from '#utils/types';
 
-import { taskList } from '../../../../data';
+import {
+    taskList,
+    typeOptions,
+} from '../../../../data';
 
 import styles from './styles.module.css';
 
 type WorkItemTypeOption = { id: WorkItemType, title: string };
-const typeOptions: WorkItemTypeOption[] = [
-    { id: 'design', title: 'Design' },
-    { id: 'development', title: 'Development' },
-    { id: 'qa', title: 'QA' },
-    { id: 'devops', title: 'DevOps' },
-    { id: 'documentation', title: 'Documentation' },
-    { id: 'meeting', title: 'Meeting' },
-    { id: 'internal-discussion', title: 'Internal discussion' },
-];
+
+function taskKeySelector(item: Task) {
+    return item.id;
+}
+function taskLabelSelector(item: Task) {
+    return item.title;
+}
+function workItemTypeKeySelector(item: WorkItemTypeOption) {
+    return item.id;
+}
+function workItemTypeLabelSelector(item: WorkItemTypeOption) {
+    return item.title;
+}
 
 export interface Props {
     className?: string;
@@ -79,19 +82,18 @@ function WorkItemRow(props: Props) {
             <SelectInput
                 name="task"
                 options={taskListByContract}
-                keySelector={numericIdSelector}
-                labelSelector={stringTitleSelector}
+                keySelector={taskKeySelector}
+                labelSelector={taskLabelSelector}
                 onChange={setFieldValue}
                 value={workItem.task}
                 nonClearable
                 icons="🧘"
             />
-            <SelectInput<WorkItemType, 'type', WorkItemTypeOption, never>
+            <SelectInput
                 name="type"
-                // title="Type"
                 options={typeOptions}
-                keySelector={stringIdSelector}
-                labelSelector={stringTitleSelector}
+                keySelector={workItemTypeKeySelector}
+                labelSelector={workItemTypeLabelSelector}
                 onChange={setFieldValue}
                 value={workItem.type}
                 nonClearable

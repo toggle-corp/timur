@@ -82,8 +82,6 @@ function DayView(props: Props) {
         [workItems],
     );
 
-    console.warn(groupedWorkItems);
-
     type GroupedWorkItem = NonNullable<(typeof groupedWorkItems)>[number];
 
     const rendererParams = useCallback(

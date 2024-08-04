@@ -1,11 +1,15 @@
-import { useCallback, useMemo } from 'react';
-import { _cs, sum, isDefined } from '@togglecorp/fujs';
+import {
+    useCallback,
+    useMemo,
+} from 'react';
+import {
+    _cs,
+    isDefined,
+    sum,
+} from '@togglecorp/fujs';
 
 import List from '#components/List';
-import {
-    numericIdSelector,
-    getDurationString,
-} from '#utils/common';
+import { getDurationString } from '#utils/common';
 import {
     Contract,
     EntriesAsList,
@@ -16,6 +20,10 @@ import {
 import WorkItemRow, { Props as WorkItemRowProps } from './WorkItemRow';
 
 import styles from './styles.module.css';
+
+function keySelector(item: WorkItem) {
+    return item.id;
+}
 
 export interface Props {
     className?: string;
@@ -81,7 +89,7 @@ function ContractGroupedView(props: Props) {
                 errored={false}
                 filtered={false}
                 data={workItems}
-                keySelector={numericIdSelector}
+                keySelector={keySelector}
                 renderer={WorkItemRow}
                 rendererParams={rendererParams}
                 compact

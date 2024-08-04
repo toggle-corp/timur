@@ -1,13 +1,15 @@
 import {
     RefObject,
     useCallback,
-    useEffect,
+    useLayoutEffect,
+    useMemo,
     useRef,
 } from 'react';
 import { IoCloseSharp } from 'react-icons/io5';
 import { _cs } from '@togglecorp/fujs';
 
 import Button from '#components/Button';
+import DialogContext from '#contexts/dialog';
 
 import styles from './styles.module.css';
 
@@ -18,6 +20,8 @@ export interface Props {
     children: React.ReactNode;
     heading?: React.ReactNode;
     contentClassName?: string;
+
+    mode?: 'right' | 'center';
 
     focusElementRef?: RefObject<HTMLElement>;
 }
@@ -31,11 +35,12 @@ function Dialog(props: Props) {
         heading,
         contentClassName,
         focusElementRef,
+        mode = 'center',
     } = props;
 
     const dialogRef = useRef<HTMLDialogElement>(null);
 
-    useEffect(
+    useLayoutEffect(
         () => {
             if (open) {
                 dialogRef.current?.showModal();
@@ -47,34 +52,55 @@ function Dialog(props: Props) {
         [open, focusElementRef],
     );
 
+    const contextValue = useMemo(
+        () => ({
+            dialogRef,
+        }),
+        [],
+    );
+
     const handleClose = useCallback(() => {
         onClose(false);
     }, [onClose]);
 
     return (
-        <dialog
-            ref={dialogRef}
-            className={_cs(styles.dialog, open && styles.open, className)}
-            onClose={handleClose}
+        <DialogContext.Provider
+            value={contextValue}
         >
-            <header className={styles.header}>
-                <h2 className={styles.heading}>
-                    {heading}
-                </h2>
-                <Button
-                    className={styles.closeButton}
-                    name={false}
-                    onClick={onClose}
-                    title="Close"
-                    variant="tertiary"
-                >
-                    <IoCloseSharp />
-                </Button>
-            </header>
-            <div className={_cs(styles.content, contentClassName)}>
-                {children}
-            </div>
-        </dialog>
+            <dialog
+                ref={dialogRef}
+                className={_cs(
+                    className,
+                    styles.dialog,
+                    open && styles.open,
+                    mode === 'right' && styles.rightMode,
+                    mode === 'center' && styles.centerMode,
+                )}
+                onClose={handleClose}
+            >
+                {open && (
+                    <>
+                        <header className={styles.header}>
+                            <h2 className={styles.heading}>
+                                {heading}
+                            </h2>
+                            <Button
+                                className={styles.closeButton}
+                                name={false}
+                                onClick={onClose}
+                                title="Close"
+                                variant="tertiary"
+                            >
+                                <IoCloseSharp />
+                            </Button>
+                        </header>
+                        <div className={_cs(styles.content, contentClassName)}>
+                            {children}
+                        </div>
+                    </>
+                )}
+            </dialog>
+        </DialogContext.Provider>
     );
 }
 

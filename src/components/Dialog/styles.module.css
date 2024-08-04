@@ -1,8 +1,4 @@
 .dialog {
-    right: 0;
-    left: unset;
-    margin: auto 0;
-
     &.open {
         display: flex;
         flex-direction: column;
@@ -10,9 +6,6 @@
         box-shadow: var(--box-shadow-xl);
         background-color: var(--color-foreground);
         padding: var(--spacing-md);
-        width: 40rem;
-        height: 100vh;
-        max-height: unset;
         overflow: auto;
         gap: var(--spacing-md);
 
@@ -37,6 +30,21 @@
         &::backdrop {
             background-color: rgba(0, 0, 0, 0.5);
         }
+    }
+
+    &.right-mode {
+        right: 0;
+        left: unset;
+        margin: auto 0;
+        width: 40rem;
+        height: 100vh;
+        max-height: unset;
+    }
+
+    &.center-mode {
+        border-radius: var(--border-radius-lg);
+        width: 60rem;
+        height: 70vh;
     }
 }
 

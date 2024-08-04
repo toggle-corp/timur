@@ -2,21 +2,31 @@ import { createPortal } from 'react-dom';
 
 export interface Props {
     portalKey?: string;
-    container?: Element | DocumentFragment;
+    container?: React.RefObject<Element | DocumentFragment>;
     children: React.ReactNode;
 }
 
 function Portal(props: Props) {
     const {
         children,
-        container = document.body,
+        container,
         portalKey,
     } = props;
+
+    const ref = container
+        ? container.current
+        : document.body;
+
+    // NOTE: Should we instead just use document.body?
+    if (!ref) {
+        return null;
+    }
+
     return (
         <>
             {createPortal(
                 children,
-                container,
+                ref,
                 portalKey,
             )}
         </>

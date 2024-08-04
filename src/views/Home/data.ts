@@ -5,7 +5,19 @@ import {
     Contract,
     Project,
     Task,
+    WorkItemType,
 } from '#utils/types';
+
+type WorkItemTypeOption = { id: WorkItemType, title: string };
+export const typeOptions: WorkItemTypeOption[] = [
+    { id: 'design', title: 'Design' },
+    { id: 'development', title: 'Development' },
+    { id: 'qa', title: 'QA' },
+    { id: 'devops', title: 'DevOps' },
+    { id: 'documentation', title: 'Documentation' },
+    { id: 'meeting', title: 'Meeting' },
+    { id: 'internal-discussion', title: 'Internal discussion' },
+];
 
 const togglecorp: Client = {
     id: 1,

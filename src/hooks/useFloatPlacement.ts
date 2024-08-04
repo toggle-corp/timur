@@ -1,6 +1,6 @@
 import {
     useCallback,
-    useEffect,
+    useLayoutEffect,
     useState,
 } from 'react';
 import {
@@ -17,11 +17,6 @@ const VERTICAL_OFFSET = 0.5 * ONE_REM;
 type Orientation = {
     vertical: 'top' | 'bottom';
     horizontal: 'left' | 'right';
-};
-
-const defaultOrientation: Orientation = {
-    vertical: 'bottom',
-    horizontal: 'right',
 };
 
 function getPreferredOrientation(position: DOMRect): Orientation {
@@ -44,13 +39,6 @@ interface Placement {
     bottom: string;
 }
 
-const defaultPlacement: Placement = {
-    top: 'unset',
-    left: 'unset',
-    right: 'unset',
-    bottom: 'unset',
-};
-
 function useFloatPlacement(
     parentRef: React.RefObject<HTMLElement | undefined>,
     preferredWidth?: number,
@@ -60,12 +48,7 @@ function useFloatPlacement(
         pointer: Placement,
         width: string,
         orientation: Orientation,
-    }>({
-        content: defaultPlacement,
-        pointer: defaultPlacement,
-        width: 'auto',
-        orientation: defaultOrientation,
-    });
+    } | undefined>();
 
     const calculatePlacement = useCallback(() => {
         if (isNotDefined(parentRef.current)) {
@@ -131,7 +114,7 @@ function useFloatPlacement(
         });
     }, [parentRef, preferredWidth]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         calculatePlacement();
         // TODO: throttle and debounce callbacks
         const handleScroll = calculatePlacement;

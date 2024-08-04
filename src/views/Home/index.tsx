@@ -34,6 +34,7 @@ import {
 import {
     EntriesAsList,
     WorkItem,
+    WorkItemType,
 } from '#utils/types';
 
 import AddWorkItemDialog from './AddWorkItemDialog';
@@ -69,7 +70,7 @@ export function Component() {
         appVersion: string,
         workItems: WorkItem[],
 
-        configDefaultTaskType: string,
+        configDefaultTaskType: WorkItemType,
         configAllowMultipleEntry: boolean;
     }>(
         KEY_DATA_STORAGE,
@@ -84,7 +85,7 @@ export function Component() {
     const [
         selectedDate,
         setSelectedDate,
-    ] = useState<string | undefined>(
+    ] = useState<string>(
         () => encodeDate(today),
     );
 
@@ -99,6 +100,16 @@ export function Component() {
     const configDefaultTaskType = storedState.configDefaultTaskType ?? 'development';
     const configAllowMultipleEntry = storedState.configAllowMultipleEntry ?? false;
 
+    const handleDateSelection = useCallback(
+        (value: string | undefined) => {
+            // NOTE: We do not reset selected date
+            if (value) {
+                setSelectedDate(value);
+            }
+        },
+        [],
+    );
+
     // Write to stored state
     const setWorkItems: Dispatch<SetStateAction<WorkItem[]>> = useCallback(
         (func) => {
@@ -111,7 +122,7 @@ export function Component() {
         },
         [setStoredState],
     );
-    const setDefaultTaskType: Dispatch<SetStateAction<string>> = useCallback(
+    const setDefaultTaskType: Dispatch<SetStateAction<WorkItemType>> = useCallback(
         (func) => {
             setStoredState((oldValue) => ({
                 ...oldValue,
@@ -139,6 +150,21 @@ export function Component() {
             workItems.filter(({ date }) => date === selectedDate)
         ),
         [workItems, selectedDate],
+    );
+
+    const handleWorkItemCreate = useCallback(
+        (taskId: number) => {
+            setWorkItems((oldWorkItems = []) => ([
+                ...oldWorkItems,
+                {
+                    id: getNewId(),
+                    task: taskId,
+                    type: configDefaultTaskType,
+                    date: selectedDate,
+                },
+            ]));
+        },
+        [setWorkItems, selectedDate, configDefaultTaskType],
     );
 
     const handleWorkItemClone = useCallback(
@@ -301,32 +327,28 @@ export function Component() {
         >
             <div className={styles.pageHeader}>
                 <div className={styles.headerContent}>
-                    {isDefined(selectedDate) && (
-                        <Button
-                            name={addDays(selectedDate, -1)}
-                            onClick={setSelectedDate}
-                            variant="secondary"
-                            title="Previous day"
-                        >
-                            <IoChevronBackSharp />
-                        </Button>
-                    )}
-                    {isDefined(selectedDate) && (
-                        <Button
-                            name={addDays(selectedDate, 1)}
-                            onClick={setSelectedDate}
-                            variant="secondary"
-                            title="Next day"
-                        >
-                            <IoChevronForwardSharp />
-                        </Button>
-                    )}
+                    <Button
+                        name={addDays(selectedDate, -1)}
+                        onClick={handleDateSelection}
+                        variant="secondary"
+                        title="Previous day"
+                    >
+                        <IoChevronBackSharp />
+                    </Button>
+                    <Button
+                        name={addDays(selectedDate, 1)}
+                        onClick={handleDateSelection}
+                        variant="secondary"
+                        title="Next day"
+                    >
+                        <IoChevronForwardSharp />
+                    </Button>
                     <DateInput
                         inputElementRef={dateInputRef}
                         className={styles.dateInput}
                         name={undefined}
                         value={selectedDate}
-                        onChange={setSelectedDate}
+                        onChange={handleDateSelection}
                     />
                     <Button
                         className={styles.dateButton}
@@ -368,10 +390,9 @@ export function Component() {
                 onWorkItemDelete={handleWorkItemDelete}
             />
             <AddWorkItemDialog
-                workItems={currentWorkItems}
-                selectedDate={selectedDate}
-                setWorkItems={setWorkItems}
                 dialogOpenTriggerRef={dialogOpenTriggerRef}
+                workItems={currentWorkItems}
+                onWorkItemCreate={handleWorkItemCreate}
                 defaultTaskType={configDefaultTaskType}
                 allowMultipleEntry={configAllowMultipleEntry}
                 onDefaultTaskTypeChange={setDefaultTaskType}

@@ -1,52 +1,73 @@
 import {
     useCallback,
     useEffect,
+    useMemo,
     useRef,
     useState,
-    useMemo,
 } from 'react';
 import { IoAddSharp } from 'react-icons/io5';
 import {
-    encodeDate,
     isDefined,
     listToGroupList,
 } from '@togglecorp/fujs';
 
 import Dialog from '#components/Dialog';
 import RawButton from '#components/RawButton';
+import SelectInput from '#components/SelectInput';
 import TextInput from '#components/TextInput';
+import { rankedSearchOnList } from '#utils/common';
 import {
-    getNewId,
-    rankedSearchOnList,
-} from '#utils/common';
-import { WorkItem } from '#utils/types';
+    WorkItem,
+    WorkItemType,
+} from '#utils/types';
 
 import {
     clientById,
     contractById,
     projectById,
     taskList,
+    typeOptions,
 } from '../data';
 
 import styles from './styles.module.css';
 
+type WorkItemTypeOption = { id: WorkItemType, title: string };
+function workItemTypeKeySelector(item: WorkItemTypeOption) {
+    return item.id;
+}
+function workItemTypeLabelSelector(item: WorkItemTypeOption) {
+    return item.title;
+}
+
+type BoolStr = 'true' | 'false';
+
+type ModeOption = { id: BoolStr, title: string };
+function modeKeySelector(item: ModeOption) {
+    return item.id;
+}
+function modeLabelSelector(item: ModeOption) {
+    return item.title;
+}
+const modeOptions: ModeOption[] = [
+    { id: 'false', title: 'Single' },
+    { id: 'true', title: 'Multiple' },
+];
+
 interface Props {
-    selectedDate: string | undefined;
-    setWorkItems: React.Dispatch<React.SetStateAction<WorkItem[]>>;
     dialogOpenTriggerRef: React.MutableRefObject<(() => void) | undefined>;
-    defaultTaskType: string;
-    allowMultipleEntry: boolean;
-    onDefaultTaskTypeChange: React.Dispatch<React.SetStateAction<string>>
-    onAllowMultipleEntryChange: React.Dispatch<React.SetStateAction<boolean>>
     workItems: WorkItem[] | undefined;
+    onWorkItemCreate: (taskId: number) => void;
+    defaultTaskType: WorkItemType;
+    onDefaultTaskTypeChange: React.Dispatch<React.SetStateAction<WorkItemType>>
+    allowMultipleEntry: boolean;
+    onAllowMultipleEntryChange: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 function AddWorkItemDialog(props: Props) {
     const {
-        selectedDate,
-        setWorkItems,
         dialogOpenTriggerRef,
         workItems,
+        onWorkItemCreate,
         defaultTaskType,
         allowMultipleEntry,
         onDefaultTaskTypeChange,
@@ -78,27 +99,57 @@ function AddWorkItemDialog(props: Props) {
         setSearchText(undefined);
     }, []);
 
-    const handleTaskAddClick = useCallback((taskId: number) => {
-        setWorkItems((oldWorkItems) => ([
-            ...(oldWorkItems ?? []),
-            {
-                id: getNewId(),
-                task: taskId,
-                type: 'development',
-                date: selectedDate ?? encodeDate(new Date()),
-            } satisfies WorkItem,
-        ]));
-    }, [selectedDate, setWorkItems]);
+    const handleWorkItemCreate = useCallback(
+        (taskId: number) => {
+            onWorkItemCreate(taskId);
+            if (!allowMultipleEntry) {
+                handleModalClose();
+            }
+        },
+        [onWorkItemCreate, handleModalClose, allowMultipleEntry],
+    );
+
+    const handleModeChange = useCallback(
+        (value: BoolStr | undefined) => {
+            onAllowMultipleEntryChange(value === 'true');
+        },
+        [onAllowMultipleEntryChange],
+    );
 
     return (
         <Dialog
             open={showAddWorkItemDialog}
+            mode={allowMultipleEntry ? 'right' : 'center'}
             onClose={handleModalClose}
             heading="Add new entry"
             contentClassName={styles.modalContent}
             className={styles.addWorkItemDialog}
             focusElementRef={titleInputRef}
         >
+            <SelectInput
+                name="type"
+                label="Mode"
+                options={modeOptions}
+                keySelector={modeKeySelector}
+                labelSelector={modeLabelSelector}
+                onChange={handleModeChange}
+                value={isDefined(allowMultipleEntry)
+                    ? String(allowMultipleEntry) as BoolStr
+                    : undefined}
+                variant="general"
+                nonClearable
+            />
+            <SelectInput
+                name="type"
+                label="Default Type"
+                options={typeOptions}
+                keySelector={workItemTypeKeySelector}
+                labelSelector={workItemTypeLabelSelector}
+                onChange={onDefaultTaskTypeChange}
+                value={defaultTaskType}
+                variant="general"
+                nonClearable
+            />
             <div>
                 Please select a task to add the workitems
             </div>
@@ -107,6 +158,7 @@ function AddWorkItemDialog(props: Props) {
                 label="Search by title"
                 name={undefined}
                 value={searchText}
+                variant="general"
                 onChange={setSearchText}
             />
             <div
@@ -142,7 +194,7 @@ function AddWorkItemDialog(props: Props) {
                             className={styles.task}
                             role="listitem"
                             name={task.id}
-                            onClick={handleTaskAddClick}
+                            onClick={handleWorkItemCreate}
                             key={task.id}
                         >
                             <IoAddSharp className={styles.icon} />

@@ -1,6 +1,8 @@
+import { useContext } from 'react';
 import { _cs } from '@togglecorp/fujs';
 
 import Portal from '#components/Portal';
+import DialogContext from '#contexts/dialog';
 import useFloatPlacement from '#hooks/useFloatPlacement';
 
 import styles from './styles.module.css';
@@ -24,15 +26,27 @@ function Popup(props: Props) {
         preferredWidth,
     } = props;
 
+    const placements = useFloatPlacement(parentRef, preferredWidth);
+
+    const {
+        dialogRef,
+    } = useContext(DialogContext);
+
+    if (!placements) {
+        return null;
+    }
+
     const {
         content,
         pointer,
         width,
         orientation,
-    } = useFloatPlacement(parentRef, preferredWidth);
+    } = placements;
 
     return (
-        <Portal>
+        <Portal
+            container={dialogRef}
+        >
             <div
                 ref={elementRef}
                 style={{
