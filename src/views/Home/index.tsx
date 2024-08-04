@@ -35,10 +35,12 @@ import {
 } from '#utils/common';
 import {
     EntriesAsList,
+    Note,
     WorkItem,
     WorkItemType,
 } from '#utils/types';
 
+import AddNoteDialog from './AddNoteDialog';
 import AddWorkItemDialog from './AddWorkItemDialog';
 import {
     contractById,
@@ -71,6 +73,7 @@ export function Component() {
     const [storedState, setStoredState] = useLocalStorage<{
         appVersion: string,
         workItems: WorkItem[],
+        notes: Note[]
 
         configDefaultTaskType: WorkItemType,
         configAllowMultipleEntry: boolean;
@@ -78,6 +81,7 @@ export function Component() {
         KEY_DATA_STORAGE,
         {
             appVersion: APP_VERSION,
+            notes: [],
             workItems: [],
             configDefaultTaskType: 'development',
             configAllowMultipleEntry: false,
@@ -102,21 +106,13 @@ export function Component() {
     const dateInputRef = useRef<HTMLInputElement>(null);
     // NOTE: We are opening the dialog from this parent component
     const dialogOpenTriggerRef = useRef<(() => void) | undefined>();
+    const noteDialogOpenTriggerRef = useRef<(() => void) | undefined>();
 
     // Read state from the stored state
     const workItems = storedState.workItems ?? emptyArray;
+    const notes = storedState.notes ?? emptyArray;
     const configDefaultTaskType = storedState.configDefaultTaskType ?? 'development';
     const configAllowMultipleEntry = storedState.configAllowMultipleEntry ?? false;
-
-    const handleDateSelection = useCallback(
-        (value: string | undefined) => {
-            // NOTE: We do not reset selected date
-            if (value) {
-                setSelectedDate(value);
-            }
-        },
-        [],
-    );
 
     // Write to stored state
     const setWorkItems: Dispatch<SetStateAction<WorkItem[]>> = useCallback(
@@ -152,12 +148,39 @@ export function Component() {
         },
         [setStoredState],
     );
+    const setNotes: Dispatch<SetStateAction<Note[]>> = useCallback(
+        (func) => {
+            setStoredState((oldValue) => ({
+                ...oldValue,
+                notes: typeof func === 'function'
+                    ? func(oldValue.notes)
+                    : func,
+            }));
+        },
+        [setStoredState],
+    );
 
     const currentWorkItems = useMemo(
         () => (
             workItems.filter(({ date }) => date === selectedDate)
         ),
         [workItems, selectedDate],
+    );
+    const currentNote = useMemo(
+        () => (
+            notes.find(({ date }) => date === selectedDate)
+        ),
+        [notes, selectedDate],
+    );
+
+    const handleDateSelection = useCallback(
+        (value: string | undefined) => {
+            // NOTE: We do not reset selected date
+            if (value) {
+                setSelectedDate(value);
+            }
+        },
+        [],
     );
 
     const handleWorkItemCreate = useCallback(
@@ -258,6 +281,59 @@ export function Component() {
         [setWorkItems],
     );
 
+    const handleNoteCreate = useCallback(
+        () => {
+            setNotes((oldNotes = []) => {
+                if (oldNotes.find((note) => note.date === selectedDate)) {
+                    return oldNotes;
+                }
+                return [
+                    ...oldNotes,
+                    {
+                        id: getNewId(),
+                        date: selectedDate,
+                        content: '',
+                    },
+                ];
+            });
+        },
+        [setNotes, selectedDate],
+    );
+
+    const handleNoteUpdate = useCallback(
+        (content: string | undefined, noteId: number | undefined) => {
+            setNotes((oldNotes = []) => {
+                if (!noteId) {
+                    // eslint-disable-next-line no-console
+                    console.error('Could not find note to update');
+                    return oldNotes;
+                }
+
+                const sourceItemIndex = oldNotes
+                    .findIndex(({ id }) => noteId === id);
+                if (sourceItemIndex === -1) {
+                    // eslint-disable-next-line no-console
+                    console.error('Could not find note to update');
+                    return oldNotes;
+                }
+
+                const prevNote = oldNotes[sourceItemIndex];
+                const newWorkItems = [...oldNotes];
+                newWorkItems.splice(
+                    sourceItemIndex,
+                    1,
+                    {
+                        ...prevNote,
+                        content,
+                    },
+                );
+
+                return newWorkItems;
+            });
+        },
+        [setNotes],
+    );
+
     const handleCopyTextButtonClick = useCallback(
         () => {
             function toSubItem(subItem: string | undefined) {
@@ -293,7 +369,14 @@ export function Component() {
         [currentWorkItems],
     );
 
-    const handleAddWorkItemClick = useCallback(
+    const handleDateButtonClick = useCallback(
+        () => {
+            dateInputRef.current?.showPicker();
+        },
+        [],
+    );
+
+    const handleWorkItemAddClick = useCallback(
         () => {
             if (dialogOpenTriggerRef.current) {
                 dialogOpenTriggerRef.current();
@@ -302,23 +385,28 @@ export function Component() {
         [],
     );
 
-    const handleDateButtonClick = useCallback(
+    const handleNoteUpdateClick = useCallback(
         () => {
-            dateInputRef.current?.showPicker();
-        },
-        [],
-    );
-
-    const handleCtrlSpacePress = useCallback(
-        (event: KeyboardEvent) => {
-            if (event.ctrlKey && event.code === 'Space') {
-                handleAddWorkItemClick();
+            handleNoteCreate();
+            if (noteDialogOpenTriggerRef.current) {
+                noteDialogOpenTriggerRef.current();
             }
         },
-        [handleAddWorkItemClick],
+        [handleNoteCreate],
     );
 
-    useKeybind(handleCtrlSpacePress);
+    const handleKeybindingsPress = useCallback(
+        (event: KeyboardEvent) => {
+            if (event.ctrlKey && event.code === 'Space') {
+                handleWorkItemAddClick();
+            } else if (event.ctrlKey && event.code === 'Enter') {
+                handleNoteUpdateClick();
+            }
+        },
+        [handleWorkItemAddClick, handleNoteUpdateClick],
+    );
+
+    useKeybind(handleKeybindingsPress);
 
     const formattedDate = dateFormatter.format(
         selectedDate ? new Date(selectedDate) : undefined,
@@ -413,7 +501,16 @@ export function Component() {
                     </Button>
                     <Button
                         name
-                        onClick={handleAddWorkItemClick}
+                        onClick={handleNoteUpdateClick}
+                        variant="secondary"
+                    >
+                        {currentNote && !!currentNote.content
+                            ? 'Edit notes'
+                            : 'Add notes'}
+                    </Button>
+                    <Button
+                        name
+                        onClick={handleWorkItemAddClick}
                     >
                         Add entry
                     </Button>
@@ -429,6 +526,11 @@ export function Component() {
                     onWorkItemDelete={handleWorkItemDelete}
                 />
             </FocusContext.Provider>
+            <AddNoteDialog
+                dialogOpenTriggerRef={noteDialogOpenTriggerRef}
+                note={currentNote}
+                onNoteContentUpdate={handleNoteUpdate}
+            />
             <AddWorkItemDialog
                 dialogOpenTriggerRef={dialogOpenTriggerRef}
                 workItems={currentWorkItems}

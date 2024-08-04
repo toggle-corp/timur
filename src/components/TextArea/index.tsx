@@ -35,6 +35,7 @@ function TextArea<const N>(props: Props<N>) {
         name,
         autoBullets = false,
         rows = 5,
+        inputElementRef,
         ...otherInputProps
     } = props;
 
@@ -90,6 +91,7 @@ function TextArea<const N>(props: Props<N>) {
                     onFocus={autoBullets ? handleInputFocus : undefined}
                     onKeyUp={autoBullets ? handleKeyUp : undefined}
                     rows={rows}
+                    elementRef={inputElementRef}
                 />
             )}
         />

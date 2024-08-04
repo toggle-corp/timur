@@ -1,0 +1,7 @@
+.update-note-dialog {
+    .modal-content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+}

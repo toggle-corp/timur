@@ -52,3 +52,9 @@ export interface WorkItem {
     type: WorkItemType;
     date: string;
 }
+
+export interface Note {
+    id: number;
+    date: string;
+    content: string | undefined;
+}
