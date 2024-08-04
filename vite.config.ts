@@ -62,12 +62,14 @@ export default defineConfig(({ mode }) => {
                     chunkFileNames: `${env.npm_package_version}/chunk-[name].[hash].js`,
                     entryFileNames: `${env.npm_package_version}/entry-[name].[hash].js`,
                     assetFileNames: `${env.npm_package_version}/asset-[name]-[hash].[ext]`,
-                    /*
                     manualChunks: {
-                        'mapbox-gl': ['mapbox-gl'],
-                        'exceljs': ['exceljs'],
+                        'code-mirror': [
+                            '@codemirror/lang-markdown',
+                            '@uiw/codemirror-theme-github',
+                            '@uiw/react-codemirror',
+                        ],
+                        'codemirror-vim-mode': ['@replit/codemirror-vim']
                     }
-                    */
                 },
             },
         },

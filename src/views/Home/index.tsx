@@ -34,6 +34,7 @@ import {
     getNewId,
 } from '#utils/common';
 import {
+    EditingMode,
     EntriesAsList,
     Note,
     WorkItem,
@@ -76,7 +77,8 @@ export function Component() {
         notes: Note[]
 
         configDefaultTaskType: WorkItemType,
-        configAllowMultipleEntry: boolean;
+        configAllowMultipleEntry: boolean,
+        configEditingMode: EditingMode,
     }>(
         KEY_DATA_STORAGE,
         {
@@ -85,6 +87,7 @@ export function Component() {
             workItems: [],
             configDefaultTaskType: 'development',
             configAllowMultipleEntry: false,
+            configEditingMode: 'normal',
         },
     );
 
@@ -113,6 +116,7 @@ export function Component() {
     const notes = storedState.notes ?? emptyArray;
     const configDefaultTaskType = storedState.configDefaultTaskType ?? 'development';
     const configAllowMultipleEntry = storedState.configAllowMultipleEntry ?? false;
+    const configEditingMode = storedState.configEditingMode ?? 'normal';
 
     // Write to stored state
     const setWorkItems: Dispatch<SetStateAction<WorkItem[]>> = useCallback(
@@ -143,6 +147,17 @@ export function Component() {
                 ...oldValue,
                 configAllowMultipleEntry: typeof func === 'function'
                     ? func(oldValue.configAllowMultipleEntry)
+                    : func,
+            }));
+        },
+        [setStoredState],
+    );
+    const setEditingModeChange: Dispatch<SetStateAction<EditingMode>> = useCallback(
+        (func) => {
+            setStoredState((oldValue) => ({
+                ...oldValue,
+                configEditingMode: typeof func === 'function'
+                    ? func(oldValue.configEditingMode)
                     : func,
             }));
         },
@@ -399,8 +414,24 @@ export function Component() {
         (event: KeyboardEvent) => {
             if (event.ctrlKey && event.code === 'Space') {
                 handleWorkItemAddClick();
+                event.preventDefault();
+                event.stopPropagation();
             } else if (event.ctrlKey && event.code === 'Enter') {
                 handleNoteUpdateClick();
+                event.preventDefault();
+                event.stopPropagation();
+            } else if (event.ctrlKey && event.code === 'ArrowLeft') {
+                setSelectedDate((value) => addDays(value, -1));
+                event.preventDefault();
+                event.stopPropagation();
+            } else if (event.ctrlKey && event.code === 'ArrowRight') {
+                setSelectedDate((value) => addDays(value, 1));
+                event.preventDefault();
+                event.stopPropagation();
+            } else if (event.ctrlKey && event.code === 'ArrowDown') {
+                setSelectedDate(encodeDate(new Date()));
+                event.preventDefault();
+                event.stopPropagation();
             }
         },
         [handleWorkItemAddClick, handleNoteUpdateClick],
@@ -520,6 +551,7 @@ export function Component() {
                 value={focusContextValue}
             >
                 <DayView
+                    selectedDate={selectedDate}
                     workItems={currentWorkItems}
                     onWorkItemClone={handleWorkItemClone}
                     onWorkItemChange={handleWorkItemChange}
@@ -530,14 +562,16 @@ export function Component() {
                 dialogOpenTriggerRef={noteDialogOpenTriggerRef}
                 note={currentNote}
                 onNoteContentUpdate={handleNoteUpdate}
+                editingMode={configEditingMode}
+                onEditingModeChange={setEditingModeChange}
             />
             <AddWorkItemDialog
                 dialogOpenTriggerRef={dialogOpenTriggerRef}
                 workItems={currentWorkItems}
                 onWorkItemCreate={handleWorkItemCreate}
                 defaultTaskType={configDefaultTaskType}
-                allowMultipleEntry={configAllowMultipleEntry}
                 onDefaultTaskTypeChange={setDefaultTaskType}
+                allowMultipleEntry={configAllowMultipleEntry}
                 onAllowMultipleEntryChange={setAllowMultipleEntryChange}
             />
         </Page>

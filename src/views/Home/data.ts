@@ -3,10 +3,17 @@ import { listToMap } from '@togglecorp/fujs';
 import {
     Client,
     Contract,
+    EditingMode,
     Project,
     Task,
     WorkItemType,
 } from '#utils/types';
+
+type EditingModeOption = { id: EditingMode, title: string };
+export const editingModeOptions: EditingModeOption[] = [
+    { id: 'normal', title: 'Normies' },
+    { id: 'vim', title: 'Vim Master Race' },
+];
 
 type WorkItemTypeOption = { id: WorkItemType, title: string };
 export const typeOptions: WorkItemTypeOption[] = [

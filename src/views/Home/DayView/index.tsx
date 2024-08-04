@@ -1,6 +1,7 @@
 import {
     useCallback,
     useMemo,
+    useState,
 } from 'react';
 import {
     _cs,
@@ -38,8 +39,54 @@ function getId(item: ProjectGroupedWorkItem) {
     return item.project.id;
 }
 
+const messages = [
+    <div>
+        Hit
+        {' '}
+        <code>Ctrl+Space</code>
+        {' '}
+        to add a new entry.
+    </div>,
+    <div>
+        Hit
+        {' '}
+        <code>Ctrl+Enter</code>
+        {' '}
+        to add a new note.
+    </div>,
+    <div>
+        Hit
+        {' '}
+        <code>Ctrl+Left</code>
+        {' '}
+        to go to previous day.
+    </div>,
+    <div>
+        Hit
+        {' '}
+        <code>Ctrl+Right</code>
+        {' '}
+        to go to next day.
+    </div>,
+    <div>
+        Hit
+        {' '}
+        <code>Ctrl+Down</code>
+        {' '}
+        to go to present day.
+    </div>,
+];
+
+function ShortcutsMessage() {
+    const [index] = useState(
+        () => Math.floor(Math.random() * messages.length),
+    );
+    return messages[index];
+}
+
 interface Props {
     className?: string;
+    selectedDate: string;
     workItems: WorkItem[] | undefined;
     onWorkItemClone: (id: number) => void;
     onWorkItemChange: (id: number, ...entries: EntriesAsList<WorkItem>) => void;
@@ -49,6 +96,7 @@ interface Props {
 function DayView(props: Props) {
     const {
         className,
+        selectedDate,
         workItems,
         onWorkItemClone,
         onWorkItemChange,
@@ -114,17 +162,7 @@ function DayView(props: Props) {
                     <div className={styles.title}>
                         No entries here!
                     </div>
-                    <div>
-                        Click on
-                        {' '}
-                        <code>Add entry</code>
-                        {' '}
-                        button or hit
-                        {' '}
-                        <code>Ctrl+Space</code>
-                        {' '}
-                        to add a new entry.
-                    </div>
+                    <ShortcutsMessage key={selectedDate} />
                 </div>
             )}
         />

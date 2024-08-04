@@ -5,6 +5,8 @@ export type EntriesAsList<T> = {
 export type SpacingType = 'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 export type SpacingVariant = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
+export type EditingMode = 'normal' | 'vim';
+
 export interface Client {
     id: number;
     title: string;

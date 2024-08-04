@@ -1,20 +1,44 @@
 import {
     useCallback,
     useEffect,
-    useRef,
     useState,
 } from 'react';
+import {
+    markdown,
+    markdownLanguage,
+} from '@codemirror/lang-markdown';
+import { vim } from '@replit/codemirror-vim';
+import { githubLight } from '@uiw/codemirror-theme-github';
+import CodeMirror from '@uiw/react-codemirror';
 
 import Dialog from '#components/Dialog';
-import TextArea from '#components/TextArea';
-import { Note } from '#utils/types';
+import SelectInput from '#components/SelectInput';
+import {
+    EditingMode,
+    Note,
+} from '#utils/types';
+
+import { editingModeOptions } from '../data';
 
 import styles from './styles.module.css';
+
+const extensionsWithoutVim = [markdown({ base: markdownLanguage })];
+const extensionsWithVim = [...extensionsWithoutVim, vim()];
+
+type EditingModeOption = { id: EditingMode, title: string };
+function editingModeKeySelector(item: EditingModeOption) {
+    return item.id;
+}
+function editingModeLabelSelector(item: EditingModeOption) {
+    return item.title;
+}
 
 interface Props {
     dialogOpenTriggerRef: React.MutableRefObject<(() => void) | undefined>;
     note: Note | undefined;
     onNoteContentUpdate: (value: string | undefined, id: number | undefined) => void;
+    editingMode: EditingMode,
+    onEditingModeChange: React.Dispatch<React.SetStateAction<EditingMode>>
 }
 
 function AddWorkItemDialog(props: Props) {
@@ -22,10 +46,11 @@ function AddWorkItemDialog(props: Props) {
         dialogOpenTriggerRef,
         note,
         onNoteContentUpdate,
+        editingMode,
+        onEditingModeChange,
     } = props;
 
     const [showAddWorkItemDialog, setShowAddWorkItemDialog] = useState(false);
-    const titleInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         dialogOpenTriggerRef.current = () => {
@@ -37,6 +62,13 @@ function AddWorkItemDialog(props: Props) {
         setShowAddWorkItemDialog(false);
     }, []);
 
+    const handleMarkdownChange = useCallback(
+        (value: string) => {
+            onNoteContentUpdate(value, note?.id);
+        },
+        [note, onNoteContentUpdate],
+    );
+
     return (
         <Dialog
             open={showAddWorkItemDialog}
@@ -45,15 +77,26 @@ function AddWorkItemDialog(props: Props) {
             heading="Notes"
             contentClassName={styles.modalContent}
             className={styles.updateNoteDialog}
-            focusElementRef={titleInputRef}
         >
-            <TextArea
-                inputElementRef={titleInputRef}
-                placeholder="Your notes"
-                name={note?.id}
-                value={note?.content}
+            <SelectInput
+                name={undefined}
+                label="Mode"
+                options={editingModeOptions}
+                keySelector={editingModeKeySelector}
+                labelSelector={editingModeLabelSelector}
+                onChange={onEditingModeChange}
+                value={editingMode}
                 variant="general"
-                onChange={onNoteContentUpdate}
+                nonClearable
+            />
+            <CodeMirror
+                className={styles.codemirror}
+                value={note?.content}
+                height="60vh"
+                extensions={editingMode === 'vim' ? extensionsWithVim : extensionsWithoutVim}
+                onChange={handleMarkdownChange}
+                theme={githubLight}
+                autoFocus
             />
         </Dialog>
     );
