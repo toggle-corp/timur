@@ -3,11 +3,13 @@ import {
     useEffect,
     useRef,
     useState,
+    useMemo,
 } from 'react';
 import { IoAddSharp } from 'react-icons/io5';
 import {
     encodeDate,
     isDefined,
+    listToGroupList,
 } from '@togglecorp/fujs';
 
 import Dialog from '#components/Dialog';
@@ -36,6 +38,7 @@ interface Props {
     allowMultipleEntry: boolean;
     onDefaultTaskTypeChange: React.Dispatch<React.SetStateAction<string>>
     onAllowMultipleEntryChange: React.Dispatch<React.SetStateAction<boolean>>
+    workItems: WorkItem[] | undefined;
 }
 
 function AddWorkItemDialog(props: Props) {
@@ -43,6 +46,7 @@ function AddWorkItemDialog(props: Props) {
         selectedDate,
         setWorkItems,
         dialogOpenTriggerRef,
+        workItems,
         defaultTaskType,
         allowMultipleEntry,
         onDefaultTaskTypeChange,
@@ -52,6 +56,16 @@ function AddWorkItemDialog(props: Props) {
     const [showAddWorkItemDialog, setShowAddWorkItemDialog] = useState(false);
     const [searchText, setSearchText] = useState<string | undefined>();
     const titleInputRef = useRef<HTMLInputElement>(null);
+
+    const taskCountMapping = useMemo(
+        () => listToGroupList(
+            workItems,
+            (item) => item.task,
+            undefined,
+            (items) => items.length,
+        ),
+        [workItems],
+    );
 
     useEffect(() => {
         dialogOpenTriggerRef.current = () => {
@@ -120,6 +134,8 @@ function AddWorkItemDialog(props: Props) {
                     const contract = contractById[task.contract];
                     const project = projectById[contract.project];
                     const client = clientById[project.client];
+                    // FIXME: show count in better way
+                    const count = taskCountMapping?.[task.id] ?? 0;
 
                     return (
                         <RawButton
@@ -131,9 +147,7 @@ function AddWorkItemDialog(props: Props) {
                         >
                             <IoAddSharp className={styles.icon} />
                             <div className={styles.details}>
-                                <div>
-                                    {task.title}
-                                </div>
+                                {task.title}
                                 <div className={styles.meta}>
                                     <div>
                                         {contract.title}
@@ -146,6 +160,11 @@ function AddWorkItemDialog(props: Props) {
                                     </div>
                                 </div>
                             </div>
+                            {count > 0 && (
+                                <div className={styles.usageCount}>
+                                    {count}
+                                </div>
+                            )}
                         </RawButton>
                     );
                 })}

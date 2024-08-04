@@ -1,8 +1,11 @@
-import { useCallback } from 'react';
-import { _cs } from '@togglecorp/fujs';
+import { useCallback, useMemo } from 'react';
+import { _cs, sum, isDefined } from '@togglecorp/fujs';
 
 import List from '#components/List';
-import { numericIdSelector } from '#utils/common';
+import {
+    numericIdSelector,
+    getDurationString,
+} from '#utils/common';
 import {
     Contract,
     EntriesAsList,
@@ -35,6 +38,13 @@ function ContractGroupedView(props: Props) {
         onWorkItemDelete,
     } = props;
 
+    const totalHours = useMemo(
+        () => (
+            sum(workItems.map((item) => item.hours).filter(isDefined))
+        ),
+        [workItems],
+    );
+
     const rendererParams = useCallback(
         (_: number, item: WorkItem): WorkItemRowProps => ({
             workItem: item,
@@ -53,11 +63,18 @@ function ContractGroupedView(props: Props) {
 
     return (
         <div className={_cs(styles.contractGroupedView, className)}>
-            <h3>
-                {project.title}
-                {' › '}
-                {contract.title}
-            </h3>
+            <div className={styles.heading}>
+                <h3>
+                    {project.title}
+                    {' › '}
+                    {contract.title}
+                </h3>
+                <div>
+                    ⏱️
+                    {' '}
+                    {getDurationString(totalHours)}
+                </div>
+            </div>
             <List
                 className={styles.workItemList}
                 pending={false}

@@ -230,16 +230,15 @@ export function Component() {
                     .join('\n');
             }
 
-            const groupedWorkItems = mapToList(
-                listToGroupList(
-                    currentWorkItems,
-                    (workItem) => contractById[taskById[workItem.task].contract].project,
-                ),
+            const groupedWorkItems = mapToList(listToGroupList(
+                currentWorkItems,
+                (workItem) => contractById[taskById[workItem.task].contract].project,
+                undefined,
                 (list, projectId) => ({
                     project: projectById[Number(projectId)],
                     workItems: list,
                 }),
-            );
+            ));
 
             const text = groupedWorkItems.map((projectGrouped) => {
                 const { project, workItems: projectWorkItems } = projectGrouped;
@@ -369,6 +368,7 @@ export function Component() {
                 onWorkItemDelete={handleWorkItemDelete}
             />
             <AddWorkItemDialog
+                workItems={currentWorkItems}
                 selectedDate={selectedDate}
                 setWorkItems={setWorkItems}
                 dialogOpenTriggerRef={dialogOpenTriggerRef}

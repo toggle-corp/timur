@@ -61,28 +61,28 @@ function DayView(props: Props) {
                 return undefined;
             }
 
-            return mapToList(
-                listToGroupList(
-                    mapToList(
-                        listToGroupList(
-                            workItems,
-                            (workItem) => contractById[taskById[workItem.task].contract].id,
-                        ),
-                        (list) => ({
-                            contract: contractById[taskById[list[0].task].contract],
-                            workItems: list,
-                        }),
-                    ),
-                    (contractGrouped) => contractGrouped.contract.project,
-                ),
-                (list) => ({
-                    project: projectById[list[0].contract.project],
+            return mapToList(listToGroupList(
+                mapToList(listToGroupList(
+                    workItems,
+                    (workItem) => taskById[workItem.task].contract,
+                    undefined,
+                    (list, contractId) => ({
+                        contract: contractById[Number(contractId)],
+                        workItems: list,
+                    }),
+                )),
+                (contractGrouped) => contractGrouped.contract.project,
+                undefined,
+                (list, projectId) => ({
+                    project: projectById[Number(projectId)],
                     contracts: list,
                 }),
-            );
+            ));
         },
         [workItems],
     );
+
+    console.warn(groupedWorkItems);
 
     type GroupedWorkItem = NonNullable<(typeof groupedWorkItems)>[number];
 

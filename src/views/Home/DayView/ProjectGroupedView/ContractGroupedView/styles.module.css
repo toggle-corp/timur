@@ -3,10 +3,17 @@
     flex-direction: column;
     gap: var(--spacing-md);
 
+
+    .heading {
+        display: flex;
+        gap: var(--spacing-sm);
+        align-items: baseline;
+    }
+
     .work-item-list {
         display: flex;
         flex-direction: column;
-        background-color: var(--color-foreground);
         border-radius: var(--border-radius-lg);
+        background-color: var(--color-foreground);
     }
 }
