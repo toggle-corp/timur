@@ -1,10 +1,12 @@
 .home {
+    /* FIXME: We should move this outside of Home */
     h1, h2, h3, h4, h5, h6 {
         margin: 0;
         line-height: 1;
         font-weight: var(--font-weight-bold);
     }
 
+    /* FIXME: We should move this outside of Home */
     p {
         margin: 0;
     }
@@ -49,5 +51,6 @@
         display: flex;
         flex-direction: column;
         gap: var(--spacing-lg);
+        padding: var(--spacing-lg) 0;
     }
 }

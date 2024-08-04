@@ -1,7 +1,7 @@
 .day-view {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-lg);
 
     .empty-message {
         display: flex;

@@ -1,18 +1,23 @@
 .navbar {
     display: flex;
-    align-items: center;
+    justify-content: center;
     box-shadow: var(--box-shadow-md);
     background-color: var(--color-foreground);
-    padding: var(--spacing-md);
-    gap: var(--spacing-sm);
+    padding: var(--spacing-xs);
 
-    .app-logo {
-        height: 1.4rem;
-    }
+    .main {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        max-width: var(--width-page-content--max);
+        gap: var(--spacing-sm);
 
-    .brand {
-        color: var(--color-primary);
-        font-size: var(--font-size-2xl);
-        font-weight: var(--font-weight-bold);
+        .app-logo {
+            height: 1.4rem;
+        }
+
+        .brand {
+            font-size: var(--font-size-2xl);
+        }
     }
 }

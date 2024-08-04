@@ -1,8 +1,7 @@
 .contract-grouped-view {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
-
+    gap: var(--spacing-sm);
 
     .heading {
         display: flex;

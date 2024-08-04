@@ -13,13 +13,15 @@ function Navbar(props: Props) {
 
     return (
         <nav className={_cs(styles.navbar, className)}>
-            <img
-                className={styles.appLogo}
-                alt="Timur Icon"
-                src={timurLogo}
-            />
-            <div className={styles.brand}>
-                Timur
+            <div className={styles.main}>
+                <img
+                    className={styles.appLogo}
+                    alt="Timur Icon"
+                    src={timurLogo}
+                />
+                <div className={styles.brand}>
+                    timur
+                </div>
             </div>
         </nav>
     );
