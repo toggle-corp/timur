@@ -218,9 +218,9 @@ const tcProjectPortfolio: Task = {
     title: 'Project Portfolio',
     contract: tcGeneral.id,
 };
-const tcGeneralTask: Task = {
+const tcMisc: Task = {
     id: 10601003,
-    title: 'TC General',
+    title: 'Misc',
     contract: tcGeneral.id,
 };
 
@@ -233,6 +233,11 @@ const deepAnalysisModule: Task = {
 const deepOcr: Task = {
     id: 10401002,
     title: 'OCR',
+    contract: deepMaintence.id,
+};
+const deepMisc: Task = {
+    id: 10401003,
+    title: 'Misc',
     contract: deepMaintence.id,
 };
 
@@ -257,6 +262,11 @@ const alertHubGoogleAnalytics: Task = {
     title: 'Google Analytics',
     contract: alertHubPhaseTwo.id,
 };
+const alertHubMisc: Task = {
+    id: 10901005,
+    title: 'Misc',
+    contract: alertHubPhaseTwo.id,
+};
 
 // SNWG tasks
 const snwgFargetIntegration: Task = {
@@ -274,7 +284,6 @@ const snwgAssessmentCycle: Task = {
     title: 'Assessment cycle management',
     contract: snwgSupportJuly2024November2024.id,
 };
-
 const snwgReportVersion: Task = {
     id: 10501004,
     title: 'Report & ReportVersion refactor',
@@ -299,9 +308,9 @@ const helixUpdateTextCases: Task = {
     title: 'Update test cases',
     contract: helixSupport.id,
 };
-const helixGeneral: Task = {
+const helixMisc: Task = {
     id: 10301003,
-    title: 'General',
+    title: 'Misc',
     contract: helixSupport.id,
 };
 
@@ -321,11 +330,21 @@ const mapSwipeEnhancements: Task = {
     title: 'Enhancements',
     contract: mapSwipeSupport2024And2025.id,
 };
+const mapSwipeMisc: Task = {
+    id: 10301004,
+    title: 'Misc',
+    contract: mapSwipeSupport2024And2025.id,
+};
 
 // Timur tasks
 const timurUi: Task = {
     id: 10001001,
     title: 'User Interface Development',
+    contract: timurPhaseOneDevelopment.id,
+};
+const timurMisc: Task = {
+    id: 10001002,
+    title: 'Misc',
     contract: timurPhaseOneDevelopment.id,
 };
 
@@ -352,7 +371,7 @@ const goDrefImport: Task = {
 };
 const goGuestUser: Task = {
     id: 11005,
-    title: 'Gues User Permission',
+    title: 'Guest User Permission',
     contract: goTwentyFourQ3.id,
 };
 const goPlaywrightIntegration: Task = {
@@ -378,9 +397,10 @@ const goStorybook: Task = {
 
 export const taskList = [
     timurUi,
+    timurMisc,
     tcWebsite,
     tcProjectPortfolio,
-    tcGeneralTask,
+    tcMisc,
     goCountryPages,
     goOpsLearning,
     goDref,
@@ -394,11 +414,13 @@ export const taskList = [
     alertHubSupport,
     alertHubGoogleAnalytics,
     alertHubLogin,
+    alertHubMisc,
     helixAwsAccount,
     helixUpdateTextCases,
-    helixGeneral,
+    helixMisc,
     deepAnalysisModule,
     deepOcr,
+    deepMisc,
     snwgFargetIntegration,
     snwgAsanaSync,
     snwgAssessmentCycle,
@@ -407,6 +429,7 @@ export const taskList = [
     mapSwipeAccessibility,
     mapSwipeBugFixes,
     mapSwipeEnhancements,
+    mapSwipeMisc,
 ];
 
 export const clientById = listToMap(clientList, ({ id }) => id);

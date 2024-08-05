@@ -10,12 +10,15 @@ import {
     isDefined,
     listToGroupList,
 } from '@togglecorp/fujs';
+import {
+    matchSorter,
+    type MatchSorterOptions,
+} from 'match-sorter';
 
 import Dialog from '#components/Dialog';
 import RawButton from '#components/RawButton';
 import SelectInput from '#components/SelectInput';
 import TextInput from '#components/TextInput';
-import { rankedSearchOnList } from '#utils/common';
 import {
     WorkItem,
     WorkItemType,
@@ -30,6 +33,27 @@ import {
 } from '../data';
 
 import styles from './styles.module.css';
+
+function fuzzySearch<ItemType = string>(
+    rows: ReadonlyArray<ItemType>,
+    filterValue: string,
+    options?: MatchSorterOptions<ItemType>,
+) {
+    if (!filterValue || filterValue.length <= 0) {
+        return rows;
+    }
+
+    const terms = filterValue.split(' ');
+    if (!terms) {
+        return rows;
+    }
+
+    // reduceRight will mean sorting is done by score for the _first_ entered word.
+    return terms.reduceRight(
+        (results, term) => matchSorter(results, term, options),
+        rows,
+    );
+}
 
 type WorkItemTypeOption = { id: WorkItemType, title: string };
 function workItemTypeKeySelector(item: WorkItemTypeOption) {
@@ -116,6 +140,23 @@ function AddWorkItemDialog(props: Props) {
         [onAllowMultipleEntryChange],
     );
 
+    const filteredTaskList = useMemo(
+        () => fuzzySearch(
+            taskList,
+            searchText ?? '',
+            {
+                keys: [
+                    (task) => task.title,
+                    (task) => contractById[task.contract]?.title,
+                    (task) => projectById[contractById[task.contract]?.project]?.title ?? '',
+                    (task) => clientById[projectById[contractById[task.contract]?.project]?.client]?.title ?? '',
+                    (task) => clientById[projectById[contractById[task.contract]?.project]?.client]?.abbvr ?? '',
+                ],
+            },
+        ),
+        [searchText],
+    );
+
     return (
         <Dialog
             open={showAddWorkItemDialog}
@@ -165,28 +206,10 @@ function AddWorkItemDialog(props: Props) {
                 role="list"
                 className={styles.taskList}
             >
-                {/* TODO: useMemo for search, use List form mapping */}
-                {rankedSearchOnList(
-                    taskList,
-                    searchText,
-                    ({ title, contract }) => {
-                        const contractObj = contractById[contract];
-                        const projectObj = projectById[contractObj.project];
-                        const clientObj = clientById[projectObj.client];
-
-                        return [
-                            title,
-                            contractObj?.title,
-                            projectObj?.title,
-                            clientObj?.title,
-                            clientObj?.abbvr,
-                        ].filter(isDefined).join(' - ');
-                    },
-                ).map((task) => {
+                {filteredTaskList.map((task) => {
                     const contract = contractById[task.contract];
                     const project = projectById[contract.project];
                     const client = clientById[project.client];
-                    // FIXME: show count in better way
                     const count = taskCountMapping?.[task.id] ?? 0;
 
                     return (
