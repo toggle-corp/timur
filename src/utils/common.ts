@@ -37,7 +37,7 @@ export function getDurationString(totalHours: number) {
 }
 
 function validateHhmm(hourStr: string, minuteStr: string) {
-    const hour = Number(hourStr);
+    const hour = Number(hourStr === '' ? '0' : hourStr);
     const minute = Number(minuteStr);
     if (minute > 59) {
         return undefined;
@@ -53,18 +53,37 @@ export function getDurationNumber(value: string | undefined) {
     if (!value) {
         return undefined;
     }
-    if (value.match(/^\d{1,2}:\d\d$/)) {
+    // decimal
+    if (value.match(/^\d{0,2}\.\d{1,2}$/)) {
+        return Number(value);
+    }
+    // hh:mm
+    // hh:m
+    // h:mm
+    // h:m
+    // :mm
+    // :m
+    if (value.match(/^\d{0,2}:\d{1,2}$/)) {
         const [hourStr, minuteStr] = value.split(':');
         return validateHhmm(hourStr, minuteStr) ?? null;
     }
-    if (value.match(/^\d\d\d\d$/)) {
+    // hhmm
+    if (value.match(/^\d{4}$/)) {
         const hourStr = value.substring(0, 2);
         const minuteStr = value.substring(2, 4);
         return validateHhmm(hourStr, minuteStr) ?? null;
     }
-    if (value.match(/^\d\d\d$/)) {
+    // hmm
+    if (value.match(/^\d{3}$/)) {
         const hourStr = value.substring(0, 1);
         const minuteStr = value.substring(1, 3);
+        return validateHhmm(hourStr, minuteStr) ?? null;
+    }
+    // hh
+    // h
+    if (value.match(/^\d{1,2}$/)) {
+        const hourStr = value;
+        const minuteStr = '0';
         return validateHhmm(hourStr, minuteStr) ?? null;
     }
     return null;

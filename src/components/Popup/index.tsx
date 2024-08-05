@@ -9,7 +9,7 @@ import styles from './styles.module.css';
 
 export interface Props {
     className?: string;
-    pointerClassName?: string;
+    // pointerClassName?: string;
     elementRef?: React.RefObject<HTMLDivElement>;
     parentRef: React.RefObject<HTMLElement | undefined>;
     children?: React.ReactNode;
@@ -22,7 +22,7 @@ function Popup(props: Props) {
         elementRef,
         children,
         className,
-        pointerClassName,
+        // pointerClassName,
         preferredWidth,
     } = props;
 
@@ -38,7 +38,7 @@ function Popup(props: Props) {
 
     const {
         content,
-        pointer,
+        // pointer,
         width,
         orientation,
     } = placements;
@@ -61,6 +61,7 @@ function Popup(props: Props) {
             >
                 {children}
             </div>
+            {/*
             <div
                 className={_cs(
                     styles.pointer,
@@ -78,6 +79,7 @@ function Popup(props: Props) {
                     />
                 </svg>
             </div>
+            */}
         </Portal>
     );
 }

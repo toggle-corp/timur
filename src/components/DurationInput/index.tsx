@@ -72,7 +72,24 @@ function DurationInput<const T>(props: Props<T>) {
 
     const handleChange: RawInputProps<T>['onChange'] = useCallback((v) => {
         // TODO: Also call onChange if v is valid
-        if (!v || v.match(/^\d{1,2}:?\d{0,2}$/) || v.match(/^\d{1,4}$/)) {
+        if (
+            !v
+            // decimal = 10.5
+            || v.match(/^\d{1,2}\.\d{0,2}$/)
+            // hh:mm = 10:12
+            // hh:m = 10:5
+            // h:mm = 1:12
+            // h:m = 1:5
+            || v.match(/^\d{1,2}:\d{0,2}$/)
+            // :m = :5
+            // :mm = :55
+            || v.match(/^:\d{0,2}$/)
+            // hhmm = 1012
+            // hmm = 100
+            // hh = 10
+            // h = 1
+            || v.match(/^\d{1,4}$/)
+        ) {
             setTempValue(v);
         }
     }, []);

@@ -6,22 +6,12 @@ import {
 
 type OptionKey = string | number | boolean;
 
-// eslint-disable-next-line import/prefer-default-export
-enum Keys {
-    Tab = 9,
-    Esc = 27,
-    Enter = 13,
-    Down = 38,
-    Up = 40,
-    Backspace = 8,
-}
-
 /*
 # Feature
 - Handles setting value of focusedKey exclusively
 */
 
-const specialKeys = [Keys.Enter, Keys.Backspace];
+const specialKeys = ["Enter", "Backspace", "ArrowUp", "ArrowDown"];
 
 function getOptionIndex<T, Q extends OptionKey>(
     key: Q | undefined,
@@ -69,19 +59,21 @@ function useKeyboard<T, Q extends OptionKey>(
     const handleKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLInputElement>) => {
             // NOTE: De-structuring e here will create access error
-            const { keyCode } = e;
+            const { code } = e;
             const myKey = focusedKey?.key;
-            if (isOptionsShown && (keyCode === Keys.Tab || keyCode === Keys.Esc)) {
+            if (isOptionsShown && (code === "Tab" || code === "Escape")) {
                 // If tab or escape was pressed and dropdown is being shown,
                 // hide the dropdown.
+                e.stopPropagation();
+                e.preventDefault();
                 onHideOptions();
-            } else if (!isOptionsShown && specialKeys.includes(keyCode)) {
+            } else if (!isOptionsShown && specialKeys.includes(code)) {
                 // If any of the special keys was pressed but the dropdown is currently hidden,
                 // show the dropdown.
                 e.stopPropagation();
                 e.preventDefault();
                 onShowOptions();
-            } else if (isOptionsShown && keyCode === Keys.Enter) {
+            } else if (isOptionsShown && code === "Enter") {
                 if (isDefined(myKey)) {
                     e.stopPropagation();
                     e.preventDefault();
@@ -98,12 +90,12 @@ function useKeyboard<T, Q extends OptionKey>(
                         onEnterWithoutOption();
                     }
                 }
-            } else if (isOptionsShown && keyCode === Keys.Up) {
+            } else if (isOptionsShown && code === "ArrowDown") {
                 e.stopPropagation();
                 e.preventDefault();
                 const newFocusedKey = getNewKey(myKey, 1, options, keySelector);
                 onFocusChange(newFocusedKey ? { key: newFocusedKey } : undefined);
-            } else if (isOptionsShown && keyCode === Keys.Down) {
+            } else if (isOptionsShown && code === "ArrowUp") {
                 e.stopPropagation();
                 e.preventDefault();
                 const newFocusedKey = getNewKey(myKey, -1, options, keySelector);
