@@ -210,6 +210,11 @@ const tcProjectPortfolio: Task = {
     title: 'Project Portfolio',
     contract: tcGeneral.id,
 };
+const tcGeneralTask: Task = {
+    id: 10601003,
+    title: 'TC General',
+    contract: tcGeneral.id,
+};
 
 // Deep tasks
 const deepAnalysisModule: Task = {
@@ -362,6 +367,7 @@ export const taskList = [
     timurUi,
     tcWebsite,
     tcProjectPortfolio,
+    tcGeneralTask,
     goCountryPages,
     goOpsLearning,
     goDref,
