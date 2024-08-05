@@ -57,21 +57,21 @@ const messages = [
     <div>
         Hit
         {' '}
-        <code>Ctrl+Left</code>
+        <code>Ctrl+Shift+Left</code>
         {' '}
         to go to previous day.
     </div>,
     <div>
         Hit
         {' '}
-        <code>Ctrl+Right</code>
+        <code>Ctrl+Shift+Right</code>
         {' '}
         to go to next day.
     </div>,
     <div>
         Hit
         {' '}
-        <code>Ctrl+Down</code>
+        <code>Ctrl+Shift+Down</code>
         {' '}
         to go to present day.
     </div>,

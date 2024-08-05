@@ -6,6 +6,7 @@ import {
     EditingMode,
     Project,
     Task,
+    WorkItemStatus,
     WorkItemType,
 } from '#utils/types';
 
@@ -24,6 +25,13 @@ export const typeOptions: WorkItemTypeOption[] = [
     { id: 'internal-discussion', title: 'Internal discussion' },
     { id: 'meeting', title: 'Meeting' },
     { id: 'qa', title: 'QA' },
+];
+
+type WorkItemStatusOption = { id: WorkItemStatus, title: string };
+export const statusOptions: WorkItemStatusOption[] = [
+    { id: 'todo', title: 'Todo' },
+    { id: 'doing', title: 'Doing' },
+    { id: 'done', title: 'Done' },
 ];
 
 const tc: Client = {

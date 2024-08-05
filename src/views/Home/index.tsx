@@ -420,15 +420,15 @@ export function Component() {
                 handleNoteUpdateClick();
                 event.preventDefault();
                 event.stopPropagation();
-            } else if (event.ctrlKey && event.code === 'ArrowLeft') {
+            } else if (event.ctrlKey && event.shiftKey && event.code === 'ArrowLeft') {
                 setSelectedDate((value) => addDays(value, -1));
                 event.preventDefault();
                 event.stopPropagation();
-            } else if (event.ctrlKey && event.code === 'ArrowRight') {
+            } else if (event.ctrlKey && event.shiftKey && event.code === 'ArrowRight') {
                 setSelectedDate((value) => addDays(value, 1));
                 event.preventDefault();
                 event.stopPropagation();
-            } else if (event.ctrlKey && event.code === 'ArrowDown') {
+            } else if (event.ctrlKey && event.shiftKey && event.code === 'ArrowDown') {
                 setSelectedDate(encodeDate(new Date()));
                 event.preventDefault();
                 event.stopPropagation();

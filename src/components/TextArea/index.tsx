@@ -9,7 +9,7 @@ const KEY_ENTER = 'Enter';
 
 type InheritedProps<N> = (Omit<InputContainerProps, 'input' | 'htmlFor'> & Omit<RawTextAreaProps<N>, 'type' | 'id'>);
 export interface Props<T> extends InheritedProps<T> {
-  inputElementRef?: React.RefObject<HTMLInputElement>;
+  inputElementRef?: React.RefObject<HTMLTextAreaElement>;
   autoBullets?: boolean;
   inputClassName?: string;
 }

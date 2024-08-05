@@ -43,6 +43,7 @@ export interface Task {
 }
 
 export type WorkItemType = 'design' | 'development' | 'qa' | 'devops' | 'documentation' | 'meeting' | 'internal-discussion';
+export type WorkItemStatus = 'todo' | 'doing' | 'done';
 
 export interface WorkItem {
     id: number;
@@ -51,6 +52,7 @@ export interface WorkItem {
     description?: string,
     hours?: number;
     startTime?: number;
+    status?: WorkItemStatus;
     type: WorkItemType;
     date: string;
 }

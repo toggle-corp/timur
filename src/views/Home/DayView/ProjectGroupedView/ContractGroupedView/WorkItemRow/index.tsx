@@ -18,10 +18,12 @@ import {
     EntriesAsList,
     Task,
     WorkItem,
+    WorkItemStatus,
     WorkItemType,
 } from '#utils/types';
 
 import {
+    statusOptions,
     taskList,
     typeOptions,
 } from '../../../../data';
@@ -29,6 +31,7 @@ import {
 import styles from './styles.module.css';
 
 type WorkItemTypeOption = { id: WorkItemType, title: string };
+type WorkItemStatusOption = { id: WorkItemStatus, title: string };
 
 function taskKeySelector(item: Task) {
     return item.id;
@@ -40,6 +43,12 @@ function workItemTypeKeySelector(item: WorkItemTypeOption) {
     return item.id;
 }
 function workItemTypeLabelSelector(item: WorkItemTypeOption) {
+    return item.title;
+}
+function workItemStatusKeySelector(item: WorkItemStatusOption) {
+    return item.id;
+}
+function workItemStatusLabelSelector(item: WorkItemStatusOption) {
     return item.title;
 }
 
@@ -103,13 +112,23 @@ function WorkItemRow(props: Props) {
                 icons="📐"
             />
             <TextArea<'description'>
-                elementRef={inputRef}
+                inputElementRef={inputRef}
                 name="description"
                 title="Description"
                 value={workItem.description}
                 onChange={setFieldValue}
                 icons="🗒️"
                 placeholder="Description"
+            />
+            <SelectInput
+                name="status"
+                options={statusOptions}
+                keySelector={workItemStatusKeySelector}
+                labelSelector={workItemStatusLabelSelector}
+                onChange={setFieldValue}
+                value={workItem.status}
+                nonClearable
+                icons="🪩"
             />
             <DurationInput
                 name="hours"
