@@ -25,6 +25,7 @@ export const typeOptions: WorkItemTypeOption[] = [
     { id: 'internal-discussion', title: 'Internal discussion' },
     { id: 'meeting', title: 'Meeting' },
     { id: 'qa', title: 'QA' },
+    { id: 'misc', title: 'Misc' },
 ];
 
 type WorkItemStatusOption = { id: WorkItemStatus, title: string };
@@ -77,7 +78,6 @@ export const clientList = [
     arc,
     dfs,
     devSeed,
-    dfs,
     nasa,
 ];
 
@@ -299,6 +299,11 @@ const helixUpdateTextCases: Task = {
     title: 'Update test cases',
     contract: helixSupport.id,
 };
+const helixGeneral: Task = {
+    id: 10301003,
+    title: 'General',
+    contract: helixSupport.id,
+};
 
 // MapSwipe tasks
 const mapSwipeAccessibility: Task = {
@@ -391,6 +396,7 @@ export const taskList = [
     alertHubLogin,
     helixAwsAccount,
     helixUpdateTextCases,
+    helixGeneral,
     deepAnalysisModule,
     deepOcr,
     snwgFargetIntegration,

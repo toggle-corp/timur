@@ -42,7 +42,7 @@ export interface Task {
     // contractDetails: Contract;
 }
 
-export type WorkItemType = 'design' | 'development' | 'qa' | 'devops' | 'documentation' | 'meeting' | 'internal-discussion';
+export type WorkItemType = 'design' | 'development' | 'qa' | 'devops' | 'documentation' | 'meeting' | 'internal-discussion' | 'misc';
 export type WorkItemStatus = 'todo' | 'doing' | 'done';
 
 export interface WorkItem {
