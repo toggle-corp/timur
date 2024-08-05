@@ -63,7 +63,7 @@ function InputError(props: Props) {
             {children && !disabled && (
                 <Popup
                     className={_cs(styles.inputError, className)}
-                    pointerClassName={styles.pointer}
+                    // pointerClassName={styles.pointer}
                     parentRef={parentRef}
                 >
                     {children}

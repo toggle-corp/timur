@@ -42,8 +42,6 @@ import {
     WorkItemType,
 } from '#utils/types';
 
-import UpdateNoteDialog from './UpdateNoteDialog';
-import ShortcutsDialog from './ShortcutsDialog';
 import AddWorkItemDialog from './AddWorkItemDialog';
 import {
     contractById,
@@ -51,6 +49,8 @@ import {
     taskById,
 } from './data';
 import DayView from './DayView';
+import ShortcutsDialog from './ShortcutsDialog';
+import UpdateNoteDialog from './UpdateNoteDialog';
 
 import styles from './styles.module.css';
 

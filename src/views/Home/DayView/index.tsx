@@ -114,7 +114,13 @@ function DayView(props: Props) {
                     <div className={styles.title}>
                         No entries here!
                     </div>
-                    Click on "Add entry" to create a new entry.
+                    <p>
+                        Click on
+                        {' '}
+                        <em>Add entry</em>
+                        {' '}
+                        to create a new entry.
+                    </p>
                 </div>
             )}
         />

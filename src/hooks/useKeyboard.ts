@@ -11,7 +11,7 @@ type OptionKey = string | number | boolean;
 - Handles setting value of focusedKey exclusively
 */
 
-const specialKeys = ["Enter", "Backspace", "ArrowUp", "ArrowDown"];
+const specialKeys = ['Enter', 'Backspace', 'ArrowUp', 'ArrowDown'];
 
 function getOptionIndex<T, Q extends OptionKey>(
     key: Q | undefined,
@@ -61,7 +61,7 @@ function useKeyboard<T, Q extends OptionKey>(
             // NOTE: De-structuring e here will create access error
             const { code } = e;
             const myKey = focusedKey?.key;
-            if (isOptionsShown && (code === "Tab" || code === "Escape")) {
+            if (isOptionsShown && (code === 'Tab' || code === 'Escape')) {
                 // If tab or escape was pressed and dropdown is being shown,
                 // hide the dropdown.
                 e.stopPropagation();
@@ -73,7 +73,7 @@ function useKeyboard<T, Q extends OptionKey>(
                 e.stopPropagation();
                 e.preventDefault();
                 onShowOptions();
-            } else if (isOptionsShown && code === "Enter") {
+            } else if (isOptionsShown && code === 'Enter') {
                 if (isDefined(myKey)) {
                     e.stopPropagation();
                     e.preventDefault();
@@ -90,12 +90,12 @@ function useKeyboard<T, Q extends OptionKey>(
                         onEnterWithoutOption();
                     }
                 }
-            } else if (isOptionsShown && code === "ArrowDown") {
+            } else if (isOptionsShown && code === 'ArrowDown') {
                 e.stopPropagation();
                 e.preventDefault();
                 const newFocusedKey = getNewKey(myKey, 1, options, keySelector);
                 onFocusChange(newFocusedKey ? { key: newFocusedKey } : undefined);
-            } else if (isOptionsShown && code === "ArrowUp") {
+            } else if (isOptionsShown && code === 'ArrowUp') {
                 e.stopPropagation();
                 e.preventDefault();
                 const newFocusedKey = getNewKey(myKey, -1, options, keySelector);

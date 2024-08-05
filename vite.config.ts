@@ -8,6 +8,7 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import checker from 'vite-plugin-checker';
 import { compression } from 'vite-plugin-compression2';
 import svgr from 'vite-plugin-svgr';
+import { VitePWA } from 'vite-plugin-pwa';
 
 import envConfig from './env';
 
@@ -33,6 +34,13 @@ export default defineConfig(({ mode }) => {
                     lintCommand: 'stylelint "./src/**/*.css"',
                 },
             }) : undefined,
+            VitePWA({
+                registerType: 'autoUpdate',
+                devOptions: { enabled: !isProd },
+                manifest: {
+                    theme_color: 'white',
+                },
+            }),
             svgr(),
             reactSwc(),
             tsconfigPaths(),

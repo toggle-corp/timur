@@ -11,12 +11,14 @@
     gap: var(--spacing-sm);
 }
 
+/*
 .pointer {
     opacity: 0;
     animation: fade-in var(--duration-transition-medium) ease-in forwards;
     animation-delay: var(--duration-transition-medium);
     color: var(--color-primary);
 }
+*/
 
 @keyframes slide-down {
     from {
