@@ -41,7 +41,7 @@ interface Props {
     onEditingModeChange: React.Dispatch<React.SetStateAction<EditingMode>>
 }
 
-function AddWorkItemDialog(props: Props) {
+function AddNoteDialog(props: Props) {
     const {
         dialogOpenTriggerRef,
         note,
@@ -50,16 +50,16 @@ function AddWorkItemDialog(props: Props) {
         onEditingModeChange,
     } = props;
 
-    const [showAddWorkItemDialog, setShowAddWorkItemDialog] = useState(false);
+    const [showDialog, setShowDialog] = useState(false);
 
     useEffect(() => {
         dialogOpenTriggerRef.current = () => {
-            setShowAddWorkItemDialog(true);
+            setShowDialog(true);
         };
     }, [dialogOpenTriggerRef]);
 
     const handleModalClose = useCallback(() => {
-        setShowAddWorkItemDialog(false);
+        setShowDialog(false);
     }, []);
 
     const handleMarkdownChange = useCallback(
@@ -71,7 +71,7 @@ function AddWorkItemDialog(props: Props) {
 
     return (
         <Dialog
-            open={showAddWorkItemDialog}
+            open={showDialog}
             mode="right"
             onClose={handleModalClose}
             heading="Notes"
@@ -102,4 +102,4 @@ function AddWorkItemDialog(props: Props) {
     );
 }
 
-export default AddWorkItemDialog;
+export default AddNoteDialog;

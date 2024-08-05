@@ -10,6 +10,7 @@ import {
     IoChevronBackSharp,
     IoChevronDown,
     IoChevronForwardSharp,
+    IoHelp,
 } from 'react-icons/io5';
 import {
     encodeDate,
@@ -41,7 +42,8 @@ import {
     WorkItemType,
 } from '#utils/types';
 
-import AddNoteDialog from './AddNoteDialog';
+import UpdateNoteDialog from './UpdateNoteDialog';
+import ShortcutsDialog from './ShortcutsDialog';
 import AddWorkItemDialog from './AddWorkItemDialog';
 import {
     contractById,
@@ -110,6 +112,7 @@ export function Component() {
     // NOTE: We are opening the dialog from this parent component
     const dialogOpenTriggerRef = useRef<(() => void) | undefined>();
     const noteDialogOpenTriggerRef = useRef<(() => void) | undefined>();
+    const shortcutsDialogOpenTriggerRef = useRef<(() => void) | undefined>();
 
     // Read state from the stored state
     const workItems = storedState.workItems ?? emptyArray;
@@ -410,6 +413,15 @@ export function Component() {
         [handleNoteCreate],
     );
 
+    const handleShortcutsButtonClick = useCallback(
+        () => {
+            if (shortcutsDialogOpenTriggerRef.current) {
+                shortcutsDialogOpenTriggerRef.current();
+            }
+        },
+        [],
+    );
+
     const handleKeybindingsPress = useCallback(
         (event: KeyboardEvent) => {
             if (event.ctrlKey && event.code === 'Space') {
@@ -492,6 +504,15 @@ export function Component() {
                 >
                     Today
                 </Button>
+                <Button
+                    name
+                    onClick={handleShortcutsButtonClick}
+                    variant="secondary"
+                    title="Open shortcuts"
+                    spacing="sm"
+                >
+                    <IoHelp />
+                </Button>
             </div>
             <div className={styles.dayHeader}>
                 <div className={styles.headerContent}>
@@ -551,14 +572,16 @@ export function Component() {
                 value={focusContextValue}
             >
                 <DayView
-                    selectedDate={selectedDate}
                     workItems={currentWorkItems}
                     onWorkItemClone={handleWorkItemClone}
                     onWorkItemChange={handleWorkItemChange}
                     onWorkItemDelete={handleWorkItemDelete}
                 />
             </FocusContext.Provider>
-            <AddNoteDialog
+            <ShortcutsDialog
+                dialogOpenTriggerRef={shortcutsDialogOpenTriggerRef}
+            />
+            <UpdateNoteDialog
                 dialogOpenTriggerRef={noteDialogOpenTriggerRef}
                 note={currentNote}
                 onNoteContentUpdate={handleNoteUpdate}
