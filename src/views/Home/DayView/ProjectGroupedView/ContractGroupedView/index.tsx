@@ -50,7 +50,7 @@ function ContractGroupedView(props: Props) {
 
     const totalHours = useMemo(
         () => (
-            sum(workItems.map((item) => item.hours).filter(isDefined))
+            sum(workItems.map((item) => item.duration).filter(isDefined))
         ),
         [workItems],
     );
@@ -77,9 +77,9 @@ function ContractGroupedView(props: Props) {
         <div className={_cs(styles.contractGroupedView, className)}>
             <div className={styles.heading}>
                 <h3>
-                    {project.title}
+                    {project.name}
                     {' › '}
-                    {contract.title}
+                    {contract.name}
                 </h3>
                 {!focusMode && (
                     <div className={styles.duration}>

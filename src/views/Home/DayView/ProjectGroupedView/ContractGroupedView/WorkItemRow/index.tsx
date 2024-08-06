@@ -1,5 +1,6 @@
 import {
     useCallback,
+    useContext,
     useMemo,
 } from 'react';
 import {
@@ -12,44 +13,38 @@ import Button from '#components/Button';
 import DurationInput from '#components/DurationInput';
 import SelectInput from '#components/SelectInput';
 import TextArea from '#components/TextArea';
+import EnumsContext from '#contexts/enums';
+import { EnumsQuery } from '#generated/types/graphql';
 import { useFocusClient } from '#hooks/useFocus';
 import {
     Contract,
     EntriesAsList,
     Task,
     WorkItem,
-    WorkItemStatus,
-    WorkItemType,
 } from '#utils/types';
-
-import {
-    statusOptions,
-    taskList,
-    typeOptions,
-} from '../../../../data';
 
 import styles from './styles.module.css';
 
-type WorkItemTypeOption = { id: WorkItemType, title: string };
-type WorkItemStatusOption = { id: WorkItemStatus, title: string };
+type WorkItemTypeOption = EnumsQuery['enums']['TimeEntryType'][number];
+type WorkItemStatusOption = EnumsQuery['enums']['TimeEntryStatus'][number];
 
 function taskKeySelector(item: Task) {
     return item.id;
 }
 function taskLabelSelector(item: Task) {
-    return item.title;
+    return item.name;
 }
 function workItemTypeKeySelector(item: WorkItemTypeOption) {
-    return item.id;
+    return item.key;
 }
 function workItemTypeLabelSelector(item: WorkItemTypeOption) {
-    return item.title;
+    return item.label;
 }
 function workItemStatusKeySelector(item: WorkItemStatusOption) {
-    return item.id;
+    return item.key;
 }
 function workItemStatusLabelSelector(item: WorkItemStatusOption) {
-    return item.title;
+    return item.label;
 }
 
 export interface Props {
@@ -57,9 +52,9 @@ export interface Props {
     workItem: WorkItem;
     contract: Contract;
 
-    onClone: (id: number) => void;
-    onChange: (id: number, ...entries: EntriesAsList<WorkItem>) => void;
-    onDelete: (id: number) => void;
+    onClone: (clientId: string) => void;
+    onChange: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
+    onDelete: (clientId: string) => void;
     focusMode: boolean;
 }
 
@@ -74,6 +69,7 @@ function WorkItemRow(props: Props) {
         focusMode,
     } = props;
 
+    const { enums } = useContext(EnumsContext);
     const inputRef = useFocusClient<HTMLTextAreaElement>(String(workItem.id));
 
     const setFieldValue = useCallback(
@@ -84,8 +80,8 @@ function WorkItemRow(props: Props) {
     );
 
     const taskListByContract = useMemo(
-        () => taskList.filter((task) => task.contract === contract.id),
-        [contract.id],
+        () => enums?.private?.allActiveTasks?.filter((task) => task.contract.id === contract.id),
+        [contract.id, enums],
     );
 
     return (
@@ -96,7 +92,7 @@ function WorkItemRow(props: Props) {
             <SelectInput
                 className={styles.status}
                 name="status"
-                options={statusOptions}
+                options={enums?.enums?.TimeEntryStatus}
                 keySelector={workItemStatusKeySelector}
                 labelSelector={workItemStatusLabelSelector}
                 onChange={setFieldValue}
@@ -118,19 +114,19 @@ function WorkItemRow(props: Props) {
                 <>
                     <SelectInput
                         className={styles.task}
-                        name="task"
+                        name="taskId"
                         options={taskListByContract}
                         keySelector={taskKeySelector}
                         labelSelector={taskLabelSelector}
                         onChange={setFieldValue}
-                        value={workItem.task}
+                        value={workItem.taskId}
                         nonClearable
                         icons="🧘"
                     />
                     <SelectInput
                         className={styles.type}
                         name="type"
-                        options={typeOptions}
+                        options={enums?.enums.TimeEntryType}
                         keySelector={workItemTypeKeySelector}
                         labelSelector={workItemTypeLabelSelector}
                         onChange={setFieldValue}
@@ -140,9 +136,9 @@ function WorkItemRow(props: Props) {
                     />
                     <DurationInput
                         className={styles.hours}
-                        name="hours"
+                        name="duration"
                         title="Hours"
-                        value={workItem.hours}
+                        value={workItem.duration}
                         onChange={setFieldValue}
                         icons="⏱️"
                         placeholder="hh:mm"

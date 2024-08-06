@@ -2,6 +2,7 @@ import {
     type Dispatch,
     type SetStateAction,
     useCallback,
+    useEffect,
     useMemo,
     useRef,
     useState,
@@ -22,11 +23,19 @@ import {
     mapToList,
     sum,
 } from '@togglecorp/fujs';
+import {
+    gql,
+    useQuery,
+} from 'urql';
 
 import Button from '#components/Button';
 import Page from '#components/Page';
 import RawInput from '#components/RawInput';
 import FocusContext from '#contexts/focus';
+import {
+    MyTimeEntriesQuery,
+    MyTimeEntriesQueryVariables,
+} from '#generated/types/graphql';
 import { useFocusManager } from '#hooks/useFocus';
 import useKeybind from '#hooks/useKeybind';
 import useLocalStorage from '#hooks/useLocalStorage';
@@ -45,11 +54,6 @@ import {
 } from '#utils/types';
 
 import AddWorkItemDialog from './AddWorkItemDialog';
-import {
-    contractById,
-    projectById,
-    taskById,
-} from './data';
 import DayView from './DayView';
 import ShortcutsDialog from './ShortcutsDialog';
 import UpdateNoteDialog from './UpdateNoteDialog';
@@ -71,6 +75,39 @@ const dateFormatter = new Intl.DateTimeFormat(
 );
 
 const emptyArray: unknown[] = [];
+
+const MY_TIME_ENTRIES_QUERY = gql`
+    query MyTimeEntries($date: Date!) {
+        private {
+            id
+            myTimeEntries(date: $date) {
+                id
+                startTime
+                type
+                typeDisplay
+                description
+                duration
+                status
+                task {
+                    id
+                    name
+                    contract {
+                        id
+                        name
+                        project {
+                            id
+                            name
+                            client {
+                                id
+                                name
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+`;
 
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
@@ -210,12 +247,15 @@ export function Component() {
         [setStoredState],
     );
 
-    const currentWorkItems = useMemo(
-        () => (
-            workItems.filter(({ date }) => date === selectedDate)
-        ),
-        [workItems, selectedDate],
-    );
+    const [myTimeEntriesResult] = useQuery<MyTimeEntriesQuery, MyTimeEntriesQueryVariables>({
+        query: MY_TIME_ENTRIES_QUERY,
+        variables: { date: selectedDate },
+    });
+
+    useEffect(() => {
+        setWorkItems(myTimeEntriesResult.data?.private.myTimeEntries ?? []);
+    }, [myTimeEntriesResult, setWorkItems]);
+
     const currentNote = useMemo(
         () => (
             notes.find(({ date }) => date === selectedDate)
@@ -243,6 +283,9 @@ export function Component() {
     const handleWorkItemCreate = useCallback(
         (taskId: number) => {
             const newId = getNewId();
+            console.info(newId);
+
+            /*
             setWorkItems((oldWorkItems = []) => ([
                 ...oldWorkItems,
                 {
@@ -253,6 +296,8 @@ export function Component() {
                     date: selectedDate,
                 },
             ]));
+            */
+
             focus(String(newId));
         },
         [setWorkItems, selectedDate, configDefaultTaskType, configDefaultTaskStatus, focus],
@@ -410,24 +455,23 @@ export function Component() {
             function toSubItem(workItem: WorkItem) {
                 const description = workItem.description ?? '??';
                 const status = (workItem.status ?? 'todo' satisfies WorkItemStatus);
-                const task = taskById[workItem.task];
 
                 return description
                     .split('\n')
                     .map((item, i) => ([
                         i === 0 ? '  -' : '   ',
-                        status !== 'done' ? `\`${status.toUpperCase()}\`` : undefined,
-                        i === 0 ? `${task.title}: ${item}` : item,
+                        status !== 'DONE' ? `\`${status.toUpperCase()}\`` : undefined,
+                        i === 0 ? `${workItem.task.title}: ${item}` : item,
                     ].filter(isDefined).join(' ')))
                     .join('\n');
             }
 
             const groupedWorkItems = mapToList(listToGroupList(
-                currentWorkItems,
-                (workItem) => contractById[taskById[workItem.task].contract].project,
+                workItems,
+                (workItem) => workItem.task.contract.project.id,
                 undefined,
-                (list, projectId) => ({
-                    project: projectById[Number(projectId)],
+                (list) => ({
+                    project: list[0].task.contract.project,
                     workItems: list,
                 }),
             ));
@@ -446,7 +490,7 @@ export function Component() {
 
             window.navigator.clipboard.writeText(text);
         },
-        [currentWorkItems],
+        [workItems],
     );
 
     const handleDateButtonClick = useCallback(
@@ -532,9 +576,9 @@ export function Component() {
 
     const totalHours = useMemo(
         () => (
-            sum(currentWorkItems.map((item) => item.hours).filter(isDefined))
+            sum(workItems.map((item) => item.duration).filter(isDefined))
         ),
-        [currentWorkItems],
+        [workItems],
     );
 
     const focusContextValue = useMemo(
@@ -637,7 +681,7 @@ export function Component() {
                         name={undefined}
                         onClick={handleCopyTextButtonClick}
                         variant="secondary"
-                        disabled={currentWorkItems.length === 0}
+                        disabled={workItems.length === 0}
                     >
                         Copy standup text
                     </Button>
@@ -662,7 +706,7 @@ export function Component() {
                 value={focusContextValue}
             >
                 <DayView
-                    workItems={currentWorkItems}
+                    workItems={workItems}
                     onWorkItemClone={handleWorkItemClone}
                     onWorkItemChange={handleWorkItemChange}
                     onWorkItemDelete={handleWorkItemDelete}
@@ -681,7 +725,7 @@ export function Component() {
             />
             <AddWorkItemDialog
                 dialogOpenTriggerRef={dialogOpenTriggerRef}
-                workItems={currentWorkItems}
+                workItems={workItems}
                 onWorkItemCreate={handleWorkItemCreate}
                 defaultTaskType={configDefaultTaskType}
                 onDefaultTaskTypeChange={setDefaultTaskType}

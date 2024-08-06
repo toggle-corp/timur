@@ -9,6 +9,7 @@ import checker from 'vite-plugin-checker';
 import { compression } from 'vite-plugin-compression2';
 import svgr from 'vite-plugin-svgr';
 import { VitePWA } from 'vite-plugin-pwa';
+import basicSsl from '@vitejs/plugin-basic-ssl';
 
 import envConfig from './env';
 
@@ -25,6 +26,7 @@ export default defineConfig(({ mode }) => {
             'import.meta.env.APP_VERSION': JSON.stringify(env.npm_package_version),
         },
         plugins: [
+            !isProd ? basicSsl() : undefined,
             isProd ? checker({
                 // typescript: true,
                 eslint: {
@@ -60,7 +62,9 @@ export default defineConfig(({ mode }) => {
         envPrefix: 'APP_',
         server: {
             port: 3000,
+            host: 'local.timur.dev.togglecorp.com',
             strictPort: true,
+            https: true,
         },
         build: {
             outDir: './build',

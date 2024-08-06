@@ -17,11 +17,6 @@ import {
     WorkItem,
 } from '#utils/types';
 
-import {
-    contractById,
-    projectById,
-    taskById,
-} from '../data';
 import ProjectGroupedView, { Props as ProjectGroupedViewProps } from './ProjectGroupedView';
 
 import styles from './styles.module.css';
@@ -66,17 +61,17 @@ function DayView(props: Props) {
             return mapToList(listToGroupList(
                 mapToList(listToGroupList(
                     workItems,
-                    (workItem) => taskById[workItem.task].contract,
+                    (workItem) => workItem.task.contract.id,
                     undefined,
-                    (list, contractId) => ({
-                        contract: contractById[Number(contractId)],
+                    (list) => ({
+                        contract: list[0].task.contract,
                         workItems: list,
                     }),
                 )),
-                (contractGrouped) => contractGrouped.contract.project,
+                (contractGrouped) => contractGrouped.contract.project.id,
                 undefined,
-                (list, projectId) => ({
-                    project: projectById[Number(projectId)],
+                (list) => ({
+                    project: list[0].contract.project,
                     contracts: list,
                 }),
             ));

@@ -3,12 +3,12 @@
     justify-content: center;
     box-shadow: var(--box-shadow-md);
     background-color: var(--color-foreground);
-    padding: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-lg);
 
-    .main {
+    .brand {
         display: flex;
         align-items: center;
-        width: 100%;
+        flex-grow: 1;
         max-width: var(--width-page-content--max);
         gap: var(--spacing-sm);
 
@@ -16,8 +16,23 @@
             height: 1.4rem;
         }
 
-        .brand {
+        .app-name {
             font-size: var(--font-size-2xl);
+        }
+    }
+
+    .auth {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        flex-shrink: 0;
+
+        .display-picture {
+            border-radius: 1rem;
+            width: 2rem;
+            height: 2rem;
+            object-fit: cover;
+            object-position: center center;
         }
     }
 }

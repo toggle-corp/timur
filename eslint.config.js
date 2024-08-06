@@ -119,8 +119,7 @@ const appConfigs = compat.config({
     ]
 }).map((conf) => ({
     ...conf,
-    files: ['src/**/*.tsx', 'src/**/*.jsx', 'src/**/*.ts', 'src/**/*.js'],
-    ignores: ['src/generated/types.ts'],
+    files: ['src/**/*.tsx', 'src/**/*.jsx', 'src/**/*.ts', 'src/**/*.js', 'generated/**/*.ts'],
 }));
 
 const otherConfig = {
