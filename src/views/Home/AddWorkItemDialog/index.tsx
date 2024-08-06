@@ -21,6 +21,7 @@ import SelectInput from '#components/SelectInput';
 import TextInput from '#components/TextInput';
 import {
     WorkItem,
+    WorkItemStatus,
     WorkItemType,
 } from '#utils/types';
 
@@ -28,6 +29,7 @@ import {
     clientById,
     contractById,
     projectById,
+    statusOptions,
     taskList,
     typeOptions,
 } from '../data';
@@ -63,6 +65,14 @@ function workItemTypeLabelSelector(item: WorkItemTypeOption) {
     return item.title;
 }
 
+type WorkItemStatusOption = { id: WorkItemStatus, title: string };
+function workItemStatusKeySelector(item: WorkItemStatusOption) {
+    return item.id;
+}
+function workItemStatusLabelSelector(item: WorkItemStatusOption) {
+    return item.title;
+}
+
 type BoolStr = 'true' | 'false';
 
 type ModeOption = { id: BoolStr, title: string };
@@ -83,6 +93,8 @@ interface Props {
     onWorkItemCreate: (taskId: number) => void;
     defaultTaskType: WorkItemType;
     onDefaultTaskTypeChange: React.Dispatch<React.SetStateAction<WorkItemType>>
+    defaultTaskStatus: WorkItemStatus;
+    onDefaultTaskStatusChange: React.Dispatch<React.SetStateAction<WorkItemStatus>>
     allowMultipleEntry: boolean;
     onAllowMultipleEntryChange: React.Dispatch<React.SetStateAction<boolean>>
 }
@@ -93,8 +105,10 @@ function AddWorkItemDialog(props: Props) {
         workItems,
         onWorkItemCreate,
         defaultTaskType,
-        allowMultipleEntry,
         onDefaultTaskTypeChange,
+        defaultTaskStatus,
+        onDefaultTaskStatusChange,
+        allowMultipleEntry,
         onAllowMultipleEntryChange,
     } = props;
 
@@ -188,6 +202,17 @@ function AddWorkItemDialog(props: Props) {
                 labelSelector={workItemTypeLabelSelector}
                 onChange={onDefaultTaskTypeChange}
                 value={defaultTaskType}
+                variant="general"
+                nonClearable
+            />
+            <SelectInput
+                name="type"
+                label="Default Status"
+                options={statusOptions}
+                keySelector={workItemStatusKeySelector}
+                labelSelector={workItemStatusLabelSelector}
+                onChange={onDefaultTaskStatusChange}
+                value={defaultTaskStatus}
                 variant="general"
                 nonClearable
             />

@@ -67,9 +67,9 @@ export default defineConfig(({ mode }) => {
             emptyOutDir: true,
             rollupOptions: {
                 output: {
-                    chunkFileNames: `${env.npm_package_version}/chunk-[name].[hash].js`,
-                    entryFileNames: `${env.npm_package_version}/entry-[name].[hash].js`,
-                    assetFileNames: `${env.npm_package_version}/asset-[name]-[hash].[ext]`,
+                    chunkFileNames: 'chunk-[name].[hash].js',
+                    entryFileNames: 'entry-[name].[hash].js',
+                    assetFileNames: 'asset-[name]-[hash].[ext]',
                     manualChunks: {
                         'code-mirror': [
                             '@codemirror/lang-markdown',

@@ -39,6 +39,7 @@ import {
     EntriesAsList,
     Note,
     WorkItem,
+    WorkItemStatus,
     WorkItemType,
 } from '#utils/types';
 
@@ -79,6 +80,7 @@ export function Component() {
         notes: Note[]
 
         configDefaultTaskType: WorkItemType,
+        configDefaultTaskStatus: WorkItemStatus,
         configAllowMultipleEntry: boolean,
         configEditingMode: EditingMode,
     }>(
@@ -88,6 +90,7 @@ export function Component() {
             notes: [],
             workItems: [],
             configDefaultTaskType: 'development',
+            configDefaultTaskStatus: 'done',
             configAllowMultipleEntry: false,
             configEditingMode: 'normal',
         },
@@ -118,6 +121,7 @@ export function Component() {
     const workItems = storedState.workItems ?? emptyArray;
     const notes = storedState.notes ?? emptyArray;
     const configDefaultTaskType = storedState.configDefaultTaskType ?? 'development';
+    const configDefaultTaskStatus = storedState.configDefaultTaskStatus ?? 'done';
     const configAllowMultipleEntry = storedState.configAllowMultipleEntry ?? false;
     const configEditingMode = storedState.configEditingMode ?? 'normal';
 
@@ -139,6 +143,17 @@ export function Component() {
                 ...oldValue,
                 configDefaultTaskType: typeof func === 'function'
                     ? func(oldValue.configDefaultTaskType)
+                    : func,
+            }));
+        },
+        [setStoredState],
+    );
+    const setDefaultTaskStatus: Dispatch<SetStateAction<WorkItemStatus>> = useCallback(
+        (func) => {
+            setStoredState((oldValue) => ({
+                ...oldValue,
+                configDefaultTaskStatus: typeof func === 'function'
+                    ? func(oldValue.configDefaultTaskStatus)
                     : func,
             }));
         },
@@ -210,12 +225,13 @@ export function Component() {
                     id: newId,
                     task: taskId,
                     type: configDefaultTaskType,
+                    status: configDefaultTaskStatus,
                     date: selectedDate,
                 },
             ]));
             focus(String(newId));
         },
-        [setWorkItems, selectedDate, configDefaultTaskType, focus],
+        [setWorkItems, selectedDate, configDefaultTaskType, configDefaultTaskStatus, focus],
     );
 
     const handleWorkItemClone = useCallback(
@@ -285,12 +301,25 @@ export function Component() {
                 }
 
                 const obsoleteWorkItem = oldWorkItems[sourceItemIndex];
+                const newWorkItem = {
+                    ...obsoleteWorkItem,
+                    [entries[1]]: entries[0],
+                };
+
+                if (
+                    isDefined(newWorkItem.hours)
+                    && newWorkItem.hours > 0
+                    && obsoleteWorkItem.hours !== newWorkItem.hours
+                    && newWorkItem.status === 'todo'
+                ) {
+                    newWorkItem.status = 'doing';
+                }
 
                 const newWorkItems = [...oldWorkItems];
                 newWorkItems.splice(
                     sourceItemIndex,
                     1,
-                    { ...obsoleteWorkItem, [entries[1]]: entries[0] },
+                    newWorkItem,
                 );
 
                 return newWorkItems;
@@ -594,6 +623,8 @@ export function Component() {
                 onWorkItemCreate={handleWorkItemCreate}
                 defaultTaskType={configDefaultTaskType}
                 onDefaultTaskTypeChange={setDefaultTaskType}
+                defaultTaskStatus={configDefaultTaskStatus}
+                onDefaultTaskStatusChange={setDefaultTaskStatus}
                 allowMultipleEntry={configAllowMultipleEntry}
                 onAllowMultipleEntryChange={setAllowMultipleEntryChange}
             />
