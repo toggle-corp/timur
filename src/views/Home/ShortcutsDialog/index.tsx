@@ -73,6 +73,20 @@ function ShortcutsDialog(props: Props) {
                 {' '}
                 to go to present day.
             </div>
+            <div>
+                Hit
+                {' '}
+                <code>Ctrl+Shift+F</code>
+                {' '}
+                to toggle focus mode.
+            </div>
+            <div>
+                Hit
+                {' '}
+                <code>Ctrl+Shift+?</code>
+                {' '}
+                to view shortcuts.
+            </div>
         </Dialog>
     );
 }

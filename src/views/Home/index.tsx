@@ -7,6 +7,7 @@ import {
     useState,
 } from 'react';
 import {
+    IoAperture,
     IoChevronBackSharp,
     IoChevronDown,
     IoChevronForwardSharp,
@@ -83,6 +84,7 @@ export function Component() {
         configDefaultTaskStatus: WorkItemStatus,
         configAllowMultipleEntry: boolean,
         configEditingMode: EditingMode,
+        configFocusMode: boolean,
     }>(
         KEY_DATA_STORAGE,
         {
@@ -93,6 +95,7 @@ export function Component() {
             configDefaultTaskStatus: 'done',
             configAllowMultipleEntry: false,
             configEditingMode: 'normal',
+            configFocusMode: false,
         },
     );
 
@@ -124,6 +127,7 @@ export function Component() {
     const configDefaultTaskStatus = storedState.configDefaultTaskStatus ?? 'done';
     const configAllowMultipleEntry = storedState.configAllowMultipleEntry ?? false;
     const configEditingMode = storedState.configEditingMode ?? 'normal';
+    const configFocusMode = storedState.configFocusMode ?? false;
 
     // Write to stored state
     const setWorkItems: Dispatch<SetStateAction<WorkItem[]>> = useCallback(
@@ -176,6 +180,17 @@ export function Component() {
                 ...oldValue,
                 configEditingMode: typeof func === 'function'
                     ? func(oldValue.configEditingMode)
+                    : func,
+            }));
+        },
+        [setStoredState],
+    );
+    const setFocusModeChange: Dispatch<SetStateAction<boolean>> = useCallback(
+        (func) => {
+            setStoredState((oldValue) => ({
+                ...oldValue,
+                configFocusMode: typeof func === 'function'
+                    ? func(oldValue.configFocusMode)
                     : func,
             }));
         },
@@ -453,29 +468,42 @@ export function Component() {
 
     const handleKeybindingsPress = useCallback(
         (event: KeyboardEvent) => {
-            if (event.ctrlKey && event.code === 'Space') {
+            if (event.ctrlKey && event.key === ' ') {
                 handleWorkItemAddClick();
                 event.preventDefault();
                 event.stopPropagation();
-            } else if (event.ctrlKey && event.code === 'Enter') {
+            } else if (event.ctrlKey && event.key === 'Enter') {
                 handleNoteUpdateClick();
                 event.preventDefault();
                 event.stopPropagation();
-            } else if (event.ctrlKey && event.shiftKey && event.code === 'ArrowLeft') {
+            } else if (event.ctrlKey && event.shiftKey && event.key === 'ArrowLeft') {
                 setSelectedDate((value) => addDays(value, -1));
                 event.preventDefault();
                 event.stopPropagation();
-            } else if (event.ctrlKey && event.shiftKey && event.code === 'ArrowRight') {
+            } else if (event.ctrlKey && event.shiftKey && event.key === 'ArrowRight') {
                 setSelectedDate((value) => addDays(value, 1));
                 event.preventDefault();
                 event.stopPropagation();
-            } else if (event.ctrlKey && event.shiftKey && event.code === 'ArrowDown') {
+            } else if (event.ctrlKey && event.shiftKey && event.key === 'ArrowDown') {
                 setSelectedDate(encodeDate(new Date()));
+                event.preventDefault();
+                event.stopPropagation();
+            } else if (event.ctrlKey && event.shiftKey && event.key === 'F') {
+                setFocusModeChange((oldVal) => !oldVal);
+                event.preventDefault();
+                event.stopPropagation();
+            } else if (event.ctrlKey && event.shiftKey && event.key === '?') {
+                handleShortcutsButtonClick();
                 event.preventDefault();
                 event.stopPropagation();
             }
         },
-        [handleWorkItemAddClick, handleNoteUpdateClick],
+        [
+            handleWorkItemAddClick,
+            handleNoteUpdateClick,
+            setFocusModeChange,
+            handleShortcutsButtonClick,
+        ],
     );
 
     useKeybind(handleKeybindingsPress);
@@ -506,42 +534,55 @@ export function Component() {
             contentClassName={styles.content}
         >
             <div className={styles.pageHeader}>
-                <Button
-                    name={addDays(selectedDate, -1)}
-                    onClick={handleDateSelection}
-                    variant="secondary"
-                    title="Previous day"
-                    spacing="sm"
-                >
-                    <IoChevronBackSharp />
-                </Button>
-                <Button
-                    name={addDays(selectedDate, 1)}
-                    onClick={handleDateSelection}
-                    variant="secondary"
-                    title="Next day"
-                    spacing="sm"
-                >
-                    <IoChevronForwardSharp />
-                </Button>
-                <Button
-                    name={encodeDate(today)}
-                    onClick={handleDateSelection}
-                    variant="secondary"
-                    disabled={selectedDate === encodeDate(today)}
-                    spacing="sm"
-                >
-                    Today
-                </Button>
-                <Button
-                    name
-                    onClick={handleShortcutsButtonClick}
-                    variant="secondary"
-                    title="Open shortcuts"
-                    spacing="sm"
-                >
-                    <IoHelp />
-                </Button>
+                <div className={styles.headerContent}>
+                    <Button
+                        name={addDays(selectedDate, -1)}
+                        onClick={handleDateSelection}
+                        variant="secondary"
+                        title="Previous day"
+                        spacing="sm"
+                    >
+                        <IoChevronBackSharp />
+                    </Button>
+                    <Button
+                        name={addDays(selectedDate, 1)}
+                        onClick={handleDateSelection}
+                        variant="secondary"
+                        title="Next day"
+                        spacing="sm"
+                    >
+                        <IoChevronForwardSharp />
+                    </Button>
+                    <Button
+                        name={encodeDate(today)}
+                        onClick={handleDateSelection}
+                        variant="secondary"
+                        disabled={selectedDate === encodeDate(today)}
+                        spacing="sm"
+                    >
+                        Today
+                    </Button>
+                </div>
+                <div className={styles.actions}>
+                    <Button
+                        name={!configFocusMode}
+                        onClick={setFocusModeChange}
+                        variant={configFocusMode ? 'primary' : 'secondary'}
+                        title={configFocusMode ? 'Disable focus mode' : 'Enable focus mode'}
+                        spacing="sm"
+                    >
+                        <IoAperture />
+                    </Button>
+                    <Button
+                        name
+                        onClick={handleShortcutsButtonClick}
+                        variant="secondary"
+                        title="Open shortcuts"
+                        spacing="sm"
+                    >
+                        <IoHelp />
+                    </Button>
+                </div>
             </div>
             <div className={styles.dayHeader}>
                 <div className={styles.headerContent}>
@@ -565,11 +606,13 @@ export function Component() {
                             {formattedDate}
                         </Button>
                     </div>
-                    <div>
-                        ⏱️
-                        {' '}
-                        {getDurationString(totalHours)}
-                    </div>
+                    {!configFocusMode && (
+                        <div className={styles.duration}>
+                            ⏱️
+                            {' '}
+                            {getDurationString(totalHours)}
+                        </div>
+                    )}
                 </div>
                 <div className={styles.actions}>
                     <Button
@@ -605,6 +648,7 @@ export function Component() {
                     onWorkItemClone={handleWorkItemClone}
                     onWorkItemChange={handleWorkItemChange}
                     onWorkItemDelete={handleWorkItemDelete}
+                    focusMode={configFocusMode}
                 />
             </FocusContext.Provider>
             <ShortcutsDialog

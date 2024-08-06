@@ -33,6 +33,7 @@ export interface Props {
     onWorkItemClone: (id: number) => void;
     onWorkItemChange: (id: number, ...entries: EntriesAsList<WorkItem>) => void;
     onWorkItemDelete: (id: number) => void;
+    focusMode: boolean;
 }
 
 function ContractGroupedView(props: Props) {
@@ -44,6 +45,7 @@ function ContractGroupedView(props: Props) {
         onWorkItemClone,
         onWorkItemChange,
         onWorkItemDelete,
+        focusMode,
     } = props;
 
     const totalHours = useMemo(
@@ -60,12 +62,14 @@ function ContractGroupedView(props: Props) {
             onChange: onWorkItemChange,
             onDelete: onWorkItemDelete,
             contract,
+            focusMode,
         }),
         [
             onWorkItemClone,
             onWorkItemChange,
             onWorkItemDelete,
             contract,
+            focusMode,
         ],
     );
 
@@ -77,11 +81,13 @@ function ContractGroupedView(props: Props) {
                     {' › '}
                     {contract.title}
                 </h3>
-                <div>
-                    ⏱️
-                    {' '}
-                    {getDurationString(totalHours)}
-                </div>
+                {!focusMode && (
+                    <div className={styles.duration}>
+                        ⏱️
+                        {' '}
+                        {getDurationString(totalHours)}
+                    </div>
+                )}
             </div>
             <List
                 className={styles.workItemList}

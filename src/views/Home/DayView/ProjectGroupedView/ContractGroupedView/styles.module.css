@@ -7,6 +7,10 @@
         display: flex;
         gap: var(--spacing-sm);
         align-items: baseline;
+
+        .duration {
+            flex-shrink: 0;
+        }
     }
 
     .work-item-list {

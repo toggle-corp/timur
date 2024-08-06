@@ -44,6 +44,7 @@ interface Props {
     onWorkItemClone: (id: number) => void;
     onWorkItemChange: (id: number, ...entries: EntriesAsList<WorkItem>) => void;
     onWorkItemDelete: (id: number) => void;
+    focusMode: boolean;
 }
 
 function DayView(props: Props) {
@@ -53,6 +54,7 @@ function DayView(props: Props) {
         onWorkItemClone,
         onWorkItemChange,
         onWorkItemDelete,
+        focusMode,
     } = props;
 
     const groupedWorkItems = useMemo(
@@ -91,11 +93,13 @@ function DayView(props: Props) {
             onWorkItemClone,
             onWorkItemChange,
             onWorkItemDelete,
+            focusMode,
         }),
         [
             onWorkItemClone,
             onWorkItemChange,
             onWorkItemDelete,
+            focusMode,
         ],
     );
 

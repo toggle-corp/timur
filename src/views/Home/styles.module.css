@@ -16,6 +16,20 @@
         align-items: center;
         flex-wrap: wrap;
         gap: var(--spacing-sm);
+
+        .header-content {
+            display: flex;
+            align-items: baseline;
+            flex-grow: 1;
+            gap: var(--spacing-sm);
+        }
+
+        .actions {
+            display: flex;
+            gap: var(--spacing-md);
+            align-items: baseline;
+            flex-shrink: 0;
+        }
     }
 
     .day-header {
@@ -41,6 +55,7 @@
                 }
 
                 .date-button {
+                    text-align: left;
                     font-size: var(--font-size-2xl);
                     font-weight: var(--font-weight-bold);
 
@@ -49,13 +64,16 @@
                     }
                 }
             }
+
+            .duration {
+                flex-shrink: 0;
+            }
         }
 
         .actions {
             display: flex;
             gap: var(--spacing-md);
             align-items: baseline;
-            flex-shrink: 0;
         }
     }
 

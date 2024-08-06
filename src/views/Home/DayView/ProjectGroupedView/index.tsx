@@ -29,6 +29,7 @@ export interface Props {
     onWorkItemClone: (id: number) => void;
     onWorkItemChange: (id: number, ...entries: EntriesAsList<WorkItem>) => void;
     onWorkItemDelete: (id: number) => void;
+    focusMode: boolean;
 }
 
 function ProjectGroupedView(props: Props) {
@@ -39,6 +40,7 @@ function ProjectGroupedView(props: Props) {
         onWorkItemClone,
         onWorkItemChange,
         onWorkItemDelete,
+        focusMode,
     } = props;
 
     const rendererParams = useCallback(
@@ -49,12 +51,14 @@ function ProjectGroupedView(props: Props) {
             onWorkItemClone,
             onWorkItemChange,
             onWorkItemDelete,
+            focusMode,
         }),
         [
             project,
             onWorkItemClone,
             onWorkItemChange,
             onWorkItemDelete,
+            focusMode,
         ],
     );
 

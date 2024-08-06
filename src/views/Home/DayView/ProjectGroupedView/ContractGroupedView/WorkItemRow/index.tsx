@@ -60,6 +60,7 @@ export interface Props {
     onClone: (id: number) => void;
     onChange: (id: number, ...entries: EntriesAsList<WorkItem>) => void;
     onDelete: (id: number) => void;
+    focusMode: boolean;
 }
 
 function WorkItemRow(props: Props) {
@@ -70,6 +71,7 @@ function WorkItemRow(props: Props) {
         onClone,
         onDelete,
         onChange,
+        focusMode,
     } = props;
 
     const inputRef = useFocusClient<HTMLTextAreaElement>(String(workItem.id));
@@ -89,38 +91,36 @@ function WorkItemRow(props: Props) {
     return (
         <div
             role="listitem"
-            className={_cs(styles.workItemRow, className)}
+            className={_cs(styles.workItemRow, className, focusMode && styles.focusMode)}
         >
+            {!focusMode && (
+                <>
+                    <SelectInput
+                        className={styles.task}
+                        name="task"
+                        options={taskListByContract}
+                        keySelector={taskKeySelector}
+                        labelSelector={taskLabelSelector}
+                        onChange={setFieldValue}
+                        value={workItem.task}
+                        nonClearable
+                        icons="🧘"
+                    />
+                    <SelectInput
+                        className={styles.type}
+                        name="type"
+                        options={typeOptions}
+                        keySelector={workItemTypeKeySelector}
+                        labelSelector={workItemTypeLabelSelector}
+                        onChange={setFieldValue}
+                        value={workItem.type}
+                        nonClearable
+                        icons="📐"
+                    />
+                </>
+            )}
             <SelectInput
-                name="task"
-                options={taskListByContract}
-                keySelector={taskKeySelector}
-                labelSelector={taskLabelSelector}
-                onChange={setFieldValue}
-                value={workItem.task}
-                nonClearable
-                icons="🧘"
-            />
-            <SelectInput
-                name="type"
-                options={typeOptions}
-                keySelector={workItemTypeKeySelector}
-                labelSelector={workItemTypeLabelSelector}
-                onChange={setFieldValue}
-                value={workItem.type}
-                nonClearable
-                icons="📐"
-            />
-            <TextArea<'description'>
-                inputElementRef={inputRef}
-                name="description"
-                title="Description"
-                value={workItem.description}
-                onChange={setFieldValue}
-                icons="🗒️"
-                placeholder="Description"
-            />
-            <SelectInput
+                className={styles.status}
                 name="status"
                 options={statusOptions}
                 keySelector={workItemStatusKeySelector}
@@ -130,34 +130,49 @@ function WorkItemRow(props: Props) {
                 nonClearable
                 icons="🪩"
             />
-            <DurationInput
-                name="hours"
-                title="Hours"
-                value={workItem.hours}
+            <TextArea<'description'>
+                className={styles.description}
+                inputElementRef={inputRef}
+                name="description"
+                title="Description"
+                value={workItem.description}
                 onChange={setFieldValue}
-                icons="⏱️"
-                placeholder="hh:mm"
+                icons="🗒️"
+                placeholder="Description"
             />
-            <div className={styles.actions}>
-                <Button
-                    name={workItem.id}
-                    variant="secondary"
-                    title="Clone this entry"
-                    onClick={onClone}
-                    spacing="sm"
-                >
-                    <IoCopyOutline />
-                </Button>
-                <Button
-                    name={workItem.id}
-                    variant="secondary"
-                    spacing="sm"
-                    title="Delete this entry"
-                    onClick={onDelete}
-                >
-                    <IoTrashOutline />
-                </Button>
-            </div>
+            {!focusMode && (
+                <>
+                    <DurationInput
+                        className={styles.hours}
+                        name="hours"
+                        title="Hours"
+                        value={workItem.hours}
+                        onChange={setFieldValue}
+                        icons="⏱️"
+                        placeholder="hh:mm"
+                    />
+                    <div className={styles.actions}>
+                        <Button
+                            name={workItem.id}
+                            variant="secondary"
+                            title="Clone this entry"
+                            onClick={onClone}
+                            spacing="sm"
+                        >
+                            <IoCopyOutline />
+                        </Button>
+                        <Button
+                            name={workItem.id}
+                            variant="secondary"
+                            spacing="sm"
+                            title="Delete this entry"
+                            onClick={onDelete}
+                        >
+                            <IoTrashOutline />
+                        </Button>
+                    </div>
+                </>
+            )}
         </div>
     );
 }
