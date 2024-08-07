@@ -35,6 +35,7 @@ export default defineConfig(({ mode }) => {
                 },
             }) : undefined,
             VitePWA({
+                buildBase: './build',
                 registerType: 'autoUpdate',
                 devOptions: { enabled: !isProd },
                 manifest: {

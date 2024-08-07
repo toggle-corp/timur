@@ -11,7 +11,7 @@ import {
     IoChevronBackSharp,
     IoChevronDown,
     IoChevronForwardSharp,
-    IoHelp,
+    IoInformation,
 } from 'react-icons/io5';
 import {
     encodeDate,
@@ -580,7 +580,7 @@ export function Component() {
                         title="Open shortcuts"
                         spacing="sm"
                     >
-                        <IoHelp />
+                        <IoInformation />
                     </Button>
                 </div>
             </div>
