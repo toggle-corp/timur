@@ -1,5 +1,6 @@
 import {
     useCallback,
+    useContext,
     useMemo,
 } from 'react';
 import {
@@ -10,6 +11,7 @@ import {
 } from '@togglecorp/fujs';
 
 import List from '#components/List';
+import EnumsContext from '#contexts/enums';
 import {
     Contract,
     EntriesAsList,
@@ -36,9 +38,9 @@ function getId(item: ProjectGroupedWorkItem) {
 interface Props {
     className?: string;
     workItems: WorkItem[] | undefined;
-    onWorkItemClone: (id: number) => void;
-    onWorkItemChange: (id: number, ...entries: EntriesAsList<WorkItem>) => void;
-    onWorkItemDelete: (id: number) => void;
+    onWorkItemClone: (clientId: string) => void;
+    onWorkItemChange: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
+    onWorkItemDelete: (clientId: string) => void;
     focusMode: boolean;
 }
 
@@ -52,19 +54,22 @@ function DayView(props: Props) {
         focusMode,
     } = props;
 
+    const { taskById } = useContext(EnumsContext);
+    console.info('task by id', taskById);
+
     const groupedWorkItems = useMemo(
         (): ProjectGroupedWorkItem[] | undefined => {
-            if (isNotDefined(workItems)) {
+            if (isNotDefined(workItems) || isNotDefined(taskById)) {
                 return undefined;
             }
 
             return mapToList(listToGroupList(
                 mapToList(listToGroupList(
                     workItems,
-                    (workItem) => workItem.task.contract.id,
+                    (workItem) => taskById[workItem.task].contract.id,
                     undefined,
                     (list) => ({
-                        contract: list[0].task.contract,
+                        contract: taskById[list[0].task].contract,
                         workItems: list,
                     }),
                 )),
@@ -76,13 +81,13 @@ function DayView(props: Props) {
                 }),
             ));
         },
-        [workItems],
+        [workItems, taskById],
     );
 
     type GroupedWorkItem = NonNullable<(typeof groupedWorkItems)>[number];
 
     const rendererParams = useCallback(
-        (_: number, item: GroupedWorkItem): ProjectGroupedViewProps => ({
+        (_: string, item: GroupedWorkItem): ProjectGroupedViewProps => ({
             contracts: item.contracts,
             project: item.project,
             onWorkItemClone,

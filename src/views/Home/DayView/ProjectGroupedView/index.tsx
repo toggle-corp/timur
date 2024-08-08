@@ -26,9 +26,9 @@ export interface Props {
     className?: string;
     project: Project;
     contracts: ContractGroupedWorkItem[];
-    onWorkItemClone: (id: number) => void;
-    onWorkItemChange: (id: number, ...entries: EntriesAsList<WorkItem>) => void;
-    onWorkItemDelete: (id: number) => void;
+    onWorkItemClone: (clientId: string) => void;
+    onWorkItemChange: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
+    onWorkItemDelete: (clientId: string) => void;
     focusMode: boolean;
 }
 
@@ -44,7 +44,7 @@ function ProjectGroupedView(props: Props) {
     } = props;
 
     const rendererParams = useCallback(
-        (_: number, item: ContractGroupedWorkItem): ContractGroupedViewProps => ({
+        (_: string, item: ContractGroupedWorkItem): ContractGroupedViewProps => ({
             project,
             contract: item.contract,
             workItems: item.workItems,

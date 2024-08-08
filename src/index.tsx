@@ -21,6 +21,7 @@ const gqlClient = new UrqlClient({
     fetchOptions: () => ({
         credentials: 'include',
     }),
+    requestPolicy: 'network-only',
 });
 
 if (isNotDefined(webappRootElement)) {

@@ -11,7 +11,10 @@ const config: CodegenConfig = {
         './generated/types/': {
             preset: 'client'
         }
-    }
+    },
+    config: {
+        enumsAsTypes: true,
+    },
 }
 
 export default config;

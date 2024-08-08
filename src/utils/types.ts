@@ -1,4 +1,9 @@
-import { MyTimeEntriesQuery } from "#generated/types/graphql";
+import {
+    EnumsQuery,
+    TimeEntryBulkCreateInput,
+    TimeEntryStatusEnum,
+    TimeEntryTypeEnum,
+} from '#generated/types/graphql';
 
 export type EntriesAsList<T> = {
     [K in keyof T]-?: [T[K], K, ...unknown[]];
@@ -9,18 +14,18 @@ export type SpacingVariant = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export type EditingMode = 'normal' | 'vim';
 
-export type Task = WorkItem['task'];
+export type Task = EnumsQuery['private']['allActiveTasks'][number];
 export type Contract = Task['contract'];
 export type Project = Contract['project'];
-export type Client = Contract['project']['client'];
+export type Client = Contract['project']['projectClient'];
 
-export type WorkItemType = 'design' | 'development' | 'qa' | 'devops' | 'documentation' | 'meeting' | 'internal-discussion' | 'misc';
-export type WorkItemStatus = 'todo' | 'doing' | 'done';
+export type WorkItemType = TimeEntryTypeEnum;
+export type WorkItemStatus = TimeEntryStatusEnum;
 
-export type WorkItem = MyTimeEntriesQuery['private']['myTimeEntries'][number];
+export type WorkItem = TimeEntryBulkCreateInput;
 
 export interface Note {
-    id: number;
+    id: string;
     date: string;
     content: string | undefined;
 }

@@ -22,7 +22,7 @@ import WorkItemRow, { Props as WorkItemRowProps } from './WorkItemRow';
 import styles from './styles.module.css';
 
 function keySelector(item: WorkItem) {
-    return item.id;
+    return item.clientId ?? '??';
 }
 
 export interface Props {
@@ -30,9 +30,9 @@ export interface Props {
     contract: Contract;
     project: Project;
     workItems: WorkItem[];
-    onWorkItemClone: (id: number) => void;
-    onWorkItemChange: (id: number, ...entries: EntriesAsList<WorkItem>) => void;
-    onWorkItemDelete: (id: number) => void;
+    onWorkItemClone: (clientId: string) => void;
+    onWorkItemChange: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
+    onWorkItemDelete: (clientId: string) => void;
     focusMode: boolean;
 }
 
@@ -56,7 +56,7 @@ function ContractGroupedView(props: Props) {
     );
 
     const rendererParams = useCallback(
-        (_: number, item: WorkItem): WorkItemRowProps => ({
+        (_: string, item: WorkItem): WorkItemRowProps => ({
             workItem: item,
             onClone: onWorkItemClone,
             onChange: onWorkItemChange,

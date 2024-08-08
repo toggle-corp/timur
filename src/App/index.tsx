@@ -8,12 +8,13 @@ import {
     createBrowserRouter,
     RouterProvider,
 } from 'react-router-dom';
+import { listToMap } from '@togglecorp/fujs';
 import {
     gql,
     useQuery,
 } from 'urql';
 
-import EnumsContext from '#contexts/enums';
+import EnumsContext, { EnumsContextProps } from '#contexts/enums';
 import RouteContext from '#contexts/route';
 import UserContext, {
     UserAuth,
@@ -74,7 +75,7 @@ const ENUMS_QUERY = gql`
                     project {
                         id
                         name
-                        client {
+                        projectClient {
                             id
                             name
                         }
@@ -117,7 +118,15 @@ function App() {
         }),
         [userAuth, setAndStoreUserAuth, removeUserAuth],
     );
-    const enumsContextValue = useMemo(() => ({ enums: enumsResult.data }), [enumsResult]);
+    const enumsContextValue = useMemo<EnumsContextProps>(
+        () => ({
+            enums: enumsResult.data,
+            taskById: listToMap(enumsResult.data?.private.allActiveTasks, ({ id }) => id),
+            statusByKey: listToMap(enumsResult.data?.enums.TimeEntryStatus, ({ key }) => key),
+            typeByKey: listToMap(enumsResult.data?.enums.TimeEntryType, ({ key }) => key),
+        }),
+        [enumsResult],
+    );
 
     return (
         <RouteContext.Provider value={wrappedRoutes}>

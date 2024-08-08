@@ -36,7 +36,7 @@ function editingModeLabelSelector(item: EditingModeOption) {
 interface Props {
     dialogOpenTriggerRef: React.MutableRefObject<(() => void) | undefined>;
     note: Note | undefined;
-    onNoteContentUpdate: (value: string | undefined, id: number | undefined) => void;
+    onNoteContentUpdate: (value: string | undefined, id: string | undefined) => void;
     editingMode: EditingMode,
     onEditingModeChange: React.Dispatch<React.SetStateAction<EditingMode>>
 }

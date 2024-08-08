@@ -4,9 +4,10 @@ import {
     encodeDate,
     isFalsyString,
 } from '@togglecorp/fujs';
+import { ulid } from 'ulidx';
 
-export function getNewId() {
-    return Math.round(Math.random() * 9999999);
+export function getNewId(): string {
+    return ulid();
 }
 
 export function rankedSearchOnList<T>(

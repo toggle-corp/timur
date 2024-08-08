@@ -2,6 +2,7 @@ import {
     type Dispatch,
     type SetStateAction,
     useCallback,
+    useContext,
     useEffect,
     useMemo,
     useRef,
@@ -20,17 +21,21 @@ import {
     isFalsyString,
     isNotDefined,
     listToGroupList,
+    listToMap,
     mapToList,
     sum,
+    unique,
 } from '@togglecorp/fujs';
 import {
     gql,
+    useMutation,
     useQuery,
 } from 'urql';
 
 import Button from '#components/Button';
 import Page from '#components/Page';
 import RawInput from '#components/RawInput';
+import EnumsContext from '#contexts/enums';
 import FocusContext from '#contexts/focus';
 import {
     MyTimeEntriesQuery,
@@ -44,6 +49,7 @@ import {
     getDurationString,
     getNewId,
 } from '#utils/common';
+import { removeNull } from '#utils/nullHelper';
 import {
     EditingMode,
     EntriesAsList,
@@ -81,39 +87,165 @@ const MY_TIME_ENTRIES_QUERY = gql`
         private {
             id
             myTimeEntries(date: $date) {
-                id
-                startTime
-                type
-                typeDisplay
+                clientId
+                date
                 description
                 duration
+                id
+                startTime
                 status
-                task {
+                taskId
+                type
+            }
+        }
+    }
+`;
+
+const BULK_TIME_ENTRY_MUTATION = gql`
+    mutation BulkTimeEntry($timeEntries: [TimeEntryBulkCreateInput!], $deleteIds: [ID!]) {
+        private {
+            bulkTimeEntry(
+                items: $timeEntries,
+                deleteIds: $deleteIds
+            ) {
+                deleted {
+                    clientId
                     id
-                    name
-                    contract {
-                        id
-                        name
-                        project {
-                            id
-                            name
-                            client {
-                                id
-                                name
-                            }
-                        }
-                    }
+                }
+                errors
+                results {
+                    id
                 }
             }
         }
     }
 `;
 
+function getChangedItems(
+    initialItems: WorkItem[] | undefined,
+    finalItems: WorkItem[] | undefined,
+) {
+    const initialKeysMap = listToMap(initialItems ?? [], ({ clientId }) => clientId ?? '??');
+    const finalKeysMap = listToMap(finalItems ?? [], ({ clientId }) => clientId ?? '??');
+
+    const addedKeys = Object.keys(finalKeysMap).filter(
+        (key) => !initialKeysMap[key],
+    );
+    const removedKeys = Object.keys(initialKeysMap).filter(
+        (key) => !finalKeysMap[key],
+    );
+    const updatedKeys = Object.keys(initialKeysMap).filter(
+        (key) => {
+            if (isNotDefined(finalKeysMap[key])) {
+                return false;
+            }
+
+            const initialJson = JSON.stringify(initialKeysMap[key]);
+            const finalJson = JSON.stringify(finalKeysMap[key]);
+
+            return initialJson !== finalJson;
+        },
+    );
+
+    return {
+        addedItems: addedKeys.map((key) => finalKeysMap[key]),
+        removedItems: removedKeys.map((key) => initialKeysMap[key]),
+        updatedItems: updatedKeys.map((key) => finalKeysMap[key]),
+    };
+}
+
+function useBackgroundSync() {
+    const [dataFromServer, setDataFromServer] = useState<WorkItem[]>();
+    const [dataFromState, setDataFromState] = useState<WorkItem[]>();
+
+    const updateServerData = useCallback((workItems: WorkItem[] | undefined) => {
+        setDataFromServer((prevData) => {
+            const newData = unique(
+                [...workItems ?? [], ...prevData ?? []],
+                ({ clientId }) => clientId ?? '??',
+            );
+
+            return newData;
+        });
+    }, []);
+
+    const updateStateData = useCallback((workItems: WorkItem[] | undefined) => {
+        setDataFromState((prevData) => {
+            const newData = unique(
+                [...workItems ?? [], ...prevData ?? []],
+                ({ clientId }) => clientId ?? '??',
+            );
+
+            return newData;
+        });
+    }, []);
+
+    const removeStateData = useCallback((clientId: string | null | undefined) => {
+        setDataFromState((prevData) => {
+            if (!prevData) {
+                return prevData;
+            }
+            const newData = [...prevData ?? []];
+            const obsoleteIndex = newData?.findIndex((item) => item.clientId === clientId);
+
+            if (obsoleteIndex !== -1) {
+                newData.splice(obsoleteIndex, 1);
+            }
+
+            return newData;
+        });
+    }, []);
+
+    const [, triggerBulkMutation] = useMutation(BULK_TIME_ENTRY_MUTATION);
+    const diffTriggerRef = useRef<number>();
+
+    useEffect(() => {
+        window.clearTimeout(diffTriggerRef.current);
+        diffTriggerRef.current = window.setTimeout(
+            () => {
+                const {
+                    addedItems,
+                    removedItems,
+                    updatedItems,
+                } = getChangedItems(dataFromServer, dataFromState);
+
+                if (addedItems.length === 0
+                    && removedItems.length === 0
+                    && updatedItems.length === 0
+                ) {
+                    console.info('no changes detected...');
+                    return;
+                }
+
+                console.info('syncing...');
+                triggerBulkMutation({
+                    timeEntries: [
+                        ...addedItems,
+                        ...updatedItems,
+                    ],
+                    deleteIds: removedItems.map(({ id }) => id),
+                });
+                setDataFromServer(dataFromState);
+            },
+            5000,
+        );
+    }, [dataFromState, dataFromServer, triggerBulkMutation]);
+
+    return useMemo(() => ({
+        updateServerData,
+        updateStateData,
+        removeStateData,
+    }), [updateServerData, updateStateData, removeStateData]);
+}
+
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
+    const [workItems, setWorkItems] = useState<WorkItem[]>([]);
+    const { taskById } = useContext(EnumsContext);
+    const { updateStateData, updateServerData, removeStateData } = useBackgroundSync();
+
     const [storedState, setStoredState] = useLocalStorage<{
         appVersion: string,
-        workItems: WorkItem[],
         notes: Note[]
 
         configDefaultTaskType: WorkItemType,
@@ -126,9 +258,8 @@ export function Component() {
         {
             appVersion: APP_VERSION,
             notes: [],
-            workItems: [],
-            configDefaultTaskType: 'development',
-            configDefaultTaskStatus: 'done',
+            configDefaultTaskType: 'DEVELOPMENT',
+            configDefaultTaskStatus: 'DONE',
             configAllowMultipleEntry: false,
             configEditingMode: 'normal',
             configFocusMode: false,
@@ -160,7 +291,6 @@ export function Component() {
     const shortcutsDialogOpenTriggerRef = useRef<(() => void) | undefined>();
 
     // Read state from the stored state
-    const workItems = storedState.workItems ?? emptyArray;
     const notes = storedState.notes ?? emptyArray;
     const configDefaultTaskType = storedState.configDefaultTaskType ?? 'development';
     const configDefaultTaskStatus = storedState.configDefaultTaskStatus ?? 'done';
@@ -168,18 +298,6 @@ export function Component() {
     const configEditingMode = storedState.configEditingMode ?? 'normal';
     const configFocusMode = storedState.configFocusMode ?? false;
 
-    // Write to stored state
-    const setWorkItems: Dispatch<SetStateAction<WorkItem[]>> = useCallback(
-        (func) => {
-            setStoredState((oldValue) => ({
-                ...oldValue,
-                workItems: typeof func === 'function'
-                    ? func(oldValue.workItems)
-                    : func,
-            }));
-        },
-        [setStoredState],
-    );
     const setDefaultTaskType: Dispatch<SetStateAction<WorkItemType>> = useCallback(
         (func) => {
             setStoredState((oldValue) => ({
@@ -253,8 +371,23 @@ export function Component() {
     });
 
     useEffect(() => {
-        setWorkItems(myTimeEntriesResult.data?.private.myTimeEntries ?? []);
-    }, [myTimeEntriesResult, setWorkItems]);
+        const workItemsFromServer = removeNull(
+            myTimeEntriesResult.data?.private.myTimeEntries?.map(
+                (timeEntry) => {
+                    const { taskId, ...otherTimeEntryProps } = timeEntry;
+
+                    return {
+                        ...otherTimeEntryProps,
+                        task: taskId,
+                    };
+                },
+            ) ?? [],
+        );
+
+        setWorkItems(workItemsFromServer);
+        updateServerData(workItemsFromServer);
+        updateStateData(workItemsFromServer);
+    }, [myTimeEntriesResult, setWorkItems, updateServerData, updateStateData]);
 
     const currentNote = useMemo(
         () => (
@@ -281,30 +414,37 @@ export function Component() {
     );
 
     const handleWorkItemCreate = useCallback(
-        (taskId: number) => {
+        (taskId: string) => {
             const newId = getNewId();
-            console.info(newId);
+            const newItem = {
+                clientId: newId,
+                task: taskId,
+                type: configDefaultTaskType,
+                status: configDefaultTaskStatus,
+                date: selectedDate,
+            } satisfies WorkItem;
 
-            /*
             setWorkItems((oldWorkItems = []) => ([
                 ...oldWorkItems,
-                {
-                    id: newId,
-                    task: taskId,
-                    type: configDefaultTaskType,
-                    status: configDefaultTaskStatus,
-                    date: selectedDate,
-                },
+                newItem,
             ]));
-            */
+
+            updateStateData([newItem]);
 
             focus(String(newId));
         },
-        [setWorkItems, selectedDate, configDefaultTaskType, configDefaultTaskStatus, focus],
+        [
+            setWorkItems,
+            selectedDate,
+            configDefaultTaskType,
+            configDefaultTaskStatus,
+            focus,
+            updateStateData,
+        ],
     );
 
     const handleWorkItemClone = useCallback(
-        (workItemId: number) => {
+        (workItemId: string) => {
             const newId = getNewId();
             setWorkItems((oldWorkItems) => {
                 if (isNotDefined(oldWorkItems)) {
@@ -326,16 +466,17 @@ export function Component() {
 
                 const newWorkItems = [...oldWorkItems];
                 newWorkItems.splice(sourceItemIndex + 1, 0, targetItem);
+                updateStateData(newWorkItems);
 
                 return newWorkItems;
             });
             focus(String(newId));
         },
-        [setWorkItems, focus],
+        [setWorkItems, focus, updateStateData],
     );
 
     const handleWorkItemDelete = useCallback(
-        (workItemId: number) => {
+        (workItemId: string) => {
             setWorkItems((oldWorkItems) => {
                 if (isNotDefined(oldWorkItems)) {
                     return oldWorkItems;
@@ -346,6 +487,9 @@ export function Component() {
                 if (sourceItemIndex === -1) {
                     return oldWorkItems;
                 }
+
+                const removedItem = oldWorkItems[sourceItemIndex];
+                removeStateData(removedItem.clientId);
 
                 const newWorkItems = [...oldWorkItems];
                 newWorkItems.splice(sourceItemIndex, 1);
@@ -353,11 +497,11 @@ export function Component() {
                 return newWorkItems;
             });
         },
-        [setWorkItems],
+        [setWorkItems, removeStateData],
     );
 
     const handleWorkItemChange = useCallback(
-        (workItemId: number, ...entries: EntriesAsList<WorkItem>) => {
+        (workItemId: string, ...entries: EntriesAsList<WorkItem>) => {
             setWorkItems((oldWorkItems) => {
                 if (isNotDefined(oldWorkItems)) {
                     return oldWorkItems;
@@ -365,26 +509,31 @@ export function Component() {
 
                 const sourceItemIndex = oldWorkItems
                     .findIndex(({ id }) => workItemId === id);
+
                 if (sourceItemIndex === -1) {
                     return oldWorkItems;
                 }
 
                 const obsoleteWorkItem = oldWorkItems[sourceItemIndex];
+
                 const newWorkItem = {
                     ...obsoleteWorkItem,
                     [entries[1]]: entries[0],
                 };
 
                 if (
-                    isDefined(newWorkItem.hours)
-                    && newWorkItem.hours > 0
-                    && obsoleteWorkItem.hours !== newWorkItem.hours
-                    && newWorkItem.status === 'todo'
+                    isDefined(newWorkItem.duration)
+                    && newWorkItem.duration > 0
+                    && obsoleteWorkItem.duration !== newWorkItem.duration
+                    && newWorkItem.status === 'TODO'
                 ) {
-                    newWorkItem.status = 'doing';
+                    newWorkItem.status = 'DOING';
                 }
 
+                updateStateData([newWorkItem]);
+
                 const newWorkItems = [...oldWorkItems];
+
                 newWorkItems.splice(
                     sourceItemIndex,
                     1,
@@ -394,7 +543,7 @@ export function Component() {
                 return newWorkItems;
             });
         },
-        [setWorkItems],
+        [setWorkItems, updateStateData],
     );
 
     const handleNoteCreate = useCallback(
@@ -417,7 +566,7 @@ export function Component() {
     );
 
     const handleNoteUpdate = useCallback(
-        (content: string | undefined, noteId: number | undefined) => {
+        (content: string | undefined, noteId: string | undefined) => {
             setNotes((oldNotes = []) => {
                 if (!noteId) {
                     // eslint-disable-next-line no-console
@@ -466,12 +615,16 @@ export function Component() {
                     .join('\n');
             }
 
+            if (isNotDefined(taskById)) {
+                return;
+            }
+
             const groupedWorkItems = mapToList(listToGroupList(
                 workItems,
-                (workItem) => workItem.task.contract.project.id,
+                (workItem) => taskById[workItem.task].contract.project.id,
                 undefined,
                 (list) => ({
-                    project: list[0].task.contract.project,
+                    project: taskById?.[list[0].task].contract.project,
                     workItems: list,
                 }),
             ));
@@ -490,7 +643,7 @@ export function Component() {
 
             window.navigator.clipboard.writeText(text);
         },
-        [workItems],
+        [workItems, taskById],
     );
 
     const handleDateButtonClick = useCallback(

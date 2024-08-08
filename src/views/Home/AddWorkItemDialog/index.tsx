@@ -1,5 +1,6 @@
 import {
     useCallback,
+    useContext,
     useEffect,
     useMemo,
     useRef,
@@ -19,20 +20,13 @@ import Dialog from '#components/Dialog';
 import RawButton from '#components/RawButton';
 import SelectInput from '#components/SelectInput';
 import TextInput from '#components/TextInput';
+import EnumsContext from '#contexts/enums';
+import { EnumsQuery } from '#generated/types/graphql';
 import {
     WorkItem,
     WorkItemStatus,
     WorkItemType,
 } from '#utils/types';
-
-import {
-    clientById,
-    contractById,
-    projectById,
-    statusOptions,
-    taskList,
-    typeOptions,
-} from '../data';
 
 import styles from './styles.module.css';
 
@@ -57,20 +51,20 @@ function fuzzySearch<ItemType = string>(
     );
 }
 
-type WorkItemTypeOption = { id: WorkItemType, title: string };
+type WorkItemTypeOption = EnumsQuery['enums']['TimeEntryType'][number];
 function workItemTypeKeySelector(item: WorkItemTypeOption) {
-    return item.id;
+    return item.key;
 }
 function workItemTypeLabelSelector(item: WorkItemTypeOption) {
-    return item.title;
+    return item.label;
 }
 
-type WorkItemStatusOption = { id: WorkItemStatus, title: string };
+type WorkItemStatusOption = EnumsQuery['enums']['TimeEntryStatus'][number];
 function workItemStatusKeySelector(item: WorkItemStatusOption) {
-    return item.id;
+    return item.key;
 }
 function workItemStatusLabelSelector(item: WorkItemStatusOption) {
-    return item.title;
+    return item.label;
 }
 
 type BoolStr = 'true' | 'false';
@@ -90,7 +84,7 @@ const modeOptions: ModeOption[] = [
 interface Props {
     dialogOpenTriggerRef: React.MutableRefObject<(() => void) | undefined>;
     workItems: WorkItem[] | undefined;
-    onWorkItemCreate: (taskId: number) => void;
+    onWorkItemCreate: (taskId: string) => void;
     defaultTaskType: WorkItemType;
     onDefaultTaskTypeChange: React.Dispatch<React.SetStateAction<WorkItemType>>
     defaultTaskStatus: WorkItemStatus;
@@ -138,7 +132,7 @@ function AddWorkItemDialog(props: Props) {
     }, []);
 
     const handleWorkItemCreate = useCallback(
-        (taskId: number) => {
+        (taskId: string) => {
             onWorkItemCreate(taskId);
             if (!allowMultipleEntry) {
                 handleModalClose();
@@ -154,21 +148,23 @@ function AddWorkItemDialog(props: Props) {
         [onAllowMultipleEntryChange],
     );
 
+    const { enums } = useContext(EnumsContext);
+
     const filteredTaskList = useMemo(
         () => fuzzySearch(
-            taskList,
+            enums?.private.allActiveTasks ?? [],
             searchText ?? '',
             {
                 keys: [
-                    (task) => task.title,
-                    (task) => contractById[task.contract]?.title,
-                    (task) => projectById[contractById[task.contract]?.project]?.title ?? '',
-                    (task) => clientById[projectById[contractById[task.contract]?.project]?.client]?.title ?? '',
-                    (task) => clientById[projectById[contractById[task.contract]?.project]?.client]?.abbvr ?? '',
+                    (task) => task.name,
+                    (task) => task.contract.name,
+                    (task) => task.contract.project.name,
+                    (task) => task.contract.project.projectClient.name,
+                    // (task) => task.contract.project.client.abbvr,
                 ],
             },
         ),
-        [searchText],
+        [searchText, enums],
     );
 
     return (
@@ -197,7 +193,7 @@ function AddWorkItemDialog(props: Props) {
             <SelectInput
                 name="type"
                 label="Default Type"
-                options={typeOptions}
+                options={enums?.enums.TimeEntryType}
                 keySelector={workItemTypeKeySelector}
                 labelSelector={workItemTypeLabelSelector}
                 onChange={onDefaultTaskTypeChange}
@@ -208,7 +204,7 @@ function AddWorkItemDialog(props: Props) {
             <SelectInput
                 name="type"
                 label="Default Status"
-                options={statusOptions}
+                options={enums?.enums.TimeEntryStatus}
                 keySelector={workItemStatusKeySelector}
                 labelSelector={workItemStatusLabelSelector}
                 onChange={onDefaultTaskStatusChange}
@@ -232,9 +228,9 @@ function AddWorkItemDialog(props: Props) {
                 className={styles.taskList}
             >
                 {filteredTaskList.map((task) => {
-                    const contract = contractById[task.contract];
-                    const project = projectById[contract.project];
-                    const client = clientById[project.client];
+                    const { contract } = task;
+                    const { project } = contract;
+                    const { projectClient } = project;
                     const count = taskCountMapping?.[task.id] ?? 0;
 
                     return (
@@ -247,16 +243,16 @@ function AddWorkItemDialog(props: Props) {
                         >
                             <IoAddSharp className={styles.icon} />
                             <div className={styles.details}>
-                                {task.title}
+                                {task.name}
                                 <div className={styles.meta}>
                                     <div className={styles.badge}>
-                                        {client.abbvr ?? client.title}
+                                        {projectClient.name}
                                     </div>
                                     <div className={styles.badge}>
-                                        {project.title}
+                                        {project.name}
                                     </div>
                                     <div className={styles.badge}>
-                                        {contract.title}
+                                        {contract.name}
                                     </div>
                                 </div>
                             </div>

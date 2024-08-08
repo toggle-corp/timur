@@ -7,7 +7,10 @@ import {
     IoCopyOutline,
     IoTrashOutline,
 } from 'react-icons/io5';
-import { _cs } from '@togglecorp/fujs';
+import {
+    _cs,
+    isDefined,
+} from '@togglecorp/fujs';
 
 import Button from '#components/Button';
 import DurationInput from '#components/DurationInput';
@@ -74,12 +77,14 @@ function WorkItemRow(props: Props) {
 
     const setFieldValue = useCallback(
         (...entries: EntriesAsList<WorkItem>) => {
-            onChange(workItem.id, ...entries);
+            if (isDefined(workItem.id)) {
+                onChange(workItem.id, ...entries);
+            }
         },
         [workItem.id, onChange],
     );
 
-    const taskListByContract = useMemo(
+    const filteredTaskList = useMemo(
         () => enums?.private?.allActiveTasks?.filter((task) => task.contract.id === contract.id),
         [contract.id, enums],
     );
@@ -110,16 +115,16 @@ function WorkItemRow(props: Props) {
                 icons="🗒️"
                 placeholder="Description"
             />
-            {!focusMode && (
+            {!focusMode && isDefined(workItem.id) && (
                 <>
                     <SelectInput
                         className={styles.task}
-                        name="taskId"
-                        options={taskListByContract}
+                        name="task"
+                        options={filteredTaskList}
                         keySelector={taskKeySelector}
                         labelSelector={taskLabelSelector}
                         onChange={setFieldValue}
-                        value={workItem.taskId}
+                        value={workItem.task}
                         nonClearable
                         icons="🧘"
                     />
