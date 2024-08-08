@@ -157,6 +157,7 @@ function getChangedItems(
 function useBackgroundSync() {
     const [dataFromServer, setDataFromServer] = useState<WorkItem[]>();
     const [dataFromState, setDataFromState] = useState<WorkItem[]>();
+    const [lastMutationOn, setLastMutationOn] = useState<number>();
 
     const updateServerData = useCallback((workItems: WorkItem[] | undefined) => {
         setDataFromServer((prevData) => {
@@ -196,13 +197,20 @@ function useBackgroundSync() {
         });
     }, []);
 
-    const [, triggerBulkMutation] = useMutation(BULK_TIME_ENTRY_MUTATION);
+    const [bulkMutationState, triggerBulkMutation] = useMutation(BULK_TIME_ENTRY_MUTATION);
+
     const diffTriggerRef = useRef<number>();
 
     useEffect(() => {
+        if (dataFromState === dataFromServer) {
+            // eslint-disable-next-line no-console
+            console.info('No changes detected...');
+            return;
+        }
+
         window.clearTimeout(diffTriggerRef.current);
         diffTriggerRef.current = window.setTimeout(
-            () => {
+            async () => {
                 const {
                     addedItems,
                     removedItems,
@@ -213,21 +221,27 @@ function useBackgroundSync() {
                     && removedItems.length === 0
                     && updatedItems.length === 0
                 ) {
-                    console.info('no changes detected...');
+                    // eslint-disable-next-line no-console
+                    console.info('No changes detected...');
                     return;
                 }
 
-                console.info('syncing...');
-                triggerBulkMutation({
+                // eslint-disable-next-line no-console
+                console.info('Changes detected! Syncing with server...');
+                const bulkMutationResponse = await triggerBulkMutation({
                     timeEntries: [
                         ...addedItems,
                         ...updatedItems,
                     ],
                     deleteIds: removedItems.map(({ id }) => id),
                 });
-                setDataFromServer(dataFromState);
+
+                if (!bulkMutationResponse.error) {
+                    setLastMutationOn(new Date().getTime());
+                    setDataFromServer(dataFromState);
+                }
             },
-            5000,
+            2000,
         );
     }, [dataFromState, dataFromServer, triggerBulkMutation]);
 
@@ -235,14 +249,22 @@ function useBackgroundSync() {
         updateServerData,
         updateStateData,
         removeStateData,
-    }), [updateServerData, updateStateData, removeStateData]);
+        bulkMutationState,
+        lastMutationOn,
+    }), [updateServerData, updateStateData, removeStateData, bulkMutationState, lastMutationOn]);
 }
 
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
     const [workItems, setWorkItems] = useState<WorkItem[]>([]);
     const { taskById } = useContext(EnumsContext);
-    const { updateStateData, updateServerData, removeStateData } = useBackgroundSync();
+    const {
+        updateStateData,
+        updateServerData,
+        removeStateData,
+        bulkMutationState,
+        lastMutationOn,
+    } = useBackgroundSync();
 
     const [storedState, setStoredState] = useLocalStorage<{
         appVersion: string,
@@ -444,7 +466,7 @@ export function Component() {
     );
 
     const handleWorkItemClone = useCallback(
-        (workItemId: string) => {
+        (workItemClientId: string) => {
             const newId = getNewId();
             setWorkItems((oldWorkItems) => {
                 if (isNotDefined(oldWorkItems)) {
@@ -452,7 +474,7 @@ export function Component() {
                 }
 
                 const sourceItemIndex = oldWorkItems
-                    .findIndex(({ id }) => workItemId === id);
+                    .findIndex(({ clientId }) => workItemClientId === clientId);
                 if (sourceItemIndex === -1) {
                     return oldWorkItems;
                 }
@@ -476,14 +498,14 @@ export function Component() {
     );
 
     const handleWorkItemDelete = useCallback(
-        (workItemId: string) => {
+        (workItemClientId: string) => {
             setWorkItems((oldWorkItems) => {
                 if (isNotDefined(oldWorkItems)) {
                     return oldWorkItems;
                 }
 
                 const sourceItemIndex = oldWorkItems
-                    .findIndex(({ id }) => workItemId === id);
+                    .findIndex(({ clientId }) => workItemClientId === clientId);
                 if (sourceItemIndex === -1) {
                     return oldWorkItems;
                 }
@@ -501,14 +523,14 @@ export function Component() {
     );
 
     const handleWorkItemChange = useCallback(
-        (workItemId: string, ...entries: EntriesAsList<WorkItem>) => {
+        (workItemClientId: string, ...entries: EntriesAsList<WorkItem>) => {
             setWorkItems((oldWorkItems) => {
                 if (isNotDefined(oldWorkItems)) {
                     return oldWorkItems;
                 }
 
                 const sourceItemIndex = oldWorkItems
-                    .findIndex(({ id }) => workItemId === id);
+                    .findIndex(({ clientId }) => workItemClientId === clientId);
 
                 if (sourceItemIndex === -1) {
                     return oldWorkItems;
@@ -748,6 +770,11 @@ export function Component() {
             className={styles.home}
             contentClassName={styles.content}
         >
+            {bulkMutationState.fetching && myTimeEntriesResult.fetching && (
+                <div className={styles.uiBlocker}>
+                    Loading...
+                </div>
+            )}
             <div className={styles.pageHeader}>
                 <div className={styles.headerContent}>
                     <Button
@@ -779,6 +806,13 @@ export function Component() {
                     </Button>
                 </div>
                 <div className={styles.actions}>
+                    <div className={styles.lastSavedStatus}>
+                        Last saved:
+                        {' '}
+                        <strong>
+                            {lastMutationOn ? new Date(lastMutationOn).toLocaleString() : 'Never'}
+                        </strong>
+                    </div>
                     <Button
                         name={!configFocusMode}
                         onClick={setFocusModeChange}

@@ -55,7 +55,6 @@ function DayView(props: Props) {
     } = props;
 
     const { taskById } = useContext(EnumsContext);
-    console.info('task by id', taskById);
 
     const groupedWorkItems = useMemo(
         (): ProjectGroupedWorkItem[] | undefined => {

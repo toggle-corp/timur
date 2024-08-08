@@ -77,11 +77,11 @@ function WorkItemRow(props: Props) {
 
     const setFieldValue = useCallback(
         (...entries: EntriesAsList<WorkItem>) => {
-            if (isDefined(workItem.id)) {
-                onChange(workItem.id, ...entries);
+            if (isDefined(workItem.clientId)) {
+                onChange(workItem.clientId, ...entries);
             }
         },
-        [workItem.id, onChange],
+        [workItem.clientId, onChange],
     );
 
     const filteredTaskList = useMemo(
@@ -115,7 +115,7 @@ function WorkItemRow(props: Props) {
                 icons="🗒️"
                 placeholder="Description"
             />
-            {!focusMode && isDefined(workItem.id) && (
+            {!focusMode && (
                 <>
                     <SelectInput
                         className={styles.task}
@@ -148,26 +148,28 @@ function WorkItemRow(props: Props) {
                         icons="⏱️"
                         placeholder="hh:mm"
                     />
-                    <div className={styles.actions}>
-                        <Button
-                            name={workItem.id}
-                            variant="secondary"
-                            title="Clone this entry"
-                            onClick={onClone}
-                            spacing="sm"
-                        >
-                            <IoCopyOutline />
-                        </Button>
-                        <Button
-                            name={workItem.id}
-                            variant="secondary"
-                            spacing="sm"
-                            title="Delete this entry"
-                            onClick={onDelete}
-                        >
-                            <IoTrashOutline />
-                        </Button>
-                    </div>
+                    {isDefined(workItem.clientId) && (
+                        <div className={styles.actions}>
+                            <Button
+                                name={workItem.clientId}
+                                variant="secondary"
+                                title="Clone this entry"
+                                onClick={onClone}
+                                spacing="sm"
+                            >
+                                <IoCopyOutline />
+                            </Button>
+                            <Button
+                                name={workItem.clientId}
+                                variant="secondary"
+                                spacing="sm"
+                                title="Delete this entry"
+                                onClick={onDelete}
+                            >
+                                <IoTrashOutline />
+                            </Button>
+                        </div>
+                    )}
                 </>
             )}
         </div>
