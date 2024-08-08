@@ -1,12 +1,5 @@
 .grow-wrap {
-    display: grid;
     width: 100%;
-
-    &::after {
-        visibility: hidden;
-        white-space: pre-wrap;
-        content: attr(data-replicated-value) " ";
-    }
 
     .raw-input {
         margin: 0;
@@ -22,8 +15,19 @@
         font-size: inherit;
     }
 
-    .raw-input, &::after {
-        font: inherit;
-        grid-area: 1 / 1 / 2 / 2;
+    &:focus-within {
+        display: grid;
+        &::after {
+            visibility: hidden;
+            white-space: pre-wrap;
+            content: attr(data-replicated-value) " ";
+            font: inherit;
+            grid-area: 1 / 1 / 2 / 2;
+        }
+
+        .raw-input {
+            font: inherit;
+            grid-area: 1 / 1 / 2 / 2;
+        }
     }
 }

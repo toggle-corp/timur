@@ -34,7 +34,7 @@ function TextArea<const N>(props: Props<N>) {
         onChange,
         name,
         autoBullets = false,
-        rows = 5,
+        rows = 1,
         inputElementRef,
         ...otherInputProps
     } = props;

@@ -1,9 +1,9 @@
 .work-item-row {
     display: grid;
-    grid-template-columns: 3fr 2.4fr 5.8rem 7fr 6rem 6rem;
+    grid-template-columns: 6.4rem 7fr 3fr 2.4fr 6.4rem 6.2rem;
 
     &.focus-mode {
-        grid-template-columns: 5.8rem 1fr;
+        grid-template-columns: 6.4rem 1fr;
     }
 
     .actions {
@@ -24,8 +24,8 @@
         &:not(.focus-mode) {
             grid-template-columns: unset;
             grid-template-areas:
-                "a a b b"
                 "d d d d"
+                "a a b b"
                 "c e e f";
 
             .task {

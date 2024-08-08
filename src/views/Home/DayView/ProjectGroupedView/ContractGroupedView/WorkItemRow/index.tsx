@@ -93,6 +93,27 @@ function WorkItemRow(props: Props) {
             role="listitem"
             className={_cs(styles.workItemRow, className, focusMode && styles.focusMode)}
         >
+            <SelectInput
+                className={styles.status}
+                name="status"
+                options={statusOptions}
+                keySelector={workItemStatusKeySelector}
+                labelSelector={workItemStatusLabelSelector}
+                onChange={setFieldValue}
+                value={workItem.status}
+                nonClearable
+                icons="🪩"
+            />
+            <TextArea<'description'>
+                className={styles.description}
+                inputElementRef={inputRef}
+                name="description"
+                title="Description"
+                value={workItem.description}
+                onChange={setFieldValue}
+                icons="🗒️"
+                placeholder="Description"
+            />
             {!focusMode && (
                 <>
                     <SelectInput
@@ -117,31 +138,6 @@ function WorkItemRow(props: Props) {
                         nonClearable
                         icons="📐"
                     />
-                </>
-            )}
-            <SelectInput
-                className={styles.status}
-                name="status"
-                options={statusOptions}
-                keySelector={workItemStatusKeySelector}
-                labelSelector={workItemStatusLabelSelector}
-                onChange={setFieldValue}
-                value={workItem.status}
-                nonClearable
-                icons="🪩"
-            />
-            <TextArea<'description'>
-                className={styles.description}
-                inputElementRef={inputRef}
-                name="description"
-                title="Description"
-                value={workItem.description}
-                onChange={setFieldValue}
-                icons="🗒️"
-                placeholder="Description"
-            />
-            {!focusMode && (
-                <>
                     <DurationInput
                         className={styles.hours}
                         name="hours"
