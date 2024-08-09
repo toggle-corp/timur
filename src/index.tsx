@@ -4,11 +4,11 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { isNotDefined } from '@togglecorp/fujs';
 import {
-    cacheExchange,
     Client as UrqlClient,
     fetchExchange,
     Provider as UrqlProvider,
 } from 'urql';
+import { cacheExchange } from '@urql/exchange-graphcache';
 
 import App from './App/index.tsx';
 
@@ -17,7 +17,16 @@ const webappRootElement = document.getElementById(webappRootId);
 
 const gqlClient = new UrqlClient({
     url: import.meta.env.APP_GRAPHQL_ENDPOINT,
-    exchanges: [cacheExchange, fetchExchange],
+    exchanges: [cacheExchange({
+        keys: {
+            PrivateQuery: () => null,
+            PublicQuery: () => null,
+            AppEnumCollection: () => null,
+            AppEnumCollectionTimeEntryType: (item) => String(item.key),
+            AppEnumCollectionTimeEntryStatus: (item) => String(item.key),
+            AppEnumCollectionJournalLeaveType: (item) => String(item.key),
+        },
+    }), fetchExchange],
     fetchOptions: () => ({
         credentials: 'include',
     }),

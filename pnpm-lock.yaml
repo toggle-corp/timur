@@ -20,6 +20,9 @@ dependencies:
   '@uiw/react-codemirror':
     specifier: ^4.23.0
     version: 4.23.0(@babel/runtime@7.24.8)(@codemirror/autocomplete@6.17.0)(@codemirror/language@6.10.2)(@codemirror/lint@6.8.1)(@codemirror/search@6.5.6)(@codemirror/state@6.4.1)(@codemirror/theme-one-dark@6.1.2)(@codemirror/view@6.29.1)(codemirror@6.0.1)(react-dom@18.2.0)(react@18.2.0)
+  '@urql/exchange-graphcache':
+    specifier: ^7.1.2
+    version: 7.1.2(@urql/core@5.0.5)(graphql@15.9.0)
   match-sorter:
     specifier: ^6.3.4
     version: 6.3.4
@@ -3981,6 +3984,18 @@ packages:
     resolution: {integrity: sha512-KmWRlN8dJz+XU21wmhcHcTV11n1K7zxaMtVwOhkH7b8H5Z5nuFKY5EkUsWqPlZl53YPiKwTtOMpptz5hamVVNQ==}
     dependencies:
       '@0no-co/graphql.web': 1.0.7(graphql@15.9.0)
+      wonka: 6.3.4
+    transitivePeerDependencies:
+      - graphql
+    dev: false
+
+  /@urql/exchange-graphcache@7.1.2(@urql/core@5.0.5)(graphql@15.9.0):
+    resolution: {integrity: sha512-W2+lYYB/aW1xjPtrMO/Cuxnq3Wl+DuiySqbdw/II91G/NH8Axx2oxRLjWMeC5r/71RivJUrmf2FVzb4Yy1+qwQ==}
+    peerDependencies:
+      '@urql/core': ^5.0.0
+    dependencies:
+      '@0no-co/graphql.web': 1.0.7(graphql@15.9.0)
+      '@urql/core': 5.0.5(graphql@15.9.0)
       wonka: 6.3.4
     transitivePeerDependencies:
       - graphql

@@ -127,9 +127,9 @@ const BULK_TIME_ENTRY_MUTATION = gql`
 
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
-    const [workItems, setWorkItems] = useState<WorkItem[]>([]);
     const { taskById } = useContext(EnumsContext);
 
+    const [workItems, setWorkItems] = useState<WorkItem[]>([]);
     const [storedState, setStoredState] = useLocalStorage<{
         appVersion: string,
         notes: Note[]
