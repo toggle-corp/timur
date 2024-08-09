@@ -42,6 +42,7 @@ import {
     MyTimeEntriesQueryVariables,
 } from '#generated/types/graphql';
 import { useFocusManager } from '#hooks/useFocus';
+import useFormattedRelativeTime from '#hooks/useFormattedRelativeTime';
 import useKeybind from '#hooks/useKeybind';
 import useLocalStorage from '#hooks/useLocalStorage';
 import {
@@ -265,6 +266,8 @@ export function Component() {
         bulkMutationState,
         lastMutationOn,
     } = useBackgroundSync();
+
+    const lastSaved = useFormattedRelativeTime(lastMutationOn);
 
     const [storedState, setStoredState] = useLocalStorage<{
         appVersion: string,
@@ -810,7 +813,7 @@ export function Component() {
                         Last saved:
                         {' '}
                         <strong>
-                            {lastMutationOn ? new Date(lastMutationOn).toLocaleString() : 'Never'}
+                            {lastSaved}
                         </strong>
                     </div>
                     <Button
