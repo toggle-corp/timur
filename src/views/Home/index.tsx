@@ -70,7 +70,6 @@ const dateFormatter = new Intl.DateTimeFormat(
     },
 );
 
-const today = new Date();
 const emptyArray: unknown[] = [];
 
 // eslint-disable-next-line import/prefer-default-export
@@ -104,6 +103,9 @@ export function Component() {
         register,
         unregister,
     } = useFocusManager();
+
+    // NOTE: We cannot put this outside the component.
+    const today = new Date();
 
     const [
         selectedDate,
@@ -227,6 +229,13 @@ export function Component() {
             if (value) {
                 setSelectedDate(value);
             }
+        },
+        [],
+    );
+
+    const handleTodaySelection = useCallback(
+        () => {
+            setSelectedDate(encodeDate(new Date()));
         },
         [],
     );
@@ -398,11 +407,18 @@ export function Component() {
 
     const handleCopyTextButtonClick = useCallback(
         () => {
-            function toSubItem(subItem: string | undefined) {
-                const safeSubItem = subItem ?? '??';
-                return safeSubItem
+            function toSubItem(workItem: WorkItem) {
+                const description = workItem.description ?? '??';
+                const status = (workItem.status ?? 'todo' satisfies WorkItemStatus);
+                const task = taskById[workItem.task];
+
+                return description
                     .split('\n')
-                    .map((item, i) => (i === 0 ? `  - ${item}` : `    ${item}`))
+                    .map((item, i) => ([
+                        i === 0 ? '  -' : '   ',
+                        status !== 'done' ? `\`${status.toUpperCase()}\`` : undefined,
+                        i === 0 ? `${task.title}: ${item}` : item,
+                    ].filter(isDefined).join(' ')))
                     .join('\n');
             }
 
@@ -419,12 +435,14 @@ export function Component() {
             const text = groupedWorkItems.map((projectGrouped) => {
                 const { project, workItems: projectWorkItems } = projectGrouped;
 
-                return `- ${project.title}\n${projectWorkItems.map((workItem) => toSubItem(workItem.description)).join('\n')}`;
+                return `- ${project.title}\n${projectWorkItems.map((workItem) => toSubItem(workItem)).join('\n')}`;
             }).join('\n');
 
             if (isFalsyString(text)) {
                 return;
             }
+
+            console.log(text);
 
             window.navigator.clipboard.writeText(text);
         },
@@ -554,8 +572,8 @@ export function Component() {
                         <IoChevronForwardSharp />
                     </Button>
                     <Button
-                        name={encodeDate(today)}
-                        onClick={handleDateSelection}
+                        name={undefined}
+                        onClick={handleTodaySelection}
                         variant="secondary"
                         disabled={selectedDate === encodeDate(today)}
                         spacing="sm"
