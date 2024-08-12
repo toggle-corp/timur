@@ -22,7 +22,7 @@ export type Client = Contract['project']['projectClient'];
 export type WorkItemType = TimeEntryTypeEnum;
 export type WorkItemStatus = TimeEntryStatusEnum;
 
-export type WorkItem = TimeEntryBulkCreateInput;
+export type WorkItem = Omit<TimeEntryBulkCreateInput, 'clientId'> & { clientId: string };
 
 export interface Note {
     id: string;

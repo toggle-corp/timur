@@ -20,8 +20,8 @@
         &::after {
             visibility: hidden;
             white-space: pre-wrap;
-            content: attr(data-replicated-value) " ";
             font: inherit;
+            content: attr(data-replicated-value) " ";
             grid-area: 1 / 1 / 2 / 2;
         }
 

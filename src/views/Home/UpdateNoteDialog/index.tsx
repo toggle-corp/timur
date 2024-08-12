@@ -18,9 +18,12 @@ import {
     Note,
 } from '#utils/types';
 
-import { editingModeOptions } from '../data';
-
 import styles from './styles.module.css';
+
+const editingModeOptions: EditingModeOption[] = [
+    { id: 'normal', title: 'Normies' },
+    { id: 'vim', title: 'Vim Masterrace' },
+];
 
 const extensionsWithoutVim = [markdown({ base: markdownLanguage })];
 const extensionsWithVim = [...extensionsWithoutVim, vim()];

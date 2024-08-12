@@ -77,9 +77,7 @@ function WorkItemRow(props: Props) {
 
     const setFieldValue = useCallback(
         (...entries: EntriesAsList<WorkItem>) => {
-            if (isDefined(workItem.clientId)) {
-                onChange(workItem.clientId, ...entries);
-            }
+            onChange(workItem.clientId, ...entries);
         },
         [workItem.clientId, onChange],
     );
@@ -148,28 +146,26 @@ function WorkItemRow(props: Props) {
                         icons="⏱️"
                         placeholder="hh:mm"
                     />
-                    {isDefined(workItem.clientId) && (
-                        <div className={styles.actions}>
-                            <Button
-                                name={workItem.clientId}
-                                variant="secondary"
-                                title="Clone this entry"
-                                onClick={onClone}
-                                spacing="sm"
-                            >
-                                <IoCopyOutline />
-                            </Button>
-                            <Button
-                                name={workItem.clientId}
-                                variant="secondary"
-                                spacing="sm"
-                                title="Delete this entry"
-                                onClick={onDelete}
-                            >
-                                <IoTrashOutline />
-                            </Button>
-                        </div>
-                    )}
+                    <div className={styles.actions}>
+                        <Button
+                            name={workItem.clientId}
+                            variant="secondary"
+                            title="Clone this entry"
+                            onClick={onClone}
+                            spacing="sm"
+                        >
+                            <IoCopyOutline />
+                        </Button>
+                        <Button
+                            name={workItem.clientId}
+                            variant="secondary"
+                            spacing="sm"
+                            title="Delete this entry"
+                            onClick={onDelete}
+                        >
+                            <IoTrashOutline />
+                        </Button>
+                    </div>
                 </>
             )}
         </div>

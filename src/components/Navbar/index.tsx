@@ -14,6 +14,7 @@ import {
 
 import Button from '#components/Button';
 import UserContext from '#contexts/user';
+import { LogoutMutation, LogoutMutationVariables } from '#generated/types/graphql';
 
 import timurLogo from '../../App/icon.svg';
 
@@ -41,24 +42,19 @@ function Navbar(props: Props) {
         removeUserAuth,
     } = useContext(UserContext);
 
-    const [, triggerLogout] = useMutation(
+    const [, triggerLogout] = useMutation<LogoutMutation, LogoutMutationVariables>(
         LOGOUT_MUTATION,
     );
 
-    const handleLogoutClick = useCallback(async () => {
-        await triggerLogout();
-        removeUserAuth();
-    }, [triggerLogout, removeUserAuth]);
-
-    /*
-        {
-            onCompleted: (response) => {
-                if (response.public.logout.ok) {
-                    removeUserAuth();
-                }
-            },
+    const handleLogoutClick = useCallback(
+        async () => {
+            const response = await triggerLogout({});
+            if (response.data?.public.logout.ok) {
+                removeUserAuth();
+            }
         },
-        */
+        [triggerLogout, removeUserAuth],
+    );
 
     return (
         <nav className={_cs(styles.navbar, className)}>

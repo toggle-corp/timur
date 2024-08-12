@@ -22,7 +22,7 @@ import WorkItemRow, { Props as WorkItemRowProps } from './WorkItemRow';
 import styles from './styles.module.css';
 
 function keySelector(item: WorkItem) {
-    return item.clientId ?? '??';
+    return item.clientId;
 }
 
 export interface Props {

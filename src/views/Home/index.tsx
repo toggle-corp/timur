@@ -126,8 +126,8 @@ function getChangedItems(
     initialItems: WorkItem[] | undefined,
     finalItems: WorkItem[] | undefined,
 ) {
-    const initialKeysMap = listToMap(initialItems ?? [], ({ clientId }) => clientId ?? '??');
-    const finalKeysMap = listToMap(finalItems ?? [], ({ clientId }) => clientId ?? '??');
+    const initialKeysMap = listToMap(initialItems ?? [], ({ clientId }) => clientId);
+    const finalKeysMap = listToMap(finalItems ?? [], ({ clientId }) => clientId);
 
     const addedKeys = Object.keys(finalKeysMap).filter(
         (key) => !initialKeysMap[key],
@@ -164,7 +164,7 @@ function useBackgroundSync() {
         setDataFromServer((prevData) => {
             const newData = unique(
                 [...workItems ?? [], ...prevData ?? []],
-                ({ clientId }) => clientId ?? '??',
+                ({ clientId }) => clientId,
             );
 
             return newData;
@@ -175,7 +175,7 @@ function useBackgroundSync() {
         setDataFromState((prevData) => {
             const newData = unique(
                 [...workItems ?? [], ...prevData ?? []],
-                ({ clientId }) => clientId ?? '??',
+                ({ clientId }) => clientId,
             );
 
             return newData;
@@ -441,13 +441,13 @@ export function Component() {
     const handleWorkItemCreate = useCallback(
         (taskId: string) => {
             const newId = getNewId();
-            const newItem = {
+            const newItem: WorkItem = {
                 clientId: newId,
                 task: taskId,
                 type: configDefaultTaskType,
                 status: configDefaultTaskStatus,
                 date: selectedDate,
-            } satisfies WorkItem;
+            };
 
             setWorkItems((oldWorkItems = []) => ([
                 ...oldWorkItems,
@@ -628,14 +628,15 @@ export function Component() {
         () => {
             function toSubItem(workItem: WorkItem) {
                 const description = workItem.description ?? '??';
-                const status = (workItem.status ?? 'todo' satisfies WorkItemStatus);
+                const status: WorkItemStatus = workItem.status ?? 'TODO';
+                const task = taskById?.[workItem.task]?.name ?? '??';
 
                 return description
                     .split('\n')
                     .map((item, i) => ([
                         i === 0 ? '  -' : '   ',
                         status !== 'DONE' ? `\`${status.toUpperCase()}\`` : undefined,
-                        i === 0 ? `${workItem.task.title}: ${item}` : item,
+                        i === 0 ? `${task}: ${item}` : item,
                     ].filter(isDefined).join(' ')))
                     .join('\n');
             }
@@ -657,14 +658,12 @@ export function Component() {
             const text = groupedWorkItems.map((projectGrouped) => {
                 const { project, workItems: projectWorkItems } = projectGrouped;
 
-                return `- ${project.title}\n${projectWorkItems.map((workItem) => toSubItem(workItem)).join('\n')}`;
+                return `- ${project.name}\n${projectWorkItems.map((workItem) => toSubItem(workItem)).join('\n')}`;
             }).join('\n');
 
             if (isFalsyString(text)) {
                 return;
             }
-
-            console.log(text);
 
             window.navigator.clipboard.writeText(text);
         },
