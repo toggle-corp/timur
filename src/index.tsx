@@ -3,12 +3,12 @@ import './index.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { isNotDefined } from '@togglecorp/fujs';
+import { cacheExchange } from '@urql/exchange-graphcache';
 import {
     Client as UrqlClient,
     fetchExchange,
     Provider as UrqlProvider,
 } from 'urql';
-import { cacheExchange } from '@urql/exchange-graphcache';
 
 import App from './App/index.tsx';
 

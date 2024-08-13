@@ -2,11 +2,11 @@ import {
     caseInsensitiveSubmatch,
     compareStringSearch,
     encodeDate,
-    isFalsyString,
-    listToMap,
     isDefined,
+    isFalsyString,
     isNotDefined,
     listToGroupList,
+    listToMap,
     mapToList,
 } from '@togglecorp/fujs';
 import { ulid } from 'ulidx';
@@ -34,7 +34,7 @@ export function mergeList<T>(
         items,
         (item) => keySelector(item),
         (item) => item,
-        (items) => squash(items),
+        (groupedItems) => squash(groupedItems),
     );
     return mapToList(squashedItemsMapping).filter(isDefined);
 }

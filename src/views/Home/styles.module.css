@@ -12,8 +12,28 @@
     }
 
     .last-saved-status {
-        opacity: 0.5;
+        display: flex;
+        align-items: center;
+        transition: .5s opacity ease-in-out;
+        opacity: 0;
+        border-radius: 0.5rem;
+        background-color: var(--color-quaternary);
+        padding: var(--spacing-2xs) var(--spacing-sm);
         color: var(--color-text-light);
+        font-size: var(--font-size-xs);
+        gap: var(--spacing-xs);
+
+        .timur-icon {
+            height: 0.75rem;
+        }
+
+        &.active {
+            opacity: 1;
+
+            .timur-icon {
+                animation: shake-it-off 2.2s ease-in infinite;
+            }
+        }
     }
 
     .ui-blocker {
@@ -104,5 +124,32 @@
         display: flex;
         flex-direction: column;
         gap: var(--spacing-lg);
+    }
+}
+
+@keyframes shake-it-off {
+    10% {
+        transform: rotate(0);
+    }
+    20% {
+        transform: rotate(-160deg);
+    }
+    30% {
+        transform: rotate(-160deg) translateY(2px);
+    }
+    35% {
+        transform: rotate(-160deg) translateY(-2px);
+    }
+    50% {
+        transform: rotate(-160deg) translateY(2px);
+    }
+    55% {
+        transform: rotate(-160deg) translateY(-2px);
+    }
+    70% {
+        transform: rotate(-160deg) translateY(0);
+    }
+    80% {
+        transform: rotate(0);
     }
 }

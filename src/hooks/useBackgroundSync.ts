@@ -2,24 +2,25 @@ import {
     useCallback,
     useEffect,
     useMemo,
-    useRef,
-    useState,
     useReducer,
+    useRef,
 } from 'react';
-import { unstable_batchedUpdates } from 'react-dom';
 import {
     isDefined,
     isNotDefined,
     listToMap,
 } from '@togglecorp/fujs';
 
-import { getChangedItems, mergeList } from '#utils/common';
+import {
+    getChangedItems,
+    mergeList,
+} from '#utils/common';
 
 type SetAction<T> = T | ((oldValue: T) => T);
 
 interface Base {
     id?: string | null,
-    clientId: string 
+    clientId: string
 }
 
 interface State<T extends Base> {
@@ -44,7 +45,10 @@ interface SetCombinedState<T extends Base> {
     value: SetAction<T[]>,
 }
 
-type Actions<T extends Base> = RemoveLocalStateItem | UpdateServerStateItems<T> | UpdateLocalStateItems<T> | SetCombinedState<T>
+type Actions<T extends Base> = RemoveLocalStateItem
+| UpdateServerStateItems<T>
+| UpdateLocalStateItems<T>
+| SetCombinedState<T>;
 
 function stateReducer<T extends Base>(prevState: State<T>, action: Actions<T>): State<T> {
     if (action.type === 'REMOVE_LOCAL_STATE_ITEM') {
@@ -72,7 +76,7 @@ function stateReducer<T extends Base>(prevState: State<T>, action: Actions<T>): 
                 action.value,
                 (item) => item.clientId,
             ),
-        }
+        };
     }
     if (action.type === 'UPDATE_LOCAL_STATE_ITEMS') {
         return {
@@ -82,7 +86,7 @@ function stateReducer<T extends Base>(prevState: State<T>, action: Actions<T>): 
                 action.value,
                 (item) => item.clientId,
             ),
-        }
+        };
     }
     if (action.type === 'SET_COMBINED_STATE') {
         const value = typeof action.value === 'function'
@@ -92,13 +96,12 @@ function stateReducer<T extends Base>(prevState: State<T>, action: Actions<T>): 
             ...prevState,
             localState: value,
             serverState: value,
-        }
+        };
     }
     // eslint-disable-next-line no-console
     console.error('Action is not supported');
     return prevState;
-};
-
+}
 
 function useBackgroundSync<T extends Base>(
     action: (
@@ -118,14 +121,12 @@ function useBackgroundSync<T extends Base>(
             serverState: [],
             localState: [],
         },
-    )
+    );
 
     const {
         localState,
         serverState,
     } = state;
-
-    const [lastMutationOn, setLastMutationOn] = useState<number>();
 
     const addOrUpdateServerData = useCallback(
         (workItems: T[] | undefined) => {
@@ -165,11 +166,11 @@ function useBackgroundSync<T extends Base>(
 
     const setStateData = useCallback(
         (value: SetAction<T[]>) => {
-            const action: SetCombinedState<T> = {
+            const setStateDataAction: SetCombinedState<T> = {
                 type: 'SET_COMBINED_STATE',
-                value: value,
+                value,
             };
-            dispatch(action);
+            dispatch(setStateDataAction);
         },
         [],
     );
@@ -184,7 +185,8 @@ function useBackgroundSync<T extends Base>(
                 return;
             }
 
-            console.log('Setting up trigger');
+            // eslint-disable-next-line no-console
+            console.info('Background sync queued.');
             diffTriggerRef.current = window.setTimeout(
                 async () => {
                     const {
@@ -214,9 +216,7 @@ function useBackgroundSync<T extends Base>(
                     }
 
                     // eslint-disable-next-line no-console
-                    console.info('Changes detected! Syncing with server...');
-                    // eslint-disable-next-line no-console
-                    console.info(`${sanitizedAddedItems.length} added. ${sanitizedUpdatedItems.length} modified. ${sanitizedDeletedItems.length} deleted.`);
+                    console.info(`Changes detected! ${sanitizedAddedItems.length} added. ${sanitizedUpdatedItems.length} modified. ${sanitizedDeletedItems.length} deleted.`);
                     const res = await action(
                         sanitizedAddedItems,
                         sanitizedUpdatedItems,
@@ -229,36 +229,56 @@ function useBackgroundSync<T extends Base>(
                             (item) => item.clientId,
                             (item) => item.id,
                         );
-                        unstable_batchedUpdates(() => {
-                            setStateData((prevLocalState) => {
-                                const newLocalState = prevLocalState?.map((item) => (
-                                    isDefined(item.id)
-                                        ? item
-                                        : { ...item, id: updatedIds[item.clientId] }
-                                ));
-                                return newLocalState;
-                            });
-                            setLastMutationOn(new Date().getTime());
+                        setStateData((prevLocalState) => {
+                            const newLocalState = prevLocalState?.map((item) => (
+                                isDefined(item.id)
+                                    ? item
+                                    : { ...item, id: updatedIds[item.clientId] }
+                            ));
+                            return newLocalState;
                         });
                     } else {
                         // eslint-disable-next-line no-console
                         console.info('Error response from server.');
                     }
                 },
-                2000,
+                1000,
             );
         },
-        [localState, serverState, action],
+        [localState, serverState, action, setStateData],
     );
+
+    const isObsolete = useMemo(() => {
+        const {
+            addedItems,
+            removedItems,
+            updatedItems,
+        } = getChangedItems<T>(
+            serverState,
+            localState,
+            (item) => item.clientId,
+        );
+
+        const sanitizedAddedItems = addedItems
+            .filter((item) => isNotDefined(item.id));
+        const sanitizedUpdatedItems = updatedItems
+            .filter((item) => isDefined(item.id));
+        const sanitizedDeletedItems = removedItems
+            .map((item) => item.id).filter(isDefined);
+
+        return sanitizedAddedItems.length !== 0
+            || sanitizedUpdatedItems.length !== 0
+            || sanitizedDeletedItems.length !== 0;
+    }, [localState, serverState]);
 
     return useMemo(
         () => ({
             addOrUpdateServerData,
             addOrUpdateStateData: addOrUpdateLocalData,
             removeFromStateData,
-            lastMutationOn,
+            isObsolete,
         }),
-        [addOrUpdateServerData, addOrUpdateLocalData, removeFromStateData, lastMutationOn],
+        [addOrUpdateServerData, addOrUpdateLocalData, removeFromStateData, isObsolete],
     );
 }
 

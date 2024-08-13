@@ -16,6 +16,8 @@ import {
     IoInformation,
 } from 'react-icons/io5';
 import {
+    _cs,
+    compareStringAsNumber,
     encodeDate,
     isDefined,
     isFalsyString,
@@ -23,7 +25,6 @@ import {
     listToGroupList,
     mapToList,
     sum,
-    compareStringAsNumber,
 } from '@togglecorp/fujs';
 import {
     gql,
@@ -44,7 +45,6 @@ import {
 } from '#generated/types/graphql';
 import useBackgroundSync from '#hooks/useBackgroundSync';
 import { useFocusManager } from '#hooks/useFocus';
-import useFormattedRelativeTime from '#hooks/useFormattedRelativeTime';
 import useKeybind from '#hooks/useKeybind';
 import useLocalStorage from '#hooks/useLocalStorage';
 import {
@@ -62,6 +62,7 @@ import {
     WorkItemType,
 } from '#utils/types';
 
+import timurLogo from '../../App/icon.svg';
 import AddWorkItemDialog from './AddWorkItemDialog';
 import DayView from './DayView';
 import ShortcutsDialog from './ShortcutsDialog';
@@ -71,7 +72,7 @@ import styles from './styles.module.css';
 
 const { APP_VERSION } = import.meta.env;
 
-const KEY_DATA_STORAGE = 'timur';
+const KEY_DATA_STORAGE = 'timur-meta';
 
 const dateFormatter = new Intl.DateTimeFormat(
     [],
@@ -282,12 +283,14 @@ export function Component() {
         addOrUpdateStateData,
         removeFromStateData,
         addOrUpdateServerData,
-        lastMutationOn,
+        isObsolete,
     } = useBackgroundSync(
         handleBulkAction,
     );
 
-    const [myTimeEntriesResult] = useQuery<MyTimeEntriesQuery, MyTimeEntriesQueryVariables>({
+    const [
+        myTimeEntriesResult,
+    ] = useQuery<MyTimeEntriesQuery, MyTimeEntriesQueryVariables>({
         query: MY_TIME_ENTRIES_QUERY,
         variables: { date: selectedDate },
     });
@@ -308,7 +311,7 @@ export function Component() {
         setWorkItems(workItemsFromServer);
         addOrUpdateServerData(workItemsFromServer);
         addOrUpdateStateData(workItemsFromServer);
-    }, [myTimeEntriesResult, setWorkItems, addOrUpdateServerData, addOrUpdateStateData]);
+    }, [myTimeEntriesResult.data, setWorkItems, addOrUpdateServerData, addOrUpdateStateData]);
 
     const currentNote = useMemo(
         () => (
@@ -379,7 +382,8 @@ export function Component() {
 
                 const targetItem = {
                     ...oldWorkItems[sourceItemIndex],
-                    id: newId,
+                    id: undefined,
+                    clientId: newId,
                     description: undefined,
                     hours: undefined,
                 };
@@ -661,8 +665,6 @@ export function Component() {
         [register, unregister],
     );
 
-    const lastSaved = useFormattedRelativeTime(lastMutationOn);
-
     return (
         <Page
             documentTitle="Timur - Home"
@@ -705,12 +707,20 @@ export function Component() {
                     </Button>
                 </div>
                 <div className={styles.actions}>
-                    <div className={styles.lastSavedStatus}>
-                        Last saved:
-                        {' '}
-                        <strong>
-                            {lastSaved}
-                        </strong>
+                    <div
+                        className={_cs(
+                            styles.lastSavedStatus,
+                            (isObsolete || bulkMutationState.fetching) && styles.active,
+                        )}
+                    >
+                        <img
+                            className={styles.timurIcon}
+                            alt="Timur Icon"
+                            src={timurLogo}
+                        />
+                        <div>
+                            Syncing...
+                        </div>
                     </div>
                     <Button
                         name={!configFocusMode}
