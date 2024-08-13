@@ -89,8 +89,8 @@ const ENUMS_QUERY = gql`
 const router = createBrowserRouter(unwrappedRoutes);
 
 function App() {
-    // AUTH
     const [userAuth, setUserAuth] = useState<UserAuth>();
+
     const [meResult] = useQuery<MeQuery, MeQueryVariables>(
         { query: ME_QUERY },
     );
@@ -102,28 +102,37 @@ function App() {
         { query: ENUMS_QUERY },
     );
 
-    const removeUserAuth = useCallback(() => {
-        setUserAuth(undefined);
-    }, []);
-
-    const setAndStoreUserAuth = useCallback((newUserDetails: UserAuth) => {
-        setUserAuth(newUserDetails);
-    }, []);
+    const removeUserAuth = useCallback(
+        () => {
+            setUserAuth(undefined);
+        },
+        [],
+    );
 
     const userContextValue = useMemo<UserContextProps>(
         () => ({
             userAuth,
-            setUserAuth: setAndStoreUserAuth,
+            setUserAuth,
             removeUserAuth,
         }),
-        [userAuth, setAndStoreUserAuth, removeUserAuth],
+        [userAuth, removeUserAuth],
     );
+
     const enumsContextValue = useMemo<EnumsContextProps>(
         () => ({
             enums: enumsResult.data,
-            taskById: listToMap(enumsResult.data?.private.allActiveTasks, ({ id }) => id),
-            statusByKey: listToMap(enumsResult.data?.enums.TimeEntryStatus, ({ key }) => key),
-            typeByKey: listToMap(enumsResult.data?.enums.TimeEntryType, ({ key }) => key),
+            taskById: listToMap(
+                enumsResult.data?.private.allActiveTasks,
+                ({ id }) => id,
+            ),
+            statusByKey: listToMap(
+                enumsResult.data?.enums.TimeEntryStatus,
+                ({ key }) => key,
+            ),
+            typeByKey: listToMap(
+                enumsResult.data?.enums.TimeEntryType,
+                ({ key }) => key,
+            ),
         }),
         [enumsResult],
     );

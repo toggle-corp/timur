@@ -21,10 +21,9 @@ import {
     isFalsyString,
     isNotDefined,
     listToGroupList,
-    listToMap,
     mapToList,
     sum,
-    unique,
+    compareStringAsNumber,
 } from '@togglecorp/fujs';
 import {
     gql,
@@ -38,9 +37,12 @@ import RawInput from '#components/RawInput';
 import EnumsContext from '#contexts/enums';
 import FocusContext from '#contexts/focus';
 import {
+    BulkTimeEntryMutation,
+    BulkTimeEntryMutationVariables,
     MyTimeEntriesQuery,
     MyTimeEntriesQueryVariables,
 } from '#generated/types/graphql';
+import useBackgroundSync from '#hooks/useBackgroundSync';
 import { useFocusManager } from '#hooks/useFocus';
 import useFormattedRelativeTime from '#hooks/useFormattedRelativeTime';
 import useKeybind from '#hooks/useKeybind';
@@ -110,164 +112,23 @@ const BULK_TIME_ENTRY_MUTATION = gql`
                 deleteIds: $deleteIds
             ) {
                 deleted {
-                    clientId
                     id
+                    clientId
                 }
                 errors
                 results {
                     id
+                    clientId
                 }
             }
         }
     }
 `;
 
-function getChangedItems(
-    initialItems: WorkItem[] | undefined,
-    finalItems: WorkItem[] | undefined,
-) {
-    const initialKeysMap = listToMap(initialItems ?? [], ({ clientId }) => clientId);
-    const finalKeysMap = listToMap(finalItems ?? [], ({ clientId }) => clientId);
-
-    const addedKeys = Object.keys(finalKeysMap).filter(
-        (key) => !initialKeysMap[key],
-    );
-    const removedKeys = Object.keys(initialKeysMap).filter(
-        (key) => !finalKeysMap[key],
-    );
-    const updatedKeys = Object.keys(initialKeysMap).filter(
-        (key) => {
-            if (isNotDefined(finalKeysMap[key])) {
-                return false;
-            }
-
-            const initialJson = JSON.stringify(initialKeysMap[key]);
-            const finalJson = JSON.stringify(finalKeysMap[key]);
-
-            return initialJson !== finalJson;
-        },
-    );
-
-    return {
-        addedItems: addedKeys.map((key) => finalKeysMap[key]),
-        removedItems: removedKeys.map((key) => initialKeysMap[key]),
-        updatedItems: updatedKeys.map((key) => finalKeysMap[key]),
-    };
-}
-
-function useBackgroundSync() {
-    const [dataFromServer, setDataFromServer] = useState<WorkItem[]>();
-    const [dataFromState, setDataFromState] = useState<WorkItem[]>();
-    const [lastMutationOn, setLastMutationOn] = useState<number>();
-
-    const updateServerData = useCallback((workItems: WorkItem[] | undefined) => {
-        setDataFromServer((prevData) => {
-            const newData = unique(
-                [...workItems ?? [], ...prevData ?? []],
-                ({ clientId }) => clientId,
-            );
-
-            return newData;
-        });
-    }, []);
-
-    const updateStateData = useCallback((workItems: WorkItem[] | undefined) => {
-        setDataFromState((prevData) => {
-            const newData = unique(
-                [...workItems ?? [], ...prevData ?? []],
-                ({ clientId }) => clientId,
-            );
-
-            return newData;
-        });
-    }, []);
-
-    const removeStateData = useCallback((clientId: string | null | undefined) => {
-        setDataFromState((prevData) => {
-            if (!prevData) {
-                return prevData;
-            }
-            const newData = [...prevData ?? []];
-            const obsoleteIndex = newData?.findIndex((item) => item.clientId === clientId);
-
-            if (obsoleteIndex !== -1) {
-                newData.splice(obsoleteIndex, 1);
-            }
-
-            return newData;
-        });
-    }, []);
-
-    const [bulkMutationState, triggerBulkMutation] = useMutation(BULK_TIME_ENTRY_MUTATION);
-
-    const diffTriggerRef = useRef<number>();
-
-    useEffect(() => {
-        if (dataFromState === dataFromServer) {
-            // eslint-disable-next-line no-console
-            console.info('No changes detected...');
-            return;
-        }
-
-        window.clearTimeout(diffTriggerRef.current);
-        diffTriggerRef.current = window.setTimeout(
-            async () => {
-                const {
-                    addedItems,
-                    removedItems,
-                    updatedItems,
-                } = getChangedItems(dataFromServer, dataFromState);
-
-                if (addedItems.length === 0
-                    && removedItems.length === 0
-                    && updatedItems.length === 0
-                ) {
-                    // eslint-disable-next-line no-console
-                    console.info('No changes detected...');
-                    return;
-                }
-
-                // eslint-disable-next-line no-console
-                console.info('Changes detected! Syncing with server...');
-                const bulkMutationResponse = await triggerBulkMutation({
-                    timeEntries: [
-                        ...addedItems,
-                        ...updatedItems,
-                    ],
-                    deleteIds: removedItems.map(({ id }) => id),
-                });
-
-                if (!bulkMutationResponse.error) {
-                    setLastMutationOn(new Date().getTime());
-                    setDataFromServer(dataFromState);
-                }
-            },
-            2000,
-        );
-    }, [dataFromState, dataFromServer, triggerBulkMutation]);
-
-    return useMemo(() => ({
-        updateServerData,
-        updateStateData,
-        removeStateData,
-        bulkMutationState,
-        lastMutationOn,
-    }), [updateServerData, updateStateData, removeStateData, bulkMutationState, lastMutationOn]);
-}
-
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
     const [workItems, setWorkItems] = useState<WorkItem[]>([]);
     const { taskById } = useContext(EnumsContext);
-    const {
-        updateStateData,
-        updateServerData,
-        removeStateData,
-        bulkMutationState,
-        lastMutationOn,
-    } = useBackgroundSync();
-
-    const lastSaved = useFormattedRelativeTime(lastMutationOn);
 
     const [storedState, setStoredState] = useLocalStorage<{
         appVersion: string,
@@ -390,6 +251,42 @@ export function Component() {
         [setStoredState],
     );
 
+    const [
+        bulkMutationState,
+        triggerBulkMutation,
+    ] = useMutation<BulkTimeEntryMutation, BulkTimeEntryMutationVariables>(
+        BULK_TIME_ENTRY_MUTATION,
+    );
+
+    const handleBulkAction = useCallback(
+        async (addedItems: WorkItem[], updatedItems: WorkItem[], removedItems: string[]) => {
+            const res = await triggerBulkMutation({
+                timeEntries: [
+                    ...addedItems,
+                    ...updatedItems,
+                ],
+                deleteIds: removedItems,
+            });
+            if (res.error) {
+                return { ok: false } as const;
+            }
+            return {
+                ok: true as const,
+                values: res.data?.private.bulkTimeEntry.results ?? [],
+            } as const;
+        },
+        [triggerBulkMutation],
+    );
+
+    const {
+        addOrUpdateStateData,
+        removeFromStateData,
+        addOrUpdateServerData,
+        lastMutationOn,
+    } = useBackgroundSync(
+        handleBulkAction,
+    );
+
     const [myTimeEntriesResult] = useQuery<MyTimeEntriesQuery, MyTimeEntriesQueryVariables>({
         query: MY_TIME_ENTRIES_QUERY,
         variables: { date: selectedDate },
@@ -400,19 +297,18 @@ export function Component() {
             myTimeEntriesResult.data?.private.myTimeEntries?.map(
                 (timeEntry) => {
                     const { taskId, ...otherTimeEntryProps } = timeEntry;
-
                     return {
                         ...otherTimeEntryProps,
                         task: taskId,
                     };
                 },
-            ) ?? [],
+            ).sort((foo, bar) => compareStringAsNumber(foo.id, bar.id)) ?? [],
         );
 
         setWorkItems(workItemsFromServer);
-        updateServerData(workItemsFromServer);
-        updateStateData(workItemsFromServer);
-    }, [myTimeEntriesResult, setWorkItems, updateServerData, updateStateData]);
+        addOrUpdateServerData(workItemsFromServer);
+        addOrUpdateStateData(workItemsFromServer);
+    }, [myTimeEntriesResult, setWorkItems, addOrUpdateServerData, addOrUpdateStateData]);
 
     const currentNote = useMemo(
         () => (
@@ -453,8 +349,7 @@ export function Component() {
                 ...oldWorkItems,
                 newItem,
             ]));
-
-            updateStateData([newItem]);
+            addOrUpdateStateData([newItem]);
 
             focus(String(newId));
         },
@@ -464,7 +359,7 @@ export function Component() {
             configDefaultTaskType,
             configDefaultTaskStatus,
             focus,
-            updateStateData,
+            addOrUpdateStateData,
         ],
     );
 
@@ -491,13 +386,13 @@ export function Component() {
 
                 const newWorkItems = [...oldWorkItems];
                 newWorkItems.splice(sourceItemIndex + 1, 0, targetItem);
-                updateStateData(newWorkItems);
+                addOrUpdateStateData(newWorkItems);
 
                 return newWorkItems;
             });
             focus(String(newId));
         },
-        [setWorkItems, focus, updateStateData],
+        [setWorkItems, focus, addOrUpdateStateData],
     );
 
     const handleWorkItemDelete = useCallback(
@@ -514,7 +409,7 @@ export function Component() {
                 }
 
                 const removedItem = oldWorkItems[sourceItemIndex];
-                removeStateData(removedItem.clientId);
+                removeFromStateData(removedItem.clientId);
 
                 const newWorkItems = [...oldWorkItems];
                 newWorkItems.splice(sourceItemIndex, 1);
@@ -522,7 +417,7 @@ export function Component() {
                 return newWorkItems;
             });
         },
-        [setWorkItems, removeStateData],
+        [setWorkItems, removeFromStateData],
     );
 
     const handleWorkItemChange = useCallback(
@@ -555,7 +450,7 @@ export function Component() {
                     newWorkItem.status = 'DOING';
                 }
 
-                updateStateData([newWorkItem]);
+                addOrUpdateStateData([newWorkItem]);
 
                 const newWorkItems = [...oldWorkItems];
 
@@ -568,7 +463,7 @@ export function Component() {
                 return newWorkItems;
             });
         },
-        [setWorkItems, updateStateData],
+        [setWorkItems, addOrUpdateStateData],
     );
 
     const handleNoteCreate = useCallback(
@@ -765,6 +660,8 @@ export function Component() {
         }),
         [register, unregister],
     );
+
+    const lastSaved = useFormattedRelativeTime(lastMutationOn);
 
     return (
         <Page

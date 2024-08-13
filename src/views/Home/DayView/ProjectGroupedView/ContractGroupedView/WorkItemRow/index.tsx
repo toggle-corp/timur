@@ -7,10 +7,7 @@ import {
     IoCopyOutline,
     IoTrashOutline,
 } from 'react-icons/io5';
-import {
-    _cs,
-    isDefined,
-} from '@togglecorp/fujs';
+import { _cs } from '@togglecorp/fujs';
 
 import Button from '#components/Button';
 import DurationInput from '#components/DurationInput';

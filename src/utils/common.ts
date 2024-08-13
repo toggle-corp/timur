@@ -3,8 +3,41 @@ import {
     compareStringSearch,
     encodeDate,
     isFalsyString,
+    listToMap,
+    isDefined,
+    isNotDefined,
+    listToGroupList,
+    mapToList,
 } from '@togglecorp/fujs';
 import { ulid } from 'ulidx';
+
+function squash<T>(items: T[]): T | undefined {
+    if (items.length <= 1) {
+        return items[0];
+    }
+    return items.reduce(
+        (acc, val) => ({
+            ...acc,
+            ...val,
+        }),
+        items[0],
+    );
+}
+
+export function mergeList<T>(
+    foo: T[],
+    bar: T[],
+    keySelector: (item: T) => string,
+) {
+    const items = [...foo, ...bar];
+    const squashedItemsMapping = listToGroupList(
+        items,
+        (item) => keySelector(item),
+        (item) => item,
+        (items) => squash(items),
+    );
+    return mapToList(squashedItemsMapping).filter(isDefined);
+}
 
 export function getNewId(): string {
     return ulid();
@@ -96,4 +129,38 @@ export function addDays(dateStr: string, numDays: number) {
     date.setDate(date.getDate() + numDays);
 
     return encodeDate(date);
+}
+
+export function getChangedItems<T>(
+    initialItems: T[] | undefined,
+    finalItems: T[] | undefined,
+    keySelector: (item: T) => string,
+) {
+    const initialKeysMap = listToMap(initialItems ?? [], keySelector);
+    const finalKeysMap = listToMap(finalItems ?? [], keySelector);
+
+    const addedKeys = Object.keys(finalKeysMap).filter(
+        (key) => !initialKeysMap[key],
+    );
+    const removedKeys = Object.keys(initialKeysMap).filter(
+        (key) => !finalKeysMap[key],
+    );
+    const updatedKeys = Object.keys(initialKeysMap).filter(
+        (key) => {
+            if (isNotDefined(finalKeysMap[key])) {
+                return false;
+            }
+
+            const initialJson = JSON.stringify(initialKeysMap[key]);
+            const finalJson = JSON.stringify(finalKeysMap[key]);
+
+            return initialJson !== finalJson;
+        },
+    );
+
+    return {
+        addedItems: addedKeys.map((key) => finalKeysMap[key]),
+        removedItems: removedKeys.map((key) => initialKeysMap[key]),
+        updatedItems: updatedKeys.map((key) => finalKeysMap[key]),
+    };
 }
