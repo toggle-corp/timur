@@ -61,10 +61,7 @@ export function rankedSearchOnList<T>(
         ));
 }
 
-export function getDurationString(totalHours: number) {
-    // NOTE: We are using round to remedy cases like (2039 / 60 * 60)
-    const totalMinutes = Math.round(totalHours * 60);
-
+export function getDurationString(totalMinutes: number) {
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
@@ -76,11 +73,11 @@ function validateHhmm(hourStr: string, minuteStr: string) {
     if (minute > 59) {
         return undefined;
     }
-    const totalHours = (hour + (minute / 60));
-    if (totalHours > 24) {
+    const totalMinutes = hour * 60 + minute;
+    if (totalMinutes > 24 * 60) {
         return undefined;
     }
-    return totalHours;
+    return totalMinutes;
 }
 
 export function getDurationNumber(value: string | undefined) {
@@ -151,8 +148,17 @@ export function getChangedItems<T>(
                 return false;
             }
 
-            const initialJson = JSON.stringify(initialKeysMap[key]);
-            const finalJson = JSON.stringify(finalKeysMap[key]);
+            const initialObj = initialKeysMap[key];
+            const finalObj = finalKeysMap[key];
+
+            const initialJson = JSON.stringify(
+                initialObj,
+                initialObj ? Object.keys(initialObj).sort() : undefined,
+            );
+            const finalJson = JSON.stringify(
+                finalObj,
+                finalObj ? Object.keys(finalObj).sort() : undefined,
+            );
 
             return initialJson !== finalJson;
         },

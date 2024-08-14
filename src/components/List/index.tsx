@@ -24,9 +24,13 @@ export interface Props<
     filtered: boolean;
 
     emptyMessage?: React.ReactNode;
+    filteredEmptyMessage?: React.ReactNode;
     pendingMessage?: React.ReactNode;
     errorMessage?: React.ReactNode;
-    filteredEmptyMessage?: React.ReactNode;
+    emptyDescription?: React.ReactNode;
+    filteredEmptyDescription?: React.ReactNode;
+    pendingDescription?: React.ReactNode;
+    errorDescription?: React.ReactNode;
 
     compact?: boolean;
     withoutMessage?: boolean;
@@ -51,6 +55,10 @@ function List<DATUM, KEY extends ListKey, RENDERER_PROPS>(
         emptyMessage,
         pendingMessage,
         filteredEmptyMessage,
+        errorDescription,
+        emptyDescription,
+        pendingDescription,
+        filteredEmptyDescription,
 
         compact,
         withoutMessage = false,
@@ -88,6 +96,10 @@ function List<DATUM, KEY extends ListKey, RENDERER_PROPS>(
                     filteredEmptyMessage={filteredEmptyMessage}
                     pendingMessage={pendingMessage}
                     errorMessage={errorMessage}
+                    emptyDescription={emptyDescription}
+                    filteredEmptyDescription={filteredEmptyDescription}
+                    pendingDescription={pendingDescription}
+                    errorDescription={errorDescription}
                     overlayPending
                 />
             )}

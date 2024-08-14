@@ -7,6 +7,6 @@ tsconfig.tsbuildinfo
 pnpm-debug.log*
 
 # Custom
-generated/
 build/
+generated/
 stats.html

@@ -42,7 +42,8 @@ interface UpdateLocalStateItems<T extends Base> {
 }
 interface SetCombinedState<T extends Base> {
     type: 'SET_COMBINED_STATE',
-    value: SetAction<T[]>,
+    localValue: SetAction<T[]>,
+    serverValue: SetAction<T[]>,
 }
 
 type Actions<T extends Base> = RemoveLocalStateItem
@@ -89,13 +90,17 @@ function stateReducer<T extends Base>(prevState: State<T>, action: Actions<T>): 
         };
     }
     if (action.type === 'SET_COMBINED_STATE') {
-        const value = typeof action.value === 'function'
-            ? action.value(prevState.localState)
-            : action.value;
+        const localValue = typeof action.localValue === 'function'
+            ? action.localValue(prevState.localState)
+            : action.localValue;
+        const serverValue = typeof action.serverValue === 'function'
+            ? action.serverValue(prevState.serverState)
+            : action.serverValue;
+
         return {
             ...prevState,
-            localState: value,
-            serverState: value,
+            localState: localValue,
+            serverState: serverValue,
         };
     }
     // eslint-disable-next-line no-console
@@ -108,7 +113,7 @@ function useBackgroundSync<T extends Base>(
         addedItems: T[],
         updatedItems: T[],
         deletedItems: string[],
-    ) => Promise<{ ok: true, values: { id: string, clientId: string }[] } | { ok: false }>,
+    ) => Promise<{ ok: true, savedValues: T[], deletedValues: string[] } | { ok: false }>,
 ) {
     const diffTriggerRef = useRef<number>();
 
@@ -165,10 +170,11 @@ function useBackgroundSync<T extends Base>(
     );
 
     const setStateData = useCallback(
-        (value: SetAction<T[]>) => {
+        (localValue: SetAction<T[]>, serverValue: SetAction<T[]>) => {
             const setStateDataAction: SetCombinedState<T> = {
                 type: 'SET_COMBINED_STATE',
-                value,
+                localValue,
+                serverValue,
             };
             dispatch(setStateDataAction);
         },
@@ -224,19 +230,37 @@ function useBackgroundSync<T extends Base>(
                     );
 
                     if (res.ok) {
-                        const updatedIds = listToMap(
-                            res.values,
-                            (item) => item.clientId,
-                            (item) => item.id,
+                        setStateData(
+                            (prevLocalState) => {
+                                const updatedIds = listToMap(
+                                    res.savedValues,
+                                    (item) => item.clientId,
+                                    (item) => item.id,
+                                );
+                                const newLocalState = prevLocalState?.map((item) => (
+                                    isDefined(item.id)
+                                        ? item
+                                        : { ...item, id: updatedIds[item.clientId] }
+                                ));
+                                return newLocalState;
+                            },
+                            (prevServerState) => {
+                                const newServerState = mergeList(
+                                    prevServerState,
+                                    res.savedValues,
+                                    (item) => item.clientId,
+                                );
+
+                                const deletedItemsMapping = listToMap(
+                                    res.deletedValues,
+                                    (item) => item,
+                                    () => true,
+                                );
+                                return newServerState.filter(
+                                    (item) => !deletedItemsMapping[item.clientId],
+                                );
+                            },
                         );
-                        setStateData((prevLocalState) => {
-                            const newLocalState = prevLocalState?.map((item) => (
-                                isDefined(item.id)
-                                    ? item
-                                    : { ...item, id: updatedIds[item.clientId] }
-                            ));
-                            return newLocalState;
-                        });
                     } else {
                         // eslint-disable-next-line no-console
                         console.info('Error response from server.');

@@ -4,6 +4,13 @@ import {
     useMemo,
 } from 'react';
 import {
+    FcClock,
+    FcDocument,
+    FcPackage,
+    FcPieChart,
+    FcRuler,
+} from 'react-icons/fc';
+import {
     IoCopyOutline,
     IoTrashOutline,
 } from 'react-icons/io5';
@@ -70,7 +77,7 @@ function WorkItemRow(props: Props) {
     } = props;
 
     const { enums } = useContext(EnumsContext);
-    const inputRef = useFocusClient<HTMLTextAreaElement>(String(workItem.id));
+    const inputRef = useFocusClient<HTMLTextAreaElement>(workItem.clientId);
 
     const setFieldValue = useCallback(
         (...entries: EntriesAsList<WorkItem>) => {
@@ -98,7 +105,9 @@ function WorkItemRow(props: Props) {
                 onChange={setFieldValue}
                 value={workItem.status}
                 nonClearable
-                icons="🪩"
+                icons={(
+                    <FcPieChart />
+                )}
             />
             <TextArea<'description'>
                 className={styles.description}
@@ -107,7 +116,9 @@ function WorkItemRow(props: Props) {
                 title="Description"
                 value={workItem.description}
                 onChange={setFieldValue}
-                icons="🗒️"
+                icons={(
+                    <FcDocument />
+                )}
                 placeholder="Description"
             />
             {!focusMode && (
@@ -121,7 +132,9 @@ function WorkItemRow(props: Props) {
                         onChange={setFieldValue}
                         value={workItem.task}
                         nonClearable
-                        icons="🧘"
+                        icons={(
+                            <FcPackage />
+                        )}
                     />
                     <SelectInput
                         className={styles.type}
@@ -132,7 +145,9 @@ function WorkItemRow(props: Props) {
                         onChange={setFieldValue}
                         value={workItem.type}
                         nonClearable
-                        icons="📐"
+                        icons={(
+                            <FcRuler />
+                        )}
                     />
                     <DurationInput
                         className={styles.hours}
@@ -140,7 +155,9 @@ function WorkItemRow(props: Props) {
                         title="Hours"
                         value={workItem.duration}
                         onChange={setFieldValue}
-                        icons="⏱️"
+                        icons={(
+                            <FcClock />
+                        )}
                         placeholder="hh:mm"
                     />
                     <div className={styles.actions}>

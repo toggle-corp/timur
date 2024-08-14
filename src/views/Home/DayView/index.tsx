@@ -38,6 +38,8 @@ function getId(item: ProjectGroupedWorkItem) {
 interface Props {
     className?: string;
     workItems: WorkItem[] | undefined;
+    loading: boolean;
+    errored: boolean;
     onWorkItemClone: (clientId: string) => void;
     onWorkItemChange: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
     onWorkItemDelete: (clientId: string) => void;
@@ -52,6 +54,8 @@ function DayView(props: Props) {
         onWorkItemChange,
         onWorkItemDelete,
         focusMode,
+        loading,
+        errored,
     } = props;
 
     const { taskById } = useContext(EnumsContext);
@@ -105,26 +109,22 @@ function DayView(props: Props) {
     return (
         <List
             className={_cs(styles.dayView, className)}
-            pending={false}
-            errored={false}
+            pending={loading}
+            errored={errored}
             filtered={false}
             data={groupedWorkItems}
             keySelector={getId}
             renderer={ProjectGroupedView}
             rendererParams={rendererParams}
-            emptyMessage={(
-                <div className={styles.emptyMessage}>
-                    <div className={styles.title}>
-                        No entries here!
-                    </div>
-                    <p>
-                        Click on
-                        {' '}
-                        <em>Add entry</em>
-                        {' '}
-                        to create a new entry.
-                    </p>
-                </div>
+            emptyMessage="No entries here!"
+            emptyDescription={(
+                <>
+                    Click on
+                    {' '}
+                    <em>Add entry</em>
+                    {' '}
+                    to create a new entry.
+                </>
             )}
         />
     );

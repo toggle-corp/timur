@@ -14,7 +14,6 @@ export interface Props {
     actions?: React.ReactNode;
     compact?: boolean;
 
-    pending?: boolean;
     title?: React.ReactNode;
     description?: React.ReactNode;
 
@@ -26,7 +25,6 @@ export interface Props {
 function Message(props: Props) {
     const {
         className,
-        pending = false,
         variant,
         icon,
         title,
@@ -50,11 +48,10 @@ function Message(props: Props) {
                 className,
             )}
         >
-            {(icon || pending) && (
+            {icon && (
                 <div className={styles.icon}>
                     {/* pending && <Spinner className={styles.spinner} /> */}
-                    {pending && <span className={styles.spinner}>Loading...</span>}
-                    {!pending && icon}
+                    {icon}
                 </div>
             )}
             {showTitle && (

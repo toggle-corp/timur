@@ -53,7 +53,6 @@ export type Props<
         ) => OPTION[];
         onSearchValueChange?: (value: string | undefined) => void;
         onShowDropdownChange?: (value: boolean) => void;
-        onEnterWithoutOption?: (value: string | undefined) => void;
 
         selectedOnTop: boolean;
     }, OMISSION>
@@ -123,7 +122,6 @@ function SearchSelectInput<
         onShowDropdownChange,
         hideOptionFilter,
         selectedOnTop,
-        onEnterWithoutOption,
         ...otherProps
     } = props;
 
@@ -216,20 +214,6 @@ function SearchSelectInput<
         [onSearchValueChange],
     );
 
-    const handleEnterWithoutOption = useCallback(() => {
-        setShowDropdown(false);
-        if (onShowDropdownChange) {
-            onShowDropdownChange(false);
-        }
-        setSearchInputValue(undefined);
-        if (onSearchValueChange) {
-            onSearchValueChange(undefined);
-        }
-        if (onEnterWithoutOption) {
-            onEnterWithoutOption(searchInputValue);
-        }
-    }, [searchInputValue, onShowDropdownChange, onEnterWithoutOption, onSearchValueChange]);
-
     const handleChangeDropdown = useCallback(
         (myVal: boolean) => {
             setShowDropdown(myVal);
@@ -292,6 +276,28 @@ function SearchSelectInput<
         },
         [onChange, name, onOptionsChange, keySelector],
     );
+
+    const handleEnterWithoutOption = useCallback(() => {
+        setShowDropdown(false);
+        if (onShowDropdownChange) {
+            onShowDropdownChange(false);
+        }
+        setSearchInputValue(undefined);
+        if (onSearchValueChange) {
+            onSearchValueChange(undefined);
+        }
+        // NOTE: Selecting first element in this case
+        const option = realOptions[0];
+        if (option) {
+            handleOptionClick(keySelector(option), option);
+        }
+    }, [
+        onShowDropdownChange,
+        onSearchValueChange,
+        handleOptionClick,
+        keySelector,
+        realOptions,
+    ]);
 
     const handleClear = useCallback(
         () => {

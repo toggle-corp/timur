@@ -104,6 +104,17 @@ function DurationInput<const T>(props: Props<T>) {
         setCounter((oldVal) => (oldVal + 1));
     }, [name, tempValue, onChange]);
 
+    const handleKeyDown = useCallback(
+        (e: React.KeyboardEvent<HTMLInputElement>) => {
+            // NOTE: De-structuring e here will create access error
+            const { code } = e;
+            if (code === 'Enter') {
+                handleBlur();
+            }
+        },
+        [handleBlur],
+    );
+
     return (
         <InputContainer
             htmlFor={inputId}
@@ -132,6 +143,7 @@ function DurationInput<const T>(props: Props<T>) {
                     value={tempValue}
                     onChange={handleChange}
                     onBlur={handleBlur}
+                    onKeyDown={handleKeyDown}
                     type="text"
                     elementRef={inputElementRef}
                 />

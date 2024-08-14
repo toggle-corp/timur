@@ -22,7 +22,12 @@
 
     .title {
         color: var(--color-text-light);
-        font-size: var(--font-size-lg);
+        font-size: var(--font-size-xl);
+    }
+
+    .description {
+        color: var(--color-text-light);
+        font-size: var(--font-size-md);
     }
 
     &.errored {
@@ -31,16 +36,25 @@
         }
     }
 
+    &:not(.compact) {
+        .title {
+            font-weight: var(--font-weight-bold);
+        }
+    }
     &.compact {
         padding: var(--spacing-sm);
         min-height: var(--height-compact-content--min);
 
         .title {
-            font-size: var(--font-size-lg);
+            font-size: var(--font-size-sm);
+        }
+
+        .description {
+            font-size: var(--font-size-sm);
         }
 
         .icon {
-            font-size: 1rem;
+            font-size: 2rem;
 
             .spinner {
                 font-size: 1rem;

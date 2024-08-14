@@ -37,7 +37,7 @@
 
             @media screen {
                 body {
-                    background-color: #f1f8e8;
+                    background-color: #fafaf0;
                 }
             }
 
@@ -48,6 +48,21 @@
                 align-items: center;
                 justify-content: center;
             }
+
+            .webapp_root_fallback_element {
+                display: flex;
+                align-items: center;
+                flex-direction: column;
+                justify-content: center;
+                width: 100vw;
+                height: 100vh;
+                gap: 1rem;
+            }
+
+            .webapp_root_fallback_element_app_logo {
+                margin-top: -4rem;
+                height: 6rem;
+            }
         </style>
     </head>
     <body>
@@ -55,13 +70,46 @@
             %APP_TITLE% needs JS.
         </noscript>
         <div id="webapp-root">
-            <div id="webapp-preload">
-                %APP_TITLE% loading...
+            <div
+                id="webapp-preload"
+                class="webapp_root_fallback_element"
+            >
+                <img
+                    class="webapp_root_fallback_element_app_logo"
+                    src="/app-icon.svg"
+                    alt="Timur Icon"
+                />
             </div>
         </div>
         <script
             type="module"
             src="/src/index.tsx"
         ></script>
+        <!-- This script tag uses JavaScript modules, so the proper `type` attribute value is required -->
+        <script type="module">
+            import { Workbox } from 'https://storage.googleapis.com/workbox-cdn/releases/6.4.1/workbox-window.prod.mjs';
+            if ('serviceWorker' in navigator) {
+                const wb = new Workbox('/sw.js');
+                let registration;
+
+                const showSkipWaitingPrompt = async (event) => {
+                    wb.addEventListener('controlling', () => {
+                        window.location.reload();
+                    });
+
+                    const updateAccepted = await promptForUpdate();
+
+                    if (updateAccepted) {
+                        wb.messageSkipWaiting();
+                    }
+                };
+
+                wb.addEventListener('waiting', (event) => {
+                    showSkipWaitingPrompt(event);
+                });
+
+                wb.register();
+            }
+        </script>
     </body>
 </html>

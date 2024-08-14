@@ -2,6 +2,7 @@ import {
     useCallback,
     useMemo,
 } from 'react';
+import { FcClock } from 'react-icons/fc';
 import {
     _cs,
     isDefined,
@@ -83,9 +84,10 @@ function ContractGroupedView(props: Props) {
                 </h3>
                 {!focusMode && (
                     <div className={styles.duration}>
-                        ⏱️
-                        {' '}
-                        {getDurationString(totalHours)}
+                        <FcClock />
+                        <div>
+                            {getDurationString(totalHours)}
+                        </div>
                     </div>
                 )}
             </div>

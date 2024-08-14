@@ -1,5 +1,8 @@
 import { useMemo } from 'react';
-import { GiShrug } from 'react-icons/gi';
+import {
+    FcAlarmClock,
+    FcDislike,
+} from 'react-icons/fc';
 import { _cs } from '@togglecorp/fujs';
 
 import Message from '#components/Message';
@@ -19,6 +22,10 @@ interface Props {
     filteredEmptyMessage?: React.ReactNode;
     pendingMessage?: React.ReactNode;
     errorMessage?: React.ReactNode;
+    emptyDescription?: React.ReactNode;
+    filteredEmptyDescription?: React.ReactNode;
+    pendingDescription?: React.ReactNode;
+    errorDescription?: React.ReactNode;
 }
 
 function DefaultMessage(props: Props) {
@@ -35,6 +42,10 @@ function DefaultMessage(props: Props) {
         filteredEmptyMessage,
         pendingMessage,
         errorMessage,
+        emptyDescription,
+        filteredEmptyDescription,
+        pendingDescription,
+        errorDescription,
     } = props;
 
     const messageTitle = useMemo(
@@ -69,6 +80,38 @@ function DefaultMessage(props: Props) {
         ],
     );
 
+    const messageDescription = useMemo(
+        () => {
+            if (pending) {
+                return pendingDescription;
+            }
+
+            if (errored) {
+                return errorDescription;
+            }
+
+            if (filtered) {
+                return filteredEmptyDescription;
+            }
+
+            if (empty) {
+                return emptyDescription;
+            }
+
+            return null;
+        },
+        [
+            empty,
+            pending,
+            filtered,
+            errored,
+            emptyDescription,
+            filteredEmptyDescription,
+            pendingDescription,
+            errorDescription,
+        ],
+    );
+
     if (!empty && !pending && !errored) {
         return null;
     }
@@ -80,10 +123,10 @@ function DefaultMessage(props: Props) {
                 pending && overlayPending && styles.overlay,
                 className,
             )}
-            icon={<GiShrug />}
+            icon={pending ? <FcAlarmClock /> : <FcDislike />}
             compact={compact}
             title={messageTitle}
-            pending={pending}
+            description={messageDescription}
         />
     );
 }

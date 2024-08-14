@@ -3,11 +3,12 @@ import {
     type SetStateAction,
     useCallback,
     useContext,
-    useEffect,
+    useLayoutEffect,
     useMemo,
     useRef,
     useState,
 } from 'react';
+import { FcClock } from 'react-icons/fc';
 import {
     IoAperture,
     IoChevronBackSharp,
@@ -91,11 +92,11 @@ const MY_TIME_ENTRIES_QUERY = gql`
         private {
             id
             myTimeEntries(date: $date) {
+                id
                 clientId
                 date
                 description
                 duration
-                id
                 startTime
                 status
                 taskId
@@ -120,12 +121,21 @@ const BULK_TIME_ENTRY_MUTATION = gql`
                 results {
                     id
                     clientId
+                    date
+                    description
+                    duration
+                    startTime
+                    status
+                    taskId
+                    type
                 }
             }
         }
     }
 `;
 
+// TODO: Do not use JSON.stringify for comparison
+// TODO: use filtered localState instead of workItems
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
     const { taskById } = useContext(EnumsContext);
@@ -271,9 +281,25 @@ export function Component() {
             if (res.error) {
                 return { ok: false } as const;
             }
+
+            const workItemsFromServer = removeNull(
+                res.data?.private.bulkTimeEntry.results?.map(
+                    (timeEntry) => {
+                        const { taskId, ...otherTimeEntryProps } = timeEntry;
+                        return {
+                            ...otherTimeEntryProps,
+                            task: taskId,
+                        };
+                    },
+                ) ?? [],
+            );
+
             return {
                 ok: true as const,
-                values: res.data?.private.bulkTimeEntry.results ?? [],
+                savedValues: workItemsFromServer ?? [],
+                deletedValues: res.data?.private.bulkTimeEntry.deleted?.map(
+                    (item) => item.clientId,
+                ) ?? [],
             } as const;
         },
         [triggerBulkMutation],
@@ -284,7 +310,7 @@ export function Component() {
         removeFromStateData,
         addOrUpdateServerData,
         isObsolete,
-    } = useBackgroundSync(
+    } = useBackgroundSync<WorkItem>(
         handleBulkAction,
     );
 
@@ -295,23 +321,48 @@ export function Component() {
         variables: { date: selectedDate },
     });
 
-    useEffect(() => {
-        const workItemsFromServer = removeNull(
-            myTimeEntriesResult.data?.private.myTimeEntries?.map(
-                (timeEntry) => {
-                    const { taskId, ...otherTimeEntryProps } = timeEntry;
-                    return {
-                        ...otherTimeEntryProps,
-                        task: taskId,
-                    };
-                },
-            ).sort((foo, bar) => compareStringAsNumber(foo.id, bar.id)) ?? [],
-        );
+    const prevCountRef = useRef<boolean>(myTimeEntriesResult.fetching);
+    useLayoutEffect(
+        () => {
+            const previousFetching = prevCountRef.current;
+            prevCountRef.current = myTimeEntriesResult.fetching;
 
-        setWorkItems(workItemsFromServer);
-        addOrUpdateServerData(workItemsFromServer);
-        addOrUpdateStateData(workItemsFromServer);
-    }, [myTimeEntriesResult.data, setWorkItems, addOrUpdateServerData, addOrUpdateStateData]);
+            if (myTimeEntriesResult.fetching === previousFetching) {
+                return;
+            }
+            if (myTimeEntriesResult.fetching) {
+                return;
+            }
+            if (myTimeEntriesResult.error) {
+                setWorkItems([]);
+                return;
+            }
+
+            const workItemsFromServer = removeNull(
+                myTimeEntriesResult.data?.private.myTimeEntries?.map(
+                    (timeEntry) => {
+                        const { taskId, ...otherTimeEntryProps } = timeEntry;
+                        return {
+                            ...otherTimeEntryProps,
+                            task: taskId,
+                        };
+                    },
+                ).sort((foo, bar) => compareStringAsNumber(foo.id, bar.id)) ?? [],
+            );
+
+            setWorkItems(workItemsFromServer);
+            addOrUpdateServerData(workItemsFromServer);
+            addOrUpdateStateData(workItemsFromServer);
+        },
+        [
+            myTimeEntriesResult.fetching,
+            myTimeEntriesResult.data,
+            myTimeEntriesResult.error,
+            setWorkItems,
+            addOrUpdateServerData,
+            addOrUpdateStateData,
+        ],
+    );
 
     const currentNote = useMemo(
         () => (
@@ -671,11 +722,6 @@ export function Component() {
             className={styles.home}
             contentClassName={styles.content}
         >
-            {bulkMutationState.fetching && myTimeEntriesResult.fetching && (
-                <div className={styles.uiBlocker}>
-                    Loading...
-                </div>
-            )}
             <div className={styles.pageHeader}>
                 <div className={styles.headerContent}>
                     <Button
@@ -766,9 +812,10 @@ export function Component() {
                     </div>
                     {!configFocusMode && (
                         <div className={styles.duration}>
-                            ⏱️
-                            {' '}
-                            {getDurationString(totalHours)}
+                            <FcClock />
+                            <div>
+                                {getDurationString(totalHours)}
+                            </div>
                         </div>
                     )}
                 </div>
@@ -802,6 +849,8 @@ export function Component() {
                 value={focusContextValue}
             >
                 <DayView
+                    loading={myTimeEntriesResult.fetching}
+                    errored={!!myTimeEntriesResult.error}
                     workItems={workItems}
                     onWorkItemClone={handleWorkItemClone}
                     onWorkItemChange={handleWorkItemChange}

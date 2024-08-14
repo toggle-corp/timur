@@ -27,7 +27,6 @@ import {
     MeQueryVariables,
 } from '#generated/types/graphql';
 
-import timurLogo from './icon.svg';
 import wrappedRoutes, { unwrappedRoutes } from './routes';
 
 import styles from './styles.module.css';
@@ -148,9 +147,8 @@ function App() {
                                 <img
                                     className={styles.appLogo}
                                     alt="Timur Icon"
-                                    src={timurLogo}
+                                    src="/app-icon.svg"
                                 />
-                                Timur loading...
                             </div>
                         )}
                     />

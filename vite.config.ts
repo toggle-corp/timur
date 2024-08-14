@@ -36,14 +36,14 @@ export default defineConfig(({ mode }) => {
                     lintCommand: 'stylelint "./src/**/*.css"',
                 },
             }) : undefined,
-            VitePWA({
+            isProd ? VitePWA({
                 buildBase: './build',
                 registerType: 'autoUpdate',
-                devOptions: { enabled: !isProd },
+                devOptions: { enabled: false },
                 manifest: {
                     theme_color: 'white',
                 },
-            }),
+            }) : undefined,
             svgr(),
             reactSwc(),
             tsconfigPaths(),

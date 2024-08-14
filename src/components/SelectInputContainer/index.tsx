@@ -148,11 +148,13 @@ function SelectInputContainer<
                 onDropdownShownChange(true);
             }
             onSearchTextChange(value);
+            onFocusedKeyChange(undefined);
         },
         [
             dropdownShown,
             onDropdownShownChange,
             onSearchTextChange,
+            onFocusedKeyChange,
         ],
     );
 

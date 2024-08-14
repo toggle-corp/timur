@@ -9,7 +9,10 @@
         align-items: baseline;
 
         .duration {
+            display: flex;
+            align-items: baseline;
             flex-shrink: 0;
+            gap: var(--spacing-xs);
         }
     }
 

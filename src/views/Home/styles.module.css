@@ -36,24 +36,6 @@
         }
     }
 
-    .ui-blocker {
-        display: flex;
-        position: fixed;
-        top: 0;
-        left: 0;
-        align-items: center;
-        flex-direction: column;
-        justify-content: center;
-        z-index: 111;
-        background-color: rgba(0, 0, 0, 0.1);
-        width: 100vw;
-        height: 100vh;
-        text-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
-        color: var(--color-text-light);
-        font-size: var(--font-size-lg);
-        backdrop-filter: blur(2px);
-    }
-
     .page-header {
         display: flex;
         align-items: center;
@@ -109,7 +91,10 @@
             }
 
             .duration {
+                display: flex;
+                align-items: baseline;
                 flex-shrink: 0;
+                gap: var(--spacing-xs);
             }
         }
 
