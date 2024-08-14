@@ -109,6 +109,21 @@ function WorkItemRow(props: Props) {
                     <FcPieChart />
                 )}
             />
+            {!focusMode && (
+                <SelectInput
+                    className={styles.task}
+                    name="task"
+                    options={filteredTaskList}
+                    keySelector={taskKeySelector}
+                    labelSelector={taskLabelSelector}
+                    onChange={setFieldValue}
+                    value={workItem.task}
+                    nonClearable
+                    icons={(
+                        <FcPackage />
+                    )}
+                />
+            )}
             <TextArea<'description'>
                 className={styles.description}
                 inputElementRef={inputRef}
@@ -123,19 +138,6 @@ function WorkItemRow(props: Props) {
             />
             {!focusMode && (
                 <>
-                    <SelectInput
-                        className={styles.task}
-                        name="task"
-                        options={filteredTaskList}
-                        keySelector={taskKeySelector}
-                        labelSelector={taskLabelSelector}
-                        onChange={setFieldValue}
-                        value={workItem.task}
-                        nonClearable
-                        icons={(
-                            <FcPackage />
-                        )}
-                    />
                     <SelectInput
                         className={styles.type}
                         name="type"

@@ -1,6 +1,6 @@
 .work-item-row {
     display: grid;
-    grid-template-columns: 6.4rem 7fr 3fr 2.4fr 6.4rem 6.2rem;
+    grid-template-columns: 6.4rem 3fr 7fr 2.4fr 6.4rem 6.2rem;
 
     &.focus-mode {
         grid-template-columns: 6.4rem 1fr;
