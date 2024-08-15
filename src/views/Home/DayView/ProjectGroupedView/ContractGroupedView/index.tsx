@@ -77,17 +77,18 @@ function ContractGroupedView(props: Props) {
     return (
         <div className={_cs(styles.contractGroupedView, className)}>
             <div className={styles.heading}>
-                <h3>
-                    {project.name}
-                    {' › '}
-                    {contract.name}
-                </h3>
+                <div className={styles.textSection}>
+                    <h3>
+                        {project.name}
+                    </h3>
+                    <div className={styles.contractName}>
+                        {contract.name}
+                    </div>
+                </div>
                 {!focusMode && (
                     <div className={styles.duration}>
                         <FcClock />
-                        <div>
-                            {getDurationString(totalHours)}
-                        </div>
+                        {getDurationString(totalHours)}
                     </div>
                 )}
             </div>

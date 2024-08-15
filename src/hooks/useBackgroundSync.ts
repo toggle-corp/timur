@@ -242,6 +242,7 @@ function useBackgroundSync<T extends Base>(
                                         ? item
                                         : { ...item, id: updatedIds[item.clientId] }
                                 ));
+
                                 return newLocalState;
                             },
                             (prevServerState) => {

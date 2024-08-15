@@ -1,18 +1,40 @@
 .contract-grouped-view {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-sm);
+    border-radius: var(--border-radius-lg);
 
     .heading {
         display: flex;
         gap: var(--spacing-sm);
-        align-items: baseline;
+        align-items: flex-end;
+
+        .text-section {
+            display: flex;
+            align-items: baseline;
+            gap: var(--spacing-sm);
+            flex-grow: 1;
+            flex-wrap: wrap;
+            padding: var(--spacing-sm);
+
+            .contract-name {
+                color: var(--color-text-light);
+                font-size: var(--font-size-sm);
+            }
+        }
 
         .duration {
             display: flex;
-            align-items: baseline;
+            align-items: center;
             flex-shrink: 0;
+            width: 12rem;
             gap: var(--spacing-xs);
+            padding: var(--spacing-sm);
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-sm);
+
+            @media screen and (max-width: 60rem) {
+                width: unset;
+            }
         }
     }
 

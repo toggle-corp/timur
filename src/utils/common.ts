@@ -11,20 +11,32 @@ import {
 } from '@togglecorp/fujs';
 import { ulid } from 'ulidx';
 
-function squash<T>(items: T[]): T | undefined {
+function removeUndefinedFromObject<T extends object>(obj: T): T {
+    const newObj = { ...obj };
+
+    Object.keys(obj).forEach((key) => {
+        if (obj[key as keyof typeof obj] === undefined) {
+            delete newObj[key as keyof typeof obj];
+        }
+    });
+
+    return newObj;
+}
+
+function squash<T extends object>(items: T[]): T | undefined {
     if (items.length <= 1) {
         return items[0];
     }
     return items.reduce(
         (acc, val) => ({
             ...acc,
-            ...val,
+            ...removeUndefinedFromObject(val),
         }),
         items[0],
     );
 }
 
-export function mergeList<T>(
+export function mergeList<T extends object>(
     foo: T[],
     bar: T[],
     keySelector: (item: T) => string,

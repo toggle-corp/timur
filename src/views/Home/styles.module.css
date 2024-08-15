@@ -52,7 +52,7 @@
         .actions {
             display: flex;
             gap: var(--spacing-md);
-            align-items: baseline;
+            align-items: center;
             flex-shrink: 0;
         }
     }
@@ -92,9 +92,11 @@
 
             .duration {
                 display: flex;
-                align-items: baseline;
+                align-items: center;
                 flex-shrink: 0;
                 gap: var(--spacing-xs);
+                padding: var(--spacing-sm);
+                font-weight: var(--font-weight-bold);
             }
         }
 

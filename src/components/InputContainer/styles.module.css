@@ -5,7 +5,7 @@
     padding: var(--spacing-xs) 0;
 
     .input-section {
-        align-items: baseline;
+        align-items: flex-start;
         padding: 0 var(--spacing-sm);
 
         .input {
@@ -13,6 +13,7 @@
         }
 
         .icons-container {
+            padding-top: 0.15em;
             filter: grayscale(70%);
         }
     }

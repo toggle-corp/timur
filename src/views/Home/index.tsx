@@ -14,6 +14,7 @@ import {
     IoChevronBackSharp,
     IoChevronDown,
     IoChevronForwardSharp,
+    IoCodeSlash,
     IoInformation,
 } from 'react-icons/io5';
 import {
@@ -53,6 +54,7 @@ import {
     getDurationString,
     getNewId,
 } from '#utils/common';
+import { getFromStorage } from '#utils/localStorage';
 import { removeNull } from '#utils/nullHelper';
 import {
     EditingMode,
@@ -74,6 +76,7 @@ import styles from './styles.module.css';
 const { APP_VERSION } = import.meta.env;
 
 const KEY_DATA_STORAGE = 'timur-meta';
+const KEY_DATA_STORAGE_OLD = 'timur';
 
 const dateFormatter = new Intl.DateTimeFormat(
     [],
@@ -716,6 +719,11 @@ export function Component() {
         [register, unregister],
     );
 
+    const handleExportButtonClick = useCallback(() => {
+        const prevData = getFromStorage(KEY_DATA_STORAGE_OLD);
+        window.navigator.clipboard.writeText(JSON.stringify(prevData));
+    }, []);
+
     return (
         <Page
             documentTitle="Timur - Home"
@@ -768,6 +776,15 @@ export function Component() {
                             Syncing...
                         </div>
                     </div>
+                    <Button
+                        name={undefined}
+                        onClick={handleExportButtonClick}
+                        variant="secondary"
+                        spacing="sm"
+                        icons={<IoCodeSlash />}
+                    >
+                        Export
+                    </Button>
                     <Button
                         name={!configFocusMode}
                         onClick={setFocusModeChange}

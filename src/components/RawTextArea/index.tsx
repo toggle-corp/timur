@@ -29,12 +29,16 @@ function RawTextArea<N>(props: Props<N>) {
         ...otherProps
     } = props;
 
-    const parentRef = React.useRef<HTMLDivElement>(null);
+    const containerRef = React.useRef<HTMLDivElement>(null);
 
     React.useLayoutEffect(
         () => {
-            if (parentRef.current) {
-                parentRef.current.dataset.replicatedValue = value ?? undefined;
+            if (containerRef.current) {
+                const splittedValue = value?.split('\n');
+                const shortValue = splittedValue?.[1] ? `${splittedValue[0]}...` : value;
+
+                containerRef.current.dataset.replicatedValue = value ?? undefined;
+                containerRef.current.dataset.shortValue = shortValue ?? undefined;
             }
         },
         [value],
@@ -67,7 +71,7 @@ function RawTextArea<N>(props: Props<N>) {
 
     return (
         <div
-            ref={parentRef}
+            ref={containerRef}
             className={styles.growWrap}
         >
             <textarea

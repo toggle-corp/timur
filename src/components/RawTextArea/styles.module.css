@@ -1,7 +1,10 @@
 .grow-wrap {
+    display: grid;
+    position: relative;
     width: 100%;
 
     .raw-input {
+        border: 1px solid blue;
         margin: 0;
         outline: 0;
         border: 0;
@@ -15,8 +18,25 @@
         font-size: inherit;
     }
 
+    &:not(:focus-within) {
+        &::after {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font: inherit;
+            content: attr(data-short-value) " ";
+            grid-area: 1 / 1 / 2 / 2;
+        }
+
+        .raw-input {
+            opacity: 0;
+        }
+    }
+
     &:focus-within {
-        display: grid;
         &::after {
             visibility: hidden;
             white-space: pre-wrap;
