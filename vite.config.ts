@@ -18,6 +18,7 @@ const commitHash = execSync('git rev-parse --short HEAD').toString();
 
 export default defineConfig(({ mode }) => {
     const isProd = mode === 'production';
+    console.log('Mode:', mode);
     const env = loadEnv(mode, process.cwd(), '')
 
     return {
@@ -36,14 +37,31 @@ export default defineConfig(({ mode }) => {
                     lintCommand: 'stylelint "./src/**/*.css"',
                 },
             }) : undefined,
-            isProd ? VitePWA({
-                buildBase: './build',
-                registerType: 'autoUpdate',
+            VitePWA({
+                // buildBase: './build/',
+                strategies: 'generateSW',
+                registerType: 'prompt',
+                injectRegister: 'script',
                 devOptions: { enabled: false },
+                includeAssets: ['app-icon.svg'],
                 manifest: {
-                    theme_color: 'white',
+                    name: 'Timur',
+                    short_name: 'Timur',
+                    description: 'Timur - Phase Zero',
+                    theme_color: '#FFFFFF',
                 },
-            }) : undefined,
+                workbox: {
+                    globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+                    // cleanupOutdatedCaches: true,
+                    clientsClaim: true,
+                    skipWaiting: true,
+                    // swDest: './build',
+                },
+                pwaAssets: {
+                    config: true,
+                    overrideManifestIcons: true,
+                },
+            }),
             svgr(),
             reactSwc(),
             tsconfigPaths(),
