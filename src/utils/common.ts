@@ -11,6 +11,17 @@ import {
 } from '@togglecorp/fujs';
 import { ulid } from 'ulidx';
 
+export interface Size {
+    width: number;
+    height: number;
+}
+export function getWindowSize(): Size {
+    return {
+        width: window.innerWidth,
+        height: window.innerHeight,
+    };
+}
+
 function removeUndefinedFromObject<T extends object>(obj: T): T {
     const newObj = { ...obj };
 

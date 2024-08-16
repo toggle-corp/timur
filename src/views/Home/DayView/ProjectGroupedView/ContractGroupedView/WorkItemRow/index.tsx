@@ -21,6 +21,7 @@ import DurationInput from '#components/DurationInput';
 import SelectInput from '#components/SelectInput';
 import TextArea from '#components/TextArea';
 import EnumsContext from '#contexts/enums';
+import SizeContext from '#contexts/size';
 import { EnumsQuery } from '#generated/types/graphql';
 import { useFocusClient } from '#hooks/useFocus';
 import {
@@ -77,6 +78,7 @@ function WorkItemRow(props: Props) {
     } = props;
 
     const { enums } = useContext(EnumsContext);
+    const { width: windowWidth } = useContext(SizeContext);
     const inputRef = useFocusClient<HTMLTextAreaElement>(workItem.clientId);
 
     const setFieldValue = useCallback(
@@ -91,97 +93,134 @@ function WorkItemRow(props: Props) {
         [contract.id, enums],
     );
 
+    const statusInput = (
+        <SelectInput
+            className={styles.status}
+            name="status"
+            options={enums?.enums?.TimeEntryStatus}
+            keySelector={workItemStatusKeySelector}
+            labelSelector={workItemStatusLabelSelector}
+            onChange={setFieldValue}
+            value={workItem.status}
+            nonClearable
+            icons={<FcPieChart />}
+        />
+    );
+
+    const taskInput = (
+        <SelectInput
+            className={styles.task}
+            name="task"
+            options={filteredTaskList}
+            keySelector={taskKeySelector}
+            labelSelector={taskLabelSelector}
+            onChange={setFieldValue}
+            value={workItem.task}
+            nonClearable
+            icons={(
+                <FcPackage />
+            )}
+        />
+    );
+
+    const descriptionInput = (
+        <TextArea<'description'>
+            className={styles.description}
+            inputElementRef={inputRef}
+            name="description"
+            title="Description"
+            value={workItem.description}
+            onChange={setFieldValue}
+            icons={(
+                <FcDocument />
+            )}
+            placeholder="Description"
+        />
+    );
+
+    const typeInput = (
+        <SelectInput
+            className={styles.type}
+            name="type"
+            options={enums?.enums.TimeEntryType}
+            keySelector={workItemTypeKeySelector}
+            labelSelector={workItemTypeLabelSelector}
+            onChange={setFieldValue}
+            value={workItem.type}
+            nonClearable
+            icons={(
+                <FcRuler />
+            )}
+        />
+    );
+
+    const durationInput = (
+        <DurationInput
+            className={styles.hours}
+            name="duration"
+            title="Hours"
+            value={workItem.duration}
+            onChange={setFieldValue}
+            icons={(
+                <FcClock />
+            )}
+            placeholder="hh:mm"
+        />
+    );
+
+    const actions = (
+        <div className={styles.actions}>
+            <Button
+                name={workItem.clientId}
+                variant="secondary"
+                title="Clone this entry"
+                onClick={onClone}
+                spacing="sm"
+            >
+                <IoCopyOutline />
+            </Button>
+            <Button
+                name={workItem.clientId}
+                variant="secondary"
+                spacing="sm"
+                title="Delete this entry"
+                onClick={onDelete}
+            >
+                <IoTrashOutline />
+            </Button>
+        </div>
+    );
+
     return (
         <div
             role="listitem"
             className={_cs(styles.workItemRow, className, focusMode && styles.focusMode)}
         >
-            <SelectInput
-                className={styles.status}
-                name="status"
-                options={enums?.enums?.TimeEntryStatus}
-                keySelector={workItemStatusKeySelector}
-                labelSelector={workItemStatusLabelSelector}
-                onChange={setFieldValue}
-                value={workItem.status}
-                nonClearable
-                icons={(
-                    <FcPieChart />
-                )}
-            />
-            {!focusMode && (
-                <SelectInput
-                    className={styles.task}
-                    name="task"
-                    options={filteredTaskList}
-                    keySelector={taskKeySelector}
-                    labelSelector={taskLabelSelector}
-                    onChange={setFieldValue}
-                    value={workItem.task}
-                    nonClearable
-                    icons={(
-                        <FcPackage />
-                    )}
-                />
-            )}
-            <TextArea<'description'>
-                className={styles.description}
-                inputElementRef={inputRef}
-                name="description"
-                title="Description"
-                value={workItem.description}
-                onChange={setFieldValue}
-                icons={(
-                    <FcDocument />
-                )}
-                placeholder="Description"
-            />
-            {!focusMode && (
+            {windowWidth >= 900 ? (
                 <>
-                    <SelectInput
-                        className={styles.type}
-                        name="type"
-                        options={enums?.enums.TimeEntryType}
-                        keySelector={workItemTypeKeySelector}
-                        labelSelector={workItemTypeLabelSelector}
-                        onChange={setFieldValue}
-                        value={workItem.type}
-                        nonClearable
-                        icons={(
-                            <FcRuler />
-                        )}
-                    />
-                    <DurationInput
-                        className={styles.hours}
-                        name="duration"
-                        title="Hours"
-                        value={workItem.duration}
-                        onChange={setFieldValue}
-                        icons={(
-                            <FcClock />
-                        )}
-                        placeholder="hh:mm"
-                    />
-                    <div className={styles.actions}>
-                        <Button
-                            name={workItem.clientId}
-                            variant="secondary"
-                            title="Clone this entry"
-                            onClick={onClone}
-                            spacing="sm"
-                        >
-                            <IoCopyOutline />
-                        </Button>
-                        <Button
-                            name={workItem.clientId}
-                            variant="secondary"
-                            spacing="sm"
-                            title="Delete this entry"
-                            onClick={onDelete}
-                        >
-                            <IoTrashOutline />
-                        </Button>
-                    </div>
+                    {statusInput}
+                    {!focusMode && taskInput}
+                    {descriptionInput}
+                    {!focusMode && (
+                        <>
+                            {typeInput}
+                            {durationInput}
+                            {actions}
+                        </>
+                    )}
+                </>
+            ) : (
+                <>
+                    {descriptionInput}
+                    {statusInput}
+                    {!focusMode && taskInput}
+                    {!focusMode && (
+                        <>
+                            {typeInput}
+                            {durationInput}
+                            {actions}
+                        </>
+                    )}
                 </>
             )}
         </div>

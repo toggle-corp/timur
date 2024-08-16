@@ -1,6 +1,6 @@
 .work-item-row {
     display: grid;
-    grid-template-columns: 6rem 3fr 7fr 2fr 6rem 6rem;
+    grid-template-columns: 6rem 2fr 5fr 10rem 6rem 6rem;
 
     &.focus-mode {
         grid-template-columns: 6rem 1fr;
@@ -28,12 +28,17 @@
             font-size: var(--font-size-sm);
         }
     }
+
     &:focus-within {
         background-color: var(--color-tertiary);
     }
 
-    @media screen and (max-width: 60rem) {
+    @media screen and (max-width: 900px) {
         grid-template-columns: auto;
+
+        &.focus-mode {
+            grid-template-columns: auto;
+        }
 
         &:not(:focus-within) {
             .task,
@@ -43,11 +48,6 @@
             .hours {
                 display: none;
             }
-        }
-
-        .description {
-            grid-column: 1 / -1;
-            grid-row: 1;
         }
     }
 }

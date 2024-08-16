@@ -16,6 +16,7 @@ import {
 
 import EnumsContext, { EnumsContextProps } from '#contexts/enums';
 import RouteContext from '#contexts/route';
+import SizeContext, { SizeContextProps } from '#contexts/size';
 import UserContext, {
     UserAuth,
     UserContextProps,
@@ -26,6 +27,8 @@ import {
     MeQuery,
     MeQueryVariables,
 } from '#generated/types/graphql';
+import useDebouncedValue from '#hooks/useDebouncedValue';
+import { getWindowSize } from '#utils/common';
 
 import wrappedRoutes, { unwrappedRoutes } from './routes';
 
@@ -89,6 +92,21 @@ const router = createBrowserRouter(unwrappedRoutes);
 
 function App() {
     const [userAuth, setUserAuth] = useState<UserAuth>();
+    const [size, setSize] = useState<SizeContextProps>(getWindowSize);
+
+    const debouncedSize = useDebouncedValue(size);
+
+    useEffect(() => {
+        function handleResize() {
+            setSize(getWindowSize());
+        }
+
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
 
     const [meResult] = useQuery<MeQuery, MeQueryVariables>(
         { query: ME_QUERY },
@@ -137,24 +155,26 @@ function App() {
     );
 
     return (
-        <RouteContext.Provider value={wrappedRoutes}>
-            <UserContext.Provider value={userContextValue}>
-                <EnumsContext.Provider value={enumsContextValue}>
-                    <RouterProvider
-                        router={router}
-                        fallbackElement={(
-                            <div className={styles.fallbackElement}>
-                                <img
-                                    className={styles.appLogo}
-                                    alt="Timur Icon"
-                                    src="/app-icon.svg"
-                                />
-                            </div>
-                        )}
-                    />
-                </EnumsContext.Provider>
-            </UserContext.Provider>
-        </RouteContext.Provider>
+        <SizeContext.Provider value={debouncedSize}>
+            <RouteContext.Provider value={wrappedRoutes}>
+                <UserContext.Provider value={userContextValue}>
+                    <EnumsContext.Provider value={enumsContextValue}>
+                        <RouterProvider
+                            router={router}
+                            fallbackElement={(
+                                <div className={styles.fallbackElement}>
+                                    <img
+                                        className={styles.appLogo}
+                                        alt="Timur Icon"
+                                        src="/app-icon.svg"
+                                    />
+                                </div>
+                            )}
+                        />
+                    </EnumsContext.Provider>
+                </UserContext.Provider>
+            </RouteContext.Provider>
+        </SizeContext.Provider>
     );
 }
 

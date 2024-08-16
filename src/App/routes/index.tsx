@@ -58,14 +58,26 @@ const home = customWrapRoute({
     index: true,
     component: {
         render: () => import('#views/Home'),
-        props: {
-            title: 'Home',
-        },
+        props: {},
     },
     wrapperComponent: Auth,
     context: {
         title: 'Home',
         visibility: 'anything',
+    },
+});
+
+const settings = customWrapRoute({
+    parent: rootLayout,
+    path: 'settings',
+    component: {
+        render: () => import('#views/Settings'),
+        props: {},
+    },
+    wrapperComponent: Auth,
+    context: {
+        title: 'Settings',
+        visibility: 'is-authenticated',
     },
 });
 
@@ -77,6 +89,7 @@ const wrappedRoutes = {
     login,
     register,
     home,
+    settings,
 };
 
 export const unwrappedRoutes = unwrapRoute(Object.values(wrappedRoutes));
