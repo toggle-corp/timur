@@ -1,17 +1,12 @@
 import React, { useId } from 'react';
-import { isNotDefined } from '@togglecorp/fujs';
 
 import InputContainer, { Props as InputContainerProps } from '../InputContainer';
 import RawTextArea, { Props as RawTextAreaProps } from '../RawTextArea';
 
-const BULLET = '•';
-const KEY_ENTER = 'Enter';
-
 type InheritedProps<N> = (Omit<InputContainerProps, 'input' | 'htmlFor'> & Omit<RawTextAreaProps<N>, 'type' | 'id'>);
 export interface Props<T> extends InheritedProps<T> {
-  inputElementRef?: React.RefObject<HTMLTextAreaElement>;
-  autoBullets?: boolean;
-  inputClassName?: string;
+    inputElementRef?: React.RefObject<HTMLTextAreaElement>;
+    inputClassName?: string;
 }
 
 function TextArea<const N>(props: Props<N>) {
@@ -33,31 +28,10 @@ function TextArea<const N>(props: Props<N>) {
         withAsterisk,
         onChange,
         name,
-        autoBullets = false,
         rows = 1,
         inputElementRef,
         ...otherInputProps
     } = props;
-
-    const handleInputFocus = React.useCallback((e: React.FocusEvent<HTMLTextAreaElement>) => {
-        if (isNotDefined(onChange)) {
-            return;
-        }
-
-        if (e.target.value === '') {
-            onChange(`${BULLET} `, name);
-        }
-    }, [onChange, name]);
-
-    const handleKeyUp = React.useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (isNotDefined(onChange)) {
-            return;
-        }
-
-        if (e.key === KEY_ENTER) {
-            onChange(`${e.currentTarget.value}${BULLET} `, name);
-        }
-    }, [onChange, name]);
 
     const inputId = useId();
 
@@ -88,8 +62,6 @@ function TextArea<const N>(props: Props<N>) {
                     className={inputClassName}
                     onChange={onChange}
                     name={name}
-                    onFocus={autoBullets ? handleInputFocus : undefined}
-                    onKeyUp={autoBullets ? handleKeyUp : undefined}
                     rows={rows}
                     elementRef={inputElementRef}
                 />

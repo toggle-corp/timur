@@ -1,8 +1,8 @@
 import React from 'react';
 import {
-    CheckboxBlankCircleLineIcon,
-    RadioButtonLineIcon,
-} from '@ifrc-go/icons';
+    IoRadioButtonOffOutline,
+    IoRadioButtonOnOutline,
+} from 'react-icons/io5';
 import { _cs } from '@togglecorp/fujs';
 
 import useBasicLayout from '#hooks/useBasicLayout';
@@ -47,9 +47,9 @@ function Radio<N, IN>(props: Props<N, IN>) {
         containerClassName,
     } = useBasicLayout({
         icons: value ? (
-            <RadioButtonLineIcon className={styles.icon} />
+            <IoRadioButtonOnOutline className={styles.icon} />
         ) : (
-            <CheckboxBlankCircleLineIcon className={styles.icon} />
+            <IoRadioButtonOffOutline className={styles.icon} />
         ),
         actions,
         childrenContainerClassName: styles.content,
@@ -63,7 +63,7 @@ function Radio<N, IN>(props: Props<N, IN>) {
                 )}
             </>
         ),
-        spacing: 'compact',
+        spacing: 'xs',
         withoutWrap: true,
     });
 

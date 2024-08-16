@@ -22,6 +22,7 @@ export interface Props {
     contentClassName?: string;
 
     mode?: 'right' | 'center';
+    size?: 'auto';
 
     focusElementRef?: RefObject<HTMLElement>;
 }
@@ -36,6 +37,7 @@ function Dialog(props: Props) {
         contentClassName,
         focusElementRef,
         mode = 'center',
+        size,
     } = props;
 
     const dialogRef = useRef<HTMLDialogElement>(null);
@@ -75,6 +77,7 @@ function Dialog(props: Props) {
                     open && styles.open,
                     mode === 'right' && styles.rightMode,
                     mode === 'center' && styles.centerMode,
+                    size === 'auto' && styles.autoSize,
                 )}
                 onClose={handleClose}
             >

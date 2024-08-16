@@ -17,6 +17,7 @@ import {
 import { _cs } from '@togglecorp/fujs';
 
 import Button from '#components/Button';
+import ConfirmButton from '#components/ConfirmButton';
 import DurationInput from '#components/DurationInput';
 import SelectInput from '#components/SelectInput';
 import TextArea from '#components/TextArea';
@@ -179,15 +180,26 @@ function WorkItemRow(props: Props) {
             >
                 <IoCopyOutline />
             </Button>
-            <Button
+            <ConfirmButton
                 name={workItem.clientId}
                 variant="secondary"
                 spacing="sm"
                 title="Delete this entry"
                 onClick={onDelete}
+                confirmHeading="Delete entry"
+                confirmDescription={(
+                    <div>
+                        <p>
+                            Do you want to delete this entry?
+                        </p>
+                        <p>
+                            This action cannot be reverted.
+                        </p>
+                    </div>
+                )}
             >
                 <IoTrashOutline />
-            </Button>
+            </ConfirmButton>
         </div>
     );
 

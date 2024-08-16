@@ -1,0 +1,13 @@
+.shortcuts-dialog {
+    .modal-content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-md);
+
+        .actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            justify-content: flex-end;
+        }
+    }
+}

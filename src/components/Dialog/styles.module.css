@@ -45,6 +45,11 @@
         border-radius: var(--border-radius-lg);
         width: 60rem;
         height: 70vh;
+
+        &.auto-size {
+            width: fit-content;
+            height: fit-content;
+        }
     }
 }
 

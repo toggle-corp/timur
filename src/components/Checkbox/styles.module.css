@@ -1,10 +1,10 @@
 .checkbox {
     display: flex;
+    position: relative;
     align-items: flex-start;
     cursor: pointer;
-    gap: var(--spacing-sm);
     width: fit-content;
-    position: relative;
+    gap: var(--spacing-sm);
 
     .input {
         position: absolute;
@@ -51,8 +51,8 @@
         display: flex;
         align-items: flex-start;
         cursor: not-allowed;
-        gap: var(--spacing-sm);
         color: var(--color-separator);
+        gap: var(--spacing-sm);
 
         .checkmark {
             color: var(--color-separator);
