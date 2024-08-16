@@ -11,31 +11,6 @@
         margin: 0;
     }
 
-    .last-saved-status {
-        display: flex;
-        align-items: center;
-        transition: .5s opacity ease-in-out;
-        opacity: 0;
-        border-radius: 0.5rem;
-        background-color: var(--color-quaternary);
-        padding: var(--spacing-2xs) var(--spacing-sm);
-        color: var(--color-text-light);
-        font-size: var(--font-size-xs);
-        gap: var(--spacing-xs);
-
-        .timur-icon {
-            height: 0.75rem;
-        }
-
-        &.active {
-            opacity: 1;
-
-            .timur-icon {
-                animation: shake-it-off 2.2s ease-in infinite;
-            }
-        }
-    }
-
     .page-header {
         display: flex;
         align-items: center;
@@ -47,13 +22,38 @@
             align-items: baseline;
             flex-grow: 1;
             gap: var(--spacing-sm);
+
+            .last-saved-status {
+                display: flex;
+                align-items: center;
+                transition: .5s opacity ease-in-out;
+                opacity: 0;
+                border-radius: 0.5rem;
+                background-color: var(--color-quaternary);
+                padding: var(--spacing-2xs) var(--spacing-sm);
+                color: var(--color-text-light);
+                font-size: var(--font-size-xs);
+                gap: var(--spacing-xs);
+
+                .timur-icon {
+                    height: 0.75rem;
+                }
+
+                &.active {
+                    opacity: 1;
+
+                    .timur-icon {
+                        animation: shake-it-off 2.2s ease-in infinite;
+                    }
+                }
+            }
+
         }
 
         .actions {
             display: flex;
             gap: var(--spacing-md);
             align-items: center;
-            flex-shrink: 0;
         }
     }
 

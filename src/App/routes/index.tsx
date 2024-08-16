@@ -37,22 +37,6 @@ const login = customWrapRoute({
     },
 });
 
-const register = customWrapRoute({
-    parent: rootLayout,
-    path: 'register',
-    component: {
-        render: () => import('#components/TemplateView'),
-        props: {
-            title: 'Register',
-        },
-    },
-    wrapperComponent: Auth,
-    context: {
-        title: 'Register',
-        visibility: 'is-not-authenticated',
-    },
-});
-
 const home = customWrapRoute({
     parent: rootLayout,
     index: true,
@@ -63,7 +47,7 @@ const home = customWrapRoute({
     wrapperComponent: Auth,
     context: {
         title: 'Home',
-        visibility: 'anything',
+        visibility: 'is-authenticated',
     },
 });
 
@@ -81,13 +65,10 @@ const settings = customWrapRoute({
     },
 });
 
-// Redirect Routes
-
 const wrappedRoutes = {
     fourHundredFour,
     rootLayout,
     login,
-    register,
     home,
     settings,
 };

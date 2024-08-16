@@ -759,8 +759,6 @@ export function Component() {
                     >
                         Today
                     </Button>
-                </div>
-                <div className={styles.actions}>
                     <div
                         className={_cs(
                             styles.lastSavedStatus,
@@ -776,6 +774,8 @@ export function Component() {
                             Syncing...
                         </div>
                     </div>
+                </div>
+                <div className={styles.actions}>
                     <Button
                         name={undefined}
                         onClick={handleExportButtonClick}
