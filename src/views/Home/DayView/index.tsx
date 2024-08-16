@@ -117,6 +117,8 @@ function DayView(props: Props) {
             renderer={ProjectGroupedView}
             rendererParams={rendererParams}
             emptyMessage="No entries here!"
+            pendingMessage="Getting your entries..."
+            pendingDescription="This should not take much time."
             emptyDescription={(
                 <>
                     Click on

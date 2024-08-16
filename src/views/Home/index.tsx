@@ -783,7 +783,7 @@ export function Component() {
                         spacing="sm"
                         icons={<IoCodeSlash />}
                     >
-                        Export
+                        Copy data
                     </Button>
                     <Button
                         name={!configFocusMode}
@@ -791,8 +791,11 @@ export function Component() {
                         variant={configFocusMode ? 'primary' : 'secondary'}
                         title={configFocusMode ? 'Disable focus mode' : 'Enable focus mode'}
                         spacing="sm"
+                        icons={(
+                            <IoAperture />
+                        )}
                     >
-                        <IoAperture />
+                        Focus
                     </Button>
                     <Button
                         name
@@ -800,8 +803,11 @@ export function Component() {
                         variant="secondary"
                         title="Open shortcuts"
                         spacing="sm"
+                        icons={(
+                            <IoInformation />
+                        )}
                     >
-                        <IoInformation />
+                        Shortcuts
                     </Button>
                 </div>
             </div>
