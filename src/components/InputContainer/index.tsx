@@ -56,7 +56,7 @@ function InputContainer(props: Props) {
         errorContainerClassName,
         hintContainerClassName,
         iconsContainerClassName,
-        spacing,
+        spacing = 'sm',
         htmlFor,
     } = props;
 

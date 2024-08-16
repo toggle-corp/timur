@@ -3,6 +3,11 @@
     flex-direction: column;
     gap: var(--spacing-xs);
 
+    .label {
+        color: var(--color-text-light);
+        font-size: var(--font-size-sm);
+    }
+
     .radio-list-container {
         display: flex;
         flex-wrap: wrap;

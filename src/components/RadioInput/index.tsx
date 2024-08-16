@@ -5,7 +5,6 @@ import {
 } from '@togglecorp/fujs';
 
 import InputError from '#components/InputError';
-import InputLabel from '#components/InputLabel';
 import RawList from '#components/RawList';
 
 import Radio, { Props as RadioProps } from './Radio';
@@ -85,9 +84,9 @@ function RadioInput<
         rendererParams: radioRendererParamsFromProps,
         disabled,
         readOnly,
-        required,
+        // required,
         onChange,
-        withAsterisk,
+        // withAsterisk,
     } = props;
 
     const handleRadioClick = React.useCallback((radioKey: V | undefined) => {
@@ -144,7 +143,7 @@ function RadioInput<
         descriptionSelector,
     ]);
 
-    const isRequired = withAsterisk ?? required;
+    // const isRequired = withAsterisk ?? required;
 
     return (
         <div
@@ -154,13 +153,9 @@ function RadioInput<
                 className,
             )}
         >
-            <InputLabel
-                className={labelContainerClassName}
-                disabled={disabled}
-                required={isRequired}
-            >
+            <div className={_cs(styles.label, labelContainerClassName)}>
                 {label}
-            </InputLabel>
+            </div>
             <div className={_cs(styles.radioListContainer, listContainerClassName)}>
                 <RawList
                     data={options}

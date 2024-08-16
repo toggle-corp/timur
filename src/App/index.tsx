@@ -15,6 +15,7 @@ import {
 } from 'urql';
 
 import EnumsContext, { EnumsContextProps } from '#contexts/enums';
+import LocalStorageContext, { LocalStorageContextProps } from '#contexts/localStorage';
 import RouteContext from '#contexts/route';
 import SizeContext, { SizeContextProps } from '#contexts/size';
 import UserContext, {
@@ -29,6 +30,7 @@ import {
 } from '#generated/types/graphql';
 import useDebouncedValue from '#hooks/useDebouncedValue';
 import { getWindowSize } from '#utils/common';
+import { setToStorage } from '#utils/localStorage';
 
 import wrappedRoutes, { unwrappedRoutes } from './routes';
 
@@ -93,6 +95,13 @@ const router = createBrowserRouter(unwrappedRoutes);
 function App() {
     const [userAuth, setUserAuth] = useState<UserAuth>();
     const [size, setSize] = useState<SizeContextProps>(getWindowSize);
+    const [storageState, setStorageState] = useState<LocalStorageContextProps['storageState']>({});
+
+    useEffect(() => {
+        Object.keys(storageState).forEach((key) => {
+            setToStorage(key, storageState[key].value);
+        });
+    }, [storageState]);
 
     const debouncedSize = useDebouncedValue(size);
 
@@ -154,26 +163,33 @@ function App() {
         [enumsResult],
     );
 
+    const storageContextValue = useMemo<LocalStorageContextProps>(() => ({
+        storageState,
+        setStorageState,
+    }), [storageState]);
+
     return (
         <SizeContext.Provider value={debouncedSize}>
-            <RouteContext.Provider value={wrappedRoutes}>
-                <UserContext.Provider value={userContextValue}>
-                    <EnumsContext.Provider value={enumsContextValue}>
-                        <RouterProvider
-                            router={router}
-                            fallbackElement={(
-                                <div className={styles.fallbackElement}>
-                                    <img
-                                        className={styles.appLogo}
-                                        alt="Timur Icon"
-                                        src="/app-icon.svg"
-                                    />
-                                </div>
-                            )}
-                        />
-                    </EnumsContext.Provider>
-                </UserContext.Provider>
-            </RouteContext.Provider>
+            <LocalStorageContext.Provider value={storageContextValue}>
+                <RouteContext.Provider value={wrappedRoutes}>
+                    <UserContext.Provider value={userContextValue}>
+                        <EnumsContext.Provider value={enumsContextValue}>
+                            <RouterProvider
+                                router={router}
+                                fallbackElement={(
+                                    <div className={styles.fallbackElement}>
+                                        <img
+                                            className={styles.appLogo}
+                                            alt="Timur Icon"
+                                            src="/app-icon.svg"
+                                        />
+                                    </div>
+                                )}
+                            />
+                        </EnumsContext.Provider>
+                    </UserContext.Provider>
+                </RouteContext.Provider>
+            </LocalStorageContext.Provider>
         </SizeContext.Provider>
     );
 }

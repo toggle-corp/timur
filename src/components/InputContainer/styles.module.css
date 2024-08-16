@@ -2,19 +2,17 @@
     display: block;
     position: relative;
     border: var(--width-separator-md) solid transparent;
-    padding: var(--spacing-xs) 0;
 
     .input-section {
         align-items: flex-start;
-        padding: 0 var(--spacing-sm);
 
         .input {
             padding: 0;
         }
 
         .icons-container {
-            padding-top: 0.15em;
-            filter: grayscale(70%);
+            filter: grayscale(80%);
+            opacity: 0.5;
         }
     }
 
@@ -52,6 +50,7 @@
         .input-section {
             .icons-container {
                 filter: unset;
+                opacity: 1;
             }
         }
     }

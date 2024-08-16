@@ -1,6 +1,6 @@
 import {
-    IoCheckboxOutline,
-    IoCreateOutline,
+    IoCheckboxSharp,
+    IoCreateSharp,
     IoSquareOutline,
 } from 'react-icons/io5';
 
@@ -20,10 +20,10 @@ function Checkmark(props: CheckmarkProps) {
     return (
         <>
             {indeterminate && (
-                <IoCreateOutline className={className} />
+                <IoCreateSharp className={className} />
             )}
             {value && !indeterminate && (
-                <IoCheckboxOutline className={className} />
+                <IoCheckboxSharp className={className} />
             )}
             {!value && !indeterminate && (
                 <IoSquareOutline className={className} />

@@ -7,10 +7,7 @@ import {
     useState,
 } from 'react';
 import { IoAddSharp } from 'react-icons/io5';
-import {
-    isDefined,
-    listToGroupList,
-} from '@togglecorp/fujs';
+import { listToGroupList } from '@togglecorp/fujs';
 import {
     matchSorter,
     type MatchSorterOptions,
@@ -18,15 +15,9 @@ import {
 
 import Dialog from '#components/Dialog';
 import RawButton from '#components/RawButton';
-import SelectInput from '#components/SelectInput';
 import TextInput from '#components/TextInput';
 import EnumsContext from '#contexts/enums';
-import { EnumsQuery } from '#generated/types/graphql';
-import {
-    WorkItem,
-    WorkItemStatus,
-    WorkItemType,
-} from '#utils/types';
+import { WorkItem } from '#utils/types';
 
 import styles from './styles.module.css';
 
@@ -51,46 +42,11 @@ function fuzzySearch<ItemType = string>(
     );
 }
 
-type WorkItemTypeOption = EnumsQuery['enums']['TimeEntryType'][number];
-function workItemTypeKeySelector(item: WorkItemTypeOption) {
-    return item.key;
-}
-function workItemTypeLabelSelector(item: WorkItemTypeOption) {
-    return item.label;
-}
-
-type WorkItemStatusOption = EnumsQuery['enums']['TimeEntryStatus'][number];
-function workItemStatusKeySelector(item: WorkItemStatusOption) {
-    return item.key;
-}
-function workItemStatusLabelSelector(item: WorkItemStatusOption) {
-    return item.label;
-}
-
-type BoolStr = 'true' | 'false';
-
-type ModeOption = { id: BoolStr, title: string };
-function modeKeySelector(item: ModeOption) {
-    return item.id;
-}
-function modeLabelSelector(item: ModeOption) {
-    return item.title;
-}
-const modeOptions: ModeOption[] = [
-    { id: 'false', title: 'Single' },
-    { id: 'true', title: 'Multiple' },
-];
-
 interface Props {
     dialogOpenTriggerRef: React.MutableRefObject<(() => void) | undefined>;
     workItems: WorkItem[] | undefined;
     onWorkItemCreate: (taskId: string) => void;
-    defaultTaskType: WorkItemType;
-    onDefaultTaskTypeChange: React.Dispatch<React.SetStateAction<WorkItemType>>
-    defaultTaskStatus: WorkItemStatus;
-    onDefaultTaskStatusChange: React.Dispatch<React.SetStateAction<WorkItemStatus>>
     allowMultipleEntry: boolean;
-    onAllowMultipleEntryChange: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 function AddWorkItemDialog(props: Props) {
@@ -98,12 +54,7 @@ function AddWorkItemDialog(props: Props) {
         dialogOpenTriggerRef,
         workItems,
         onWorkItemCreate,
-        defaultTaskType,
-        onDefaultTaskTypeChange,
-        defaultTaskStatus,
-        onDefaultTaskStatusChange,
         allowMultipleEntry,
-        onAllowMultipleEntryChange,
     } = props;
 
     const [showAddWorkItemDialog, setShowAddWorkItemDialog] = useState(false);
@@ -141,13 +92,6 @@ function AddWorkItemDialog(props: Props) {
         [onWorkItemCreate, handleModalClose, allowMultipleEntry],
     );
 
-    const handleModeChange = useCallback(
-        (value: BoolStr | undefined) => {
-            onAllowMultipleEntryChange(value === 'true');
-        },
-        [onAllowMultipleEntryChange],
-    );
-
     const { enums } = useContext(EnumsContext);
 
     const filteredTaskList = useMemo(
@@ -177,41 +121,6 @@ function AddWorkItemDialog(props: Props) {
             className={styles.addWorkItemDialog}
             focusElementRef={titleInputRef}
         >
-            <SelectInput
-                name="type"
-                label="Mode"
-                options={modeOptions}
-                keySelector={modeKeySelector}
-                labelSelector={modeLabelSelector}
-                onChange={handleModeChange}
-                value={isDefined(allowMultipleEntry)
-                    ? String(allowMultipleEntry) as BoolStr
-                    : undefined}
-                variant="general"
-                nonClearable
-            />
-            <SelectInput
-                name="type"
-                label="Default Type"
-                options={enums?.enums.TimeEntryType}
-                keySelector={workItemTypeKeySelector}
-                labelSelector={workItemTypeLabelSelector}
-                onChange={onDefaultTaskTypeChange}
-                value={defaultTaskType}
-                variant="general"
-                nonClearable
-            />
-            <SelectInput
-                name="type"
-                label="Default Status"
-                options={enums?.enums.TimeEntryStatus}
-                keySelector={workItemStatusKeySelector}
-                labelSelector={workItemStatusLabelSelector}
-                onChange={onDefaultTaskStatusChange}
-                value={defaultTaskStatus}
-                variant="general"
-                nonClearable
-            />
             <div>
                 Please select a task to add the workitems
             </div>

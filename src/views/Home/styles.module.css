@@ -1,4 +1,6 @@
 .home {
+    position: relative;
+
     /* FIXME: We should move this outside of Home */
     h1, h2, h3, h4, h5, h6 {
         margin: 0;
@@ -11,49 +13,31 @@
         margin: 0;
     }
 
-    .page-header {
+    .last-saved-status {
         display: flex;
+        position: absolute;
+        top: var(--spacing-md);
+        right: var(--spacing-md);
         align-items: center;
-        flex-wrap: wrap;
-        gap: var(--spacing-sm);
+        transition: .5s opacity ease-in-out;
+        opacity: 0;
+        border-radius: 0.5rem;
+        background-color: var(--color-quaternary);
+        padding: var(--spacing-2xs) var(--spacing-sm);
+        color: var(--color-text-light);
+        font-size: var(--font-size-xs);
+        gap: var(--spacing-xs);
 
-        .header-content {
-            display: flex;
-            align-items: baseline;
-            flex-grow: 1;
-            gap: var(--spacing-sm);
-
-            .last-saved-status {
-                display: flex;
-                align-items: center;
-                transition: .5s opacity ease-in-out;
-                opacity: 0;
-                border-radius: 0.5rem;
-                background-color: var(--color-quaternary);
-                padding: var(--spacing-2xs) var(--spacing-sm);
-                color: var(--color-text-light);
-                font-size: var(--font-size-xs);
-                gap: var(--spacing-xs);
-
-                .timur-icon {
-                    height: 0.75rem;
-                }
-
-                &.active {
-                    opacity: 1;
-
-                    .timur-icon {
-                        animation: shake-it-off 2.2s ease-in infinite;
-                    }
-                }
-            }
-
+        .timur-icon {
+            height: 0.75rem;
         }
 
-        .actions {
-            display: flex;
-            gap: var(--spacing-md);
-            align-items: center;
+        &.active {
+            opacity: 1;
+
+            .timur-icon {
+                animation: shake-it-off 2.2s ease-in infinite;
+            }
         }
     }
 
@@ -63,47 +47,36 @@
         flex-wrap: wrap;
         gap: var(--spacing-md);
 
-        .header-content {
+        .date-container {
             display: flex;
-            align-items: baseline;
+            position: relative;
             flex-grow: 1;
-            gap: var(--spacing-sm);
 
-            .date-container {
-                display: flex;
-                position: relative;
-
-                .date-input {
-                    position: absolute;
-                    bottom: 0;
-                    visibility: hidden;
-                }
-
-                .date-button {
-                    text-align: left;
-                    font-size: var(--font-size-2xl);
-                    font-weight: var(--font-weight-bold);
-
-                    .button-actions {
-                        font-size: var(--font-size-lg);
-                    }
-                }
+            .date-input {
+                position: absolute;
+                bottom: 0;
+                visibility: hidden;
             }
 
-            .duration {
-                display: flex;
-                align-items: center;
-                flex-shrink: 0;
-                gap: var(--spacing-xs);
-                padding: var(--spacing-sm);
+            .date-button {
+                text-align: left;
+                font-size: var(--font-size-2xl);
                 font-weight: var(--font-weight-bold);
+
+                .button-actions {
+                    font-size: var(--font-size-lg);
+                }
             }
         }
 
-        .actions {
+        .duration {
             display: flex;
-            gap: var(--spacing-md);
-            align-items: baseline;
+            align-items: center;
+            flex-shrink: 0;
+            padding: var(--spacing-sm);
+            width: calc(12rem + 2 * var(--spacing-xs) + var(--spacing-sm));
+            font-weight: var(--font-weight-bold);
+            gap: var(--spacing-xs);
         }
     }
 

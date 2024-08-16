@@ -1,47 +1,23 @@
-import { useCallback } from 'react';
-
 import Checkbox from '#components/Checkbox';
 import Page from '#components/Page';
 import useLocalStorage from '#hooks/useLocalStorage';
+import useSetFieldValue from '#hooks/useSetFieldValue';
 import {
-    EditingMode,
-    EntriesAsList,
-    WorkItemStatus,
-    WorkItemType,
-} from '#utils/types';
+    defaultConfigValue,
+    KEY_CONFIG_STORAGE,
+} from '#utils/constants';
+import { ConfigStorage } from '#utils/types';
 
 import styles from './styles.module.css';
-
-const KEY_CONFIG_STORAGE = 'timur-config';
-type ConfigStorage = {
-    defaultTaskType: WorkItemType,
-    defaultTaskStatus: WorkItemStatus,
-    editingMode: EditingMode,
-    allowMultipleEntry: boolean,
-    focusMode: boolean,
-    checkboxForStatus: boolean,
-}
 
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
     const [storedState, setStoredState] = useLocalStorage<ConfigStorage>(
         KEY_CONFIG_STORAGE,
-        {
-            defaultTaskType: 'DEVELOPMENT',
-            defaultTaskStatus: 'DONE',
-            allowMultipleEntry: false,
-            editingMode: 'normal',
-            focusMode: false,
-            checkboxForStatus: false,
-        },
+        defaultConfigValue,
     );
 
-    const setFieldValue = useCallback((...entries: EntriesAsList<ConfigStorage>) => {
-        setStoredState((oldState) => ({
-            ...oldState,
-            [entries[1]]: entries[0],
-        }));
-    }, [setStoredState]);
+    const setFieldValue = useSetFieldValue(setStoredState);
 
     return (
         <Page

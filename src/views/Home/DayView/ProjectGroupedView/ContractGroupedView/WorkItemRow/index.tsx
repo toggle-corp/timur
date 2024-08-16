@@ -17,6 +17,7 @@ import {
 import { _cs } from '@togglecorp/fujs';
 
 import Button from '#components/Button';
+import Checkbox from '#components/Checkbox';
 import ConfirmButton from '#components/ConfirmButton';
 import DurationInput from '#components/DurationInput';
 import SelectInput from '#components/SelectInput';
@@ -25,11 +26,17 @@ import EnumsContext from '#contexts/enums';
 import SizeContext from '#contexts/size';
 import { EnumsQuery } from '#generated/types/graphql';
 import { useFocusClient } from '#hooks/useFocus';
+import useLocalStorage from '#hooks/useLocalStorage';
+import {
+    defaultConfigValue,
+    KEY_CONFIG_STORAGE,
+} from '#utils/constants';
 import {
     Contract,
     EntriesAsList,
     Task,
     WorkItem,
+    WorkItemStatus,
 } from '#utils/types';
 
 import styles from './styles.module.css';
@@ -64,7 +71,6 @@ export interface Props {
     onClone: (clientId: string) => void;
     onChange: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
     onDelete: (clientId: string) => void;
-    focusMode: boolean;
 }
 
 function WorkItemRow(props: Props) {
@@ -75,12 +81,12 @@ function WorkItemRow(props: Props) {
         onClone,
         onDelete,
         onChange,
-        focusMode,
     } = props;
 
     const { enums } = useContext(EnumsContext);
     const { width: windowWidth } = useContext(SizeContext);
     const inputRef = useFocusClient<HTMLTextAreaElement>(workItem.clientId);
+    const [config] = useLocalStorage(KEY_CONFIG_STORAGE, defaultConfigValue);
 
     const setFieldValue = useCallback(
         (...entries: EntriesAsList<WorkItem>) => {
@@ -94,7 +100,32 @@ function WorkItemRow(props: Props) {
         [contract.id, enums],
     );
 
-    const statusInput = (
+    const handleStatusCheck = useCallback(() => {
+        const newValueMap: Record<WorkItemStatus, WorkItemStatus> = {
+            TODO: 'DOING',
+            DOING: 'DONE',
+            DONE: 'TODO',
+        };
+
+        setFieldValue(
+            newValueMap[workItem.status],
+            'status',
+        );
+    }, [workItem.status, setFieldValue]);
+
+    const statusInput = config.checkboxForStatus ? (
+        <Checkbox
+            className={_cs(
+                styles.statusCheckbox,
+                workItem.status === 'DOING' && styles.doing,
+                workItem.status === 'DONE' && styles.done,
+            )}
+            name="status"
+            indeterminate={workItem.status === 'DOING'}
+            value={workItem.status === 'DONE'}
+            onChange={handleStatusCheck}
+        />
+    ) : (
         <SelectInput
             className={styles.status}
             name="status"
@@ -104,7 +135,7 @@ function WorkItemRow(props: Props) {
             onChange={setFieldValue}
             value={workItem.status}
             nonClearable
-            icons={<FcPieChart />}
+            icons={config.showInputIcons && <FcPieChart />}
         />
     );
 
@@ -118,9 +149,7 @@ function WorkItemRow(props: Props) {
             onChange={setFieldValue}
             value={workItem.task}
             nonClearable
-            icons={(
-                <FcPackage />
-            )}
+            icons={config.showInputIcons && <FcPackage />}
         />
     );
 
@@ -132,9 +161,7 @@ function WorkItemRow(props: Props) {
             title="Description"
             value={workItem.description}
             onChange={setFieldValue}
-            icons={(
-                <FcDocument />
-            )}
+            icons={config.showInputIcons && <FcDocument />}
             placeholder="Description"
         />
     );
@@ -149,9 +176,7 @@ function WorkItemRow(props: Props) {
             onChange={setFieldValue}
             value={workItem.type}
             nonClearable
-            icons={(
-                <FcRuler />
-            )}
+            icons={config.showInputIcons && <FcRuler />}
         />
     );
 
@@ -162,9 +187,7 @@ function WorkItemRow(props: Props) {
             title="Hours"
             value={workItem.duration}
             onChange={setFieldValue}
-            icons={(
-                <FcClock />
-            )}
+            icons={config.showInputIcons && <FcClock />}
             placeholder="hh:mm"
         />
     );
@@ -206,14 +229,19 @@ function WorkItemRow(props: Props) {
     return (
         <div
             role="listitem"
-            className={_cs(styles.workItemRow, className, focusMode && styles.focusMode)}
+            className={_cs(
+                styles.workItemRow,
+                config.focusMode && styles.focusMode,
+                config.checkboxForStatus && styles.checkboxForStatus,
+                className,
+            )}
         >
             {windowWidth >= 900 ? (
                 <>
                     {statusInput}
-                    {!focusMode && taskInput}
+                    {!config.focusMode && taskInput}
                     {descriptionInput}
-                    {!focusMode && (
+                    {!config.focusMode && (
                         <>
                             {typeInput}
                             {durationInput}
@@ -223,16 +251,19 @@ function WorkItemRow(props: Props) {
                 </>
             ) : (
                 <>
+                    {config.checkboxForStatus && statusInput}
                     {descriptionInput}
-                    {statusInput}
-                    {!focusMode && taskInput}
-                    {!focusMode && (
-                        <>
-                            {typeInput}
-                            {durationInput}
-                            {actions}
-                        </>
-                    )}
+                    <div className={styles.compactOptions}>
+                        {!config.checkboxForStatus && statusInput}
+                        {!config.focusMode && taskInput}
+                        {!config.focusMode && (
+                            <>
+                                {typeInput}
+                                {durationInput}
+                                {actions}
+                            </>
+                        )}
+                    </div>
                 </>
             )}
         </div>

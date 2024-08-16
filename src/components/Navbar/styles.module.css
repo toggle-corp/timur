@@ -9,7 +9,6 @@
         display: flex;
         align-items: center;
         flex-grow: 1;
-        max-width: var(--width-page-content--max);
         gap: var(--spacing-sm);
 
         .app-logo {

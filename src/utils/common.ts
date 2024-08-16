@@ -11,6 +11,12 @@ import {
 } from '@togglecorp/fujs';
 import { ulid } from 'ulidx';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Func = (...args:any[]) => any;
+export function isCallable<T, X extends Func>(value: T | X): value is X {
+    return typeof value === 'function';
+}
+
 export interface Size {
     width: number;
     height: number;

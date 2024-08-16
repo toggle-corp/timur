@@ -29,3 +29,13 @@ export interface Note {
     date: string;
     content: string | undefined;
 }
+
+export type ConfigStorage = {
+    defaultTaskType: WorkItemType,
+    defaultTaskStatus: WorkItemStatus,
+    editingMode: EditingMode,
+    allowMultipleEntry: boolean,
+    focusMode: boolean,
+    checkboxForStatus: boolean,
+    showInputIcons: boolean,
+}

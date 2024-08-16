@@ -1,31 +1,37 @@
 .work-item-row {
     display: grid;
+    align-items: baseline;
     grid-template-columns: 6rem 2fr 5fr 10rem 6rem 6rem;
+    padding: var(--spacing-2xs) var(--spacing-xs);
+    gap: var(--spacing-sm);
 
     &.focus-mode {
         grid-template-columns: 6rem 1fr;
+
+        &.checkbox-for-status {
+            grid-template-columns: 1rem 1fr;
+        }
+    }
+
+    &.checkbox-for-status {
+        grid-template-columns: 1rem 2fr 5fr 10rem 6rem 6rem;
     }
 
     .actions {
         display: flex;
         align-items: baseline;
+        justify-content: end;
         flex-wrap: wrap;
         gap: var(--spacing-xs);
-        padding: var(--spacing-xs);
     }
 
-    .task {
-        font-size: var(--font-size-sm);
-    }
-    .type {
-        font-size: var(--font-size-sm);
-    }
-    .status {
-        font-size: var(--font-size-sm);
-    }
-    .hours {
-        ::placeholder {
-            font-size: var(--font-size-sm);
+    .status-checkbox {
+        &.doing {
+            color: var(--color-secondary);
+        }
+
+        &.done {
+            color: var(--color-primary);
         }
     }
 
@@ -35,12 +41,25 @@
 
     @media screen and (max-width: 900px) {
         grid-template-columns: auto;
+        gap: var(--spacing-sm);
 
         &.focus-mode {
             grid-template-columns: auto;
         }
 
+        &.checkbox-for-status {
+            grid-template-columns: 1rem 1fr;
+        }
+
+        .compact-options {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+            grid-column: 1 / -1;
+        }
+
         &:not(:focus-within) {
+            .compact-options,
             .task,
             .type,
             .status,

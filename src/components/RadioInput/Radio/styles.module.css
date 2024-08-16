@@ -1,6 +1,7 @@
 .radio {
     --cursor: default;
     cursor: var(--cursor);
+    width: fit-content;
 
     .icon {
         transition: var(--duration-transition-medium) color ease-in-out;

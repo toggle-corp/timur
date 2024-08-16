@@ -1,31 +1,18 @@
 import {
-    type Dispatch,
-    type SetStateAction,
     useCallback,
-    useContext,
     useLayoutEffect,
     useMemo,
     useRef,
     useState,
 } from 'react';
 import { FcClock } from 'react-icons/fc';
-import {
-    IoAperture,
-    IoChevronBackSharp,
-    IoChevronDown,
-    IoChevronForwardSharp,
-    IoCodeSlash,
-    IoInformation,
-} from 'react-icons/io5';
+import { IoChevronDown } from 'react-icons/io5';
 import {
     _cs,
     compareStringAsNumber,
     encodeDate,
     isDefined,
-    isFalsyString,
     isNotDefined,
-    listToGroupList,
-    mapToList,
     sum,
 } from '@togglecorp/fujs';
 import {
@@ -37,7 +24,6 @@ import {
 import Button from '#components/Button';
 import Page from '#components/Page';
 import RawInput from '#components/RawInput';
-import EnumsContext from '#contexts/enums';
 import FocusContext from '#contexts/focus';
 import {
     BulkTimeEntryMutation,
@@ -54,29 +40,24 @@ import {
     getDurationString,
     getNewId,
 } from '#utils/common';
-import { getFromStorage } from '#utils/localStorage';
+import {
+    defaultConfigValue,
+    KEY_CONFIG_STORAGE,
+} from '#utils/constants';
 import { removeNull } from '#utils/nullHelper';
 import {
-    EditingMode,
+    ConfigStorage,
     EntriesAsList,
-    Note,
     WorkItem,
-    WorkItemStatus,
-    WorkItemType,
 } from '#utils/types';
 
 import timurLogo from '../../App/icon.svg';
 import AddWorkItemDialog from './AddWorkItemDialog';
 import DayView from './DayView';
 import ShortcutsDialog from './ShortcutsDialog';
-import UpdateNoteDialog from './UpdateNoteDialog';
+import StartSidebar from './StartSidebar';
 
 import styles from './styles.module.css';
-
-const { APP_VERSION } = import.meta.env;
-
-const KEY_DATA_STORAGE = 'timur-meta';
-const KEY_DATA_STORAGE_OLD = 'timur';
 
 const dateFormatter = new Intl.DateTimeFormat(
     [],
@@ -87,8 +68,6 @@ const dateFormatter = new Intl.DateTimeFormat(
         weekday: 'short',
     },
 );
-
-const emptyArray: unknown[] = [];
 
 const MY_TIME_ENTRIES_QUERY = gql`
     query MyTimeEntries($date: Date!) {
@@ -141,30 +120,7 @@ const BULK_TIME_ENTRY_MUTATION = gql`
 // TODO: use filtered localState instead of workItems
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
-    const { taskById } = useContext(EnumsContext);
-
     const [workItems, setWorkItems] = useState<WorkItem[]>([]);
-    const [storedState, setStoredState] = useLocalStorage<{
-        appVersion: string,
-        notes: Note[]
-
-        configDefaultTaskType: WorkItemType,
-        configDefaultTaskStatus: WorkItemStatus,
-        configAllowMultipleEntry: boolean,
-        configEditingMode: EditingMode,
-        configFocusMode: boolean,
-    }>(
-        KEY_DATA_STORAGE,
-        {
-            appVersion: APP_VERSION,
-            notes: [],
-            configDefaultTaskType: 'DEVELOPMENT',
-            configDefaultTaskStatus: 'DONE',
-            configAllowMultipleEntry: false,
-            configEditingMode: 'normal',
-            configFocusMode: false,
-        },
-    );
 
     const {
         focus,
@@ -187,83 +143,43 @@ export function Component() {
     const dateInputRef = useRef<HTMLInputElement>(null);
     // NOTE: We are opening the dialog from this parent component
     const dialogOpenTriggerRef = useRef<(() => void) | undefined>();
-    const noteDialogOpenTriggerRef = useRef<(() => void) | undefined>();
+    // const noteDialogOpenTriggerRef = useRef<(() => void) | undefined>();
     const shortcutsDialogOpenTriggerRef = useRef<(() => void) | undefined>();
 
-    // Read state from the stored state
-    const notes = storedState.notes ?? emptyArray;
-    const configDefaultTaskType = storedState.configDefaultTaskType ?? 'development';
-    const configDefaultTaskStatus = storedState.configDefaultTaskStatus ?? 'done';
-    const configAllowMultipleEntry = storedState.configAllowMultipleEntry ?? false;
-    const configEditingMode = storedState.configEditingMode ?? 'normal';
-    const configFocusMode = storedState.configFocusMode ?? false;
+    /*
+    const [storedData, setStoredDataState] = useLocalStorage<{
+        appVersion: string,
+        notes: Note[]
+    }>(
+        KEY_DATA_STORAGE,
+        {
+            appVersion: APP_VERSION,
+            notes: [],
+        },
+    );
+    */
 
-    const setDefaultTaskType: Dispatch<SetStateAction<WorkItemType>> = useCallback(
-        (func) => {
-            setStoredState((oldValue) => ({
-                ...oldValue,
-                configDefaultTaskType: typeof func === 'function'
-                    ? func(oldValue.configDefaultTaskType)
-                    : func,
-            }));
-        },
-        [setStoredState],
+    const [storedConfig, setStoredConfig] = useLocalStorage<ConfigStorage>(
+        KEY_CONFIG_STORAGE,
+        defaultConfigValue,
     );
-    const setDefaultTaskStatus: Dispatch<SetStateAction<WorkItemStatus>> = useCallback(
-        (func) => {
-            setStoredState((oldValue) => ({
-                ...oldValue,
-                configDefaultTaskStatus: typeof func === 'function'
-                    ? func(oldValue.configDefaultTaskStatus)
-                    : func,
-            }));
-        },
-        [setStoredState],
-    );
-    const setAllowMultipleEntryChange: Dispatch<SetStateAction<boolean>> = useCallback(
-        (func) => {
-            setStoredState((oldValue) => ({
-                ...oldValue,
-                configAllowMultipleEntry: typeof func === 'function'
-                    ? func(oldValue.configAllowMultipleEntry)
-                    : func,
-            }));
-        },
-        [setStoredState],
-    );
-    const setEditingModeChange: Dispatch<SetStateAction<EditingMode>> = useCallback(
-        (func) => {
-            setStoredState((oldValue) => ({
-                ...oldValue,
-                configEditingMode: typeof func === 'function'
-                    ? func(oldValue.configEditingMode)
-                    : func,
-            }));
-        },
-        [setStoredState],
-    );
-    const setFocusModeChange: Dispatch<SetStateAction<boolean>> = useCallback(
-        (func) => {
-            setStoredState((oldValue) => ({
-                ...oldValue,
-                configFocusMode: typeof func === 'function'
-                    ? func(oldValue.configFocusMode)
-                    : func,
-            }));
-        },
-        [setStoredState],
-    );
+
+    // Read state from the stored state
+    // const notes = storedData.notes ?? emptyArray;
+
+    /*
     const setNotes: Dispatch<SetStateAction<Note[]>> = useCallback(
         (func) => {
-            setStoredState((oldValue) => ({
+            setStoredDataState((oldValue) => ({
                 ...oldValue,
                 notes: typeof func === 'function'
                     ? func(oldValue.notes)
                     : func,
             }));
         },
-        [setStoredState],
+        [setStoredDataState],
     );
+    */
 
     const [
         bulkMutationState,
@@ -367,29 +283,14 @@ export function Component() {
         ],
     );
 
+    /*
     const currentNote = useMemo(
         () => (
             notes.find(({ date }) => date === selectedDate)
         ),
         [notes, selectedDate],
     );
-
-    const handleDateSelection = useCallback(
-        (value: string | undefined) => {
-            // NOTE: We do not reset selected date
-            if (value) {
-                setSelectedDate(value);
-            }
-        },
-        [],
-    );
-
-    const handleTodaySelection = useCallback(
-        () => {
-            setSelectedDate(encodeDate(new Date()));
-        },
-        [],
-    );
+    */
 
     const handleWorkItemCreate = useCallback(
         (taskId: string) => {
@@ -397,8 +298,8 @@ export function Component() {
             const newItem: WorkItem = {
                 clientId: newId,
                 task: taskId,
-                type: configDefaultTaskType,
-                status: configDefaultTaskStatus,
+                type: storedConfig.defaultTaskType,
+                status: storedConfig.defaultTaskStatus,
                 date: selectedDate,
             };
 
@@ -413,8 +314,8 @@ export function Component() {
         [
             setWorkItems,
             selectedDate,
-            configDefaultTaskType,
-            configDefaultTaskStatus,
+            storedConfig.defaultTaskStatus,
+            storedConfig.defaultTaskType,
             focus,
             addOrUpdateStateData,
         ],
@@ -524,6 +425,7 @@ export function Component() {
         [setWorkItems, addOrUpdateStateData],
     );
 
+    /*
     const handleNoteCreate = useCallback(
         () => {
             setNotes((oldNotes = []) => {
@@ -542,7 +444,9 @@ export function Component() {
         },
         [setNotes, selectedDate],
     );
+    */
 
+    /*
     const handleNoteUpdate = useCallback(
         (content: string | undefined, noteId: string | undefined) => {
             setNotes((oldNotes = []) => {
@@ -576,52 +480,7 @@ export function Component() {
         },
         [setNotes],
     );
-
-    const handleCopyTextButtonClick = useCallback(
-        () => {
-            function toSubItem(workItem: WorkItem) {
-                const description = workItem.description ?? '??';
-                const status: WorkItemStatus = workItem.status ?? 'TODO';
-                const task = taskById?.[workItem.task]?.name ?? '??';
-
-                return description
-                    .split('\n')
-                    .map((item, i) => ([
-                        i === 0 ? '  -' : '   ',
-                        status !== 'DONE' ? `\`${status.toUpperCase()}\`` : undefined,
-                        i === 0 ? `${task}: ${item}` : item,
-                    ].filter(isDefined).join(' ')))
-                    .join('\n');
-            }
-
-            if (isNotDefined(taskById)) {
-                return;
-            }
-
-            const groupedWorkItems = mapToList(listToGroupList(
-                workItems,
-                (workItem) => taskById[workItem.task].contract.project.id,
-                undefined,
-                (list) => ({
-                    project: taskById?.[list[0].task].contract.project,
-                    workItems: list,
-                }),
-            ));
-
-            const text = groupedWorkItems.map((projectGrouped) => {
-                const { project, workItems: projectWorkItems } = projectGrouped;
-
-                return `- ${project.name}\n${projectWorkItems.map((workItem) => toSubItem(workItem)).join('\n')}`;
-            }).join('\n');
-
-            if (isFalsyString(text)) {
-                return;
-            }
-
-            window.navigator.clipboard.writeText(text);
-        },
-        [workItems, taskById],
-    );
+    */
 
     const handleDateButtonClick = useCallback(
         () => {
@@ -630,7 +489,7 @@ export function Component() {
         [],
     );
 
-    const handleWorkItemAddClick = useCallback(
+    const handleAddEntryClick = useCallback(
         () => {
             if (dialogOpenTriggerRef.current) {
                 dialogOpenTriggerRef.current();
@@ -639,6 +498,7 @@ export function Component() {
         [],
     );
 
+    /*
     const handleNoteUpdateClick = useCallback(
         () => {
             handleNoteCreate();
@@ -648,6 +508,7 @@ export function Component() {
         },
         [handleNoteCreate],
     );
+    */
 
     const handleShortcutsButtonClick = useCallback(
         () => {
@@ -658,14 +519,21 @@ export function Component() {
         [],
     );
 
+    const toggleFocusMode = useCallback(() => {
+        setStoredConfig((oldConfig) => ({
+            ...oldConfig,
+            focusMode: !oldConfig.focusMode,
+        }));
+    }, [setStoredConfig]);
+
     const handleKeybindingsPress = useCallback(
         (event: KeyboardEvent) => {
             if (event.ctrlKey && event.key === ' ') {
-                handleWorkItemAddClick();
+                handleAddEntryClick();
                 event.preventDefault();
                 event.stopPropagation();
             } else if (event.ctrlKey && event.key === 'Enter') {
-                handleNoteUpdateClick();
+                // handleNoteUpdateClick();
                 event.preventDefault();
                 event.stopPropagation();
             } else if (event.ctrlKey && event.shiftKey && event.key === 'ArrowLeft') {
@@ -681,7 +549,7 @@ export function Component() {
                 event.preventDefault();
                 event.stopPropagation();
             } else if (event.ctrlKey && event.shiftKey && event.key === 'F') {
-                setFocusModeChange((oldVal) => !oldVal);
+                toggleFocusMode();
                 event.preventDefault();
                 event.stopPropagation();
             } else if (event.ctrlKey && event.shiftKey && event.key === '?') {
@@ -691,9 +559,9 @@ export function Component() {
             }
         },
         [
-            handleWorkItemAddClick,
-            handleNoteUpdateClick,
-            setFocusModeChange,
+            handleAddEntryClick,
+            // handleNoteUpdateClick,
+            toggleFocusMode,
             handleShortcutsButtonClick,
         ],
     );
@@ -719,154 +587,74 @@ export function Component() {
         [register, unregister],
     );
 
-    const handleExportButtonClick = useCallback(() => {
-        const prevData = getFromStorage(KEY_DATA_STORAGE_OLD);
-        window.navigator.clipboard.writeText(JSON.stringify(prevData));
-    }, []);
+    const handleDateSelection = useCallback(
+        (newDate: string | undefined) => {
+            if (isDefined(newDate)) {
+                setSelectedDate(newDate);
+            }
+        },
+        [setSelectedDate],
+    );
 
     return (
         <Page
             documentTitle="Timur - Home"
             className={styles.home}
             contentClassName={styles.content}
+            startAsideContainerClassName={styles.startAside}
+            startAsideContent={(
+                <StartSidebar
+                    workItems={workItems}
+                    onAddEntryClick={handleAddEntryClick}
+                    selectedDate={selectedDate}
+                    setSelectedDate={setSelectedDate}
+                />
+            )}
         >
-            <div className={styles.pageHeader}>
-                <div className={styles.headerContent}>
-                    <Button
-                        name={addDays(selectedDate, -1)}
-                        onClick={handleDateSelection}
-                        variant="secondary"
-                        title="Previous day"
-                        spacing="sm"
-                    >
-                        <IoChevronBackSharp />
-                    </Button>
-                    <Button
-                        name={addDays(selectedDate, 1)}
-                        onClick={handleDateSelection}
-                        variant="secondary"
-                        title="Next day"
-                        spacing="sm"
-                    >
-                        <IoChevronForwardSharp />
-                    </Button>
-                    <Button
-                        name={undefined}
-                        onClick={handleTodaySelection}
-                        variant="secondary"
-                        disabled={selectedDate === encodeDate(today)}
-                        spacing="sm"
-                    >
-                        Today
-                    </Button>
-                    <div
-                        className={_cs(
-                            styles.lastSavedStatus,
-                            (isObsolete || bulkMutationState.fetching) && styles.active,
-                        )}
-                    >
-                        <img
-                            className={styles.timurIcon}
-                            alt="Timur Icon"
-                            src={timurLogo}
-                        />
-                        <div>
-                            Syncing...
-                        </div>
-                    </div>
-                </div>
-                <div className={styles.actions}>
-                    <Button
-                        name={undefined}
-                        onClick={handleExportButtonClick}
-                        variant="secondary"
-                        spacing="sm"
-                        icons={<IoCodeSlash />}
-                    >
-                        Copy data
-                    </Button>
-                    <Button
-                        name={!configFocusMode}
-                        onClick={setFocusModeChange}
-                        variant={configFocusMode ? 'primary' : 'secondary'}
-                        title={configFocusMode ? 'Disable focus mode' : 'Enable focus mode'}
-                        spacing="sm"
-                        icons={(
-                            <IoAperture />
-                        )}
-                    >
-                        Focus
-                    </Button>
-                    <Button
-                        name
-                        onClick={handleShortcutsButtonClick}
-                        variant="secondary"
-                        title="Open shortcuts"
-                        spacing="sm"
-                        icons={(
-                            <IoInformation />
-                        )}
-                    >
-                        Shortcuts
-                    </Button>
+            <div
+                className={_cs(
+                    styles.lastSavedStatus,
+                    (isObsolete || bulkMutationState.fetching) && styles.active,
+                )}
+            >
+                <img
+                    className={styles.timurIcon}
+                    alt="Timur Icon"
+                    src={timurLogo}
+                />
+                <div>
+                    Syncing...
                 </div>
             </div>
             <div className={styles.dayHeader}>
-                <div className={styles.headerContent}>
-                    <div className={styles.dateContainer}>
-                        <RawInput
-                            elementRef={dateInputRef}
-                            type="date"
-                            className={styles.dateInput}
-                            name={undefined}
-                            value={selectedDate}
-                            onChange={handleDateSelection}
-                        />
-                        <Button
-                            className={styles.dateButton}
-                            actionsContainerClassName={styles.buttonActions}
-                            name={undefined}
-                            variant="tertiary"
-                            onClick={handleDateButtonClick}
-                            actions={<IoChevronDown />}
-                        >
-                            {formattedDate}
-                        </Button>
-                    </div>
-                    {!configFocusMode && (
-                        <div className={styles.duration}>
-                            <FcClock />
-                            <div>
-                                {getDurationString(totalHours)}
-                            </div>
-                        </div>
-                    )}
-                </div>
-                <div className={styles.actions}>
-                    <Button
+                <div className={styles.dateContainer}>
+                    <RawInput
+                        elementRef={dateInputRef}
+                        type="date"
+                        className={styles.dateInput}
                         name={undefined}
-                        onClick={handleCopyTextButtonClick}
-                        variant="secondary"
-                        disabled={workItems.length === 0}
-                    >
-                        Copy standup text
-                    </Button>
+                        value={selectedDate}
+                        onChange={handleDateSelection}
+                    />
                     <Button
-                        name
-                        onClick={handleNoteUpdateClick}
-                        variant="secondary"
+                        className={styles.dateButton}
+                        actionsContainerClassName={styles.buttonActions}
+                        name={undefined}
+                        variant="tertiary"
+                        onClick={handleDateButtonClick}
+                        actions={<IoChevronDown />}
                     >
-                        {currentNote && !!currentNote.content
-                            ? 'Edit notes'
-                            : 'Add notes'}
-                    </Button>
-                    <Button
-                        name
-                        onClick={handleWorkItemAddClick}
-                    >
-                        Add entry
+                        {formattedDate}
                     </Button>
                 </div>
+                {!storedConfig.focusMode && (
+                    <div className={styles.duration}>
+                        <FcClock />
+                        <div>
+                            {getDurationString(totalHours)}
+                        </div>
+                    </div>
+                )}
             </div>
             <FocusContext.Provider
                 value={focusContextValue}
@@ -878,12 +666,13 @@ export function Component() {
                     onWorkItemClone={handleWorkItemClone}
                     onWorkItemChange={handleWorkItemChange}
                     onWorkItemDelete={handleWorkItemDelete}
-                    focusMode={configFocusMode}
+                    focusMode={storedConfig.focusMode}
                 />
             </FocusContext.Provider>
             <ShortcutsDialog
                 dialogOpenTriggerRef={shortcutsDialogOpenTriggerRef}
             />
+            {/*
             <UpdateNoteDialog
                 dialogOpenTriggerRef={noteDialogOpenTriggerRef}
                 note={currentNote}
@@ -891,16 +680,12 @@ export function Component() {
                 editingMode={configEditingMode}
                 onEditingModeChange={setEditingModeChange}
             />
+            */}
             <AddWorkItemDialog
                 dialogOpenTriggerRef={dialogOpenTriggerRef}
                 workItems={workItems}
                 onWorkItemCreate={handleWorkItemCreate}
-                defaultTaskType={configDefaultTaskType}
-                onDefaultTaskTypeChange={setDefaultTaskType}
-                defaultTaskStatus={configDefaultTaskStatus}
-                onDefaultTaskStatusChange={setDefaultTaskStatus}
-                allowMultipleEntry={configAllowMultipleEntry}
-                onAllowMultipleEntryChange={setAllowMultipleEntryChange}
+                allowMultipleEntry={storedConfig.allowMultipleEntry}
             />
         </Page>
     );
