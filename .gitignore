@@ -1,4 +1,5 @@
 .env
+.vite/
 
 # Tooling
 node_modules/
@@ -10,3 +11,4 @@ pnpm-debug.log*
 build/
 generated/
 stats.html
+
