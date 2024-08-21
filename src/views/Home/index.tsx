@@ -1,12 +1,18 @@
 import {
     useCallback,
+    useContext,
     useLayoutEffect,
     useMemo,
     useRef,
     useState,
 } from 'react';
 import { FcClock } from 'react-icons/fc';
-import { IoChevronDown } from 'react-icons/io5';
+import {
+    IoAdd,
+    IoChevronBackSharp,
+    IoChevronDown,
+    IoChevronForwardSharp,
+} from 'react-icons/io5';
 import {
     _cs,
     compareStringAsNumber,
@@ -23,8 +29,10 @@ import {
 
 import Button from '#components/Button';
 import Page from '#components/Page';
+import Portal from '#components/Portal';
 import RawInput from '#components/RawInput';
 import FocusContext from '#contexts/focus';
+import NavbarContext from '#contexts/navbar';
 import {
     BulkTimeEntryMutation,
     BulkTimeEntryMutationVariables,
@@ -54,6 +62,7 @@ import {
 import timurLogo from '../../App/icon.svg';
 import AddWorkItemDialog from './AddWorkItemDialog';
 import DayView from './DayView';
+import EndSidebar from './EndSidebar';
 import ShortcutsDialog from './ShortcutsDialog';
 import StartSidebar from './StartSidebar';
 
@@ -596,6 +605,15 @@ export function Component() {
         [setSelectedDate],
     );
 
+    const handleTodaySelection = useCallback(
+        () => {
+            setSelectedDate(encodeDate(new Date()));
+        },
+        [setSelectedDate],
+    );
+
+    const { midActionsRef } = useContext(NavbarContext);
+
     return (
         <Page
             documentTitle="Timur - Home"
@@ -605,11 +623,24 @@ export function Component() {
             startAsideContent={(
                 <StartSidebar
                     workItems={workItems}
-                    onAddEntryClick={handleAddEntryClick}
-                    selectedDate={selectedDate}
-                    setSelectedDate={setSelectedDate}
                 />
             )}
+            endAsideContent={(
+                <EndSidebar
+                    workItems={workItems}
+                    onWorkItemCreate={handleWorkItemCreate}
+                />
+            )}
+            onSwipeLeft={() => {
+                console.info('swipe left');
+                // FIXME: no inline function
+                handleDateSelection(addDays(selectedDate, -1));
+            }}
+            onSwipeRight={() => {
+                console.info('swipe right');
+                // FIXME: no inline function
+                handleDateSelection(addDays(selectedDate, 1));
+            }}
         >
             <div
                 className={_cs(
@@ -626,6 +657,37 @@ export function Component() {
                     Syncing...
                 </div>
             </div>
+            <Portal container={midActionsRef}>
+                <div className={styles.dateNavigation}>
+                    <Button
+                        name={addDays(selectedDate, -1)}
+                        onClick={handleDateSelection}
+                        variant="secondary"
+                        title="Previous day"
+                        spacing="sm"
+                    >
+                        <IoChevronBackSharp />
+                    </Button>
+                    <Button
+                        name={addDays(selectedDate, 1)}
+                        onClick={handleDateSelection}
+                        variant="secondary"
+                        title="Next day"
+                        spacing="sm"
+                    >
+                        <IoChevronForwardSharp />
+                    </Button>
+                    <Button
+                        name={undefined}
+                        onClick={handleTodaySelection}
+                        variant="secondary"
+                        disabled={selectedDate === encodeDate(today)}
+                        spacing="sm"
+                    >
+                        Today
+                    </Button>
+                </div>
+            </Portal>
             <div className={styles.dayHeader}>
                 <div className={styles.dateContainer}>
                     <RawInput
@@ -648,8 +710,15 @@ export function Component() {
                     </Button>
                 </div>
                 {!storedConfig.focusMode && (
-                    <div className={styles.duration}>
-                        <FcClock />
+                    <div
+                        className={_cs(
+                            styles.duration,
+                            storedConfig.showInputIcons && styles.withIcon,
+                        )}
+                    >
+                        {storedConfig.showInputIcons && (
+                            <FcClock />
+                        )}
                         <div>
                             {getDurationString(totalHours)}
                         </div>
@@ -669,6 +738,13 @@ export function Component() {
                     focusMode={storedConfig.focusMode}
                 />
             </FocusContext.Provider>
+            <Button
+                name={undefined}
+                onClick={handleAddEntryClick}
+                icons={<IoAdd />}
+            >
+                Add entry
+            </Button>
             <ShortcutsDialog
                 dialogOpenTriggerRef={shortcutsDialogOpenTriggerRef}
             />

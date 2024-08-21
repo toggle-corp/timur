@@ -109,6 +109,7 @@ function DayView(props: Props) {
     return (
         <List
             className={_cs(styles.dayView, className)}
+            compact={!!groupedWorkItems?.length}
             pending={loading}
             errored={errored}
             filtered={false}

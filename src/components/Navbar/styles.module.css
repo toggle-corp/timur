@@ -1,37 +1,54 @@
 .navbar {
     display: flex;
+    align-items: center;
     justify-content: center;
-    box-shadow: var(--box-shadow-md);
-    background-color: var(--color-foreground);
-    padding: var(--spacing-xs) var(--spacing-lg);
+    border-bottom: var(--width-separator-sm) solid var(--color-separator);
+    padding: var(--spacing-sm) var(--spacing-md);
+    gap: var(--spacing-md);
+
+    .spacer {
+        flex-grow: 1;
+    }
+
+    .start-actions,
+    .middle-actions,
+    .end-actions {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+    }
 
     .brand {
         display: flex;
         align-items: center;
-        flex-grow: 1;
-        gap: var(--spacing-sm);
+        font-size: var(--font-size-2xl);
+
+        .home-link {
+            display: flex;
+            align-items: baseline;
+            font-weight: var(--font-weight-light);
+        }
 
         .app-logo {
             height: 1.4rem;
-        }
-
-        .app-name {
-            font-size: var(--font-size-2xl);
         }
     }
 
     .auth {
         display: flex;
         align-items: center;
-        gap: var(--spacing-md);
         flex-shrink: 0;
+        gap: var(--spacing-md);
 
         .display-picture {
-            border-radius: 1rem;
-            width: 2rem;
-            height: 2rem;
-            object-fit: cover;
-            object-position: center center;
+            font-size: var(--font-size-3xl);
         }
     }
+}
+
+.greetings {
+    border-bottom: var(--width-separator-sm) solid var(--color-separator);
+    padding: var(--spacing-sm) var(--spacing-md);
+    color: var(--color-text-light);
+    font-size: var(--font-size-sm);
 }

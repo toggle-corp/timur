@@ -1,7 +1,6 @@
 .input-container {
     display: block;
     position: relative;
-    border: var(--width-separator-md) solid transparent;
 
     .input-section {
         align-items: flex-start;
@@ -17,8 +16,7 @@
     }
 
     &.general {
-        border: var(--width-separator-md) solid var(--color-separator);
-        border-radius: var(--border-radius-md);
+        border-bottom: var(--width-separator-md) solid var(--color-separator);
     }
 
     &.disabled {

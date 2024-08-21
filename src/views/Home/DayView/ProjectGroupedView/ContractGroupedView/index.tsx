@@ -9,8 +9,14 @@ import {
     sum,
 } from '@togglecorp/fujs';
 
+import DisplayPicture from '#components/DisplayPicture';
 import List from '#components/List';
+import useLocalStorage from '#hooks/useLocalStorage';
 import { getDurationString } from '#utils/common';
+import {
+    defaultConfigValue,
+    KEY_CONFIG_STORAGE,
+} from '#utils/constants';
 import {
     Contract,
     EntriesAsList,
@@ -49,6 +55,8 @@ function ContractGroupedView(props: Props) {
         focusMode,
     } = props;
 
+    const [config] = useLocalStorage(KEY_CONFIG_STORAGE, defaultConfigValue);
+
     const totalHours = useMemo(
         () => (
             sum(workItems.map((item) => item.duration).filter(isDefined))
@@ -63,20 +71,23 @@ function ContractGroupedView(props: Props) {
             onChange: onWorkItemChange,
             onDelete: onWorkItemDelete,
             contract,
-            focusMode,
         }),
         [
             onWorkItemClone,
             onWorkItemChange,
             onWorkItemDelete,
             contract,
-            focusMode,
         ],
     );
 
     return (
         <div className={_cs(styles.contractGroupedView, className)}>
             <div className={styles.heading}>
+                <DisplayPicture
+                    className={styles.displayPicture}
+                    imageUrl={project.logo?.url}
+                    displayName={project.name}
+                />
                 <div className={styles.textSection}>
                     <h3>
                         {project.name}
@@ -86,8 +97,15 @@ function ContractGroupedView(props: Props) {
                     </div>
                 </div>
                 {!focusMode && (
-                    <div className={styles.duration}>
-                        <FcClock />
+                    <div
+                        className={_cs(
+                            styles.duration,
+                            config.showInputIcons && styles.withIcon,
+                        )}
+                    >
+                        {config.showInputIcons && (
+                            <FcClock />
+                        )}
                         {getDurationString(totalHours)}
                     </div>
                 )}

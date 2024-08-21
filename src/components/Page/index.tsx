@@ -1,15 +1,24 @@
 import {
+    useContext,
     useEffect,
+    useRef,
     useState,
 } from 'react';
 import {
-    IoChevronForward,
-    IoClose,
+    IoList,
     IoMenu,
 } from 'react-icons/io5';
-import { _cs } from '@togglecorp/fujs';
+import {
+    _cs,
+    isDefined,
+    isNotDefined,
+} from '@togglecorp/fujs';
+import TinyGesture from 'tinygesture';
 
 import Button from '#components/Button';
+import Portal from '#components/Portal';
+import NavbarContext from '#contexts/navbar';
+import SizeContext from '#contexts/size';
 
 import styles from './styles.module.css';
 
@@ -22,6 +31,8 @@ interface Props {
     endAsideContent?: React.ReactNode;
     children: React.ReactNode;
     contentClassName?: string;
+    onSwipeLeft?: () => void;
+    onSwipeRight?: () => void;
 }
 
 function Page(props: Props) {
@@ -34,33 +45,73 @@ function Page(props: Props) {
         children,
         contentClassName,
         endAsideContainerClassName,
+        onSwipeLeft,
+        onSwipeRight,
     } = props;
 
     useEffect(() => {
         document.title = documentTitle;
     }, [documentTitle]);
 
-    const [startSidebarCollapsed, setStartSidebarCollapsed] = useState(false);
+    const { width } = useContext(SizeContext);
+    const [startSidebarCollapsed, setStartSidebarCollapsed] = useState(width <= 900);
+    const [endSidebarCollapsed, setEndSidebarCollapsed] = useState(true);
+    const {
+        startActionsRef,
+        endActionsRef,
+    } = useContext(NavbarContext);
+
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (isNotDefined(containerRef.current)) {
+            return undefined;
+        }
+        const gesture = new TinyGesture(
+            containerRef.current,
+            {
+                mouseSupport: false,
+                velocityThreshold: 5,
+            },
+        );
+        const swipeLeftListener = isDefined(onSwipeLeft) ? gesture.on('swipeleft', onSwipeLeft) : undefined;
+        const swipeRightListener = isDefined(onSwipeRight) ? gesture.on('swiperight', onSwipeRight) : undefined;
+
+        return () => {
+            swipeLeftListener?.cancel();
+            swipeRightListener?.cancel();
+        };
+    }, [onSwipeLeft, onSwipeRight]);
 
     return (
         <div
+            ref={containerRef}
             className={_cs(
                 styles.page,
                 startSidebarCollapsed && styles.startSidebarCollapsed,
+                (endSidebarCollapsed || width <= 900) && styles.endSidebarCollapsed,
+                !startSidebarCollapsed && !!startAsideContent && styles.startSidebarVisible,
+                !endSidebarCollapsed
+                    && !!endAsideContent
+                    && width > 900
+                    && styles.endSidebarVisible,
                 className,
             )}
         >
             {startAsideContent && (
-                <aside className={_cs(styles.startAside, startAsideContainerClassName)}>
+                <Portal container={startActionsRef}>
                     <Button
                         name={!startSidebarCollapsed}
-                        spacing="sm"
                         onClick={setStartSidebarCollapsed}
                         className={styles.toggleCollapsedButton}
                         variant="tertiary"
                     >
-                        {startSidebarCollapsed ? <IoMenu /> : <IoClose />}
+                        <IoMenu className={styles.sidebarIcon} />
                     </Button>
+                </Portal>
+            )}
+            {startAsideContent && (
+                <aside className={_cs(styles.startAside, startAsideContainerClassName)}>
                     {startAsideContent}
                 </aside>
             )}
@@ -69,7 +120,18 @@ function Page(props: Props) {
                     {children}
                 </div>
             </main>
-            {endAsideContent && (
+            {endAsideContent && width > 900 && (
+                <Portal container={endActionsRef}>
+                    <Button
+                        name={!endSidebarCollapsed}
+                        onClick={setEndSidebarCollapsed}
+                        variant="tertiary"
+                    >
+                        <IoList className={styles.sidebarIcon} />
+                    </Button>
+                </Portal>
+            )}
+            {endAsideContent && width > 900 && (
                 <aside className={_cs(styles.endAside, endAsideContainerClassName)}>
                     {endAsideContent}
                 </aside>

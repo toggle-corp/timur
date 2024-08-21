@@ -3,16 +3,25 @@ import {
     useMemo,
 } from 'react';
 import {
+    IoChevronForward,
+    IoExit,
+} from 'react-icons/io5';
+import {
     generatePath,
     Link as InternalLink,
     LinkProps as RouterLinkProps,
 } from 'react-router-dom';
 import {
     _cs,
+    isDefined,
     isFalsyString,
     isNotDefined,
 } from '@togglecorp/fujs';
 
+import {
+    type ButtonFeatureProps,
+    useButtonFeatures,
+} from '#components/Button';
 import RouteContext from '#contexts/route';
 import useAuth from '#hooks/useAuth';
 import usePermissions from '#hooks/usePermissions';
@@ -93,8 +102,18 @@ export function useLink(props: {
 
 export type CommonLinkProps<OMISSION extends string = never> = Omit<RouterLinkProps, 'to' | OMISSION> &
 Omit<{
+    actions?: React.ReactNode;
+    actionsContainerClassName?: string;
     disabled?: boolean;
+    icons?: React.ReactNode;
+    iconsContainerClassName?: string;
+    linkElementClassName?: string;
     // to?: RouterLinkProps['to'];
+    variant?: ButtonFeatureProps['variant'];
+    withLinkIcon?: boolean;
+    withUnderline?: boolean;
+    ellipsize?: boolean;
+    spacing?: ButtonFeatureProps['spacing'];
 }, OMISSION>
 
 export type InternalLinkProps = {
@@ -120,9 +139,19 @@ export type Props<OMISSION extends string = never> = CommonLinkProps<OMISSION>
 
 function Link(props: Props) {
     const {
+        actions,
+        actionsContainerClassName,
         children: childrenFromProps,
         className,
         disabled: disabledFromProps,
+        icons,
+        iconsContainerClassName,
+        linkElementClassName,
+        withUnderline,
+        withLinkIcon,
+        variant = 'tertiary',
+        ellipsize,
+        spacing,
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         external,
@@ -155,8 +184,31 @@ function Link(props: Props) {
     // eslint-disable-next-line react/destructuring-assignment
     const nonLink = isFalsyString(toLink);
 
-    const containerClassName = styles.content;
-    const content = childrenFromProps;
+    const {
+        children: content,
+        className: containerClassName,
+    } = useButtonFeatures({
+        className: styles.content,
+        icons,
+        children: childrenFromProps,
+        variant,
+        ellipsize,
+        disabled,
+        spacing,
+        actions: (isDefined(actions) || withLinkIcon) ? (
+            <>
+                {actions}
+                {withLinkIcon && external && (
+                    <IoExit />
+                )}
+                {withLinkIcon && !external && (
+                    <IoChevronForward className={styles.forwardIcon} />
+                )}
+            </>
+        ) : null,
+        iconsContainerClassName,
+        actionsContainerClassName,
+    });
 
     const children = useMemo(
         () => {
@@ -174,6 +226,7 @@ function Link(props: Props) {
                         // eslint-disable-next-line react/jsx-props-no-spreading
                         {...otherProps}
                         className={_cs(
+                            linkElementClassName,
                             styles.linkElement,
                             containerClassName,
                         )}
@@ -191,6 +244,7 @@ function Link(props: Props) {
                     // eslint-disable-next-line react/jsx-props-no-spreading
                     {...otherProps}
                     className={_cs(
+                        linkElementClassName,
                         styles.linkElement,
                         containerClassName,
                     )}
@@ -207,6 +261,7 @@ function Link(props: Props) {
             );
         },
         [
+            linkElementClassName,
             containerClassName,
             content,
             otherProps,
@@ -225,9 +280,15 @@ function Link(props: Props) {
             className={_cs(
                 styles.link,
                 nonLink && styles.nonLink,
+                withUnderline && styles.underline,
                 disabled && styles.disabled,
+                variant === 'dropdown-item' && styles.dropdownItem,
+                variant === 'tertiary' && styles.tertiary,
+                ellipsize && styles.ellipsized,
                 className,
             )}
+            title={(ellipsize && typeof childrenFromProps === 'string')
+                ? childrenFromProps : undefined}
         >
             {children}
         </div>

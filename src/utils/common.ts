@@ -9,6 +9,10 @@ import {
     listToMap,
     mapToList,
 } from '@togglecorp/fujs';
+import {
+    matchSorter,
+    type MatchSorterOptions,
+} from 'match-sorter';
 import { ulid } from 'ulidx';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -198,4 +202,25 @@ export function getChangedItems<T>(
         removedItems: removedKeys.map((key) => initialKeysMap[key]),
         updatedItems: updatedKeys.map((key) => finalKeysMap[key]),
     };
+}
+
+export function fuzzySearch<ItemType = string>(
+    rows: ReadonlyArray<ItemType>,
+    filterValue: string,
+    options?: MatchSorterOptions<ItemType>,
+) {
+    if (!filterValue || filterValue.length <= 0) {
+        return rows;
+    }
+
+    const terms = filterValue.split(' ');
+    if (!terms) {
+        return rows;
+    }
+
+    // reduceRight will mean sorting is done by score for the _first_ entered word.
+    return terms.reduceRight(
+        (results, term) => matchSorter(results, term, options),
+        rows,
+    );
 }

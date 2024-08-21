@@ -65,6 +65,11 @@ function Dialog(props: Props) {
         onClose(false);
     }, [onClose]);
 
+    const handleCloseButtonClick = useCallback((_: undefined, e: React.MouseEvent) => {
+        e.stopPropagation();
+        onClose(false);
+    }, [onClose]);
+
     return (
         <DialogContext.Provider
             value={contextValue}
@@ -89,8 +94,8 @@ function Dialog(props: Props) {
                             </h2>
                             <Button
                                 className={styles.closeButton}
-                                name={false}
-                                onClick={onClose}
+                                name={undefined}
+                                onClick={handleCloseButtonClick}
                                 title="Close"
                                 variant="tertiary"
                             >

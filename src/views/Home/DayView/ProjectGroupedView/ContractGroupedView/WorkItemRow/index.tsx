@@ -12,13 +12,15 @@ import {
 } from 'react-icons/fc';
 import {
     IoCopyOutline,
+    IoEllipsisVertical,
     IoTrashOutline,
 } from 'react-icons/io5';
 import { _cs } from '@togglecorp/fujs';
 
 import Button from '#components/Button';
 import Checkbox from '#components/Checkbox';
-import ConfirmButton from '#components/ConfirmButton';
+import DropdownMenu from '#components/DropdownMenu';
+import DropdownMenuItem from '#components/DropdownMenuItem';
 import DurationInput from '#components/DurationInput';
 import SelectInput from '#components/SelectInput';
 import TextArea from '#components/TextArea';
@@ -199,30 +201,37 @@ function WorkItemRow(props: Props) {
                 variant="secondary"
                 title="Clone this entry"
                 onClick={onClone}
-                spacing="sm"
+                spacing="xs"
             >
                 <IoCopyOutline />
             </Button>
-            <ConfirmButton
-                name={workItem.clientId}
-                variant="secondary"
-                spacing="sm"
-                title="Delete this entry"
-                onClick={onDelete}
-                confirmHeading="Delete entry"
-                confirmDescription={(
-                    <div>
-                        <p>
-                            Do you want to delete this entry?
-                        </p>
-                        <p>
-                            This action cannot be reverted.
-                        </p>
-                    </div>
-                )}
+            <DropdownMenu
+                label={<IoEllipsisVertical />}
+                withoutDropdownIcon
+                variant="tertiary"
+                persistent
             >
-                <IoTrashOutline />
-            </ConfirmButton>
+                <DropdownMenuItem
+                    type="confirm-button"
+                    name={workItem.clientId}
+                    title="Delete this entry"
+                    onClick={onDelete}
+                    confirmHeading="Delete entry"
+                    confirmDescription={(
+                        <div>
+                            <p>
+                                Do you want to delete this entry?
+                            </p>
+                            <p>
+                                This action cannot be reverted.
+                            </p>
+                        </div>
+                    )}
+                    icons={<IoTrashOutline />}
+                >
+                    Delete
+                </DropdownMenuItem>
+            </DropdownMenu>
         </div>
     );
 
@@ -233,6 +242,7 @@ function WorkItemRow(props: Props) {
                 styles.workItemRow,
                 config.focusMode && styles.focusMode,
                 config.checkboxForStatus && styles.checkboxForStatus,
+                config.showInputIcons && styles.withIcons,
                 className,
             )}
         >

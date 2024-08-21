@@ -146,7 +146,7 @@
         width: 100%;
         text-align: left;
         --border-radius: unset;
-        --padding: var(--spacing-sm) var(--spacing-lg);
+        --padding: var(--spacing-sm) var(--spacing-md);
 
         &:hover {
             background-color: var(--color-quaternary);

@@ -1,23 +1,11 @@
 .home {
     position: relative;
 
-    /* FIXME: We should move this outside of Home */
-    h1, h2, h3, h4, h5, h6 {
-        margin: 0;
-        line-height: 1;
-        font-weight: var(--font-weight-bold);
-    }
-
-    /* FIXME: We should move this outside of Home */
-    p {
-        margin: 0;
-    }
-
     .last-saved-status {
         display: flex;
-        position: absolute;
-        top: var(--spacing-md);
+        position: fixed;
         right: var(--spacing-md);
+        bottom: var(--spacing-md);
         align-items: center;
         transition: .5s opacity ease-in-out;
         opacity: 0;
@@ -25,11 +13,10 @@
         background-color: var(--color-quaternary);
         padding: var(--spacing-2xs) var(--spacing-sm);
         color: var(--color-text-light);
-        font-size: var(--font-size-xs);
         gap: var(--spacing-xs);
 
         .timur-icon {
-            height: 0.75rem;
+            height: 1rem;
         }
 
         &.active {
@@ -74,9 +61,13 @@
             align-items: center;
             flex-shrink: 0;
             padding: var(--spacing-sm);
-            width: calc(12rem + 2 * var(--spacing-xs) + var(--spacing-sm));
+            width: calc(9rem + 2 * var(--spacing-xs) + var(--spacing-sm));
             font-weight: var(--font-weight-bold);
             gap: var(--spacing-xs);
+
+            &.with-icon {
+                width: calc(10rem + 2 * var(--spacing-xs) + var(--spacing-sm));
+            }
         }
     }
 
@@ -85,6 +76,11 @@
         flex-direction: column;
         gap: var(--spacing-lg);
     }
+}
+
+.date-navigation {
+    display: flex;
+    gap: var(--spacing-xs)
 }
 
 @keyframes shake-it-off {

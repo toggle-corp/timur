@@ -6,7 +6,11 @@
     .heading {
         display: flex;
         gap: var(--spacing-sm);
-        align-items: flex-end;
+        align-items: center;
+
+        .display-picture {
+            font-size: var(--font-size-xl);
+        }
 
         .text-section {
             display: flex;
@@ -14,7 +18,6 @@
             gap: var(--spacing-sm);
             flex-grow: 1;
             flex-wrap: wrap;
-            padding: var(--spacing-sm);
 
             .contract-name {
                 color: var(--color-text-light);
@@ -25,14 +28,19 @@
         .duration {
             display: flex;
             align-items: center;
+            align-self: flex-end;
             flex-shrink: 0;
             padding: var(--spacing-xs) 0;
-            width: calc(12rem + 2 * var(--spacing-xs));
+            width: calc(9rem + 2 * var(--spacing-xs));
+            color: var(--color-text-light);
             font-weight: var(--font-weight-bold);
             gap: var(--spacing-2xs);
-            color: var(--color-text-light);
 
-            @media screen and (max-width: 60rem) {
+            &.with-icon {
+                width: calc(10rem + 2 * var(--spacing-xs));
+            }
+
+            @media screen and (max-width: 900px) {
                 width: unset;
             }
         }
@@ -43,5 +51,6 @@
         flex-direction: column;
         border-radius: var(--border-radius-lg);
         background-color: var(--color-foreground);
+        padding: var(--spacing-3xs) 0;
     }
 }

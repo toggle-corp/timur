@@ -32,9 +32,8 @@
                     }
                 }
 
-                .icon {
-                    flex-shrink: 0;
-                    font-size: var(--font-size-lg);
+                .display-picture {
+                    font-size: var(--font-size-xl);
                 }
                 .usage-count {
                     flex-shrink: 0;

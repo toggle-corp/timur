@@ -3,6 +3,10 @@ import {
     useContext,
 } from 'react';
 import {
+    IoExitOutline,
+    IoSettingsOutline,
+} from 'react-icons/io5';
+import {
     _cs,
     isDefined,
     isNotDefined,
@@ -12,8 +16,11 @@ import {
     useMutation,
 } from 'urql';
 
-import Button from '#components/Button';
+import DisplayPicture from '#components/DisplayPicture';
+import DropdownMenu from '#components/DropdownMenu';
+import DropdownMenuItem from '#components/DropdownMenuItem';
 import Link from '#components/Link';
+import NavbarContext from '#contexts/navbar';
 import UserContext from '#contexts/user';
 import {
     LogoutMutation,
@@ -45,6 +52,11 @@ function Navbar(props: Props) {
         userAuth,
         removeUserAuth,
     } = useContext(UserContext);
+    const {
+        startActionsRef,
+        midActionsRef,
+        endActionsRef,
+    } = useContext(NavbarContext);
 
     const [{ fetching }, triggerLogout] = useMutation<LogoutMutation, LogoutMutationVariables>(
         LOGOUT_MUTATION,
@@ -62,16 +74,34 @@ function Navbar(props: Props) {
 
     return (
         <nav className={_cs(styles.navbar, className)}>
+            <div
+                className={styles.startActions}
+                ref={startActionsRef}
+            />
             <div className={styles.brand}>
-                <img
-                    className={styles.appLogo}
-                    alt="Timur Icon"
-                    src={timurLogo}
-                />
-                <div className={styles.appName}>
-                    timur
-                </div>
+                <Link
+                    linkElementClassName={styles.homeLink}
+                    to="home"
+                    icons={(
+                        <img
+                            className={styles.appLogo}
+                            alt=""
+                            src={timurLogo}
+                        />
+                    )}
+                >
+                    Timur
+                </Link>
             </div>
+            <div
+                className={styles.middleActions}
+                ref={midActionsRef}
+            />
+            <div className={styles.spacer} />
+            <div
+                className={styles.endActions}
+                ref={endActionsRef}
+            />
             <div className={styles.auth}>
                 {isNotDefined(userAuth) && (
                     <Link
@@ -82,26 +112,37 @@ function Navbar(props: Props) {
                     </Link>
                 )}
                 {isDefined(userAuth) && (
-                    <>
-                        {isDefined(userAuth.displayPicture) && (
-                            <img
+                    <DropdownMenu
+                        variant="tertiary"
+                        withoutDropdownIcon
+                        label={(
+                            <DisplayPicture
                                 className={styles.displayPicture}
-                                src={userAuth.displayPicture}
-                                alt="DP"
+                                imageUrl={userAuth.displayPicture}
+                                displayName={userAuth.displayName}
                             />
                         )}
-                        <div>
-                            {userAuth.displayName}
+                    >
+                        <div className={styles.greetings}>
+                            {`Hello ${userAuth.displayName}!`}
                         </div>
-                        <Button
+                        <DropdownMenuItem
+                            type="link"
+                            to="settings"
+                            icons={<IoSettingsOutline />}
+                        >
+                            Settings
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            type="button"
                             name={undefined}
                             onClick={handleLogoutClick}
                             disabled={fetching}
-                            variant="secondary"
+                            icons={<IoExitOutline />}
                         >
                             Sign out
-                        </Button>
-                    </>
+                        </DropdownMenuItem>
+                    </DropdownMenu>
                 )}
             </div>
         </nav>

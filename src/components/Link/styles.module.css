@@ -6,10 +6,25 @@
     flex-wrap: nowrap;
     width: fit-content;
 
+    &.ellipsized {
+        width: 100%;
+        overflow: auto;
+    }
+
+    &.dropdown-item {
+        width: 100%;
+    }
+
     &:not(.non-link) {
+        font-weight: var(--font-weight-normal);
+
         &.underline {
             --decoration: underline;
         }
+    }
+
+    &:not(.tertiary):not(.dropdown-item) {
+        text-align: center;
     }
 
     &:not(.disabled):not(.non-link) {
@@ -34,4 +49,9 @@
             outline: var(--width-separator-sm) dashed var(--color-separator);
         }
     }
+
+    .forward-icon {
+        margin-inline-start: -0.3em;
+    }
+
 }

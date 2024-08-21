@@ -1,5 +1,6 @@
 import React, {
     useCallback,
+    useEffect,
     useId,
     useRef,
 } from 'react';
@@ -9,8 +10,10 @@ import {
 } from 'react-icons/io5';
 import {
     _cs,
+    isDefined,
     isTruthyString,
 } from '@togglecorp/fujs';
+import stringToColor from 'string-to-color';
 
 import Button from '#components/Button';
 import InputContainer, { Props as InputContainerProps } from '#components/InputContainer';
@@ -19,6 +22,7 @@ import Popup from '#components/Popup';
 import RawInput from '#components/RawInput';
 import useBlurEffect from '#hooks/useBlurEffect';
 import useKeyboard from '#hooks/useKeyboard';
+import { modifyHexSL } from '#utils/colors';
 
 import GenericOption, {
     ContentBaseProps,
@@ -268,13 +272,41 @@ function SelectInputContainer<
         : undefined;
 
     const dropdownShownActual = dropdownShown && !dropdownHidden;
+    const color = isTruthyString(valueDisplay) ? stringToColor(valueDisplay) : undefined;
+
+    useEffect(() => {
+        const input = document.getElementById(inputId);
+        function modifier(a: number, b: number) {
+            return (1 - b) ** 0.1 / a;
+        }
+
+        if (isDefined(input)) {
+            if (isDefined(color)) {
+                input.style.borderColor = color;
+                input.style.backgroundColor = color;
+                input.style.backgroundColor = modifyHexSL(
+                    color,
+                    (s) => (1 - s) / s,
+                    (l, s) => modifier(l, s),
+                );
+                input.style.color = modifyHexSL(
+                    color,
+                    (s) => 1 / (1 - s),
+                    (l, s) => ((l * modifier(l, s)) > 0.5 ? 0.33 : (1.33 / l)),
+                );
+            } else {
+                input.style.backgroundColor = 'unset';
+                input.style.color = 'inherit';
+            }
+        }
+    }, [color, inputId]);
 
     return (
         <>
             <InputContainer
                 htmlFor={inputId}
                 actionsContainerClassName={actionsContainerClassName}
-                className={className}
+                className={_cs(styles.selectInputContainer, className)}
                 containerRef={containerRef}
                 disabled={disabled}
                 errorContainerClassName={errorContainerClassName}
@@ -335,6 +367,7 @@ function SelectInputContainer<
                 )}
                 input={(
                     <RawInput
+                        className={styles.input}
                         id={inputId}
                         name={name}
                         elementRef={inputElementRef}

@@ -8,7 +8,7 @@ import Dialog from '#components/Dialog';
 
 import styles from './styles.module.css';
 
-interface Props<N> extends ButtonProps<N> {
+export interface Props<N> extends ButtonProps<N> {
     confirmHeading: React.ReactNode;
     confirmDescription: React.ReactNode;
 }
@@ -29,6 +29,11 @@ function ConfirmButton<const N>(props: Props<N>) {
     }, []);
 
     const handleModalClose = useCallback(() => {
+        setConfirmationShown(false);
+    }, []);
+
+    const handleCancelButtonClick = useCallback((_: undefined, e: React.MouseEvent) => {
+        e.stopPropagation();
         setConfirmationShown(false);
     }, []);
 
@@ -53,7 +58,7 @@ function ConfirmButton<const N>(props: Props<N>) {
                 <div className={styles.actions}>
                     <Button
                         name={undefined}
-                        onClick={handleModalClose}
+                        onClick={handleCancelButtonClick}
                         variant="secondary"
                     >
                         Cancel

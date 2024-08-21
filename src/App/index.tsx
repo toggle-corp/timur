@@ -2,6 +2,7 @@ import {
     useCallback,
     useEffect,
     useMemo,
+    useRef,
     useState,
 } from 'react';
 import {
@@ -16,6 +17,7 @@ import {
 
 import EnumsContext, { EnumsContextProps } from '#contexts/enums';
 import LocalStorageContext, { LocalStorageContextProps } from '#contexts/localStorage';
+import NavbarContext, { NavbarContextProps } from '#contexts/navbar';
 import RouteContext from '#contexts/route';
 import SizeContext, { SizeContextProps } from '#contexts/size';
 import UserContext, {
@@ -79,6 +81,9 @@ const ENUMS_QUERY = gql`
                     project {
                         id
                         name
+                        logo {
+                            url
+                        }
                         projectClient {
                             id
                             name
@@ -168,29 +173,41 @@ function App() {
         setStorageState,
     }), [storageState]);
 
+    const navbarStartActionRef = useRef<HTMLDivElement>(null);
+    const navbarMidActionRef = useRef<HTMLDivElement>(null);
+    const navbarEndActionRef = useRef<HTMLDivElement>(null);
+
+    const navbarContextValue = useMemo<NavbarContextProps>(() => ({
+        startActionsRef: navbarStartActionRef,
+        midActionsRef: navbarMidActionRef,
+        endActionsRef: navbarEndActionRef,
+    }), []);
+
     return (
-        <SizeContext.Provider value={debouncedSize}>
-            <LocalStorageContext.Provider value={storageContextValue}>
-                <RouteContext.Provider value={wrappedRoutes}>
-                    <UserContext.Provider value={userContextValue}>
-                        <EnumsContext.Provider value={enumsContextValue}>
-                            <RouterProvider
-                                router={router}
-                                fallbackElement={(
-                                    <div className={styles.fallbackElement}>
-                                        <img
-                                            className={styles.appLogo}
-                                            alt="Timur Icon"
-                                            src="/app-icon.svg"
-                                        />
-                                    </div>
-                                )}
-                            />
-                        </EnumsContext.Provider>
-                    </UserContext.Provider>
-                </RouteContext.Provider>
-            </LocalStorageContext.Provider>
-        </SizeContext.Provider>
+        <NavbarContext.Provider value={navbarContextValue}>
+            <SizeContext.Provider value={debouncedSize}>
+                <LocalStorageContext.Provider value={storageContextValue}>
+                    <RouteContext.Provider value={wrappedRoutes}>
+                        <UserContext.Provider value={userContextValue}>
+                            <EnumsContext.Provider value={enumsContextValue}>
+                                <RouterProvider
+                                    router={router}
+                                    fallbackElement={(
+                                        <div className={styles.fallbackElement}>
+                                            <img
+                                                className={styles.appLogo}
+                                                alt="Timur Icon"
+                                                src="/app-icon.svg"
+                                            />
+                                        </div>
+                                    )}
+                                />
+                            </EnumsContext.Provider>
+                        </UserContext.Provider>
+                    </RouteContext.Provider>
+                </LocalStorageContext.Provider>
+            </SizeContext.Provider>
+        </NavbarContext.Provider>
     );
 }
 

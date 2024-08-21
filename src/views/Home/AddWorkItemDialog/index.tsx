@@ -8,39 +8,16 @@ import {
 } from 'react';
 import { IoAddSharp } from 'react-icons/io5';
 import { listToGroupList } from '@togglecorp/fujs';
-import {
-    matchSorter,
-    type MatchSorterOptions,
-} from 'match-sorter';
 
 import Dialog from '#components/Dialog';
 import RawButton from '#components/RawButton';
 import TextInput from '#components/TextInput';
 import EnumsContext from '#contexts/enums';
+import { fuzzySearch } from '#utils/common';
 import { WorkItem } from '#utils/types';
 
 import styles from './styles.module.css';
-
-function fuzzySearch<ItemType = string>(
-    rows: ReadonlyArray<ItemType>,
-    filterValue: string,
-    options?: MatchSorterOptions<ItemType>,
-) {
-    if (!filterValue || filterValue.length <= 0) {
-        return rows;
-    }
-
-    const terms = filterValue.split(' ');
-    if (!terms) {
-        return rows;
-    }
-
-    // reduceRight will mean sorting is done by score for the _first_ entered word.
-    return terms.reduceRight(
-        (results, term) => matchSorter(results, term, options),
-        rows,
-    );
-}
+import DisplayPicture from '#components/DisplayPicture';
 
 interface Props {
     dialogOpenTriggerRef: React.MutableRefObject<(() => void) | undefined>;
@@ -150,7 +127,11 @@ function AddWorkItemDialog(props: Props) {
                             onClick={handleWorkItemCreate}
                             key={task.id}
                         >
-                            <IoAddSharp className={styles.icon} />
+                            <DisplayPicture
+                                className={styles.displayPicture}
+                                imageUrl={project.logo?.url}
+                                displayName={project.name}
+                            />
                             <div className={styles.details}>
                                 {task.name}
                                 <div className={styles.meta}>

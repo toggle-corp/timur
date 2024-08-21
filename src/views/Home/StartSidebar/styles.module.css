@@ -4,17 +4,12 @@
     gap: var(--spacing-lg);
     padding: var(--spacing-md);
 
-    .date-navigation {
-        display: flex;
-        gap: var(--spacing-xs)
-    }
-
     .calendar {
         display: flex;
         align-items: center;
         justify-content: center;
         opacity: 0.2;
-        height: 10rem;
+        height: 6rem;
         font-size: 6rem;
     }
 

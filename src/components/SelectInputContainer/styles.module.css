@@ -1,3 +1,11 @@
+.select-input-container {
+    .input {
+        padding: 0 var(--spacing-2xs);
+        text-align: center;
+        font-size: var(--font-size-sm);
+    }
+}
+
 .popup {
     padding: var(--spacing-sm) 0;
 

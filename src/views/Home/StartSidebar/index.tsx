@@ -2,14 +2,8 @@ import {
     useCallback,
     useContext,
 } from 'react';
+import { IoCalendar } from 'react-icons/io5';
 import {
-    IoCalendar,
-    IoChevronBackSharp,
-    IoChevronForwardSharp,
-    IoCodeSlash,
-} from 'react-icons/io5';
-import {
-    encodeDate,
     isDefined,
     isFalsyString,
     isNotDefined,
@@ -19,18 +13,15 @@ import {
 
 import Button from '#components/Button';
 import Checkbox from '#components/Checkbox';
-import RadioInput from '#components/RadioInput';
+import SelectInput from '#components/SelectInput';
 import EnumsContext from '#contexts/enums';
 import { EnumsQuery } from '#generated/types/graphql';
 import useLocalStorage from '#hooks/useLocalStorage';
 import useSetFieldValue from '#hooks/useSetFieldValue';
-import { addDays } from '#utils/common';
 import {
     defaultConfigValue,
     KEY_CONFIG_STORAGE,
-    KEY_DATA_STORAGE_OLD,
 } from '#utils/constants';
-import { getFromStorage } from '#utils/localStorage';
 import {
     ConfigStorage,
     WorkItem,
@@ -56,25 +47,14 @@ function workItemStatusLabelSelector(item: WorkItemStatusOption) {
 }
 
 interface Props {
-    selectedDate: string,
-    setSelectedDate: React.Dispatch<React.SetStateAction<string>>;
     workItems: WorkItem[];
-    onAddEntryClick: () => void;
 }
 
 function StartSidebar(props: Props) {
-    const {
-        selectedDate,
-        setSelectedDate,
-        workItems,
-        onAddEntryClick,
-    } = props;
+    const { workItems } = props;
 
     const { taskById } = useContext(EnumsContext);
     const { enums } = useContext(EnumsContext);
-
-    // NOTE: We cannot put this outside the component.
-    const today = new Date();
 
     const [storedConfig, setStoredConfig] = useLocalStorage<ConfigStorage>(
         KEY_CONFIG_STORAGE,
@@ -82,18 +62,6 @@ function StartSidebar(props: Props) {
     );
 
     const setConfigFieldValue = useSetFieldValue(setStoredConfig);
-
-    const handleExportButtonClick = useCallback(() => {
-        const prevData = getFromStorage(KEY_DATA_STORAGE_OLD);
-        window.navigator.clipboard.writeText(JSON.stringify(prevData));
-    }, []);
-
-    const handleTodaySelection = useCallback(
-        () => {
-            setSelectedDate(encodeDate(new Date()));
-        },
-        [setSelectedDate],
-    );
 
     const handleCopyTextButtonClick = useCallback(
         () => {
@@ -141,62 +109,14 @@ function StartSidebar(props: Props) {
         [workItems, taskById],
     );
 
-    const handleDateSelection = useCallback(
-        (value: string | undefined) => {
-            // NOTE: We do not reset selected date
-            if (value) {
-                setSelectedDate(value);
-            }
-        },
-        [setSelectedDate],
-    );
-
     return (
         <div
             className={styles.startSidebar}
         >
-            <div className={styles.dateNavigation}>
-                <Button
-                    name={addDays(selectedDate, -1)}
-                    onClick={handleDateSelection}
-                    variant="secondary"
-                    title="Previous day"
-                    spacing="sm"
-                >
-                    <IoChevronBackSharp />
-                </Button>
-                <Button
-                    name={addDays(selectedDate, 1)}
-                    onClick={handleDateSelection}
-                    variant="secondary"
-                    title="Next day"
-                    spacing="sm"
-                >
-                    <IoChevronForwardSharp />
-                </Button>
-                <Button
-                    name={undefined}
-                    onClick={handleTodaySelection}
-                    variant="secondary"
-                    disabled={selectedDate === encodeDate(today)}
-                    spacing="sm"
-                >
-                    Today
-                </Button>
-            </div>
             <div className={styles.calendar}>
                 <IoCalendar />
             </div>
             <div className={styles.actions}>
-                <Button
-                    name={undefined}
-                    onClick={handleExportButtonClick}
-                    variant="tertiary"
-                    spacing="sm"
-                    icons={<IoCodeSlash />}
-                >
-                    Copy data
-                </Button>
                 {/*
                 <Button
                     name
@@ -258,7 +178,7 @@ function StartSidebar(props: Props) {
                     onChange={setConfigFieldValue}
                     value={storedConfig.allowMultipleEntry}
                 />
-                <RadioInput
+                <SelectInput
                     name="defaultTaskStatus"
                     label="Default Status"
                     options={enums?.enums.TimeEntryStatus}
@@ -266,8 +186,9 @@ function StartSidebar(props: Props) {
                     labelSelector={workItemStatusLabelSelector}
                     onChange={setConfigFieldValue}
                     value={storedConfig.defaultTaskStatus}
+                    nonClearable
                 />
-                <RadioInput
+                <SelectInput
                     name="defaultTaskType"
                     label="Default Type"
                     options={enums?.enums.TimeEntryType}
@@ -275,15 +196,10 @@ function StartSidebar(props: Props) {
                     labelSelector={workItemTypeLabelSelector}
                     onChange={setConfigFieldValue}
                     value={storedConfig.defaultTaskType}
-                    listContainerClassName={styles.typeOptionList}
+                    nonClearable
+                    // listContainerClassName={styles.typeOptionList}
                 />
             </div>
-            <Button
-                name
-                onClick={onAddEntryClick}
-            >
-                Add entry
-            </Button>
         </div>
     );
 }
