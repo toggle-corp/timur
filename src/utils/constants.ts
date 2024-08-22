@@ -7,9 +7,9 @@ export const KEY_DATA_STORAGE_OLD = 'timur';
 export const defaultConfigValue: ConfigStorage = {
     defaultTaskType: 'DEVELOPMENT',
     defaultTaskStatus: 'DONE',
-    allowMultipleEntry: false,
     editingMode: 'normal',
-    focusMode: false,
     checkboxForStatus: false,
     showInputIcons: false,
+    startSidebarShown: window.innerWidth >= 900,
+    endSidebarShown: false,
 };

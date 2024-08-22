@@ -103,12 +103,14 @@
     &.start-sidebar-collapsed {
         .start-aside {
             transform: translateX(-100%);
+            pointer-events: none;
         }
     }
 
     &.end-sidebar-collapsed {
         .end-aside {
             transform: translateX(100%);
+            pointer-events: none;
         }
     }
 

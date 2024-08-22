@@ -42,6 +42,10 @@
 
             @media screen and (max-width: 900px) {
                 width: unset;
+
+                &.with-icon {
+                    width: unset;
+                }
             }
         }
     }

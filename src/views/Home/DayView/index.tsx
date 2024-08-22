@@ -43,7 +43,6 @@ interface Props {
     onWorkItemClone: (clientId: string) => void;
     onWorkItemChange: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
     onWorkItemDelete: (clientId: string) => void;
-    focusMode: boolean;
 }
 
 function DayView(props: Props) {
@@ -53,7 +52,6 @@ function DayView(props: Props) {
         onWorkItemClone,
         onWorkItemChange,
         onWorkItemDelete,
-        focusMode,
         loading,
         errored,
     } = props;
@@ -96,13 +94,11 @@ function DayView(props: Props) {
             onWorkItemClone,
             onWorkItemChange,
             onWorkItemDelete,
-            focusMode,
         }),
         [
             onWorkItemClone,
             onWorkItemChange,
             onWorkItemDelete,
-            focusMode,
         ],
     );
 

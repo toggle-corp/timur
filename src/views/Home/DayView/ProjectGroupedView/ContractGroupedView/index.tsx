@@ -40,7 +40,6 @@ export interface Props {
     onWorkItemClone: (clientId: string) => void;
     onWorkItemChange: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
     onWorkItemDelete: (clientId: string) => void;
-    focusMode: boolean;
 }
 
 function ContractGroupedView(props: Props) {
@@ -52,7 +51,6 @@ function ContractGroupedView(props: Props) {
         onWorkItemClone,
         onWorkItemChange,
         onWorkItemDelete,
-        focusMode,
     } = props;
 
     const [config] = useLocalStorage(KEY_CONFIG_STORAGE, defaultConfigValue);
@@ -96,19 +94,17 @@ function ContractGroupedView(props: Props) {
                         {contract.name}
                     </div>
                 </div>
-                {!focusMode && (
-                    <div
-                        className={_cs(
-                            styles.duration,
-                            config.showInputIcons && styles.withIcon,
-                        )}
-                    >
-                        {config.showInputIcons && (
-                            <FcClock />
-                        )}
-                        {getDurationString(totalHours)}
-                    </div>
-                )}
+                <div
+                    className={_cs(
+                        styles.duration,
+                        config.showInputIcons && styles.withIcon,
+                    )}
+                >
+                    {config.showInputIcons && (
+                        <FcClock />
+                    )}
+                    {getDurationString(totalHours)}
+                </div>
             </div>
             <List
                 className={styles.workItemList}

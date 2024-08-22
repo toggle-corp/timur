@@ -165,6 +165,7 @@ function WorkItemRow(props: Props) {
             onChange={setFieldValue}
             icons={config.showInputIcons && <FcDocument />}
             placeholder="Description"
+            compact={windowWidth >= 900}
         />
     );
 
@@ -240,7 +241,6 @@ function WorkItemRow(props: Props) {
             role="listitem"
             className={_cs(
                 styles.workItemRow,
-                config.focusMode && styles.focusMode,
                 config.checkboxForStatus && styles.checkboxForStatus,
                 config.showInputIcons && styles.withIcons,
                 className,
@@ -249,15 +249,11 @@ function WorkItemRow(props: Props) {
             {windowWidth >= 900 ? (
                 <>
                     {statusInput}
-                    {!config.focusMode && taskInput}
+                    {taskInput}
                     {descriptionInput}
-                    {!config.focusMode && (
-                        <>
-                            {typeInput}
-                            {durationInput}
-                            {actions}
-                        </>
-                    )}
+                    {typeInput}
+                    {durationInput}
+                    {actions}
                 </>
             ) : (
                 <>
@@ -265,14 +261,10 @@ function WorkItemRow(props: Props) {
                     {descriptionInput}
                     <div className={styles.compactOptions}>
                         {!config.checkboxForStatus && statusInput}
-                        {!config.focusMode && taskInput}
-                        {!config.focusMode && (
-                            <>
-                                {typeInput}
-                                {durationInput}
-                                {actions}
-                            </>
-                        )}
+                        {taskInput}
+                        {typeInput}
+                        {durationInput}
+                        {actions}
                     </div>
                 </>
             )}

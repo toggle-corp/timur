@@ -34,8 +34,8 @@ export type ConfigStorage = {
     defaultTaskType: WorkItemType,
     defaultTaskStatus: WorkItemStatus,
     editingMode: EditingMode,
-    allowMultipleEntry: boolean,
-    focusMode: boolean,
     checkboxForStatus: boolean,
     showInputIcons: boolean,
+    startSidebarShown: boolean,
+    endSidebarShown: boolean,
 }

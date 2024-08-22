@@ -1,8 +1,8 @@
 import {
+    useCallback,
     useContext,
     useEffect,
     useRef,
-    useState,
 } from 'react';
 import {
     IoList,
@@ -19,6 +19,13 @@ import Button from '#components/Button';
 import Portal from '#components/Portal';
 import NavbarContext from '#contexts/navbar';
 import SizeContext from '#contexts/size';
+import useLocalStorage from '#hooks/useLocalStorage';
+import useSetFieldValue from '#hooks/useSetFieldValue';
+import {
+    defaultConfigValue,
+    KEY_CONFIG_STORAGE,
+} from '#utils/constants';
+import { ConfigStorage } from '#utils/types';
 
 import styles from './styles.module.css';
 
@@ -49,13 +56,33 @@ function Page(props: Props) {
         onSwipeRight,
     } = props;
 
+    const { width } = useContext(SizeContext);
+
+    const [storedState, setStoredState] = useLocalStorage<ConfigStorage>(
+        KEY_CONFIG_STORAGE,
+        defaultConfigValue,
+    );
+
+    const {
+        startSidebarShown,
+        endSidebarShown,
+    } = storedState;
+
+    const setFieldValue = useSetFieldValue(setStoredState);
+
+    const handleStartSidebarToggle = useCallback(
+        (newValue: boolean) => setFieldValue(newValue, 'startSidebarShown'),
+        [setFieldValue],
+    );
+    const handleEndSidebarToggle = useCallback(
+        (newValue: boolean) => setFieldValue(newValue, 'endSidebarShown'),
+        [setFieldValue],
+    );
+
     useEffect(() => {
         document.title = documentTitle;
     }, [documentTitle]);
 
-    const { width } = useContext(SizeContext);
-    const [startSidebarCollapsed, setStartSidebarCollapsed] = useState(width <= 900);
-    const [endSidebarCollapsed, setEndSidebarCollapsed] = useState(true);
     const {
         startActionsRef,
         endActionsRef,
@@ -88,10 +115,10 @@ function Page(props: Props) {
             ref={containerRef}
             className={_cs(
                 styles.page,
-                startSidebarCollapsed && styles.startSidebarCollapsed,
-                (endSidebarCollapsed || width <= 900) && styles.endSidebarCollapsed,
-                !startSidebarCollapsed && !!startAsideContent && styles.startSidebarVisible,
-                !endSidebarCollapsed
+                !startSidebarShown && styles.startSidebarCollapsed,
+                (!endSidebarShown || width <= 900) && styles.endSidebarCollapsed,
+                startSidebarShown && !!startAsideContent && styles.startSidebarVisible,
+                endSidebarShown
                     && !!endAsideContent
                     && width > 900
                     && styles.endSidebarVisible,
@@ -101,8 +128,8 @@ function Page(props: Props) {
             {startAsideContent && (
                 <Portal container={startActionsRef}>
                     <Button
-                        name={!startSidebarCollapsed}
-                        onClick={setStartSidebarCollapsed}
+                        name={!startSidebarShown}
+                        onClick={handleStartSidebarToggle}
                         className={styles.toggleCollapsedButton}
                         variant="tertiary"
                     >
@@ -123,8 +150,8 @@ function Page(props: Props) {
             {endAsideContent && width > 900 && (
                 <Portal container={endActionsRef}>
                     <Button
-                        name={!endSidebarCollapsed}
-                        onClick={setEndSidebarCollapsed}
+                        name={!endSidebarShown}
+                        onClick={handleEndSidebarToggle}
                         variant="tertiary"
                     >
                         <IoList className={styles.sidebarIcon} />

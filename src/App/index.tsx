@@ -30,7 +30,7 @@ import {
     MeQuery,
     MeQueryVariables,
 } from '#generated/types/graphql';
-import useDebouncedValue from '#hooks/useDebouncedValue';
+import useThrottledValue from '#hooks/useThrottledValue';
 import { getWindowSize } from '#utils/common';
 import { setToStorage } from '#utils/localStorage';
 
@@ -108,7 +108,7 @@ function App() {
         });
     }, [storageState]);
 
-    const debouncedSize = useDebouncedValue(size);
+    const debouncedSize = useThrottledValue(size);
 
     useLayoutEffect(() => {
         function handleResize() {

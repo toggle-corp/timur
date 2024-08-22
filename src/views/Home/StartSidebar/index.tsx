@@ -159,24 +159,11 @@ function StartSidebar(props: Props) {
                     onChange={setConfigFieldValue}
                 />
                 <Checkbox
-                    name="focusMode"
-                    label="Enable focus mode"
-                    tooltip="Focus mode will remove all of the visual distraction from the page and allows you to focus on writing the journal"
-                    value={storedConfig.focusMode}
-                    onChange={setConfigFieldValue}
-                />
-                <Checkbox
                     name="checkboxForStatus"
                     label="Use checkbox for status"
                     tooltip="Use checkbox instead of select input for the status. i.e. to toggle TODO, Doing and Done"
                     value={storedConfig.checkboxForStatus}
                     onChange={setConfigFieldValue}
-                />
-                <Checkbox
-                    name="allowMultipleEntry"
-                    label="Allow multiple entry"
-                    onChange={setConfigFieldValue}
-                    value={storedConfig.allowMultipleEntry}
                 />
                 <SelectInput
                     name="defaultTaskStatus"

@@ -68,6 +68,16 @@
             &.with-icon {
                 width: calc(10rem + 2 * var(--spacing-xs) + var(--spacing-sm));
             }
+
+            @media screen and (max-width: 900px) {
+                padding: unset;
+                width: unset;
+
+                &.with-icon {
+                    padding: unset;
+                    width: unset;
+                }
+            }
         }
     }
 

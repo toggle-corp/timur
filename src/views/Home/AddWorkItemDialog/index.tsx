@@ -22,7 +22,6 @@ interface Props {
     dialogOpenTriggerRef: React.MutableRefObject<(() => void) | undefined>;
     workItems: WorkItem[] | undefined;
     onWorkItemCreate: (taskId: string) => void;
-    allowMultipleEntry: boolean;
 }
 
 function AddWorkItemDialog(props: Props) {
@@ -30,7 +29,6 @@ function AddWorkItemDialog(props: Props) {
         dialogOpenTriggerRef,
         workItems,
         onWorkItemCreate,
-        allowMultipleEntry,
     } = props;
 
     const [showAddWorkItemDialog, setShowAddWorkItemDialog] = useState(false);
@@ -61,11 +59,9 @@ function AddWorkItemDialog(props: Props) {
     const handleWorkItemCreate = useCallback(
         (taskId: string) => {
             onWorkItemCreate(taskId);
-            if (!allowMultipleEntry) {
-                handleModalClose();
-            }
+            handleModalClose();
         },
-        [onWorkItemCreate, handleModalClose, allowMultipleEntry],
+        [onWorkItemCreate, handleModalClose],
     );
 
     const { enums } = useContext(EnumsContext);
@@ -90,7 +86,6 @@ function AddWorkItemDialog(props: Props) {
     return (
         <Dialog
             open={showAddWorkItemDialog}
-            mode={allowMultipleEntry ? 'right' : 'center'}
             onClose={handleModalClose}
             heading="Add new entry"
             contentClassName={styles.modalContent}

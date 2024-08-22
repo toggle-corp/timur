@@ -9,22 +9,6 @@
         grid-template-columns: 4.5rem 2fr 5fr 12rem 4rem 6rem;
     }
 
-    &.focus-mode {
-        grid-template-columns: 4rem 1fr;
-
-        &.with-icons {
-            grid-template-columns: 4.5rem 1fr;
-        }
-
-        &.checkbox-for-status {
-            grid-template-columns: 1rem 1fr;
-
-            &.with-icons {
-                grid-template-columns: 1rem 1fr;
-            }
-        }
-    }
-
     &.checkbox-for-status {
         grid-template-columns: 1rem 2fr 5fr 10rem 3rem 6rem;
 
@@ -64,10 +48,6 @@
         gap: var(--spacing-sm);
 
         &.with-icons {
-            grid-template-columns: auto;
-        }
-
-        &.focus-mode {
             grid-template-columns: auto;
         }
 

@@ -169,7 +169,7 @@ export function Component() {
     );
     */
 
-    const [storedConfig, setStoredConfig] = useLocalStorage<ConfigStorage>(
+    const [storedConfig] = useLocalStorage<ConfigStorage>(
         KEY_CONFIG_STORAGE,
         defaultConfigValue,
     );
@@ -527,13 +527,6 @@ export function Component() {
         [],
     );
 
-    const toggleFocusMode = useCallback(() => {
-        setStoredConfig((oldConfig) => ({
-            ...oldConfig,
-            focusMode: !oldConfig.focusMode,
-        }));
-    }, [setStoredConfig]);
-
     const handleKeybindingsPress = useCallback(
         (event: KeyboardEvent) => {
             if (event.ctrlKey && event.key === ' ') {
@@ -556,10 +549,6 @@ export function Component() {
                 setSelectedDate(encodeDate(new Date()));
                 event.preventDefault();
                 event.stopPropagation();
-            } else if (event.ctrlKey && event.shiftKey && event.key === 'F') {
-                toggleFocusMode();
-                event.preventDefault();
-                event.stopPropagation();
             } else if (event.ctrlKey && event.shiftKey && event.key === '?') {
                 handleShortcutsButtonClick();
                 event.preventDefault();
@@ -569,7 +558,6 @@ export function Component() {
         [
             handleAddEntryClick,
             // handleNoteUpdateClick,
-            toggleFocusMode,
             handleShortcutsButtonClick,
         ],
     );
@@ -719,21 +707,19 @@ export function Component() {
                         {formattedDate}
                     </Button>
                 </div>
-                {!storedConfig.focusMode && (
-                    <div
-                        className={_cs(
-                            styles.duration,
-                            storedConfig.showInputIcons && styles.withIcon,
-                        )}
-                    >
-                        {storedConfig.showInputIcons && (
-                            <FcClock />
-                        )}
-                        <div>
-                            {getDurationString(totalHours)}
-                        </div>
+                <div
+                    className={_cs(
+                        styles.duration,
+                        storedConfig.showInputIcons && styles.withIcon,
+                    )}
+                >
+                    {storedConfig.showInputIcons && (
+                        <FcClock />
+                    )}
+                    <div>
+                        {getDurationString(totalHours)}
                     </div>
-                )}
+                </div>
             </div>
             <FocusContext.Provider
                 value={focusContextValue}
@@ -745,7 +731,6 @@ export function Component() {
                     onWorkItemClone={handleWorkItemClone}
                     onWorkItemChange={handleWorkItemChange}
                     onWorkItemDelete={handleWorkItemDelete}
-                    focusMode={storedConfig.focusMode}
                 />
             </FocusContext.Provider>
             <Button
@@ -771,7 +756,6 @@ export function Component() {
                 dialogOpenTriggerRef={dialogOpenTriggerRef}
                 workItems={workItems}
                 onWorkItemCreate={handleWorkItemCreate}
-                allowMultipleEntry={storedConfig.allowMultipleEntry}
             />
         </Page>
     );

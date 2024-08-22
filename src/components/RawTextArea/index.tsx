@@ -16,6 +16,7 @@ export interface Props<N> extends Omit<React.HTMLProps<HTMLTextAreaElement>, 're
     e?: React.ChangeEvent<HTMLTextAreaElement> | undefined,
   ) => void;
   elementRef?: React.Ref<HTMLTextAreaElement>;
+  compact?: boolean;
 }
 
 function RawTextArea<N>(props: Props<N>) {
@@ -26,6 +27,7 @@ function RawTextArea<N>(props: Props<N>) {
         elementRef,
         value,
         name,
+        compact,
         ...otherProps
     } = props;
 
@@ -72,7 +74,10 @@ function RawTextArea<N>(props: Props<N>) {
     return (
         <div
             ref={containerRef}
-            className={styles.growWrap}
+            className={_cs(
+                styles.growWrap,
+                compact && styles.compact,
+            )}
         >
             <textarea
                 // eslint-disable-next-line react/jsx-props-no-spreading
