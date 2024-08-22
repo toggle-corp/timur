@@ -1,6 +1,5 @@
 import React, {
     useCallback,
-    useEffect,
     useId,
     useRef,
 } from 'react';
@@ -10,10 +9,8 @@ import {
 } from 'react-icons/io5';
 import {
     _cs,
-    isDefined,
     isTruthyString,
 } from '@togglecorp/fujs';
-import stringToColor from 'string-to-color';
 
 import Button from '#components/Button';
 import InputContainer, { Props as InputContainerProps } from '#components/InputContainer';
@@ -22,7 +19,6 @@ import Popup from '#components/Popup';
 import RawInput from '#components/RawInput';
 import useBlurEffect from '#hooks/useBlurEffect';
 import useKeyboard from '#hooks/useKeyboard';
-import { modifyHexSL } from '#utils/colors';
 
 import GenericOption, {
     ContentBaseProps,
@@ -272,6 +268,8 @@ function SelectInputContainer<
         : undefined;
 
     const dropdownShownActual = dropdownShown && !dropdownHidden;
+
+    /*
     const color = isTruthyString(valueDisplay) ? stringToColor(valueDisplay) : undefined;
 
     useEffect(() => {
@@ -300,6 +298,7 @@ function SelectInputContainer<
             }
         }
     }, [color, inputId]);
+    */
 
     return (
         <>

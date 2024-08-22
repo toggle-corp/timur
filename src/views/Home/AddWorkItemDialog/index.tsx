@@ -6,10 +6,10 @@ import {
     useRef,
     useState,
 } from 'react';
-import { IoAddSharp } from 'react-icons/io5';
 import { listToGroupList } from '@togglecorp/fujs';
 
 import Dialog from '#components/Dialog';
+import DisplayPicture from '#components/DisplayPicture';
 import RawButton from '#components/RawButton';
 import TextInput from '#components/TextInput';
 import EnumsContext from '#contexts/enums';
@@ -17,7 +17,6 @@ import { fuzzySearch } from '#utils/common';
 import { WorkItem } from '#utils/types';
 
 import styles from './styles.module.css';
-import DisplayPicture from '#components/DisplayPicture';
 
 interface Props {
     dialogOpenTriggerRef: React.MutableRefObject<(() => void) | undefined>;

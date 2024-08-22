@@ -1,6 +1,6 @@
 import {
     useCallback,
-    useEffect,
+    useLayoutEffect,
     useMemo,
     useRef,
     useState,
@@ -102,7 +102,7 @@ function App() {
     const [size, setSize] = useState<SizeContextProps>(getWindowSize);
     const [storageState, setStorageState] = useState<LocalStorageContextProps['storageState']>({});
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         Object.keys(storageState).forEach((key) => {
             setToStorage(key, storageState[key].value);
         });
@@ -110,7 +110,7 @@ function App() {
 
     const debouncedSize = useDebouncedValue(size);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         function handleResize() {
             setSize(getWindowSize());
         }
@@ -125,7 +125,7 @@ function App() {
     const [meResult] = useQuery<MeQuery, MeQueryVariables>(
         { query: ME_QUERY },
     );
-    useEffect(() => {
+    useLayoutEffect(() => {
         setUserAuth(meResult.data?.public.me ?? undefined);
     }, [meResult.data]);
 
@@ -183,6 +183,20 @@ function App() {
         endActionsRef: navbarEndActionRef,
     }), []);
 
+    const fallbackElement = (
+        <div className={styles.fallbackElement}>
+            <img
+                className={styles.appLogo}
+                alt="Timur Icon"
+                src="/app-icon.svg"
+            />
+        </div>
+    );
+
+    if (meResult.fetching) {
+        return fallbackElement;
+    }
+
     return (
         <NavbarContext.Provider value={navbarContextValue}>
             <SizeContext.Provider value={debouncedSize}>
@@ -192,15 +206,7 @@ function App() {
                             <EnumsContext.Provider value={enumsContextValue}>
                                 <RouterProvider
                                     router={router}
-                                    fallbackElement={(
-                                        <div className={styles.fallbackElement}>
-                                            <img
-                                                className={styles.appLogo}
-                                                alt="Timur Icon"
-                                                src="/app-icon.svg"
-                                            />
-                                        </div>
-                                    )}
+                                    fallbackElement={fallbackElement}
                                 />
                             </EnumsContext.Provider>
                         </UserContext.Provider>

@@ -27,6 +27,7 @@ import {
     useQuery,
 } from 'urql';
 
+import SizeContext from '#contexts/size';
 import Button from '#components/Button';
 import Page from '#components/Page';
 import Portal from '#components/Portal';
@@ -453,9 +454,7 @@ export function Component() {
         },
         [setNotes, selectedDate],
     );
-    */
 
-    /*
     const handleNoteUpdate = useCallback(
         (content: string | undefined, noteId: string | undefined) => {
             setNotes((oldNotes = []) => {
@@ -613,6 +612,21 @@ export function Component() {
     );
 
     const { midActionsRef } = useContext(NavbarContext);
+    const { width: windowWidth } = useContext(SizeContext);
+
+    const handleSwipeLeft = useCallback(
+        () => {
+            handleDateSelection(addDays(selectedDate, 1));
+        },
+        [selectedDate, handleDateSelection],
+    );
+
+    const handleSwipeRight = useCallback(
+        () => {
+            handleDateSelection(addDays(selectedDate, -1));
+        },
+        [selectedDate, handleDateSelection],
+    );
 
     return (
         <Page
@@ -631,16 +645,8 @@ export function Component() {
                     onWorkItemCreate={handleWorkItemCreate}
                 />
             )}
-            onSwipeLeft={() => {
-                console.info('swipe left');
-                // FIXME: no inline function
-                handleDateSelection(addDays(selectedDate, -1));
-            }}
-            onSwipeRight={() => {
-                console.info('swipe right');
-                // FIXME: no inline function
-                handleDateSelection(addDays(selectedDate, 1));
-            }}
+            onSwipeLeft={handleSwipeLeft}
+            onSwipeRight={handleSwipeRight}
         >
             <div
                 className={_cs(
@@ -659,24 +665,28 @@ export function Component() {
             </div>
             <Portal container={midActionsRef}>
                 <div className={styles.dateNavigation}>
-                    <Button
-                        name={addDays(selectedDate, -1)}
-                        onClick={handleDateSelection}
-                        variant="secondary"
-                        title="Previous day"
-                        spacing="sm"
-                    >
-                        <IoChevronBackSharp />
-                    </Button>
-                    <Button
-                        name={addDays(selectedDate, 1)}
-                        onClick={handleDateSelection}
-                        variant="secondary"
-                        title="Next day"
-                        spacing="sm"
-                    >
-                        <IoChevronForwardSharp />
-                    </Button>
+                    {windowWidth >= 900 && (
+                        <>
+                            <Button
+                                name={addDays(selectedDate, -1)}
+                                onClick={handleDateSelection}
+                                variant="secondary"
+                                title="Previous day"
+                                spacing="sm"
+                            >
+                                <IoChevronBackSharp />
+                            </Button>
+                            <Button
+                                name={addDays(selectedDate, 1)}
+                                onClick={handleDateSelection}
+                                variant="secondary"
+                                title="Next day"
+                                spacing="sm"
+                            >
+                                <IoChevronForwardSharp />
+                            </Button>
+                        </>
+                    )}
                     <Button
                         name={undefined}
                         onClick={handleTodaySelection}

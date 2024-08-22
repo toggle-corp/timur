@@ -71,7 +71,7 @@ function Page(props: Props) {
             containerRef.current,
             {
                 mouseSupport: false,
-                velocityThreshold: 5,
+                velocityThreshold: 1,
             },
         );
         const swipeLeftListener = isDefined(onSwipeLeft) ? gesture.on('swipeleft', onSwipeLeft) : undefined;
