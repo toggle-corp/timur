@@ -34,7 +34,7 @@
 
                 &:hover {
                     outline: var(--width-separator-md) solid var(--color-secondary);
-                    outline-offset: var(--spacing-xs);
+                    /* outline-offset: var(--spacing-xs); */
                 }
             }
 

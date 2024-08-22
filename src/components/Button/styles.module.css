@@ -1,5 +1,4 @@
 .button {
-    --color-border: transparent;
     --color-text: inherit;
     --color-background: transparent;
     --font-size: inherit;
@@ -11,7 +10,6 @@
     display: inline-flex;
     position: relative;
     align-items: center;
-    border: var(--width-separator-sm) solid var(--color-border);
     border-radius: var(--border-radius);
     background-color: var(--color-background);
     cursor: var(--cursor);
@@ -81,7 +79,6 @@
     }
 
     &.primary {
-        --color-border: var(--color-primary);
         --color-background: var(--color-primary);
         --color-text: var(--color-text-on-dark);
 
@@ -97,7 +94,6 @@
     }
 
     &.secondary {
-        --color-border: var(--color-quaternary);
         --color-background: var(--color-quaternary);
         --color-text: var(--color-text-light);
 
@@ -114,7 +110,6 @@
     }
 
     &.tertiary {
-        --color-border: transparent;
         --color-background: transparent;
         --color-text: inherit;
         --padding: 0;
@@ -128,7 +123,6 @@
     }
 
     &.tertiary-on-dark {
-        --color-border: transparent;
         --color-background: transparent;
         --color-text: var(--color-text-on-dark);
         --padding: 0;

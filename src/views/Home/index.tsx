@@ -27,13 +27,13 @@ import {
     useQuery,
 } from 'urql';
 
-import SizeContext from '#contexts/size';
 import Button from '#components/Button';
 import Page from '#components/Page';
 import Portal from '#components/Portal';
 import RawInput from '#components/RawInput';
 import FocusContext from '#contexts/focus';
 import NavbarContext from '#contexts/navbar';
+import SizeContext from '#contexts/size';
 import {
     BulkTimeEntryMutation,
     BulkTimeEntryMutationVariables,

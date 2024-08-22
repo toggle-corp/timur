@@ -1,6 +1,6 @@
 .raw-button {
     position: relative;
-    outline-offset: calc(-1 * var(--width-separator-md));
+    margin: 0;
     border: 0;
     background-color: transparent;
     cursor: pointer;
@@ -12,7 +12,7 @@
     &:focus-visible,
     &.focused {
         outline: var(--width-separator-md) solid var(--color-secondary);
-        /* outline-offset: calc(-1 * var(--width-separator-md)); */
+        /* outline-offset: var(--width-separator-md); */
     }
 }
 
