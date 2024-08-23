@@ -11,6 +11,7 @@ import {
 import {
     encodeDate,
     isNotDefined,
+    listToMap,
 } from '@togglecorp/fujs';
 
 import { isCallable } from '#utils/common';
@@ -20,10 +21,10 @@ type SearchValueFromUser = string | number | boolean | Date | undefined | null;
 
 type ValueOrSetter<VALUE> = VALUE | ((prevValue: VALUE) => VALUE);
 
-function useUrlQueryState<VALUE>(
-    key: string,
-    deserialize: (value: SearchValueFromUrl) => VALUE,
-    serialize: (value: VALUE) => SearchValueFromUser,
+function useUrlSearchState<VALUE, KEY extends string>(
+    keys: KEY[],
+    deserialize: (valueFromUrl: Record<KEY, SearchValueFromUrl>) => VALUE,
+    serialize: (value: VALUE) => Record<KEY, SearchValueFromUser>,
     navigateOptions: NavigateOptions = { replace: true },
 ) {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -44,7 +45,22 @@ function useUrlQueryState<VALUE>(
         [deserialize],
     );
 
-    const potentialValue = searchParams.get(key);
+    const getValues = useCallback(
+        (currentKeys: KEY[], currentUrlParams: URLSearchParams) => (
+            listToMap(
+                currentKeys,
+                (key) => key,
+                (key) => currentUrlParams.get(key),
+            )
+        ),
+        [],
+    );
+
+    const potentialValue = useMemo(
+        () => getValues(keys, searchParams),
+        [keys, searchParams, getValues],
+    );
+
     const value = useMemo(
         () => deserializerRef.current(potentialValue),
         [potentialValue],
@@ -55,37 +71,46 @@ function useUrlQueryState<VALUE>(
             setSearchParams(
                 (prevParams) => {
                     const encodedValue = isCallable(newValueOrGetNewValue)
-                        ? newValueOrGetNewValue(deserializerRef.current(prevParams.get(key)))
+                        ? newValueOrGetNewValue(
+                            deserializerRef.current(getValues(keys, prevParams)),
+                        )
                         : newValueOrGetNewValue;
 
                     const newValue = serializerRef.current(encodedValue);
-                    if (isNotDefined(newValue)) {
-                        prevParams.delete(key);
-                    } else {
-                        let serializedValue: string;
 
-                        if (typeof newValue === 'number') {
-                            serializedValue = String(newValue);
-                        } else if (typeof newValue === 'boolean') {
-                            serializedValue = newValue ? 'true' : 'false';
-                        } else if (newValue instanceof Date) {
-                            serializedValue = encodeDate(newValue);
-                        } else {
-                            serializedValue = newValue;
-                        }
+                    (Object.keys(newValue) as KEY[]).forEach(
+                        (newValueKey) => {
+                            const newParamValue = newValue[newValueKey];
 
-                        prevParams.set(key, serializedValue);
-                    }
+                            if (isNotDefined(newParamValue)) {
+                                prevParams.delete(newValueKey);
+                            } else {
+                                let serializedValue: string;
+
+                                if (typeof newParamValue === 'number') {
+                                    serializedValue = String(newParamValue);
+                                } else if (typeof newParamValue === 'boolean') {
+                                    serializedValue = newValue ? 'true' : 'false';
+                                } else if (newParamValue instanceof Date) {
+                                    serializedValue = encodeDate(newParamValue);
+                                } else {
+                                    serializedValue = newParamValue;
+                                }
+
+                                prevParams.set(newValueKey, serializedValue);
+                            }
+                        },
+                    );
 
                     return prevParams;
                 },
                 navigateOptions,
             );
         },
-        [setSearchParams, key, navigateOptions],
+        [setSearchParams, keys, getValues, navigateOptions],
     );
 
     return [value, setValue] as const;
 }
 
-export default useUrlQueryState;
+export default useUrlSearchState;

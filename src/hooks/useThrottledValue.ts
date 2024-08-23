@@ -3,7 +3,6 @@ import {
     useRef,
     useState,
 } from 'react';
-
 import { isDefined } from '@togglecorp/fujs';
 
 function useThrottledValue<T>(
@@ -27,10 +26,10 @@ function useThrottledValue<T>(
 
     useEffect(() => {
         if (isDefined(idleCallbackRef.current)) {
-            return undefined;
+            return;
         }
 
-        idleCallbackRef.current  = window.requestIdleCallback(
+        idleCallbackRef.current = window.requestIdleCallback(
             () => {
                 setThrottledValue(latestValue.current);
 
@@ -40,13 +39,11 @@ function useThrottledValue<T>(
         );
     }, [input, throttleTime]);
 
-    useEffect(() => {
-        return () => {
-            if (idleCallbackRef.current) {
-                window.cancelIdleCallback(idleCallbackRef.current);
-                idleCallbackRef.current = undefined;
-            }
-        };
+    useEffect(() => () => {
+        if (idleCallbackRef.current) {
+            window.cancelIdleCallback(idleCallbackRef.current);
+            idleCallbackRef.current = undefined;
+        }
     }, []);
 
     return throttleValue;

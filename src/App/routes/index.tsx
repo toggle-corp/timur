@@ -47,7 +47,7 @@ const home = customWrapRoute({
     wrapperComponent: Auth,
     context: {
         title: 'Home',
-        visibility: 'is-authenticated',
+        visibility: 'anything',
     },
 });
 

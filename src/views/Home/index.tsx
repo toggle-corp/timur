@@ -1,3 +1,8 @@
+import {
+    IoBookOutline,
+    IoDesktopOutline,
+} from 'react-icons/io5';
+
 import Link from '#components/Link';
 import Page from '#components/Page';
 
@@ -11,12 +16,22 @@ export function Component() {
             className={styles.home}
             contentClassName={styles.mainContent}
         >
-            <Link to="dailyJournal">
-                Goto daily Journal
-            </Link>
-            <Link to="dailyStandup">
-                Daily standup
-            </Link>
+            <div className={styles.quickLinks}>
+                <Link
+                    linkElementClassName={styles.link}
+                    to="dailyJournal"
+                    icons={<IoBookOutline className={styles.icon} />}
+                >
+                    Daily Journal
+                </Link>
+                <Link
+                    to="dailyStandup"
+                    linkElementClassName={styles.link}
+                    icons={<IoDesktopOutline className={styles.icon} />}
+                >
+                    Daily standup
+                </Link>
+            </div>
         </Page>
     );
 }

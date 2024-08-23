@@ -1,8 +1,22 @@
 .home {
     .main-content {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-md);
+        .quick-links {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: var(--spacing-xl);
+
+            .link {
+                flex-direction: column;
+                font-size: var(--font-size-lg);
+                padding: var(--spacing-md);
+
+                .icon {
+                    font-size: 8rem;
+                }
+            }
+        }
     }
 }
 

@@ -1,6 +1,6 @@
 import {
     useCallback,
-    useLayoutEffect,
+    useEffect,
     useMemo,
     useRef,
     useState,
@@ -100,9 +100,10 @@ const router = createBrowserRouter(unwrappedRoutes);
 function App() {
     const [userAuth, setUserAuth] = useState<UserAuth>();
     const [size, setSize] = useState<SizeContextProps>(getWindowSize);
+    const [ready, setReady] = useState(false);
     const [storageState, setStorageState] = useState<LocalStorageContextProps['storageState']>({});
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         Object.keys(storageState).forEach((key) => {
             setToStorage(key, storageState[key].value);
         });
@@ -110,7 +111,7 @@ function App() {
 
     const debouncedSize = useThrottledValue(size);
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         function handleResize() {
             setSize(getWindowSize());
         }
@@ -125,9 +126,14 @@ function App() {
     const [meResult] = useQuery<MeQuery, MeQueryVariables>(
         { query: ME_QUERY },
     );
-    useLayoutEffect(() => {
+
+    useEffect(() => {
+        if (meResult.fetching) {
+            return;
+        }
         setUserAuth(meResult.data?.public.me ?? undefined);
-    }, [meResult.data]);
+        setReady(true);
+    }, [meResult.data, meResult.fetching]);
 
     const [enumsResult] = useQuery<EnumsQuery, EnumsQueryVariables>(
         { query: ENUMS_QUERY },
@@ -193,7 +199,7 @@ function App() {
         </div>
     );
 
-    if (meResult.fetching) {
+    if (!ready) {
         return fallbackElement;
     }
 

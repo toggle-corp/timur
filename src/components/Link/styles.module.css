@@ -46,7 +46,7 @@
         text-decoration: var(--decoration);
 
         &:focus-visible {
-            outline: var(--width-separator-sm) dashed var(--color-separator);
+            outline: var(--width-separator-md) solid var(--color-secondary);
         }
     }
 

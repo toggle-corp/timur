@@ -26,6 +26,7 @@ import {
 } from '#generated/types/graphql';
 import useUrlQueryState from '#hooks/useUrlQueryState';
 
+import EndSection from './EndSection';
 import ProjectStandup from './ProjectStandup';
 
 import styles from './styles.module.css';
@@ -49,7 +50,11 @@ function getFormattedDaysRemaining(numDays: number) {
         return 'Tomorrow';
     }
 
-    return `In ${numDays} days`;
+    if (numDays === -1) {
+        return 'Yesterday';
+    }
+
+    return numDays < 0 ? `${numDays} days ago` : `In ${numDays} days`;
 }
 
 const ALL_PROJECTS_QUERY = gql`
@@ -101,31 +106,13 @@ export function Component() {
         query: ALL_PROJECTS_QUERY,
     });
 
-    const [currentProjectId, setCurrentProjectId] = useUrlQueryState<string | undefined>(
-        'project',
-        (value) => {
-            if (isNotDefined(value)) {
-                return undefined;
-            }
-
-            return value;
-        },
+    type UrlQueryKey = 'project' | 'page';
+    const [
+        urlQuery,
+        setUrlQuery,
+    ] = useUrlQueryState<Record<UrlQueryKey, string | null | undefined>, UrlQueryKey>(
+        ['project', 'page'],
         (value) => value,
-    );
-
-    const [currentPage, setCurrentPage] = useUrlQueryState<'everyone' | 'end' | undefined>(
-        'page',
-        (value) => {
-            if (isNotDefined(value)) {
-                return undefined;
-            }
-
-            if (value === 'everyone' || value === 'end') {
-                return value;
-            }
-
-            return undefined;
-        },
         (value) => value,
     );
 
@@ -142,12 +129,12 @@ export function Component() {
                 prev: undefined,
                 next: allProjectsData[0].id,
             },
-            everyone: {
+            misc: {
                 prev: allProjectsData[allProjectsData.length - 1].id,
                 next: 'end',
             },
             end: {
-                prev: 'everyone',
+                prev: 'misc',
                 next: undefined,
             },
         };
@@ -155,7 +142,7 @@ export function Component() {
         return allProjectsData.reduce(
             (acc, val, index) => {
                 const currentMap = {
-                    next: index === (allProjectsData.length - 1) ? 'everyone' : allProjectsData[index + 1].id,
+                    next: index === (allProjectsData.length - 1) ? 'misc' : allProjectsData[index + 1].id,
                     prev: index === 0 ? 'start' : allProjectsData[index - 1].id,
                 };
 
@@ -168,30 +155,37 @@ export function Component() {
     }, [allProjectsResponse?.data]);
 
     const updatePage = useCallback((pageId: string | undefined) => {
-        console.info(pageId);
-
         if (pageId === 'start') {
-            setCurrentPage(undefined);
-            setCurrentProjectId(undefined);
+            setUrlQuery({
+                project: undefined,
+                page: undefined,
+            });
             return;
         }
 
-        if (pageId === 'everyone') {
-            setCurrentPage('everyone');
-            setCurrentProjectId(undefined);
+        if (pageId === 'misc') {
+            setUrlQuery({
+                project: undefined,
+                page: 'misc',
+            });
             return;
         }
 
         if (pageId === 'end') {
-            setCurrentPage('end');
-            setCurrentProjectId(undefined);
+            setUrlQuery({
+                project: undefined,
+                page: 'end',
+            });
             return;
         }
 
-        setCurrentProjectId(pageId);
-    }, [setCurrentProjectId, setCurrentPage]);
+        setUrlQuery({
+            project: pageId,
+            page: undefined,
+        });
+    }, [setUrlQuery]);
 
-    const mapId = currentPage ?? currentProjectId;
+    const mapId = urlQuery.page ?? urlQuery.project;
     const prevButtonName = isDefined(mapId) ? projectsMap?.[mapId]?.prev : undefined;
     const prevButtonDisabled = isNotDefined(mapId) || isNotDefined(projectsMap?.[mapId]?.prev);
 
@@ -209,7 +203,7 @@ export function Component() {
             contentClassName={styles.pageContent}
         >
             <div className={styles.content}>
-                {isNotDefined(currentProjectId) && (
+                {isNotDefined(mapId) && (
                     <section className={styles.welcomeSection}>
                         <header className={styles.welcomeHeader}>
                             <div className={styles.welcomeLabel}>
@@ -282,11 +276,24 @@ export function Component() {
                         </section>
                     </section>
                 )}
-                {isDefined(currentProjectId) && (
+                {isNotDefined(urlQuery.page) && isDefined(urlQuery.project) && (
                     <ProjectStandup
                         className={styles.projectStandup}
                         date={selectedDate}
-                        projectId={currentProjectId}
+                        projectId={urlQuery.project}
+                    />
+                )}
+                {urlQuery.page === 'misc' && (
+                    <div className={styles.miscSection}>
+                        <h2 className={styles.miscHeading}>
+                            Miscellaneous
+                        </h2>
+                    </div>
+                )}
+                {urlQuery.page === 'end' && (
+                    <EndSection
+                        date={selectedDate}
+                        className={styles.endSection}
                     />
                 )}
             </div>

@@ -68,12 +68,12 @@ function ProjectStandup(props: Props) {
         className,
     } = props;
 
-    const [standup] = useQuery<DailyStandupQuery, DailyStandupQueryVariables>({
+    const [standupResponse] = useQuery<DailyStandupQuery, DailyStandupQueryVariables>({
         query: DAILY_STANDUP_QUERY,
         variables: { date, projectId },
     });
 
-    const stats = standup.data?.private.dailyStandup.projectStat;
+    const stats = standupResponse.data?.private.dailyStandup.projectStat;
 
     return (
         <div className={_cs(styles.projectStandup, className)}>

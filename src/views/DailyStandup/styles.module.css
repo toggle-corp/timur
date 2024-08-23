@@ -11,51 +11,51 @@
             display: flex;
             flex-direction: column;
             flex-grow: 1;
-            overflow: auto;
             border: var(--width-separator-sm) solid var(--color-primary);
+            overflow: auto;
 
             .welcome-section {
-                flex-grow: 1;
                 display: flex;
+                flex-grow: 1;
 
                 .welcome-header {
                     display: flex;
-                    flex-direction: column;
-                    justify-content: center;
                     flex-basis: 50%;
-                    flex-shrink: 0;
+                    flex-direction: column;
                     flex-grow: 0;
-                    gap: var(--spacing-md);
+                    flex-shrink: 0;
+                    justify-content: center;
                     padding: var(--spacing-xl);
+                    gap: var(--spacing-md);
 
                     .welcome-label {
                         font-size: var(--font-size-xl);
                     }
 
                     .welcome-heading {
+                        color: var(--color-primary);
                         font-size: var(--font-size-4xl);
                         font-weight: var(--font-weight-light);
-                        color: var(--color-primary);
                     }
 
                     .date {
-                        font-size: var(--font-size-xl);
                         color: var(--color-text-light);
+                        font-size: var(--font-size-xl);
                     }
                 }
 
                 .deadline-section {
+                    display: flex;
+                    flex-direction: column;
                     flex-grow: 1;
                     background-color: var(--color-foreground);
                     padding: var(--spacing-xl);
-                    display: flex;
-                    flex-direction: column;
                     gap: var(--spacing-lg);
 
                     .deadline-heading {
+                        color: var(--color-secondary);
                         font-size: var(--font-size-2xl);
                         font-weight: var(--font-weight-normal);
-                        color: var(--color-secondary);
                     }
 
                     .project-list {
@@ -87,8 +87,8 @@
                                     gap: var(--spacing-2xs);
 
                                     .d-day {
-                                        font-weight: var(--font-weight-bold);
                                         color: var(--color-text-light);
+                                        font-weight: var(--font-weight-bold);
 
                                         &:before {
                                             content: '- '
@@ -106,6 +106,23 @@
             }
 
             .project-standup {
+                flex-grow: 1;
+            }
+
+            .misc-section {
+                display: flex;
+                align-items: center;
+                flex-grow: 1;
+                justify-content: center;
+
+                .misc-heading {
+                    color: var(--color-primary);
+                    font-size: var(--font-size-4xl);
+                    font-weight: var(--font-weight-light);
+                }
+            }
+
+            .end-section {
                 flex-grow: 1;
             }
         }
