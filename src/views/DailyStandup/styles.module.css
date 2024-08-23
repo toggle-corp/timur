@@ -1,0 +1,119 @@
+.daily-standup {
+    overflow: auto;
+
+    .page-content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-lg);
+        overflow: auto;
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            overflow: auto;
+            border: var(--width-separator-sm) solid var(--color-primary);
+
+            .welcome-section {
+                flex-grow: 1;
+                display: flex;
+
+                .welcome-header {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    flex-basis: 50%;
+                    flex-shrink: 0;
+                    flex-grow: 0;
+                    gap: var(--spacing-md);
+                    padding: var(--spacing-xl);
+
+                    .welcome-label {
+                        font-size: var(--font-size-xl);
+                    }
+
+                    .welcome-heading {
+                        font-size: var(--font-size-4xl);
+                        font-weight: var(--font-weight-light);
+                        color: var(--color-primary);
+                    }
+
+                    .date {
+                        font-size: var(--font-size-xl);
+                        color: var(--color-text-light);
+                    }
+                }
+
+                .deadline-section {
+                    flex-grow: 1;
+                    background-color: var(--color-foreground);
+                    padding: var(--spacing-xl);
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--spacing-lg);
+
+                    .deadline-heading {
+                        font-size: var(--font-size-2xl);
+                        font-weight: var(--font-weight-normal);
+                        color: var(--color-secondary);
+                    }
+
+                    .project-list {
+                        display: flex;
+                        flex-direction: column;
+                        gap: var(--spacing-md);
+
+                        .project {
+                            display: flex;
+                            flex-direction: column;
+                            gap: var(--spacing-sm);
+
+                            .project-header {
+                                display: flex;
+                                gap: var(--spacing-sm);
+
+                                .project-dp {
+                                    font-size: var(--font-size-lg);
+                                }
+                            }
+
+                            .deadline-list {
+                                display: flex;
+                                flex-direction: column;
+                                gap: var(--spacing-xs);
+
+                                .deadline {
+                                    display: flex;
+                                    gap: var(--spacing-2xs);
+
+                                    .d-day {
+                                        font-weight: var(--font-weight-bold);
+                                        color: var(--color-text-light);
+
+                                        &:before {
+                                            content: '- '
+                                        }
+
+                                        &:after {
+                                            content: ':'
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            .project-standup {
+                flex-grow: 1;
+            }
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--spacing-sm);
+        }
+    }
+}

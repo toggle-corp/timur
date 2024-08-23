@@ -53,6 +53,10 @@
 
         &.checkbox-for-status {
             grid-template-columns: 1rem 1fr;
+
+            &.with-icons {
+                grid-template-columns: 1rem 1fr;
+            }
         }
 
         .compact-options {

@@ -28,8 +28,8 @@
     --font-size-lg: calc(var(--base-font-size) * 1.25);
     --font-size-xl: calc(var(--base-font-size) * 1.44);
     --font-size-2xl: calc(var(--base-font-size) * 1.8);
-    --font-size-3xl: calc(var(--base-font-size) * 2.25);
-    --font-size-4xl: calc(var(--base-font-size) * 3);
+    --font-size-3xl: calc(var(--base-font-size) * 2.5);
+    --font-size-4xl: calc(var(--base-font-size) * 3.6);
 
     @media screen and (max-width: 40rem) {
         --font-size-2xs: calc(var(--base-font-size) * 0.625);
@@ -153,8 +153,8 @@ ul, ol, p {
 
 h1, h2, h3, h4, h5, h6 {
     margin: 0;
-    line-height: 1;
-    font-weight: var(--font-weight-bold);
+    line-height: 1.25;
+    font-weight: var(--font-weight-semibold);
 }
 
 p {

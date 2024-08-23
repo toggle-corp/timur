@@ -13,18 +13,14 @@ import {
     isNotDefined,
 } from '@togglecorp/fujs';
 
+import { isCallable } from '#utils/common';
+
 type SearchValueFromUrl = string | null | undefined;
 type SearchValueFromUser = string | number | boolean | Date | undefined | null;
 
 type ValueOrSetter<VALUE> = VALUE | ((prevValue: VALUE) => VALUE);
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Func = (...args:any[]) => any;
-function isCallable<T, X extends Func>(value: T | X): value is X {
-    return typeof value === 'function';
-}
-
-function useUrlSearchState<VALUE>(
+function useUrlQueryState<VALUE>(
     key: string,
     deserialize: (value: SearchValueFromUrl) => VALUE,
     serialize: (value: VALUE) => SearchValueFromUser,
@@ -92,4 +88,4 @@ function useUrlSearchState<VALUE>(
     return [value, setValue] as const;
 }
 
-export default useUrlSearchState;
+export default useUrlQueryState;

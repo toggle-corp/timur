@@ -51,6 +51,34 @@ const home = customWrapRoute({
     },
 });
 
+const dailyJournal = customWrapRoute({
+    parent: rootLayout,
+    path: 'daily-journal/:date?',
+    component: {
+        render: () => import('#views/DailyJournal'),
+        props: {},
+    },
+    wrapperComponent: Auth,
+    context: {
+        title: 'Daily Journal',
+        visibility: 'is-authenticated',
+    },
+});
+
+const dailyStandup = customWrapRoute({
+    parent: rootLayout,
+    path: 'daily-standup/:date?',
+    component: {
+        render: () => import('#views/DailyStandup'),
+        props: {},
+    },
+    wrapperComponent: Auth,
+    context: {
+        title: 'Daily Standup',
+        visibility: 'is-authenticated',
+    },
+});
+
 const settings = customWrapRoute({
     parent: rootLayout,
     path: 'settings',
@@ -70,6 +98,8 @@ const wrappedRoutes = {
     rootLayout,
     login,
     home,
+    dailyJournal,
+    dailyStandup,
     settings,
 };
 
