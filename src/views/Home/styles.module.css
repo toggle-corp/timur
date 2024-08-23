@@ -3,14 +3,14 @@
         .quick-links {
             display: flex;
             align-items: center;
-            justify-content: center;
             flex-wrap: wrap;
+            justify-content: center;
             gap: var(--spacing-xl);
 
             .link {
                 flex-direction: column;
-                font-size: var(--font-size-lg);
                 padding: var(--spacing-md);
+                font-size: var(--font-size-lg);
 
                 .icon {
                     font-size: 8rem;

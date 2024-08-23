@@ -4,12 +4,12 @@
     .header {
         display: flex;
         align-items: center;
-        flex-direction: column;
-        justify-content: center;
-        padding: var(--spacing-xl);
         flex-basis: 50%;
+        flex-direction: column;
         flex-grow: 0;
         flex-shrink: 0;
+        justify-content: center;
+        padding: var(--spacing-xl);
         gap: var(--spacing-md);
 
         .logo {
@@ -26,23 +26,23 @@
     }
 
     .content {
-        padding: var(--spacing-xl);
         display: flex;
-        background-color: var(--color-foreground);
         flex-direction: column;
-        gap: var(--spacing-lg);
         flex-grow: 1;
+        background-color: var(--color-foreground);
+        padding: var(--spacing-xl);
+        gap: var(--spacing-lg);
 
         .team-heading {
-            font-size: var(--font-size-2xl);
             color: var(--color-secondary);
+            font-size: var(--font-size-2xl);
             font-weight: var(--font-weight-normal);
         }
 
         .separator {
+            margin: 0;
             border-top: unset;
             border-bottom: var(--width-separator-md) solid var(--color-separator);
-            margin: 0;
         }
 
         .user-list {
@@ -52,8 +52,8 @@
 
             .user {
                 display: flex;
-                gap: var(--spacing-xs);
                 font-size: var(--font-size-lg);
+                gap: var(--spacing-xs);
 
                 .display-picture {
                     font-size: var(--font-size-xl);

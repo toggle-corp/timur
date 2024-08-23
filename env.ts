@@ -6,4 +6,5 @@ export default defineConfig({
     APP_GRAPHQL_CODEGEN_ENDPOINT: Schema.string(),
     APP_GRAPHQL_ENDPOINT: Schema.string(),
     APP_AUTH_URL: Schema.string(),
+    APP_ADMIN_URL: Schema.string(),
 })

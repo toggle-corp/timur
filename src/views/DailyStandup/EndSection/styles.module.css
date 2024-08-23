@@ -6,9 +6,9 @@
     .quote-section {
         display: flex;
         flex-direction: column;
-        gap: var(--spacing-md);
-        max-width: 60rem;
         padding: var(--spacing-xl);
+        max-width: 60rem;
+        gap: var(--spacing-md);
 
         .quote {
             white-space: pre-wrap;
@@ -16,9 +16,9 @@
         }
 
         .author {
-            font-size: var(--font-size-xl);
-            color: var(--color-text-light);
             align-self: end;
+            color: var(--color-text-light);
+            font-size: var(--font-size-xl);
 
             &:before {
                 content: '- '

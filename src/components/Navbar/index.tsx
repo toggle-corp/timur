@@ -5,6 +5,7 @@ import {
 import {
     IoExitOutline,
     IoSettingsOutline,
+    IoShieldCheckmarkOutline,
 } from 'react-icons/io5';
 import {
     _cs,
@@ -126,6 +127,14 @@ function Navbar(props: Props) {
                         <div className={styles.greetings}>
                             {`Hello ${userAuth.displayName}!`}
                         </div>
+                        <DropdownMenuItem
+                            type="link"
+                            external
+                            href={import.meta.env.APP_ADMIN_URL}
+                            icons={<IoShieldCheckmarkOutline />}
+                        >
+                            Admin Panel
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                             type="link"
                             to="settings"

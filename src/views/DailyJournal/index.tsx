@@ -151,7 +151,10 @@ export function Component() {
         return encodeDate(date);
     }, [dateFromParams]);
 
-    const setSelectedDate = useCallback((newDate: string) => {
+    const setSelectedDate = useCallback((newDateStr: string | undefined) => {
+        const today = encodeDate(new Date());
+        const newDate = newDateStr === today ? undefined : newDateStr;
+
         const { resolvedPath } = resolvePath('dailyJournal', routes, { date: newDate });
         if (isNotDefined(resolvedPath)) {
             return;
@@ -159,6 +162,28 @@ export function Component() {
 
         navigate(resolvedPath);
     }, [routes, navigate]);
+
+    const getNextDay = useCallback(() => {
+        const today = encodeDate(new Date());
+        const nextDay = addDays(selectedDate, 1);
+
+        if (today === nextDay) {
+            return undefined;
+        }
+
+        return nextDay;
+    }, [selectedDate]);
+
+    const getPrevDay = useCallback(() => {
+        const today = encodeDate(new Date());
+        const prevDay = addDays(selectedDate, -1);
+
+        if (today === prevDay) {
+            return undefined;
+        }
+
+        return prevDay;
+    }, [selectedDate]);
 
     // NOTE: We are hiding the native dateinput and triggering calender popup
     // using a separate button
@@ -511,9 +536,7 @@ export function Component() {
 
     const handleDateSelection = useCallback(
         (newDate: string | undefined) => {
-            if (isDefined(newDate)) {
-                setSelectedDate(newDate);
-            }
+            setSelectedDate(newDate);
         },
         [setSelectedDate],
     );
@@ -576,7 +599,7 @@ export function Component() {
                         <>
                             <Link
                                 to="dailyJournal"
-                                urlParams={{ date: addDays(selectedDate, -1) }}
+                                urlParams={{ date: getPrevDay() }}
                                 variant="secondary"
                                 title="Previous day"
                                 spacing="sm"
@@ -585,7 +608,7 @@ export function Component() {
                             </Link>
                             <Link
                                 to="dailyJournal"
-                                urlParams={{ date: addDays(selectedDate, 1) }}
+                                urlParams={{ date: getNextDay() }}
                                 variant="secondary"
                                 title="Next day"
                                 spacing="sm"
@@ -601,7 +624,7 @@ export function Component() {
                             className={styles.dateInput}
                             name={undefined}
                             value={selectedDate}
-                            onChange={handleDateSelection}
+                            onChange={setSelectedDate}
                         />
                         <Button
                             className={styles.dateButton}

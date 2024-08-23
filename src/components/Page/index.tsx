@@ -19,6 +19,7 @@ import Button from '#components/Button';
 import Portal from '#components/Portal';
 import NavbarContext from '#contexts/navbar';
 import SizeContext from '#contexts/size';
+import useDebouncedValue from '#hooks/useDebouncedValue';
 import useLocalStorage from '#hooks/useLocalStorage';
 import useSetFieldValue from '#hooks/useSetFieldValue';
 import {
@@ -110,12 +111,17 @@ function Page(props: Props) {
         };
     }, [onSwipeLeft, onSwipeRight]);
 
+    const debouncedStartSidebarCollapsed = useDebouncedValue(!startSidebarShown, 200);
+    const debouncedEndSidebarCollapsed = useDebouncedValue(!endSidebarShown, 200);
+
     return (
         <div
             ref={containerRef}
             className={_cs(
                 styles.page,
                 !startSidebarShown && styles.startSidebarCollapsed,
+                debouncedStartSidebarCollapsed && styles.debouncedStartSidebarCollapsed,
+                debouncedEndSidebarCollapsed && styles.debouncedEndSidebarCollapsed,
                 (!endSidebarShown || width <= 900) && styles.endSidebarCollapsed,
                 startSidebarShown && !!startAsideContent && styles.startSidebarVisible,
                 endSidebarShown
