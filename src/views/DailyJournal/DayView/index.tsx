@@ -38,9 +38,9 @@ const dateFormatter = new Intl.DateTimeFormat(
     [],
     {
         year: 'numeric',
-        month: 'long',
+        month: 'short',
         day: 'numeric',
-        weekday: 'long',
+        weekday: 'short',
     },
 );
 
@@ -149,6 +149,7 @@ function DayView(props: Props) {
             <header className={styles.header}>
                 <h2 className={styles.heading}>
                     {formattedDate}
+                    {' '}
                     <span className={styles.relativeDate}>
                         {`(${formattedRelativeDate})`}
                     </span>

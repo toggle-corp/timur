@@ -11,11 +11,14 @@
 
         .heading {
             display: flex;
+            align-items: baseline;
             flex-grow: 1;
-            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+            gap: 0 var(--spacing-sm);
 
             .relative-date {
                 color: var(--color-text-light);
+                font-size: var(--font-size-md);
                 font-weight: var(--font-weight-normal);
             }
         }
@@ -34,6 +37,8 @@
             }
 
             @media screen and (max-width: 900px) {
+                flex-grow: 1;
+                justify-content: flex-end;
                 padding: unset;
                 width: unset;
 

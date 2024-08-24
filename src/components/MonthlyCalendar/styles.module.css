@@ -5,8 +5,8 @@
 
     .day-name {
         text-align: center;
-        font-size: var(--font-size-sm);
         color: var(--color-text-light);
+        font-size: var(--font-size-sm);
     }
 
     .date {
