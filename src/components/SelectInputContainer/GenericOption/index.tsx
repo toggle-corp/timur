@@ -11,7 +11,7 @@ import styles from './styles.module.css';
 
 export interface ContentBaseProps {
     containerClassName?: string;
-    title?: string;
+    title: string;
 }
 export type OptionKey = string | number;
 

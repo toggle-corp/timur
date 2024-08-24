@@ -211,6 +211,7 @@ function WorkItemRow(props: Props) {
                 withoutDropdownIcon
                 variant="tertiary"
                 persistent
+                title="Show additional entry options"
             >
                 <DropdownMenuItem
                     type="confirm-button"

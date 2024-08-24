@@ -202,6 +202,9 @@ devDependencies:
   vitest:
     specifier: ^1.2.2
     version: 1.2.2(@types/node@20.11.6)
+  workbox-window:
+    specifier: ^7.1.0
+    version: 7.1.0
 
 packages:
 
@@ -1633,15 +1636,6 @@ packages:
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
-    dev: true
-
-  /@babel/types@7.24.9:
-    resolution: {integrity: sha512-xm8XrMKz0IlUdocVbYJe0Z9xEgidU7msskG8BbhnTPK/HZ2z/7FP7ykqPgrUH+C+r414mNfNWam1f2vqOjqjYQ==}
-    engines: {node: '>=6.9.0'}
-    dependencies:
-      '@babel/helper-string-parser': 7.24.8
-      '@babel/helper-validator-identifier': 7.24.7
-      to-fast-properties: 2.0.0
     dev: true
 
   /@babel/types@7.25.2:
@@ -7552,7 +7546,7 @@ packages:
     resolution: {integrity: sha512-TyDF/Pn36bBji9rWKHlZe+PZb6Mx5V8IHCSxk7X4aljM4e/vyDvZZYwHewdVaqiA0nb3ghfHU/6AUpDxWoER2Q==}
     dependencies:
       '@babel/parser': 7.25.3
-      '@babel/types': 7.24.9
+      '@babel/types': 7.25.2
       source-map-js: 1.2.0
     dev: true
 

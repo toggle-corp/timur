@@ -86,7 +86,8 @@
         "vite-plugin-svgr": "^4.2.0",
         "vite-plugin-webfont-dl": "^3.9.4",
         "vite-tsconfig-paths": "^4.2.2",
-        "vitest": "^1.2.2"
+        "vitest": "^1.2.2",
+        "workbox-window": "^7.1.0"
     },
     "packageManager": "pnpm@8.6.0+sha1.71f9126a20cd3d00fa47c188f956918858180e54"
 }

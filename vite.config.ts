@@ -1,5 +1,5 @@
 import { ValidateEnv as validateEnv } from '@julr/vite-plugin-validate-env';
-import { defineConfig, loadEnv } from 'vite';
+import { type HtmlTagDescriptor, defineConfig, loadEnv } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import webfontDownload from 'vite-plugin-webfont-dl';
 import reactSwc from '@vitejs/plugin-react-swc';
@@ -15,6 +15,30 @@ import envConfig from './env';
 
 /* Get commit hash */
 const commitHash = execSync('git rev-parse --short HEAD').toString();
+
+function umamiPlugin(options: { id: string | undefined, src: string | undefined }) {
+    return {
+        name: "html-transform",
+        transformIndexHtml: () => {
+            if (!options.id || !options.src) {
+                console.warn('Umami src and id not set.');
+                return [];
+            }
+            const tags: HtmlTagDescriptor[] = [
+                {
+                    tag: 'script',
+                    attrs: {
+                        'async': true,
+                        'defer': true,
+                        'data-website-id': options.id,
+                        'src': options.src,
+                    },
+                }
+            ];
+            return tags;
+        },
+    };
+};
 
 export default defineConfig(({ mode }) => {
     const isProd = mode === 'production';
@@ -37,10 +61,14 @@ export default defineConfig(({ mode }) => {
                     lintCommand: 'stylelint "./src/**/*.css"',
                 },
             }) : undefined,
+            isProd ? umamiPlugin({
+                id: env.APP_UMAMI_ID,
+                src: env.APP_UMAMI_SRC,
+            }) : undefined,
             VitePWA({
                 // buildBase: './build/',
                 strategies: 'generateSW',
-                registerType: 'prompt',
+                registerType: 'autoUpdate',
                 injectRegister: 'script',
                 devOptions: { enabled: false },
                 includeAssets: ['app-icon.svg'],
@@ -52,10 +80,8 @@ export default defineConfig(({ mode }) => {
                 },
                 workbox: {
                     globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
-                    // cleanupOutdatedCaches: true,
-                    clientsClaim: true,
                     skipWaiting: true,
-                    // swDest: './build',
+                    clientsClaim: true,
                 },
                 pwaAssets: {
                     config: true,

@@ -96,7 +96,7 @@ function Dialog(props: Props) {
                                 className={styles.closeButton}
                                 name={undefined}
                                 onClick={handleCloseButtonClick}
-                                title="Close"
+                                title="Close dialog"
                                 variant="tertiary"
                             >
                                 <IoCloseSharp />

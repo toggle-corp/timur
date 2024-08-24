@@ -9,8 +9,11 @@ import {
     fetchExchange,
     Provider as UrqlProvider,
 } from 'urql';
+import { registerSW } from 'virtual:pwa-register';
 
 import App from './App/index.tsx';
+
+registerSW({ immediate: true });
 
 const webappRootId = 'webapp-root';
 const webappRootElement = document.getElementById(webappRootId);

@@ -30,5 +30,5 @@
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true
     },
-    "include": ["src", "env.ts"]
+    "include": ["src", "env.ts", "node_modules/vite-plugin-pwa/client.d.ts"]
 }

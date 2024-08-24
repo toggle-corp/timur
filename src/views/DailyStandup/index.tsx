@@ -199,7 +199,7 @@ export function Component() {
     return (
         <Page
             className={styles.dailyStandup}
-            documentTitle="Timur - DailyStandup"
+            documentTitle="Timur - Daily Standup"
             contentClassName={styles.pageContent}
         >
             <div className={styles.content}>
@@ -304,6 +304,7 @@ export function Component() {
                     variant="secondary"
                     disabled={prevButtonDisabled}
                     icons={<IoChevronBack />}
+                    title="Previous standup slide"
                 >
                     Prev
                 </Button>
@@ -313,6 +314,7 @@ export function Component() {
                     variant="secondary"
                     disabled={nextButtonDisabled}
                     actions={<IoChevronForward />}
+                    title="Next standup slide"
                 >
                     Next
                 </Button>

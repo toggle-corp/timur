@@ -123,6 +123,7 @@ function Navbar(props: Props) {
                                 displayName={userAuth.displayName}
                             />
                         )}
+                        title="Show user actions"
                     >
                         <div className={styles.greetings}>
                             {`Hello ${userAuth.displayName}!`}
@@ -148,6 +149,7 @@ function Navbar(props: Props) {
                             onClick={handleLogoutClick}
                             disabled={fetching}
                             icons={<IoExitOutline />}
+                            title="Sign out"
                         >
                             Sign out
                         </DropdownMenuItem>
