@@ -343,7 +343,7 @@ function SelectInputContainer<
                                 disabled={disabled}
                                 variant="tertiary"
                                 name={undefined}
-                                title="Clear all"
+                                title="Clear all options"
                             >
                                 <IoCloseSharp className={styles.icon} />
                             </Button>

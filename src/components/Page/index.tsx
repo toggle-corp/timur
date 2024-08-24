@@ -138,6 +138,7 @@ function Page(props: Props) {
                         onClick={handleStartSidebarToggle}
                         className={styles.toggleCollapsedButton}
                         variant="tertiary"
+                        title="Toggle left pane"
                     >
                         <IoMenu className={styles.sidebarIcon} />
                     </Button>
@@ -159,6 +160,7 @@ function Page(props: Props) {
                         name={!endSidebarShown}
                         onClick={handleEndSidebarToggle}
                         variant="tertiary"
+                        title="Toggle right pane"
                     >
                         <IoList className={styles.sidebarIcon} />
                     </Button>

@@ -120,6 +120,7 @@ function AddWorkItemDialog(props: Props) {
                             name={task.id}
                             onClick={handleWorkItemCreate}
                             key={task.id}
+                            title={`Add entry for "${task.name}" from dialog`}
                         >
                             <DisplayPicture
                                 className={styles.displayPicture}

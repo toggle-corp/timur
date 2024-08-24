@@ -136,6 +136,7 @@ function StartSidebar(props: Props) {
                     onClick={handleCopyTextButtonClick}
                     variant="secondary"
                     disabled={workItems.length === 0}
+                    title="Copy standup text"
                 >
                     Copy standup text
                 </Button>

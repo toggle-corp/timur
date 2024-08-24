@@ -627,6 +627,7 @@ export function Component() {
                             onChange={setSelectedDate}
                         />
                         <Button
+                            title="Open calendar"
                             className={styles.dateButton}
                             actionsContainerClassName={styles.buttonActions}
                             name={undefined}
@@ -655,6 +656,7 @@ export function Component() {
                 name={undefined}
                 onClick={handleAddEntryClick}
                 icons={<IoAdd />}
+                title="Add entry"
             >
                 Add entry
             </Button>

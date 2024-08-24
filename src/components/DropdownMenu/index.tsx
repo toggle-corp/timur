@@ -34,6 +34,7 @@ export interface Props {
     } | null>;
     elementRef?: React.RefObject<HTMLButtonElement>;
     persistent?: boolean;
+    title: string;
 }
 
 function DropdownMenu(props: Props) {
@@ -52,6 +53,7 @@ function DropdownMenu(props: Props) {
         elementRef: buttonRef = newButtonRef,
         persistent,
         preferredPopupWidth,
+        title,
     } = props;
 
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -108,6 +110,7 @@ function DropdownMenu(props: Props) {
         <DropdownMenuContext.Provider value={contextValue}>
             <Button
                 name={undefined}
+                title={title}
                 className={_cs(
                     styles.dropdownMenu,
                     showDropdown && activeClassName,

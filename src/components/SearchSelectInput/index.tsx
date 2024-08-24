@@ -23,7 +23,7 @@ import Option from './Option';
 
 import styles from './styles.module.css';
 
-type Def = { containerClassName?: string, title?: string; };
+type Def = { containerClassName?: string, title: string; };
 type OptionKey = string | number;
 
 export type Props<
@@ -122,6 +122,7 @@ function SearchSelectInput<
         onShowDropdownChange,
         hideOptionFilter,
         selectedOnTop,
+        label,
         ...otherProps
     } = props;
 
@@ -251,13 +252,13 @@ function SearchSelectInput<
                     ? descriptionSelector(option)
                     : undefined,
                 containerClassName: _cs(styles.optionContainer, isActive && styles.active),
-                title: labelSelector(option),
+                title: isDefined(label) ? `Select "${label}" option` : "Select select option",
 
                 className: styles.option,
                 iconClassName: styles.icon,
             };
         },
-        [value, labelSelector, descriptionSelector],
+        [label, value, labelSelector, descriptionSelector],
     );
 
     const handleOptionClick = useCallback(
@@ -317,6 +318,7 @@ function SearchSelectInput<
             // eslint-disable-next-line react/jsx-props-no-spreading
             {...otherProps}
             name={name}
+            label={label}
             options={realOptions}
             optionsPending={optionsPending}
             optionsErrored={optionsErrored}

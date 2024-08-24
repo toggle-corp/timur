@@ -11,6 +11,7 @@ import styles from './styles.module.css';
 export interface Props<N> extends ButtonProps<N> {
     confirmHeading: React.ReactNode;
     confirmDescription: React.ReactNode;
+    title: string;
 }
 
 function ConfirmButton<const N>(props: Props<N>) {
@@ -19,6 +20,7 @@ function ConfirmButton<const N>(props: Props<N>) {
         onClick,
         confirmHeading,
         confirmDescription,
+        title,
         ...buttonProps
     } = props;
 
@@ -42,6 +44,7 @@ function ConfirmButton<const N>(props: Props<N>) {
             <Button
                 name={undefined}
                 onClick={handleModalOpen}
+                title={title}
                 // eslint-disable-next-line react/jsx-props-no-spreading
                 {...buttonProps}
             />
@@ -57,6 +60,7 @@ function ConfirmButton<const N>(props: Props<N>) {
                 {confirmDescription}
                 <div className={styles.actions}>
                     <Button
+                        title={`Cancel ${title}`}
                         name={undefined}
                         onClick={handleCancelButtonClick}
                         variant="secondary"
@@ -65,6 +69,7 @@ function ConfirmButton<const N>(props: Props<N>) {
                     </Button>
                     <Button
                         name={name}
+                        title={`Confirm ${title}`}
                         onClick={onClick}
                         variant="primary"
                     >

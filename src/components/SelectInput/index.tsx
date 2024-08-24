@@ -1,7 +1,7 @@
 import SearchSelectInput, { Props as SearchSelectInputProps } from '#components/SearchSelectInput';
 import { rankedSearchOnList } from '#utils/common';
 
-type Def = { containerClassName?: string };
+type Def = { containerClassName?: string, title: string };
 type OptionKey = string | number;
 
 export type Props<
