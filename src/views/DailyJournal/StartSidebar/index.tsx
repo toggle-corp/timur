@@ -136,7 +136,6 @@ function StartSidebar(props: Props) {
             className={styles.startSidebar}
         >
             <MonthlyCalendar
-                className={styles.calendar}
                 year={date.getFullYear()}
                 month={date.getMonth()}
                 onDateClick={setSelectedDate}
@@ -162,6 +161,39 @@ function StartSidebar(props: Props) {
                 <h4>
                     Quick Settings
                 </h4>
+                <SelectInput
+                    name="defaultTaskStatus"
+                    variant="general"
+                    label="Default Entry Status"
+                    options={enums?.enums.TimeEntryStatus}
+                    keySelector={workItemStatusKeySelector}
+                    labelSelector={workItemStatusLabelSelector}
+                    onChange={setConfigFieldValue}
+                    value={storedConfig.defaultTaskStatus}
+                    nonClearable
+                />
+                <SelectInput
+                    name="defaultTaskType"
+                    label="Default Entry Type"
+                    variant="general"
+                    options={enums?.enums.TimeEntryType}
+                    keySelector={workItemTypeKeySelector}
+                    labelSelector={workItemTypeLabelSelector}
+                    onChange={setConfigFieldValue}
+                    value={storedConfig.defaultTaskType}
+                    nonClearable
+                />
+                <SelectInput
+                    name="editingMode"
+                    label="Note Editing Mode"
+                    variant="general"
+                    options={editingOptions}
+                    keySelector={editingOptionKeySelector}
+                    labelSelector={editingOptionLabelSelector}
+                    onChange={setConfigFieldValue}
+                    value={storedConfig.editingMode}
+                    nonClearable
+                />
                 <Checkbox
                     name="showInputIcons"
                     label="Show input icons"
@@ -174,39 +206,6 @@ function StartSidebar(props: Props) {
                     tooltip="Use checkbox instead of select input for the status. i.e. to toggle TODO, Doing and Done"
                     value={storedConfig.checkboxForStatus}
                     onChange={setConfigFieldValue}
-                />
-                <SelectInput
-                    name="defaultTaskStatus"
-                    variant="general"
-                    label="Default Status"
-                    options={enums?.enums.TimeEntryStatus}
-                    keySelector={workItemStatusKeySelector}
-                    labelSelector={workItemStatusLabelSelector}
-                    onChange={setConfigFieldValue}
-                    value={storedConfig.defaultTaskStatus}
-                    nonClearable
-                />
-                <SelectInput
-                    name="defaultTaskType"
-                    label="Default Type"
-                    variant="general"
-                    options={enums?.enums.TimeEntryType}
-                    keySelector={workItemTypeKeySelector}
-                    labelSelector={workItemTypeLabelSelector}
-                    onChange={setConfigFieldValue}
-                    value={storedConfig.defaultTaskType}
-                    nonClearable
-                />
-                <SelectInput
-                    name="editingMode"
-                    label="Editing Mode"
-                    variant="general"
-                    options={editingOptions}
-                    keySelector={editingOptionKeySelector}
-                    labelSelector={editingOptionLabelSelector}
-                    onChange={setConfigFieldValue}
-                    value={storedConfig.editingMode}
-                    nonClearable
                 />
             </div>
         </div>

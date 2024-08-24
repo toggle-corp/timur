@@ -1,21 +1,30 @@
-import { useMemo } from 'react';
+import {
+    useCallback,
+    useMemo,
+    useState,
+} from 'react';
+import {
+    IoChevronBackSharp,
+    IoChevronForwardSharp,
+} from 'react-icons/io5';
 import {
     _cs,
     encodeDate,
 } from '@togglecorp/fujs';
 
+import Button from '#components/Button';
 import RawButton from '#components/RawButton';
 
 import styles from './styles.module.css';
 
 const weekDaysName = [
-    'Sun',
-    'Mon',
-    'Tue',
-    'Wed',
-    'Thu',
-    'Fri',
-    'Sat',
+    'Su',
+    'Mo',
+    'Tu',
+    'We',
+    'Th',
+    'Fr',
+    'Sa',
 ];
 
 interface Day {
@@ -35,13 +44,41 @@ interface Props {
 
 function MonthlyCalendar(props: Props) {
     const {
-        year,
-        month,
+        year: initialYear,
+        month: initialMonth,
         className,
         onDateClick,
         weekDayNameClassName,
         dateClassName,
     } = props;
+
+    const [year, setYear] = useState(initialYear);
+    const [month, setMonth] = useState(initialMonth);
+
+    const handlePrevMonth = useCallback(
+        () => {
+            const newMonth = month - 1;
+            if (newMonth === -1) {
+                setMonth(11);
+                setYear(year - 1);
+            } else {
+                setMonth(newMonth);
+            }
+        },
+        [month, year],
+    );
+    const handleNextMonth = useCallback(
+        () => {
+            const newMonth = month + 1;
+            if (newMonth === 12) {
+                setMonth(0);
+                setYear(year + 1);
+            } else {
+                setMonth(newMonth);
+            }
+        },
+        [month, year],
+    );
 
     const daysInMonth = useMemo(() => {
         // NOTE: getDate() starts at 1
@@ -65,38 +102,65 @@ function MonthlyCalendar(props: Props) {
     }, [year, month]);
 
     return (
-        <div className={_cs(styles.monthlyCalendar, className)}>
-            {weekDaysName.map((dayName, i) => (
-                <div
-                    className={_cs(styles.dayName, weekDayNameClassName)}
-                    key={dayName}
-                    style={{
-                        gridColumnStart: i + 1,
-                        gridRowStart: 1,
-                    }}
-                >
-                    {dayName}
+        <div className={_cs(styles.calendarContainer, className)}>
+            <div className={styles.header}>
+                <div>
+                    {year}
+                    /
+                    {month + 1}
                 </div>
-            ))}
-            {daysInMonth.map((day) => {
-                const date = encodeDate(new Date(year, month, day.date));
-                return (
-                    <RawButton
-                        onClick={onDateClick}
-                        className={_cs(styles.date, dateClassName)}
-                        name={date}
-                        title={`Set date to ${date}`}
-                        key={day.date}
+                <Button
+                    name={undefined}
+                    variant="secondary"
+                    onClick={handlePrevMonth}
+                    title="See previous month"
+                    spacing="xs"
+                >
+                    <IoChevronBackSharp />
+                </Button>
+                <Button
+                    name={undefined}
+                    variant="secondary"
+                    onClick={handleNextMonth}
+                    title="See next month"
+                    spacing="xs"
+                >
+                    <IoChevronForwardSharp />
+                </Button>
+            </div>
+            <div className={styles.monthlyCalendar}>
+                {weekDaysName.map((dayName, i) => (
+                    <div
+                        className={_cs(styles.dayName, weekDayNameClassName)}
+                        key={dayName}
                         style={{
-                            gridColumnStart: day.dayOfWeek + 1,
-                            // Note +2 is due to the week day name row
-                            gridRowStart: day.week + 2,
+                            gridColumnStart: i + 1,
+                            gridRowStart: 1,
                         }}
                     >
-                        {day.date}
-                    </RawButton>
-                );
-            })}
+                        {dayName}
+                    </div>
+                ))}
+                {daysInMonth.map((day) => {
+                    const date = encodeDate(new Date(year, month, day.date));
+                    return (
+                        <RawButton
+                            onClick={onDateClick}
+                            className={_cs(styles.date, dateClassName)}
+                            name={date}
+                            title={`Set date to ${date}`}
+                            key={day.date}
+                            style={{
+                                gridColumnStart: day.dayOfWeek + 1,
+                                // Note +2 is due to the week day name row
+                                gridRowStart: day.week + 2,
+                            }}
+                        >
+                            {day.date}
+                        </RawButton>
+                    );
+                })}
+            </div>
         </div>
     );
 }

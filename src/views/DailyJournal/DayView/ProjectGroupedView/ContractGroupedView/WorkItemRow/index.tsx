@@ -13,8 +13,9 @@ import {
 import {
     IoCopyOutline,
     IoEllipsisVertical,
-    IoTrashOutline,
     IoPencilOutline,
+    IoSwapHorizontal,
+    IoTrashOutline,
 } from 'react-icons/io5';
 import { _cs } from '@togglecorp/fujs';
 
@@ -223,6 +224,16 @@ function WorkItemRow(props: Props) {
                     disabled
                 >
                     Edit entry
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                    type="button"
+                    name={workItem.clientId}
+                    title="Move this entry to another day"
+                    onClick={undefined}
+                    icons={<IoSwapHorizontal />}
+                    disabled
+                >
+                    Move to another day
                 </DropdownMenuItem>
                 <DropdownMenuItem
                     type="confirm-button"

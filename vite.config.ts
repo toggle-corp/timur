@@ -76,7 +76,7 @@ export default defineConfig(({ mode }) => {
                     name: 'Timur',
                     short_name: 'Timur',
                     description: 'Timur - Phase Zero',
-                    theme_color: '#FFFFFF',
+                    theme_color: '#fafaf0',
                 },
                 workbox: {
                     globPatterns: ['**/*.{js,css,html,png,svg,ico}'],

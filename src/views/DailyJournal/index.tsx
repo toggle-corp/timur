@@ -170,9 +170,9 @@ export function Component() {
     }, [routes, navigate]);
 
     const getNextDay = useCallback(() => {
-        const today = encodeDate(new Date());
         const nextDay = addDays(selectedDate, 1);
 
+        const today = encodeDate(new Date());
         if (today === nextDay) {
             return undefined;
         }
@@ -181,9 +181,9 @@ export function Component() {
     }, [selectedDate]);
 
     const getPrevDay = useCallback(() => {
-        const today = encodeDate(new Date());
         const prevDay = addDays(selectedDate, -1);
 
+        const today = encodeDate(new Date());
         if (today === prevDay) {
             return undefined;
         }

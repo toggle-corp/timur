@@ -1,7 +1,6 @@
 .select-input-container {
     .input {
         padding: 0 var(--spacing-2xs);
-        font-size: var(--font-size-sm);
     }
 }
 
