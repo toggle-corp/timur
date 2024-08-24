@@ -1,0 +1,17 @@
+.update-note-dialog {
+    .modal-content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-md);
+
+        .codemirror {
+            border: var(--width-separator-md) solid var(--color-separator);
+            border-radius: var(--border-radius-md);
+
+            &:focus-within {
+                outline: none;
+                border-color: var(--color-secondary);
+            }
+        }
+    }
+}

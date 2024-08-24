@@ -1,0 +1,16 @@
+.option-container {
+    display: flex;
+    overflow: auto;
+
+    .option {
+        flex-grow: 1;
+    }
+
+    &.active {
+        color: var(--color-primary);
+
+        .icon {
+            opacity: 1;
+        }
+    }
+}

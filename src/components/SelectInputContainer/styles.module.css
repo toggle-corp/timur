@@ -1,0 +1,26 @@
+.select-input-container {
+    .input {
+        padding: 0 var(--spacing-2xs);
+        font-size: var(--font-size-sm);
+    }
+}
+
+.popup {
+    padding: var(--spacing-sm) 0;
+
+    .list {
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+
+        .list-item {
+            flex-shrink: 0;
+        }
+    }
+
+    .info-message {
+        padding: var(--spacing-sm);
+        text-align: center;
+        color: var(--color-text-light);
+    }
+}

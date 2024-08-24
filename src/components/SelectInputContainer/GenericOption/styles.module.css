@@ -1,0 +1,10 @@
+.generic-option {
+    display: flex;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm);
+    text-align: left;
+
+    &:hover {
+        background-color: var(--color-tertiary);
+    }
+}

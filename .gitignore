@@ -1,1 +1,12 @@
 .env
+
+# Tooling
+node_modules/
+.eslintcache
+tsconfig.tsbuildinfo
+pnpm-debug.log*
+
+# Custom
+build/
+generated/
+stats.html

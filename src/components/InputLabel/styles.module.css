@@ -1,0 +1,16 @@
+.input-label {
+    display: flex;
+    padding: 0 var(--spacing-sm);
+    line-height: 1;
+    color: var(--color-text-light);
+    font-size: var(--font-size-xs);
+    gap: var(--spacing-xs);
+
+    &.disabled {
+        opacity: var(--opacity-disabled-element);
+    }
+
+    .required {
+        color: var(--color-primary);
+    }
+}

@@ -83,6 +83,16 @@ services:
     ports:
       - 127.0.0.1:8100:8100
 
+  react:
+    depends_on:
+      - web
+    build: .
+    command: sh -c 'pnpm install && pnpm start'
+    volumes:
+      - .:/code
+    ports:
+      - 127.0.0.1:3000:3000
+
 
 volumes:
   postgres-data15:

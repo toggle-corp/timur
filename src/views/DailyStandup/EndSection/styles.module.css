@@ -1,0 +1,28 @@
+.end-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .quote-section {
+        display: flex;
+        flex-direction: column;
+        padding: var(--spacing-xl);
+        max-width: 60rem;
+        gap: var(--spacing-md);
+
+        .quote {
+            white-space: pre-wrap;
+            font-size: var(--font-size-2xl);
+        }
+
+        .author {
+            align-self: end;
+            color: var(--color-text-light);
+            font-size: var(--font-size-xl);
+
+            &:before {
+                content: '- '
+            }
+        }
+    }
+}

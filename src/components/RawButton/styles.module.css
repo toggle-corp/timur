@@ -1,0 +1,18 @@
+.raw-button {
+    position: relative;
+    margin: 0;
+    border: 0;
+    background-color: transparent;
+    cursor: pointer;
+    padding: 0;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+
+    &:focus-visible,
+    &.focused {
+        outline: var(--width-separator-md) solid var(--color-secondary);
+        /* outline-offset: var(--width-separator-md); */
+    }
+}
+

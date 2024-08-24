@@ -1,0 +1,55 @@
+.dialog {
+    &.open {
+        display: flex;
+        flex-direction: column;
+        border: none;
+        box-shadow: var(--box-shadow-xl);
+        background-color: var(--color-foreground);
+        padding: var(--spacing-md);
+        overflow: auto;
+        gap: var(--spacing-md);
+
+        .header {
+            display: flex;
+
+            .heading {
+                flex-grow: 1;
+            }
+
+            .close-button {
+                flex-shrink: 0;
+                font-size: var(--font-size-xl);
+            }
+        }
+
+        .content {
+            flex-grow: 1;
+            overflow: auto;
+        }
+
+        &::backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+    }
+
+    &.right-mode {
+        right: 0;
+        left: unset;
+        margin: auto 0;
+        width: 40rem;
+        height: 100vh;
+        max-height: unset;
+    }
+
+    &.center-mode {
+        border-radius: var(--border-radius-lg);
+        width: 60rem;
+        height: 70vh;
+
+        &.auto-size {
+            width: fit-content;
+            height: fit-content;
+        }
+    }
+}
+

@@ -1,0 +1,136 @@
+.daily-standup {
+    overflow: auto;
+
+    .page-content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-lg);
+        overflow: auto;
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            border: var(--width-separator-sm) solid var(--color-primary);
+            overflow: auto;
+
+            .welcome-section {
+                display: flex;
+                flex-grow: 1;
+
+                .welcome-header {
+                    display: flex;
+                    flex-basis: 50%;
+                    flex-direction: column;
+                    flex-grow: 0;
+                    flex-shrink: 0;
+                    justify-content: center;
+                    padding: var(--spacing-xl);
+                    gap: var(--spacing-md);
+
+                    .welcome-label {
+                        font-size: var(--font-size-xl);
+                    }
+
+                    .welcome-heading {
+                        color: var(--color-primary);
+                        font-size: var(--font-size-4xl);
+                        font-weight: var(--font-weight-light);
+                    }
+
+                    .date {
+                        color: var(--color-text-light);
+                        font-size: var(--font-size-xl);
+                    }
+                }
+
+                .deadline-section {
+                    display: flex;
+                    flex-direction: column;
+                    flex-grow: 1;
+                    background-color: var(--color-foreground);
+                    padding: var(--spacing-xl);
+                    gap: var(--spacing-lg);
+
+                    .deadline-heading {
+                        color: var(--color-secondary);
+                        font-size: var(--font-size-2xl);
+                        font-weight: var(--font-weight-normal);
+                    }
+
+                    .project-list {
+                        display: flex;
+                        flex-direction: column;
+                        gap: var(--spacing-md);
+
+                        .project {
+                            display: flex;
+                            flex-direction: column;
+                            gap: var(--spacing-sm);
+
+                            .project-header {
+                                display: flex;
+                                gap: var(--spacing-sm);
+
+                                .project-dp {
+                                    font-size: var(--font-size-lg);
+                                }
+                            }
+
+                            .deadline-list {
+                                display: flex;
+                                flex-direction: column;
+                                gap: var(--spacing-xs);
+
+                                .deadline {
+                                    display: flex;
+                                    gap: var(--spacing-2xs);
+
+                                    .d-day {
+                                        color: var(--color-text-light);
+                                        font-weight: var(--font-weight-bold);
+
+                                        &:before {
+                                            content: '- '
+                                        }
+
+                                        &:after {
+                                            content: ':'
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            .project-standup {
+                flex-grow: 1;
+            }
+
+            .misc-section {
+                display: flex;
+                align-items: center;
+                flex-grow: 1;
+                justify-content: center;
+
+                .misc-heading {
+                    color: var(--color-primary);
+                    font-size: var(--font-size-4xl);
+                    font-weight: var(--font-weight-light);
+                }
+            }
+
+            .end-section {
+                flex-grow: 1;
+            }
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--spacing-sm);
+        }
+    }
+}

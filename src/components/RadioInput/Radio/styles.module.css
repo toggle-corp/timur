@@ -1,0 +1,52 @@
+.radio {
+    --cursor: default;
+    cursor: var(--cursor);
+    width: fit-content;
+
+    .icon {
+        transition: var(--duration-transition-medium) color ease-in-out;
+    }
+
+    .content {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .description {
+        color: var(--color-text-light);
+        font-size: var(--font-size-sm);
+    }
+
+    .input {
+        position: absolute;
+        opacity: 0;
+        margin: 0;
+        padding: 0;
+        width: 0;
+        height: 0;
+        pointer-events: none;
+    }
+
+    &.active {
+        .icon {
+            color: var(--color-primary);
+        }
+    }
+
+    &.disabled {
+        opacity: var(--opacity-disabled-element);
+    }
+
+    &:not(.disabled) {
+        &:focus,
+        &:hover {
+            .icon {
+                color: var(--color-primary);
+            }
+        }
+
+        &:not(.read-only) {
+            --cursor: pointer;
+        }
+    }
+}

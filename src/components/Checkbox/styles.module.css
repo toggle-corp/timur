@@ -1,0 +1,61 @@
+.checkbox {
+    display: flex;
+    position: relative;
+    align-items: flex-start;
+    cursor: pointer;
+    width: fit-content;
+    gap: var(--spacing-sm);
+
+    .input {
+        position: absolute;
+        opacity: 0;
+        margin: 0;
+        padding: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .checkmark {
+        font-size: var(--font-size-lg);
+    }
+
+    &:focus-within {
+        outline: var(--width-separator-md) solid var(--color-secondary);
+        /* outline-offset: var(--spacing-2xs); */
+    }
+
+    .content {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .description {
+        color: var(--color-text-light);
+        font-size: var(--font-size-xs);
+    }
+
+    &.checked {
+        .checkmark {
+            color: var(--color-primary);
+        }
+    }
+
+    &:focus,
+    &:hover {
+        .checkmark {
+            color: var(--color-primary);
+        }
+    }
+
+    &.disabled-checkbox {
+        display: flex;
+        align-items: flex-start;
+        cursor: not-allowed;
+        color: var(--color-separator);
+        gap: var(--spacing-sm);
+
+        .checkmark {
+            color: var(--color-separator);
+        }
+    }
+}

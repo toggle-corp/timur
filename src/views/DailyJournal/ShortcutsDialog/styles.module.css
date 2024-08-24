@@ -1,0 +1,9 @@
+.shortcuts-dialog {
+    .modal-content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-md);
+
+        font-size: var(--font-size-md);
+    }
+}

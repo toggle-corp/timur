@@ -1,0 +1,162 @@
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --font-family-sans-serif: "Fira Sans", sans-serif;
+
+    --color-primary: #c45332;
+    --color-secondary: #9cb56e;
+    --color-tertiary: #f2fde1;
+    --color-quaternary: #f2f2d0;
+
+    --color-background: #fafaf0;
+    --color-foreground: #ffffff;
+
+    --color-text: rgba(0, 0, 0, .8);
+    --color-text-light: rgba(0, 0, 0, .6);
+    --color-text-on-dark: #ffffff;
+
+    --color-separator: rgba(0, 0, 0, 0.1);
+
+    --base-font-size: 1rem;
+
+    --font-size-2xs: calc(var(--base-font-size) * 0.625);
+    --font-size-xs: calc(var(--base-font-size) * 0.75);
+    --font-size-sm: calc(var(--base-font-size) * 0.875);
+    --font-size-md: var(--base-font-size);
+    --font-size-lg: calc(var(--base-font-size) * 1.25);
+    --font-size-xl: calc(var(--base-font-size) * 1.44);
+    --font-size-2xl: calc(var(--base-font-size) * 1.8);
+    --font-size-3xl: calc(var(--base-font-size) * 2.5);
+    --font-size-4xl: calc(var(--base-font-size) * 3.6);
+
+    @media screen and (max-width: 40rem) {
+        --font-size-2xs: calc(var(--base-font-size) * 0.625);
+        --font-size-xs: calc(var(--base-font-size) * 0.75);
+        --font-size-sm: calc(var(--base-font-size) * 0.875);
+        --font-size-md: calc(var(--base-font-size) * 1);
+        --font-size-lg: calc(var(--base-font-size) * 1.25);
+        --font-size-xl: calc(var(--base-font-size) * 1.44);
+        --font-size-2xl: calc(var(--base-font-size) * 1.8);
+        --font-size-3xl: calc(var(--base-font-size) * 2.25);
+        --font-size-4xl: calc(var(--base-font-size) * 3);
+    }
+
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    --width-screen-sm: 640px;
+    --width-screen-md: 768px;
+    --width-screen-lg: 1024px;
+    --width-screen-xl: 1280px;
+    --width-screen-2xl: 1536px;
+
+    --base-spacing: 1rem;
+
+    --spacing-4xs: calc(var(--base-spacing) * 0.0625);
+    --spacing-3xs: calc(var(--base-spacing) * 0.125);
+    --spacing-2xs: calc(var(--base-spacing) * 0.25);
+    --spacing-xs: calc(var(--base-spacing) * 0.4);
+    --spacing-sm: calc(var(--base-spacing) * 0.625);
+    --spacing-md: calc(var(--base-spacing) * 1);
+    --spacing-lg: calc(var(--base-spacing) * 1.5);
+    --spacing-xl: calc(var(--base-spacing) * 2.25);
+    --spacing-2xl: calc(var(--base-spacing) * 3.5);
+    --spacing-3xl: calc(var(--base-spacing) * 4.75);
+    --spacing-4xl: calc(var(--base-spacing) * 6);
+    --spacing-5xl: calc(var(--base-spacing) * 7.25);
+
+    @media screen and (max-width: 40rem) {
+        --spacing-4xs: calc(var(--base-spacing) * 0.0625);
+        --spacing-3xs: calc(var(--base-spacing) * 0.125);
+        --spacing-2xs: calc(var(--base-spacing) * 0.25);
+        --spacing-xs: calc(var(--base-spacing) * 0.4);
+        --spacing-sm: calc(var(--base-spacing) * 0.625);
+        --spacing-md: calc(var(--base-spacing) * 1);
+        --spacing-lg: calc(var(--base-spacing) * 1.25);
+        --spacing-xl: calc(var(--base-spacing) * 1.5625);
+        --spacing-2xl: calc(var(--base-spacing) * 1.95);
+        --spacing-3xl: calc(var(--base-spacing) * 2.44);
+        --spacing-4xl: calc(var(--base-spacing) * 3);
+        --spacing-5xl: calc(var(--base-spacing) * 3.8);
+    }
+
+    --width-separator-sm: 1pt;
+    --width-separator-md: 2pt;
+    --width-separator-lg: 4pt;
+    --width-separator-xl: 8pt;
+
+    --width-page-content--max: 84rem;
+
+    --border-radius-none: 0;
+    --border-radius-sm: 0.125rem;
+    --border-radius-md: 0.25rem;
+    --border-radius-lg: 0.5rem;
+    --border-radius-xl: 0.75rem;
+    --border-radius-2xl: 1rem;
+    --border-radius-3xl: 1.5rem;
+    --border-radius-full: 9999px;
+
+    --box-shadow-xs: 0 1pt 2pt rgb(0 0 0 / 0.2);
+    --box-shadow-sm: 0 1pt 4pt rgb(0 0 0 / 0.2);
+    --box-shadow-md: 0 1pt 5pt -2pt rgb(0 0 0 / 0.375);
+    --box-shadow-lg: 0 2pt 8pt -4pt rgb(0 0 0 / 0.5);
+    --box-shadow-xl: 0 3pt 16pt -6pt rgb(0 0 0 / 0.5);
+    --box-shadow-2xl: 0 4pt 16pt -6pt rgb(0 0 0 / 1);
+    --box-shadow-inner: inset 0 2pt 4pt 0 rgb(0 0 0 / 0.375);
+    --box-shadow-none: 0 0 #0000;
+
+    --duration-transition-fast: .1s;
+    --duration-transition-medium: .2s;
+    --duration-transition-slow: .5s;
+
+    --duration-animation-fast: .5s;
+    --duration-animation-medium: 1s;
+    --duration-animation-slow: 2s;
+
+    --opacity-disabled-element: 0.5;
+    --opacity-message: 0.6;
+
+    --height-content--min: 20rem;
+    --height-compact-content--min: 1rem;
+}
+
+html {
+    @media screen {
+        margin: 0;
+        padding: 0;
+        scrollbar-gutter: stable;
+    }
+}
+
+body {
+    overflow-x: hidden;
+    color: var(--color-text);
+    font-family: var(--font-family-sans-serif);
+    font-weight: var(--font-weight-normal);
+    font-style: normal;
+    font-optical-sizing: auto;
+
+    @media screen {
+        margin: 0;
+        background-color: var(--color-background);
+        padding: 0;
+    }
+}
+
+ul, ol, p {
+    margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    line-height: 1.25;
+    font-weight: var(--font-weight-semibold);
+}
+
+p {
+    margin: 0;
+}

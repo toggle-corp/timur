@@ -1,0 +1,92 @@
+.end-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-md);
+
+    .grouped-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-md);
+
+        .project-grouped {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-direction: column;
+
+            .header {
+                display: flex;
+                align-items: center;
+                text-align: left;
+                gap: var(--spacing-xs);
+
+                &.active {
+                    color: var(--color-primary);
+                }
+
+                .project-name {
+                    flex-grow: 1;
+                }
+
+                .client-name {
+                    font-size: var(--font-size-xs);
+                }
+
+                &:hover {
+                    outline: var(--width-separator-md) solid var(--color-secondary);
+                    /* outline-offset: var(--spacing-xs); */
+                }
+            }
+
+            .task-list {
+                display: flex;
+                flex-direction: column;
+
+                .task {
+                    display: flex;
+                    position: relative;
+                    align-items: center;
+                    padding: var(--spacing-xs) var(--spacing-sm);
+                    text-align: left;
+                    gap: var(--spacing-sm);
+
+                    .task-name {
+                        flex-grow: 1;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
+
+                    .contract-name {
+                        max-width: 6rem;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        color: var(--color-text-light);
+                        font-size: var(--font-size-xs);
+                    }
+
+                    .usage-count {
+                        display: flex;
+                        position: absolute;
+                        align-items: center;
+                        justify-content: center;
+                        transform: translateX(-100%) translateY(-50%);
+                        border-radius: 1rem;
+                        background-color: var(--color-secondary);
+                        padding: var(--spacing-3xs) var(--spacing-2xs);
+                        min-width: 1em;
+                        height: 1.5em;
+                        line-height: 1;
+                        color: var(--color-text-on-dark);
+                        font-size: var(--font-size-2xs);
+                    }
+
+                    &:hover {
+                        outline: var(--width-separator-sm) solid var(--color-secondary);
+                    }
+                }
+            }
+        }
+    }
+}

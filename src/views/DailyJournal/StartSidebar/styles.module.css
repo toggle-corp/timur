@@ -1,0 +1,31 @@
+.start-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-md);
+
+    .calendar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.2;
+        height: 6rem;
+        font-size: 6rem;
+    }
+
+    .actions {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .quick-settings {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-md);
+
+        .type-option-list {
+            flex-direction: column;
+        }
+    }
+}
