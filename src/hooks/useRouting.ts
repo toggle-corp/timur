@@ -10,7 +10,7 @@ import {
 
 import {
     resolvePath,
-    type UrlParams,
+    UrlParams,
 } from '#components/Link';
 import RouteContext from '#contexts/route';
 

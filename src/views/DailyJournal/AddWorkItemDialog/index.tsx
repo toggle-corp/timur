@@ -6,8 +6,8 @@ import {
     useRef,
     useState,
 } from 'react';
-import { listToGroupList } from '@togglecorp/fujs';
 import { IoSearch } from 'react-icons/io5';
+import { listToGroupList } from '@togglecorp/fujs';
 
 import Dialog from '#components/Dialog';
 import DisplayPicture from '#components/DisplayPicture';

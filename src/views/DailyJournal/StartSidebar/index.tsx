@@ -25,11 +25,24 @@ import {
 } from '#utils/constants';
 import {
     ConfigStorage,
+    EditingMode,
     WorkItem,
     WorkItemStatus,
 } from '#utils/types';
 
 import styles from './styles.module.css';
+
+type EditingOption = { key: EditingMode, label: string };
+function editingOptionKeySelector(item: EditingOption) {
+    return item.key;
+}
+function editingOptionLabelSelector(item: EditingOption) {
+    return item.label;
+}
+const editingOptions: EditingOption[] = [
+    { key: 'normal', label: 'Normies' },
+    { key: 'vim', label: 'Vim Masterace' },
+];
 
 type WorkItemTypeOption = EnumsQuery['enums']['TimeEntryType'][number];
 function workItemTypeKeySelector(item: WorkItemTypeOption) {
@@ -158,17 +171,6 @@ function StartSidebar(props: Props) {
                 >
                     Copy standup text
                 </Button>
-                {/*
-                <Button
-                    name
-                    onClick={handleNoteUpdateClick}
-                    variant="secondary"
-                >
-                    {currentNote && !!currentNote.content
-                        ? 'Edit notes'
-                        : 'Add notes'}
-                </Button>
-                */}
             </div>
             <div className={styles.quickSettings}>
                 <Checkbox
@@ -205,7 +207,17 @@ function StartSidebar(props: Props) {
                     onChange={setConfigFieldValue}
                     value={storedConfig.defaultTaskType}
                     nonClearable
-                    // listContainerClassName={styles.typeOptionList}
+                />
+                <SelectInput
+                    name="editingMode"
+                    label="Editing Mode"
+                    variant="general"
+                    options={editingOptions}
+                    keySelector={editingOptionKeySelector}
+                    labelSelector={editingOptionLabelSelector}
+                    onChange={setConfigFieldValue}
+                    value={storedConfig.editingMode}
+                    nonClearable
                 />
             </div>
         </div>

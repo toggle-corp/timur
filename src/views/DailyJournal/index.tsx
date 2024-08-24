@@ -48,6 +48,7 @@ import useBackgroundSync from '#hooks/useBackgroundSync';
 import { useFocusManager } from '#hooks/useFocus';
 import useKeybind from '#hooks/useKeybind';
 import useLocalStorage from '#hooks/useLocalStorage';
+import useSetFieldValue from '#hooks/useSetFieldValue';
 import {
     addDays,
     getNewId,
@@ -69,8 +70,11 @@ import DayView from './DayView';
 import EndSidebar from './EndSidebar';
 import ShortcutsDialog from './ShortcutsDialog';
 import StartSidebar from './StartSidebar';
+import UpdateNoteDialog from './UpdateNoteDialog';
 
 import styles from './styles.module.css';
+
+const emptyArray: unknown[] = [];
 
 const MY_TIME_ENTRIES_QUERY = gql`
     query MyTimeEntries($date: Date!) {
@@ -190,43 +194,39 @@ export function Component() {
     const dateInputRef = useRef<HTMLInputElement>(null);
     // NOTE: We are opening the dialog from this parent component
     const dialogOpenTriggerRef = useRef<(() => void) | undefined>();
-    // const noteDialogOpenTriggerRef = useRef<(() => void) | undefined>();
+    const noteDialogOpenTriggerRef = useRef<(() => void) | undefined>();
     const shortcutsDialogOpenTriggerRef = useRef<(() => void) | undefined>();
 
-    /*
-    const [storedData, setStoredDataState] = useLocalStorage<{
-        appVersion: string,
-        notes: Note[]
-    }>(
-        KEY_DATA_STORAGE,
-        {
-            appVersion: APP_VERSION,
-            notes: [],
-        },
-    );
-    */
-
-    const [storedConfig] = useLocalStorage<ConfigStorage>(
+    const [storedConfig, setStoredConfig] = useLocalStorage<ConfigStorage>(
         KEY_CONFIG_STORAGE,
         defaultConfigValue,
     );
 
     // Read state from the stored state
-    // const notes = storedData.notes ?? emptyArray;
+    const notes = storedConfig.notes ?? emptyArray;
+    // FIXME: memoize this
+    const currentNote = notes.find((item) => item.date === selectedDate);
+    const editMode = storedConfig.editingMode ?? 'normal';
+    const setFieldValue = useSetFieldValue(setStoredConfig);
 
-    /*
-    const setNotes: Dispatch<SetStateAction<Note[]>> = useCallback(
-        (func) => {
-            setStoredDataState((oldValue) => ({
-                ...oldValue,
-                notes: typeof func === 'function'
-                    ? func(oldValue.notes)
-                    : func,
-            }));
-        },
-        [setStoredDataState],
-    );
-    */
+    const handleCurrentNoteChange = (value: string | undefined, id: string | undefined) => {
+        const newNotes = [...notes];
+        const index = newNotes.findIndex((item) => item.id === id);
+        if (id && index !== -1) {
+            const note = newNotes[index];
+            newNotes.splice(index, 1, {
+                ...note,
+                content: value,
+            });
+        } else {
+            newNotes.push({
+                id: getNewId(),
+                date: selectedDate,
+                content: value,
+            });
+        }
+        setFieldValue(newNotes, 'notes');
+    };
 
     const [
         bulkMutationState,
@@ -481,6 +481,15 @@ export function Component() {
         [],
     );
 
+    const handleNoteUpdateClick = useCallback(
+        () => {
+            if (noteDialogOpenTriggerRef.current) {
+                noteDialogOpenTriggerRef.current();
+            }
+        },
+        [],
+    );
+
     const handleAddEntryClick = useCallback(
         () => {
             if (dialogOpenTriggerRef.current) {
@@ -661,26 +670,34 @@ export function Component() {
                     selectedDate={selectedDate}
                 />
             </FocusContext.Provider>
-            <Button
-                name={undefined}
-                onClick={handleAddEntryClick}
-                icons={<IoAdd />}
-                title="Add entry"
-            >
-                Add entry
-            </Button>
+            <div className={styles.bottomActions}>
+                <Button
+                    name={undefined}
+                    onClick={handleAddEntryClick}
+                    icons={<IoAdd />}
+                    title="Add entry"
+                >
+                    Add entry
+                </Button>
+                <Button
+                    name={undefined}
+                    onClick={handleNoteUpdateClick}
+                    icons={<IoAdd />}
+                    title={currentNote ? 'Update Note' : 'Add note'}
+                    variant="secondary"
+                >
+                    {currentNote ? 'Update Note' : 'Add note'}
+                </Button>
+            </div>
             <ShortcutsDialog
                 dialogOpenTriggerRef={shortcutsDialogOpenTriggerRef}
             />
-            {/*
             <UpdateNoteDialog
                 dialogOpenTriggerRef={noteDialogOpenTriggerRef}
                 note={currentNote}
-                onNoteContentUpdate={handleNoteUpdate}
-                editingMode={configEditingMode}
-                onEditingModeChange={setEditingModeChange}
+                onNoteContentUpdate={handleCurrentNoteChange}
+                editingMode={editMode}
             />
-            */}
             <AddWorkItemDialog
                 dialogOpenTriggerRef={dialogOpenTriggerRef}
                 workItems={workItems}

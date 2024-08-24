@@ -12,7 +12,7 @@ export type EntriesAsList<T> = {
 export type SpacingType = 'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 export type SpacingVariant = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
-type EditingMode = 'normal' | 'vim';
+export type EditingMode = 'normal' | 'vim';
 
 export type Task = EnumsQuery['private']['allActiveTasks'][number];
 export type Contract = Task['contract'];
@@ -23,13 +23,11 @@ export type WorkItemStatus = TimeEntryStatusEnum;
 
 export type WorkItem = Omit<TimeEntryBulkCreateInput, 'clientId'> & { clientId: string };
 
-/*
-interface Note {
+export interface Note {
     id: string;
     date: string;
     content: string | undefined;
 }
-*/
 
 export type ConfigStorage = {
     defaultTaskType: WorkItemType,
@@ -39,4 +37,6 @@ export type ConfigStorage = {
     showInputIcons: boolean,
     startSidebarShown: boolean,
     endSidebarShown: boolean,
+
+    notes: Note[],
 }

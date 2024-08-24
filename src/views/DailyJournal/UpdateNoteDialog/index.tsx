@@ -1,18 +1,21 @@
 import {
     useCallback,
     useEffect,
+    useRef,
     useState,
 } from 'react';
 import {
     markdown,
     markdownLanguage,
 } from '@codemirror/lang-markdown';
-import { vim } from '@replit/codemirror-vim';
+import {
+    Vim,
+    vim,
+} from '@replit/codemirror-vim';
 import { githubLight } from '@uiw/codemirror-theme-github';
-import CodeMirror from '@uiw/react-codemirror';
+import CodeMirror, { type ReactCodeMirrorRef } from '@uiw/react-codemirror';
 
 import Dialog from '#components/Dialog';
-import SelectInput from '#components/SelectInput';
 import {
     EditingMode,
     Note,
@@ -20,28 +23,15 @@ import {
 
 import styles from './styles.module.css';
 
-const editingModeOptions: EditingModeOption[] = [
-    { id: 'normal', title: 'Normies' },
-    { id: 'vim', title: 'Vim Masterrace' },
-];
-
 const extensionsWithoutVim = [markdown({ base: markdownLanguage })];
 const extensionsWithVim = [...extensionsWithoutVim, vim()];
-
-type EditingModeOption = { id: EditingMode, title: string };
-function editingModeKeySelector(item: EditingModeOption) {
-    return item.id;
-}
-function editingModeLabelSelector(item: EditingModeOption) {
-    return item.title;
-}
 
 interface Props {
     dialogOpenTriggerRef: React.MutableRefObject<(() => void) | undefined>;
     note: Note | undefined;
     onNoteContentUpdate: (value: string | undefined, id: string | undefined) => void;
     editingMode: EditingMode,
-    onEditingModeChange: React.Dispatch<React.SetStateAction<EditingMode>>
+    // onEditingModeChange: React.Dispatch<React.SetStateAction<EditingMode>>
 }
 
 function AddNoteDialog(props: Props) {
@@ -50,8 +40,10 @@ function AddNoteDialog(props: Props) {
         note,
         onNoteContentUpdate,
         editingMode,
-        onEditingModeChange,
+        // onEditingModeChange,
     } = props;
+
+    const refs = useRef<ReactCodeMirrorRef>({});
 
     const [showDialog, setShowDialog] = useState(false);
 
@@ -60,6 +52,26 @@ function AddNoteDialog(props: Props) {
             setShowDialog(true);
         };
     }, [dialogOpenTriggerRef]);
+
+    useEffect(() => {
+        if (!showDialog) {
+            return undefined;
+        }
+        const exitHandler = () => {
+            setShowDialog(false);
+        };
+        Vim.defineEx('w', undefined, exitHandler);
+        Vim.defineEx('q', undefined, exitHandler);
+        Vim.defineEx('x', undefined, exitHandler);
+
+        // TODO: We need to only defineEx for this particular codemirror
+        // instance
+        return () => {
+            Vim.defineEx('w', undefined, undefined);
+            Vim.defineEx('q', undefined, undefined);
+            Vim.defineEx('x', undefined, undefined);
+        };
+    }, [showDialog]);
 
     const handleModalClose = useCallback(() => {
         setShowDialog(false);
@@ -75,24 +87,14 @@ function AddNoteDialog(props: Props) {
     return (
         <Dialog
             open={showDialog}
-            mode="right"
             onClose={handleModalClose}
             heading="Notes"
             contentClassName={styles.modalContent}
             className={styles.updateNoteDialog}
+            escapeDisabled={editingMode === 'vim'}
         >
-            <SelectInput
-                name={undefined}
-                label="Mode"
-                options={editingModeOptions}
-                keySelector={editingModeKeySelector}
-                labelSelector={editingModeLabelSelector}
-                onChange={onEditingModeChange}
-                value={editingMode}
-                variant="general"
-                nonClearable
-            />
             <CodeMirror
+                ref={refs}
                 className={styles.codemirror}
                 value={note?.content}
                 height="60vh"

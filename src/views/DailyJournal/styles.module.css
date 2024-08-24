@@ -28,6 +28,11 @@
         }
     }
 
+    .bottom-actions {
+        display: flex;
+        gap: var(--spacing-sm);
+    }
+
     .content {
         display: flex;
         flex-direction: column;
