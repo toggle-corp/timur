@@ -14,6 +14,7 @@ import {
     IoCopyOutline,
     IoEllipsisVertical,
     IoTrashOutline,
+    IoPencilOutline,
 } from 'react-icons/io5';
 import { _cs } from '@togglecorp/fujs';
 
@@ -214,6 +215,16 @@ function WorkItemRow(props: Props) {
                 title="Show additional entry options"
             >
                 <DropdownMenuItem
+                    type="button"
+                    name={workItem.clientId}
+                    title="Edit this entry"
+                    onClick={undefined}
+                    icons={<IoPencilOutline />}
+                    disabled
+                >
+                    Edit entry
+                </DropdownMenuItem>
+                <DropdownMenuItem
                     type="confirm-button"
                     name={workItem.clientId}
                     title="Delete this entry"
@@ -231,7 +242,7 @@ function WorkItemRow(props: Props) {
                     )}
                     icons={<IoTrashOutline />}
                 >
-                    Delete
+                    Delete entry
                 </DropdownMenuItem>
             </DropdownMenu>
         </div>
