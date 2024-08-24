@@ -582,7 +582,7 @@ export function Component() {
     );
 
     // FIXME: memoize this
-    const filteredWorkItems = workItems.filter((item) => item.date == selectedDate);
+    const filteredWorkItems = workItems.filter((item) => item.date === selectedDate);
 
     return (
         <Page

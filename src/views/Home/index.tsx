@@ -45,6 +45,7 @@ export function Component() {
             contentClassName={styles.mainContent}
         >
             <MonthlyCalendar
+                selectedDate={undefined}
                 className={styles.calendar}
                 year={today.getFullYear()}
                 month={today.getMonth()}

@@ -1,12 +1,12 @@
 .work-item-row {
     display: grid;
     align-items: flex-start;
-    grid-template-columns: 4rem 2fr 5fr 9rem 4rem 4rem;
+    grid-template-columns: 5rem 2fr 5fr 9rem 4rem 4rem;
     padding: var(--spacing-2xs) var(--spacing-xs);
     gap: var(--spacing-xs);
 
     &.with-icons {
-        grid-template-columns: 4.5rem 2fr 5fr 12rem 5rem 4rem;
+        grid-template-columns: 5.5rem 2fr 5fr 12rem 5rem 4rem;
     }
 
     &.checkbox-for-status {

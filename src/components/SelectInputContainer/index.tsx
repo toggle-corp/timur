@@ -19,6 +19,7 @@ import Popup from '#components/Popup';
 import RawInput from '#components/RawInput';
 import useBlurEffect from '#hooks/useBlurEffect';
 import useKeyboard from '#hooks/useKeyboard';
+import { colorscheme } from '#utils/constants';
 
 import GenericOption, {
     ContentBaseProps,
@@ -61,6 +62,8 @@ export type SelectInputContainerProps<
         persistentOptionPopup?: boolean;
         placeholder?: string;
         valueDisplay: string;
+        valueBgColor?: string;
+        valueFgColor?: string;
         autoFocus?: boolean;
         hasValue: boolean;
         nonClearable?: boolean;
@@ -111,6 +114,8 @@ function SelectInputContainer<
         readOnly,
         placeholder,
         valueDisplay = '',
+        valueBgColor,
+        valueFgColor,
         nonClearable,
         onClearButtonClick,
         onSelectAllButtonClick,
@@ -366,6 +371,11 @@ function SelectInputContainer<
                 )}
                 input={(
                     <RawInput
+                        className={styles.input}
+                        style={{
+                            backgroundColor: valueBgColor ?? colorscheme[0][1],
+                            color: valueFgColor ?? colorscheme[0][0],
+                        }}
                         id={inputId}
                         name={name}
                         elementRef={inputElementRef}

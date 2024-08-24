@@ -33,7 +33,7 @@ interface Day {
 }
 
 interface Props {
-    selectedDate: string;
+    selectedDate: string | undefined;
     year: number;
     month: number;
     className?: string;

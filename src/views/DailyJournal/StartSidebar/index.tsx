@@ -20,6 +20,7 @@ import { EnumsQuery } from '#generated/types/graphql';
 import useLocalStorage from '#hooks/useLocalStorage';
 import useSetFieldValue from '#hooks/useSetFieldValue';
 import {
+    colorscheme,
     defaultConfigValue,
     KEY_CONFIG_STORAGE,
 } from '#utils/constants';
@@ -58,6 +59,19 @@ function workItemStatusKeySelector(item: WorkItemStatusOption) {
 }
 function workItemStatusLabelSelector(item: WorkItemStatusOption) {
     return item.label;
+}
+function workItemStatusColorSelector(item: WorkItemStatusOption): [string, string] {
+    if (item.key === 'DOING') {
+        return colorscheme[1];
+    }
+    if (item.key === 'DONE') {
+        return colorscheme[5];
+    }
+    return colorscheme[7];
+}
+
+function defaultColorSelector<T>(_: T, i: number): [string, string] {
+    return colorscheme[i % colorscheme.length];
 }
 
 interface Props {
@@ -169,6 +183,7 @@ function StartSidebar(props: Props) {
                     options={enums?.enums.TimeEntryStatus}
                     keySelector={workItemStatusKeySelector}
                     labelSelector={workItemStatusLabelSelector}
+                    colorSelector={workItemStatusColorSelector}
                     onChange={setConfigFieldValue}
                     value={storedConfig.defaultTaskStatus}
                     nonClearable
@@ -180,6 +195,7 @@ function StartSidebar(props: Props) {
                     options={enums?.enums.TimeEntryType}
                     keySelector={workItemTypeKeySelector}
                     labelSelector={workItemTypeLabelSelector}
+                    colorSelector={defaultColorSelector}
                     onChange={setConfigFieldValue}
                     value={storedConfig.defaultTaskType}
                     nonClearable
@@ -191,6 +207,7 @@ function StartSidebar(props: Props) {
                     options={editingOptions}
                     keySelector={editingOptionKeySelector}
                     labelSelector={editingOptionLabelSelector}
+                    // colorSelector={defaultColorSelector}
                     onChange={setConfigFieldValue}
                     value={storedConfig.editingMode}
                     nonClearable

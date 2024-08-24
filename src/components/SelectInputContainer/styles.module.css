@@ -1,3 +1,8 @@
+.input {
+    border-radius: var(--border-radius-md);
+    padding: 0 var(--spacing-sm);
+}
+
 .popup {
     padding: var(--spacing-sm) 0;
 

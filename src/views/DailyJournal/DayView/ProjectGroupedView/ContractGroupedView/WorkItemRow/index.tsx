@@ -32,6 +32,7 @@ import { EnumsQuery } from '#generated/types/graphql';
 import { useFocusClient } from '#hooks/useFocus';
 import useLocalStorage from '#hooks/useLocalStorage';
 import {
+    colorscheme,
     defaultConfigValue,
     KEY_CONFIG_STORAGE,
 } from '#utils/constants';
@@ -65,6 +66,19 @@ function workItemStatusKeySelector(item: WorkItemStatusOption) {
 }
 function workItemStatusLabelSelector(item: WorkItemStatusOption) {
     return item.label;
+}
+function workItemStatusColorSelector(item: WorkItemStatusOption): [string, string] {
+    if (item.key === 'DOING') {
+        return colorscheme[1];
+    }
+    if (item.key === 'DONE') {
+        return colorscheme[5];
+    }
+    return colorscheme[7];
+}
+
+function defaultColorSelector<T>(_: T, i: number): [string, string] {
+    return colorscheme[i % colorscheme.length];
 }
 
 export interface Props {
@@ -136,6 +150,7 @@ function WorkItemRow(props: Props) {
             options={enums?.enums?.TimeEntryStatus}
             keySelector={workItemStatusKeySelector}
             labelSelector={workItemStatusLabelSelector}
+            colorSelector={workItemStatusColorSelector}
             onChange={setFieldValue}
             value={workItem.status}
             nonClearable
@@ -150,6 +165,7 @@ function WorkItemRow(props: Props) {
             options={filteredTaskList}
             keySelector={taskKeySelector}
             labelSelector={taskLabelSelector}
+            // colorSelector={defaultColorSelector}
             onChange={setFieldValue}
             value={workItem.task}
             nonClearable
@@ -188,6 +204,7 @@ function WorkItemRow(props: Props) {
             options={enums?.enums.TimeEntryType}
             keySelector={workItemTypeKeySelector}
             labelSelector={workItemTypeLabelSelector}
+            colorSelector={defaultColorSelector}
             onChange={setFieldValue}
             value={workItem.type}
             nonClearable
