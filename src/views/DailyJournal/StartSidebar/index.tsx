@@ -62,14 +62,14 @@ function workItemStatusLabelSelector(item: WorkItemStatusOption) {
 
 interface Props {
     workItems: WorkItem[];
-    selecteDate: string;
+    selectedDate: string;
     setSelectedDate: (newDate: string) => void;
 }
 
 function StartSidebar(props: Props) {
     const {
         workItems,
-        selecteDate,
+        selectedDate,
         setSelectedDate,
     } = props;
 
@@ -129,13 +129,14 @@ function StartSidebar(props: Props) {
         [workItems, taskById],
     );
 
-    const date = new Date(selecteDate);
+    const date = new Date(selectedDate);
 
     return (
         <div
             className={styles.startSidebar}
         >
             <MonthlyCalendar
+                selectedDate={selectedDate}
                 year={date.getFullYear()}
                 month={date.getMonth()}
                 onDateClick={setSelectedDate}

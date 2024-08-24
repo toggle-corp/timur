@@ -7,7 +7,7 @@ import { isDefined } from '@togglecorp/fujs';
 
 function useThrottledValue<T>(
     input: T,
-    throttleTime = 500,
+    throttleTime = 200,
 ): T {
     const [throttleValue, setThrottledValue] = useState(
         () => input,

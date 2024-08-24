@@ -119,7 +119,7 @@ function WorkItemRow(props: Props) {
 
     const statusInput = config.checkboxForStatus ? (
         <Checkbox
-            className={_cs(
+            checkmarkClassName={_cs(
                 styles.statusCheckbox,
                 workItem.status === 'DOING' && styles.doing,
                 workItem.status === 'DONE' && styles.done,
@@ -153,7 +153,11 @@ function WorkItemRow(props: Props) {
             onChange={setFieldValue}
             value={workItem.task}
             nonClearable
-            icons={config.showInputIcons && <FcPackage />}
+            icons={(
+                config.showInputIcons
+                && (windowWidth < 900 || !config.checkboxForStatus)
+                && <FcPackage />
+            )}
         />
     );
 
@@ -165,7 +169,11 @@ function WorkItemRow(props: Props) {
             title="Description"
             value={workItem.description}
             onChange={setFieldValue}
-            icons={config.showInputIcons && <FcDocument />}
+            icons={(
+                config.showInputIcons
+                && (windowWidth >= 900 || !config.checkboxForStatus)
+                && <FcDocument />
+            )}
             placeholder="Description"
             compact={windowWidth >= 900}
         />

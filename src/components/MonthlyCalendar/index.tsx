@@ -13,7 +13,6 @@ import {
 } from '@togglecorp/fujs';
 
 import Button from '#components/Button';
-import RawButton from '#components/RawButton';
 
 import styles from './styles.module.css';
 
@@ -34,6 +33,7 @@ interface Day {
 }
 
 interface Props {
+    selectedDate: string;
     year: number;
     month: number;
     className?: string;
@@ -50,10 +50,13 @@ function MonthlyCalendar(props: Props) {
         onDateClick,
         weekDayNameClassName,
         dateClassName,
+        selectedDate,
     } = props;
 
     const [year, setYear] = useState(initialYear);
     const [month, setMonth] = useState(initialMonth);
+
+    const today = new Date();
 
     const handlePrevMonth = useCallback(
         () => {
@@ -143,8 +146,16 @@ function MonthlyCalendar(props: Props) {
                 ))}
                 {daysInMonth.map((day) => {
                     const date = encodeDate(new Date(year, month, day.date));
+                    let variant;
+                    if (encodeDate(today) === date) {
+                        variant = 'primary' as const;
+                    } else if (selectedDate === date) {
+                        variant = 'secondary' as const;
+                    } else {
+                        variant = 'tertiary' as const;
+                    }
                     return (
-                        <RawButton
+                        <Button
                             onClick={onDateClick}
                             className={_cs(styles.date, dateClassName)}
                             name={date}
@@ -155,9 +166,10 @@ function MonthlyCalendar(props: Props) {
                                 // Note +2 is due to the week day name row
                                 gridRowStart: day.week + 2,
                             }}
+                            variant={variant}
                         >
                             {day.date}
-                        </RawButton>
+                        </Button>
                     );
                 })}
             </div>

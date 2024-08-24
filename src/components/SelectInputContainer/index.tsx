@@ -366,7 +366,6 @@ function SelectInputContainer<
                 )}
                 input={(
                     <RawInput
-                        className={styles.input}
                         id={inputId}
                         name={name}
                         elementRef={inputElementRef}

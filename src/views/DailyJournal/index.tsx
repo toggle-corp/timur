@@ -581,6 +581,9 @@ export function Component() {
         [selectedDate, handleDateSelection],
     );
 
+    // FIXME: memoize this
+    const filteredWorkItems = workItems.filter((item) => item.date == selectedDate);
+
     return (
         <Page
             documentTitle="Timur - Daily Journal"
@@ -589,14 +592,14 @@ export function Component() {
             startAsideContainerClassName={styles.startAside}
             startAsideContent={(
                 <StartSidebar
-                    selecteDate={selectedDate}
-                    workItems={workItems}
+                    selectedDate={selectedDate}
+                    workItems={filteredWorkItems}
                     setSelectedDate={setSelectedDate}
                 />
             )}
             endAsideContent={(
                 <EndSidebar
-                    workItems={workItems}
+                    workItems={filteredWorkItems}
                     onWorkItemCreate={handleWorkItemCreate}
                 />
             )}
@@ -666,7 +669,7 @@ export function Component() {
                 <DayView
                     loading={myTimeEntriesResult.fetching}
                     errored={!!myTimeEntriesResult.error}
-                    workItems={workItems}
+                    workItems={filteredWorkItems}
                     onWorkItemClone={handleWorkItemClone}
                     onWorkItemChange={handleWorkItemChange}
                     onWorkItemDelete={handleWorkItemDelete}
@@ -713,7 +716,7 @@ export function Component() {
             />
             <AddWorkItemDialog
                 dialogOpenTriggerRef={dialogOpenTriggerRef}
-                workItems={workItems}
+                workItems={filteredWorkItems}
                 onWorkItemCreate={handleWorkItemCreate}
             />
         </Page>

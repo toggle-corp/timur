@@ -48,7 +48,12 @@
             }
 
             .raw-input {
-                opacity: 0;
+                /* We should not hide raw input if empty to show placeholder */
+                &:not(.empty) {
+                    /* We are use visibility: hidden because element needs to
+                     * be focused on tab press */
+                    opacity: 0;
+                }
             }
         }
 

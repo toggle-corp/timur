@@ -40,13 +40,6 @@
         }
     }
 
-    &:focus,
-    &:hover {
-        .checkmark {
-            color: var(--color-primary);
-        }
-    }
-
     &.disabled-checkbox {
         display: flex;
         align-items: flex-start;

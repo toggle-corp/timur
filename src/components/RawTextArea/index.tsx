@@ -39,8 +39,8 @@ function RawTextArea<N>(props: Props<N>) {
                 const splittedValue = value?.split('\n');
                 const shortValue = splittedValue?.[1] ? `${splittedValue[0]}...` : value;
 
-                containerRef.current.dataset.replicatedValue = value ?? undefined;
-                containerRef.current.dataset.shortValue = shortValue ?? undefined;
+                containerRef.current.dataset.replicatedValue = value ?? '';
+                containerRef.current.dataset.shortValue = shortValue ?? '';
             }
         },
         [value],
@@ -85,6 +85,7 @@ function RawTextArea<N>(props: Props<N>) {
                 ref={elementRef}
                 className={_cs(
                     styles.rawInput,
+                    !value && styles.empty,
                     className,
                 )}
                 // FIXME: do we even need to pass name?
