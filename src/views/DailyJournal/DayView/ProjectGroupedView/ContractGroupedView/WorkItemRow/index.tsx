@@ -155,6 +155,7 @@ function WorkItemRow(props: Props) {
             nonClearable
             icons={(
                 config.showInputIcons
+                // NOTE: hide/unhide icon wrt "checkbox for status" flag
                 && (windowWidth < 900 || !config.checkboxForStatus)
                 && <FcPackage />
             )}
@@ -171,11 +172,12 @@ function WorkItemRow(props: Props) {
             onChange={setFieldValue}
             icons={(
                 config.showInputIcons
+                // NOTE: hide/unhide icon wrt "checkbox for status" flag
                 && (windowWidth >= 900 || !config.checkboxForStatus)
                 && <FcDocument />
             )}
             placeholder="Description"
-            compact={windowWidth >= 900}
+            compact={config.compactTextArea}
         />
     );
 

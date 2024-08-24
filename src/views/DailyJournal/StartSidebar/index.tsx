@@ -196,6 +196,12 @@ function StartSidebar(props: Props) {
                     nonClearable
                 />
                 <Checkbox
+                    name="compactTextArea"
+                    label="Collapse text area on blur"
+                    value={storedConfig.compactTextArea}
+                    onChange={setConfigFieldValue}
+                />
+                <Checkbox
                     name="showInputIcons"
                     label="Show input icons"
                     value={storedConfig.showInputIcons}

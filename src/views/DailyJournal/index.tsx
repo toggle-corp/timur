@@ -208,7 +208,7 @@ export function Component() {
     const notes = storedConfig.notes ?? emptyArray;
     // FIXME: memoize this
     const currentNote = notes.find((item) => item.date === selectedDate);
-    const editMode = storedConfig.editingMode ?? 'normal';
+    const editMode = storedConfig.editingMode ?? defaultConfigValue.editingMode;
     const setFieldValue = useSetFieldValue(setStoredConfig);
 
     const handleCurrentNoteChange = (value: string | undefined, id: string | undefined) => {
