@@ -1,6 +1,4 @@
-import React, {
-    useContext,
-} from 'react';
+import React, { useContext } from 'react';
 import { _cs } from '@togglecorp/fujs';
 
 import UserContext from '#contexts/user';

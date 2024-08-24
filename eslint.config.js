@@ -57,6 +57,7 @@ const appConfigs = compat.config({
         'no-shadow': 0,
         '@typescript-eslint/no-shadow': ['error'],
 
+        'import/no-unresolved': ['error', { ignore: ['^virtual:'] }],
         'import/no-extraneous-dependencies': [
             'error',
             {

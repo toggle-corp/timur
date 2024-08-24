@@ -252,7 +252,7 @@ function SearchSelectInput<
                     ? descriptionSelector(option)
                     : undefined,
                 containerClassName: _cs(styles.optionContainer, isActive && styles.active),
-                title: isDefined(label) ? `Select "${label}" option` : "Select select option",
+                title: isDefined(label) ? `Select "${label}" option` : 'Select select option',
 
                 className: styles.option,
                 iconClassName: styles.icon,
