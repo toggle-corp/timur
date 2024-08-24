@@ -68,7 +68,7 @@ export default defineConfig(({ mode }) => {
             VitePWA({
                 // buildBase: './build/',
                 strategies: 'generateSW',
-                registerType: 'autoUpdate',
+                registerType: 'prompt',
                 injectRegister: 'script',
                 devOptions: { enabled: false },
                 includeAssets: ['app-icon.svg'],
@@ -80,8 +80,6 @@ export default defineConfig(({ mode }) => {
                 },
                 workbox: {
                     globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
-                    skipWaiting: true,
-                    clientsClaim: true,
                 },
                 pwaAssets: {
                     config: true,

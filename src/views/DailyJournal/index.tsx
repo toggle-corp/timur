@@ -240,7 +240,18 @@ export function Component() {
             const res = await triggerBulkMutation({
                 timeEntries: [
                     ...addedItems,
-                    ...updatedItems,
+                    ...updatedItems.map((item) => ({
+                        // NOTE: We need to send null to the server so that we
+                        // can clear the values
+                        clientId: item.clientId ?? null,
+                        date: item.date ?? null,
+                        description: item.description ?? null,
+                        duration: item.duration ?? null,
+                        id: item.id ?? null,
+                        status: item.status ?? null,
+                        task: item.task ?? null,
+                        type: item.type ?? null,
+                    })),
                 ],
                 deleteIds: removedItems,
             });
@@ -375,11 +386,11 @@ export function Component() {
 
                 const targetItem = {
                     ...oldWorkItems[sourceItemIndex],
-                    id: undefined,
                     clientId: newId,
-                    description: undefined,
-                    hours: undefined,
                 };
+                delete targetItem.id;
+                delete targetItem.description;
+                delete targetItem.duration;
 
                 const newWorkItems = [...oldWorkItems];
                 newWorkItems.splice(sourceItemIndex + 1, 0, targetItem);
