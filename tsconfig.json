@@ -25,10 +25,18 @@
 
         /* Linting */
         "strict": true,
-        "types": ["vite-plugin-svgr/client", "node"],
+        "types": [
+            "vite-plugin-pwa/info.d.ts",
+            "vite-plugin-pwa/client.d.ts",
+            "vite-plugin-svgr/client",
+            "node"
+        ],
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true
     },
-    "include": ["src", "env.ts", "node_modules/vite-plugin-pwa/client.d.ts"]
+    "include": [
+        "src",
+        "env.ts"
+    ]
 }

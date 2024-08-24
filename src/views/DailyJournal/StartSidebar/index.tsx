@@ -13,6 +13,7 @@ import {
 
 import Button from '#components/Button';
 import Checkbox from '#components/Checkbox';
+import Link from '#components/Link';
 import SelectInput from '#components/SelectInput';
 import EnumsContext from '#contexts/enums';
 import { EnumsQuery } from '#generated/types/graphql';
@@ -131,6 +132,12 @@ function StartSidebar(props: Props) {
                     Shortcuts
                 </Button>
                         */}
+                <Link
+                    to="dailyJournal"
+                    variant="secondary"
+                >
+                    Go to today
+                </Link>
                 <Button
                     name={undefined}
                     onClick={handleCopyTextButtonClick}

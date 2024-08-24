@@ -273,6 +273,7 @@ function useBackgroundSync<T extends Base>(
         [localState, serverState, action, setStateData],
     );
 
+    // NOTE: We can use useThrottledValue here
     const isObsolete = useMemo(() => {
         const {
             addedItems,

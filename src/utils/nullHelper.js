@@ -26,13 +26,10 @@ export function removeNull(
 
                 const val = data[key];
                 const newEntry = removeNull(val, ignoreKeys);
-                if (isDefined(newEntry)) {
-                    return {
-                        ...acc,
-                        [key]: newEntry,
-                    };
-                }
-                return acc;
+                return {
+                    ...acc,
+                    [key]: isDefined(newEntry) ? newEntry : undefined,
+                };
             },
             {},
         );

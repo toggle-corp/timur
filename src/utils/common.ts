@@ -32,18 +32,6 @@ export function getWindowSize(): Size {
     };
 }
 
-function removeUndefinedFromObject<T extends object>(obj: T): T {
-    const newObj = { ...obj };
-
-    Object.keys(obj).forEach((key) => {
-        if (obj[key as keyof typeof obj] === undefined) {
-            delete newObj[key as keyof typeof obj];
-        }
-    });
-
-    return newObj;
-}
-
 function squash<T extends object>(items: T[]): T | undefined {
     if (items.length <= 1) {
         return items[0];
@@ -51,7 +39,7 @@ function squash<T extends object>(items: T[]): T | undefined {
     return items.reduce(
         (acc, val) => ({
             ...acc,
-            ...removeUndefinedFromObject(val),
+            ...val,
         }),
         items[0],
     );

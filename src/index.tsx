@@ -9,11 +9,9 @@ import {
     fetchExchange,
     Provider as UrqlProvider,
 } from 'urql';
-import { registerSW } from 'virtual:pwa-register';
 
 import App from './App/index.tsx';
-
-registerSW({ immediate: true });
+import PwaPrompt from './PwaPrompt/index.tsx';
 
 const webappRootId = 'webapp-root';
 const webappRootElement = document.getElementById(webappRootId);
@@ -42,6 +40,7 @@ if (isNotDefined(webappRootElement)) {
 } else {
     ReactDOM.createRoot(webappRootElement).render(
         <React.StrictMode>
+            <PwaPrompt />
             <UrqlProvider value={gqlClient}>
                 <App />
             </UrqlProvider>
