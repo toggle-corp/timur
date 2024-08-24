@@ -7,6 +7,7 @@ import {
     useState,
 } from 'react';
 import { listToGroupList } from '@togglecorp/fujs';
+import { IoSearch } from 'react-icons/io5';
 
 import Dialog from '#components/Dialog';
 import DisplayPicture from '#components/DisplayPicture';
@@ -97,11 +98,14 @@ function AddWorkItemDialog(props: Props) {
             </div>
             <TextInput
                 inputElementRef={titleInputRef}
-                label="Search by title"
+                label="Search by project, contact, client or task name"
                 name={undefined}
                 value={searchText}
                 variant="general"
                 onChange={setSearchText}
+                icons={(
+                    <IoSearch />
+                )}
             />
             <div
                 role="list"

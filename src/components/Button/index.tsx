@@ -14,7 +14,7 @@ import { SpacingType } from '#utils/types';
 import styles from './styles.module.css';
 
 // NOTE: Adding a 'tertiary-on-dark' to use 'tertiary' button on darker backgrounds
-export type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'tertiary-on-dark' | 'dropdown-item';
+type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'tertiary-on-dark' | 'dropdown-item';
 
 const buttonVariantToClassNameMap: Record<ButtonVariant, string> = {
     primary: styles.primary,

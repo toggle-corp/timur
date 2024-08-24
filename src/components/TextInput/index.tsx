@@ -5,7 +5,7 @@ import RawInput, { Props as RawInputProps } from '#components/RawInput';
 
 type InheritedProps<T> = (Omit<InputContainerProps, 'input' | 'htmlFor'> & Omit<RawInputProps<T>, 'type' | 'id'>);
 
-export interface Props<T> extends InheritedProps<T> {
+interface Props<T> extends InheritedProps<T> {
     inputElementRef?: React.RefObject<HTMLInputElement>;
     inputClassName?: string;
     type?: 'text' | 'password';

@@ -4,7 +4,7 @@ export type StoredValue<VALUE = unknown> = {
     timestamp: number;
     value: VALUE;
 };
-export type StorageState<VALUE = unknown> = Record<string, StoredValue<VALUE>>;
+type StorageState<VALUE = unknown> = Record<string, StoredValue<VALUE>>;
 
 export interface LocalStorageContextProps {
     storageState: StorageState;

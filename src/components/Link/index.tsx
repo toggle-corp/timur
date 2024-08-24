@@ -30,7 +30,7 @@ import { type WrappedRoutes } from '../../App/routes';
 
 import styles from './styles.module.css';
 
-export interface UrlParams {
+interface UrlParams {
     [key: string]: string | number | null | undefined;
 }
 
@@ -100,7 +100,7 @@ export function useLink(props: {
     };
 }
 
-export type CommonLinkProps<OMISSION extends string = never> = Omit<RouterLinkProps, 'to' | OMISSION> &
+type CommonLinkProps<OMISSION extends string = never> = Omit<RouterLinkProps, 'to' | OMISSION> &
 Omit<{
     actions?: React.ReactNode;
     actionsContainerClassName?: string;
@@ -116,7 +116,7 @@ Omit<{
     spacing?: ButtonFeatureProps['spacing'];
 }, OMISSION>
 
-export type InternalLinkProps = {
+type InternalLinkProps = {
     external?: never;
     to: keyof WrappedRoutes | undefined | null;
     urlParams?: UrlParams;
@@ -125,7 +125,7 @@ export type InternalLinkProps = {
     href?: never;
 }
 
-export type ExternalLinkProps = {
+type ExternalLinkProps = {
     external: true;
     href: string | undefined | null;
     urlParams?: never;

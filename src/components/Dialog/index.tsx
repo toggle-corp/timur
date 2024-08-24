@@ -13,7 +13,7 @@ import DialogContext from '#contexts/dialog';
 
 import styles from './styles.module.css';
 
-export interface Props {
+interface Props {
     className?: string;
     open?: boolean;
     onClose: (show: boolean) => void;

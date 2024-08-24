@@ -11,7 +11,7 @@ import RawList, {
 
 import styles from './styles.module.css';
 
-export interface Props<
+interface Props<
     DATUM,
     KEY extends ListKey,
     RENDERER_PROPS

@@ -186,6 +186,7 @@ function StartSidebar(props: Props) {
                 />
                 <SelectInput
                     name="defaultTaskStatus"
+                    variant="general"
                     label="Default Status"
                     options={enums?.enums.TimeEntryStatus}
                     keySelector={workItemStatusKeySelector}
@@ -197,6 +198,7 @@ function StartSidebar(props: Props) {
                 <SelectInput
                     name="defaultTaskType"
                     label="Default Type"
+                    variant="general"
                     options={enums?.enums.TimeEntryType}
                     keySelector={workItemTypeKeySelector}
                     labelSelector={workItemTypeLabelSelector}

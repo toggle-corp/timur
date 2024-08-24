@@ -18,7 +18,7 @@ import useBlurEffect from '#hooks/useBlurEffect';
 
 import styles from './styles.module.css';
 
-export interface Props {
+interface Props {
     className?: string;
     popupClassName?: string;
     preferredPopupWidth?: number;

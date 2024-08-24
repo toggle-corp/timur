@@ -4,7 +4,7 @@ import { _cs } from '@togglecorp/fujs';
 
 import styles from './styles.module.css';
 
-export interface Props {
+interface Props {
     className?: string;
     label: ReactNode;
     iconClassName?: string;

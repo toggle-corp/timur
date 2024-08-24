@@ -12,7 +12,7 @@ import Popup from '#components/Popup';
 
 import styles from './styles.module.css';
 
-export interface Props {
+interface Props {
     className?: string;
     children?: React.ReactNode;
     disabled?: boolean;

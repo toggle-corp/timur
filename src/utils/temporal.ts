@@ -1,6 +1,6 @@
 import { isNotDefined } from '@togglecorp/fujs';
 
-export interface RelativeTime {
+interface RelativeTime {
     direction: 'past' | 'present' | 'future',
     resolution: 'second' | 'minute' | 'hour' | 'day';
     value: number;
