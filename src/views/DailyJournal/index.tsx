@@ -602,7 +602,6 @@ export function Component() {
                                 urlParams={{ date: getPrevDay() }}
                                 variant="secondary"
                                 title="Previous day"
-                                spacing="sm"
                             >
                                 <IoChevronBackSharp />
                             </Link>
@@ -611,7 +610,6 @@ export function Component() {
                                 urlParams={{ date: getNextDay() }}
                                 variant="secondary"
                                 title="Next day"
-                                spacing="sm"
                             >
                                 <IoChevronForwardSharp />
                             </Link>
@@ -628,10 +626,8 @@ export function Component() {
                         />
                         <Button
                             title="Open calendar"
-                            className={styles.dateButton}
-                            actionsContainerClassName={styles.buttonActions}
                             name={undefined}
-                            variant="tertiary"
+                            variant="secondary"
                             onClick={handleDateButtonClick}
                         >
                             <IoCalendarOutline />

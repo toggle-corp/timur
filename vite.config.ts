@@ -80,6 +80,8 @@ export default defineConfig(({ mode }) => {
                 },
                 workbox: {
                     globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+                    skipWaiting: true,
+                    clientsClaim: true,
                 },
                 pwaAssets: {
                     config: true,
