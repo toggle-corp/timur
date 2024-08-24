@@ -11,6 +11,8 @@ import {
     IoCalendarOutline,
     IoChevronBackSharp,
     IoChevronForwardSharp,
+    IoNewspaperOutline,
+    IoTerminalOutline,
 } from 'react-icons/io5';
 import {
     useNavigate,
@@ -517,7 +519,7 @@ export function Component() {
             } else if (event.ctrlKey && event.key === 'Enter') {
                 event.preventDefault();
                 event.stopPropagation();
-                // FIXME: this binding is empty
+                handleNoteUpdateClick();
             } else if (event.ctrlKey && event.shiftKey && event.key === 'ArrowLeft') {
                 event.preventDefault();
                 event.stopPropagation();
@@ -541,6 +543,7 @@ export function Component() {
             setSelectedDate,
             handleAddEntryClick,
             handleShortcutsButtonClick,
+            handleNoteUpdateClick,
         ],
     );
 
@@ -682,12 +685,22 @@ export function Component() {
                 <Button
                     name={undefined}
                     onClick={handleNoteUpdateClick}
-                    icons={<IoAdd />}
+                    icons={<IoNewspaperOutline />}
                     title={currentNote ? 'Update Note' : 'Add note'}
                     variant="secondary"
                 >
                     {currentNote ? 'Update Note' : 'Add note'}
                 </Button>
+                {windowWidth >= 900 && (
+                    <Button
+                        title="Show shortcuts"
+                        name={undefined}
+                        variant="secondary"
+                        onClick={handleShortcutsButtonClick}
+                    >
+                        <IoTerminalOutline />
+                    </Button>
+                )}
             </div>
             <ShortcutsDialog
                 dialogOpenTriggerRef={shortcutsDialogOpenTriggerRef}

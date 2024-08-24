@@ -142,20 +142,6 @@ function StartSidebar(props: Props) {
                 onDateClick={setSelectedDate}
             />
             <div className={styles.actions}>
-                {/*
-                <Button
-                    name
-                    onClick={handleShortcutsButtonClick}
-                    variant="secondary"
-                    title="Open shortcuts"
-                    spacing="sm"
-                    icons={(
-                        <IoInformation />
-                    )}
-                >
-                    Shortcuts
-                </Button>
-                        */}
                 <Link
                     to="dailyJournal"
                     variant="secondary"
@@ -173,6 +159,9 @@ function StartSidebar(props: Props) {
                 </Button>
             </div>
             <div className={styles.quickSettings}>
+                <h4>
+                    Quick Settings
+                </h4>
                 <Checkbox
                     name="showInputIcons"
                     label="Show input icons"
