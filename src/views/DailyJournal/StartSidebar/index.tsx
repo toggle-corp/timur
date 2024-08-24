@@ -2,7 +2,6 @@ import {
     useCallback,
     useContext,
 } from 'react';
-import { IoCalendar } from 'react-icons/io5';
 import {
     isDefined,
     isFalsyString,
@@ -14,6 +13,7 @@ import {
 import Button from '#components/Button';
 import Checkbox from '#components/Checkbox';
 import Link from '#components/Link';
+import MonthlyCalendar from '#components/MonthlyCalendar';
 import SelectInput from '#components/SelectInput';
 import EnumsContext from '#contexts/enums';
 import { EnumsQuery } from '#generated/types/graphql';
@@ -49,10 +49,16 @@ function workItemStatusLabelSelector(item: WorkItemStatusOption) {
 
 interface Props {
     workItems: WorkItem[];
+    selecteDate: string;
+    setSelectedDate: (newDate: string) => void;
 }
 
 function StartSidebar(props: Props) {
-    const { workItems } = props;
+    const {
+        workItems,
+        selecteDate,
+        setSelectedDate,
+    } = props;
 
     const { taskById } = useContext(EnumsContext);
     const { enums } = useContext(EnumsContext);
@@ -110,13 +116,18 @@ function StartSidebar(props: Props) {
         [workItems, taskById],
     );
 
+    const date = new Date(selecteDate);
+
     return (
         <div
             className={styles.startSidebar}
         >
-            <div className={styles.calendar}>
-                <IoCalendar />
-            </div>
+            <MonthlyCalendar
+                className={styles.calendar}
+                year={date.getFullYear()}
+                month={date.getMonth()}
+                onDateClick={setSelectedDate}
+            />
             <div className={styles.actions}>
                 {/*
                 <Button

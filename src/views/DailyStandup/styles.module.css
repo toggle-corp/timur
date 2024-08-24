@@ -17,6 +17,7 @@
             .welcome-section {
                 display: flex;
                 flex-grow: 1;
+                flex-wrap: wrap;
 
                 .welcome-header {
                     display: flex;
@@ -107,19 +108,6 @@
 
             .project-standup {
                 flex-grow: 1;
-            }
-
-            .misc-section {
-                display: flex;
-                align-items: center;
-                flex-grow: 1;
-                justify-content: center;
-
-                .misc-heading {
-                    color: var(--color-primary);
-                    font-size: var(--font-size-4xl);
-                    font-weight: var(--font-weight-light);
-                }
             }
 
             .end-section {

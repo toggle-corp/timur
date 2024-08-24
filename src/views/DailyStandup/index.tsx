@@ -129,12 +129,8 @@ export function Component() {
                 prev: undefined,
                 next: allProjectsData[0].id,
             },
-            misc: {
-                prev: allProjectsData[allProjectsData.length - 1].id,
-                next: 'end',
-            },
             end: {
-                prev: 'misc',
+                prev: allProjectsData[allProjectsData.length - 1].id,
                 next: undefined,
             },
         };
@@ -142,7 +138,7 @@ export function Component() {
         return allProjectsData.reduce(
             (acc, val, index) => {
                 const currentMap = {
-                    next: index === (allProjectsData.length - 1) ? 'misc' : allProjectsData[index + 1].id,
+                    next: index === (allProjectsData.length - 1) ? 'end' : allProjectsData[index + 1].id,
                     prev: index === 0 ? 'start' : allProjectsData[index - 1].id,
                 };
 
@@ -159,14 +155,6 @@ export function Component() {
             setUrlQuery({
                 project: undefined,
                 page: undefined,
-            });
-            return;
-        }
-
-        if (pageId === 'misc') {
-            setUrlQuery({
-                project: undefined,
-                page: 'misc',
             });
             return;
         }
@@ -282,13 +270,6 @@ export function Component() {
                         date={selectedDate}
                         projectId={urlQuery.project}
                     />
-                )}
-                {urlQuery.page === 'misc' && (
-                    <div className={styles.miscSection}>
-                        <h2 className={styles.miscHeading}>
-                            Miscellaneous
-                        </h2>
-                    </div>
                 )}
                 {urlQuery.page === 'end' && (
                     <EndSection
