@@ -1,0 +1,17 @@
+.monthly-calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: var(--spacing-xs);
+
+    .day-name {
+        text-align: center;
+        color: var(--color-text-light);
+        font-size: var(--font-size-sm);
+    }
+
+    .date {
+        &:hover {
+            background-color: var(--color-secondary);
+        }
+    }
+}

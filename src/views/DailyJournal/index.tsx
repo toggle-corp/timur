@@ -577,7 +577,9 @@ export function Component() {
             startAsideContainerClassName={styles.startAside}
             startAsideContent={(
                 <StartSidebar
+                    selecteDate={selectedDate}
                     workItems={workItems}
+                    setSelectedDate={setSelectedDate}
                 />
             )}
             endAsideContent={(
