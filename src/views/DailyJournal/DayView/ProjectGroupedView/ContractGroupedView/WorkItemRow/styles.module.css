@@ -25,6 +25,8 @@
         gap: var(--spacing-xs);
     }
 
+
+    /* TODO: sync this color from colorscheme */
     .status-checkbox {
         &.doing {
             color: #039BE5;

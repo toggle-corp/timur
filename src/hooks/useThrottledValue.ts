@@ -15,7 +15,7 @@ function useThrottledValue<T>(
 
     const latestValue = useRef(input);
 
-    const idleCallbackRef = useRef<number>();
+    const timeoutRef = useRef<number>();
 
     useEffect(
         () => {
@@ -25,24 +25,24 @@ function useThrottledValue<T>(
     );
 
     useEffect(() => {
-        if (isDefined(idleCallbackRef.current)) {
+        if (isDefined(timeoutRef.current)) {
             return;
         }
 
-        idleCallbackRef.current = window.requestIdleCallback(
+        timeoutRef.current = window.setTimeout(
             () => {
                 setThrottledValue(latestValue.current);
 
-                idleCallbackRef.current = undefined;
+                timeoutRef.current = undefined;
             },
-            { timeout: throttleTime },
+            throttleTime,
         );
     }, [input, throttleTime]);
 
     useEffect(() => () => {
-        if (idleCallbackRef.current) {
-            window.cancelIdleCallback(idleCallbackRef.current);
-            idleCallbackRef.current = undefined;
+        if (timeoutRef.current) {
+            window.clearTimeout(timeoutRef.current);
+            timeoutRef.current = undefined;
         }
     }, []);
 
