@@ -28,6 +28,7 @@ const login = customWrapRoute({
         render: () => import('#components/TemplateView'),
         props: {
             title: 'Login',
+            description: 'You need to login to continue',
         },
     },
     wrapperComponent: Auth,

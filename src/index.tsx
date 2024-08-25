@@ -35,6 +35,7 @@ const gqlClient = new UrqlClient({
             AppEnumCollectionTimeEntryType: (item) => String(item.key),
             AppEnumCollectionTimeEntryStatus: (item) => String(item.key),
             AppEnumCollectionJournalLeaveType: (item) => String(item.key),
+            DjangoImageType: (item) => String(item.url),
         },
     }), fetchExchange],
     fetchOptions: () => ({
@@ -62,13 +63,10 @@ if (dsn) {
         // tracing.
         tracesSampleRate: 1.0,
 
+        // FIXME: configure later
         // Set `tracePropagationTargets` to control for which URLs trace
         // propagation should be enabled
-        tracePropagationTargets: [
-            /^\//,
-            // FIXME: move this to env later
-            /^https:\/\/alpha-api\.timur\.dev\.togglecorp\.com\/graphql/,
-        ],
+        // tracePropagationTargets: [],
 
         // Capture Replay for 10% of all sessions, plus for 100% of sessions
         // with an error

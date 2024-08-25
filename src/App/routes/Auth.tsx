@@ -46,7 +46,10 @@ function Auth(props: Props) {
 
         if (!hasPermission) {
             return (
-                <TemplateView title="403" />
+                <TemplateView
+                    title="403"
+                    description="You are not authorized to view this page"
+                />
             );
         }
     }

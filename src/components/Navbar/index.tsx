@@ -109,7 +109,7 @@ function Navbar(props: Props) {
                         external
                         href={`${import.meta.env.APP_AUTH_URL}?redirect_to=${window.location.href}`}
                     >
-                        Sign In
+                        Login
                     </Link>
                 )}
                 {isDefined(userAuth) && (
@@ -149,9 +149,9 @@ function Navbar(props: Props) {
                             onClick={handleLogoutClick}
                             disabled={fetching}
                             icons={<IoExitOutline />}
-                            title="Sign out"
+                            title="Log out"
                         >
-                            Sign out
+                            Log out
                         </DropdownMenuItem>
                     </DropdownMenu>
                 )}
