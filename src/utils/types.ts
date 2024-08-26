@@ -30,7 +30,7 @@ export interface Note {
 }
 
 export type ConfigStorage = {
-    defaultTaskType: WorkItemType,
+    defaultTaskType: WorkItemType | undefined,
     defaultTaskStatus: WorkItemStatus,
     editingMode: EditingMode,
     checkboxForStatus: boolean,

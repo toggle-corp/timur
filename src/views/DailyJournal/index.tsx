@@ -1,11 +1,13 @@
 import {
     useCallback,
     useContext,
+    useEffect,
     useLayoutEffect,
     useMemo,
     useRef,
     useState,
 } from 'react';
+import { FcHighPriority } from 'react-icons/fc';
 import {
     IoAdd,
     IoCalendarOutline,
@@ -32,10 +34,10 @@ import {
 } from 'urql';
 
 import Button from '#components/Button';
+import CalendarInput from '#components/CalendarInput';
 import Link, { resolvePath } from '#components/Link';
 import Page from '#components/Page';
 import Portal from '#components/Portal';
-import RawInput from '#components/RawInput';
 import FocusContext from '#contexts/focus';
 import NavbarContext from '#contexts/navbar';
 import RouteContext from '#contexts/route';
@@ -141,6 +143,14 @@ export function Component() {
 
     const { date: dateFromParams } = useParams<{ date: string | undefined}>();
 
+    // NOTE: We are opening the dialog from this parent component
+    const dialogOpenTriggerRef = useRef<(() => void) | undefined>();
+    const noteDialogOpenTriggerRef = useRef<(() => void) | undefined>();
+    const shortcutsDialogOpenTriggerRef = useRef<(() => void) | undefined>();
+    const calendarRef = useRef<
+        { resetView:(year: number, month: number) => void; }
+            >(null);
+
     const selectedDate = useMemo(() => {
         const today = new Date();
 
@@ -156,6 +166,19 @@ export function Component() {
 
         return encodeDate(date);
     }, [dateFromParams]);
+
+    useEffect(
+        () => {
+            if (calendarRef.current && selectedDate) {
+                const selectedDateObj = new Date(selectedDate);
+                calendarRef.current.resetView(
+                    selectedDateObj.getFullYear(),
+                    selectedDateObj.getMonth(),
+                );
+            }
+        },
+        [selectedDate],
+    );
 
     const setSelectedDate = useCallback((newDateStr: string | undefined) => {
         const today = encodeDate(new Date());
@@ -190,14 +213,6 @@ export function Component() {
 
         return prevDay;
     }, [selectedDate]);
-
-    // NOTE: We are hiding the native dateinput and triggering calender popup
-    // using a separate button
-    const dateInputRef = useRef<HTMLInputElement>(null);
-    // NOTE: We are opening the dialog from this parent component
-    const dialogOpenTriggerRef = useRef<(() => void) | undefined>();
-    const noteDialogOpenTriggerRef = useRef<(() => void) | undefined>();
-    const shortcutsDialogOpenTriggerRef = useRef<(() => void) | undefined>();
 
     const [storedConfig, setStoredConfig] = useLocalStorage<ConfigStorage>(
         KEY_CONFIG_STORAGE,
@@ -373,7 +388,7 @@ export function Component() {
     );
 
     const handleWorkItemClone = useCallback(
-        (workItemClientId: string) => {
+        (workItemClientId: string, override?: Partial<WorkItem>) => {
             const newId = getNewId();
             setWorkItems((oldWorkItems) => {
                 if (isNotDefined(oldWorkItems)) {
@@ -388,11 +403,16 @@ export function Component() {
 
                 const targetItem = {
                     ...oldWorkItems[sourceItemIndex],
+                    ...override,
                     clientId: newId,
                 };
                 delete targetItem.id;
-                delete targetItem.description;
-                delete targetItem.duration;
+                // NOTE: If we have defined overrides, we don't need to clear
+                // description and duration
+                if (!override) {
+                    delete targetItem.description;
+                    delete targetItem.duration;
+                }
 
                 const newWorkItems = [...oldWorkItems];
                 newWorkItems.splice(sourceItemIndex + 1, 0, targetItem);
@@ -474,13 +494,6 @@ export function Component() {
             });
         },
         [setWorkItems, addOrUpdateStateData],
-    );
-
-    const handleDateButtonClick = useCallback(
-        () => {
-            dateInputRef.current?.showPicker();
-        },
-        [],
     );
 
     const handleNoteUpdateClick = useCallback(
@@ -584,6 +597,13 @@ export function Component() {
     // FIXME: memoize this
     const filteredWorkItems = workItems.filter((item) => item.date === selectedDate);
 
+    const entriesWithoutTask = filteredWorkItems
+        .filter((item) => isNotDefined(item.type) && item.status !== 'TODO')
+        .length;
+    const entriesWithoutHours = filteredWorkItems
+        .filter((item) => isNotDefined(item.duration) && item.status !== 'TODO')
+        .length;
+
     return (
         <Page
             documentTitle="Timur - Daily Journal"
@@ -592,6 +612,7 @@ export function Component() {
             startAsideContainerClassName={styles.startAside}
             startAsideContent={(
                 <StartSidebar
+                    calendarComponentRef={calendarRef}
                     selectedDate={selectedDate}
                     workItems={filteredWorkItems}
                     setSelectedDate={setSelectedDate}
@@ -628,7 +649,7 @@ export function Component() {
                             <Link
                                 to="dailyJournal"
                                 urlParams={{ date: getPrevDay() }}
-                                variant="secondary"
+                                variant="quaternary"
                                 title="Previous day"
                             >
                                 <IoChevronBackSharp />
@@ -636,31 +657,22 @@ export function Component() {
                             <Link
                                 to="dailyJournal"
                                 urlParams={{ date: getNextDay() }}
-                                variant="secondary"
+                                variant="quaternary"
                                 title="Next day"
                             >
                                 <IoChevronForwardSharp />
                             </Link>
                         </>
                     )}
-                    <div className={styles.dateContainer}>
-                        <RawInput
-                            elementRef={dateInputRef}
-                            type="date"
-                            className={styles.dateInput}
-                            name={undefined}
-                            value={selectedDate}
-                            onChange={setSelectedDate}
-                        />
-                        <Button
-                            title="Open calendar"
-                            name={undefined}
-                            variant="secondary"
-                            onClick={handleDateButtonClick}
-                        >
-                            <IoCalendarOutline />
-                        </Button>
-                    </div>
+                    <CalendarInput
+                        title="Open calendar"
+                        name={undefined}
+                        variant="quaternary"
+                        value={selectedDate}
+                        onChange={setSelectedDate}
+                    >
+                        <IoCalendarOutline />
+                    </CalendarInput>
                 </div>
             </Portal>
             <FocusContext.Provider
@@ -676,6 +688,26 @@ export function Component() {
                     selectedDate={selectedDate}
                 />
             </FocusContext.Provider>
+            {entriesWithoutTask + entriesWithoutHours > 0 && (
+                <div className={styles.warning}>
+                    {entriesWithoutTask > 0 && (
+                        <div className={styles.warningBadge}>
+                            <FcHighPriority />
+                            <span>
+                                {`${entriesWithoutTask} uncategorized entries`}
+                            </span>
+                        </div>
+                    )}
+                    {entriesWithoutHours > 0 && (
+                        <div className={styles.warningBadge}>
+                            <FcHighPriority />
+                            <span>
+                                {`${entriesWithoutHours} untracked entries`}
+                            </span>
+                        </div>
+                    )}
+                </div>
+            )}
             <div className={styles.bottomActions}>
                 <Button
                     name={undefined}
@@ -690,7 +722,7 @@ export function Component() {
                     onClick={handleNoteUpdateClick}
                     icons={<IoNewspaperOutline />}
                     title={currentNote ? 'Update Note' : 'Add note'}
-                    variant="secondary"
+                    variant="quaternary"
                 >
                     {currentNote ? 'Update Note' : 'Add note'}
                 </Button>
@@ -698,7 +730,7 @@ export function Component() {
                     <Button
                         title="Show shortcuts"
                         name={undefined}
-                        variant="secondary"
+                        variant="quaternary"
                         onClick={handleShortcutsButtonClick}
                     >
                         <IoTerminalOutline />

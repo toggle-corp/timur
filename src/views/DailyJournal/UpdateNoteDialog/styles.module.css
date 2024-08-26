@@ -3,6 +3,7 @@
         display: flex;
         flex-direction: column;
         gap: var(--spacing-md);
+        padding: var(--spacing-md);
 
         .codemirror {
             border: var(--width-separator-md) solid var(--color-separator);

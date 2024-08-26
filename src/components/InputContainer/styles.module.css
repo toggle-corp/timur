@@ -1,9 +1,10 @@
 .input-container {
-    display: block;
+    display: flex;
     position: relative;
+    flex-direction: column;
 
     .input-section {
-        align-items: flex-start;
+        align-items: center;
 
         .input {
             padding: 0;
@@ -19,6 +20,7 @@
         border: var(--width-separator-sm) solid var(--color-separator);
         border-radius: var(--border-radius-md);
         padding: var(--spacing-2xs);
+        gap: var(--spacing-2xs);
     }
 
     &.disabled {

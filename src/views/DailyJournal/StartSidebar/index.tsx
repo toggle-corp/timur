@@ -78,10 +78,14 @@ interface Props {
     workItems: WorkItem[];
     selectedDate: string;
     setSelectedDate: (newDate: string) => void;
+    calendarComponentRef?: React.MutableRefObject<{
+        resetView: (year: number, month: number) => void;
+    } | null>;
 }
 
 function StartSidebar(props: Props) {
     const {
+        calendarComponentRef,
         workItems,
         selectedDate,
         setSelectedDate,
@@ -150,22 +154,23 @@ function StartSidebar(props: Props) {
             className={styles.startSidebar}
         >
             <MonthlyCalendar
+                componentRef={calendarComponentRef}
                 selectedDate={selectedDate}
-                year={date.getFullYear()}
-                month={date.getMonth()}
+                initialYear={date.getFullYear()}
+                initialMonth={date.getMonth()}
                 onDateClick={setSelectedDate}
             />
             <div className={styles.actions}>
                 <Link
                     to="dailyJournal"
-                    variant="secondary"
+                    variant="quaternary"
                 >
                     Go to today
                 </Link>
                 <Button
                     name={undefined}
                     onClick={handleCopyTextButtonClick}
-                    variant="secondary"
+                    variant="quaternary"
                     disabled={workItems.length === 0}
                     title="Copy standup text"
                 >
@@ -176,6 +181,25 @@ function StartSidebar(props: Props) {
                 <h4>
                     Quick Settings
                 </h4>
+                <Checkbox
+                    name="compactTextArea"
+                    label="Collapse text area on blur"
+                    value={storedConfig.compactTextArea}
+                    onChange={setConfigFieldValue}
+                />
+                <Checkbox
+                    name="showInputIcons"
+                    label="Show input icons"
+                    value={storedConfig.showInputIcons}
+                    onChange={setConfigFieldValue}
+                />
+                <Checkbox
+                    name="checkboxForStatus"
+                    label="Use checkbox for status"
+                    tooltip="Use checkbox instead of select input for the status. i.e. to toggle TODO, Doing and Done"
+                    value={storedConfig.checkboxForStatus}
+                    onChange={setConfigFieldValue}
+                />
                 <SelectInput
                     name="defaultTaskStatus"
                     variant="general"
@@ -198,7 +222,6 @@ function StartSidebar(props: Props) {
                     colorSelector={defaultColorSelector}
                     onChange={setConfigFieldValue}
                     value={storedConfig.defaultTaskType}
-                    nonClearable
                 />
                 <SelectInput
                     name="editingMode"
@@ -211,25 +234,6 @@ function StartSidebar(props: Props) {
                     onChange={setConfigFieldValue}
                     value={storedConfig.editingMode}
                     nonClearable
-                />
-                <Checkbox
-                    name="compactTextArea"
-                    label="Collapse text area on blur"
-                    value={storedConfig.compactTextArea}
-                    onChange={setConfigFieldValue}
-                />
-                <Checkbox
-                    name="showInputIcons"
-                    label="Show input icons"
-                    value={storedConfig.showInputIcons}
-                    onChange={setConfigFieldValue}
-                />
-                <Checkbox
-                    name="checkboxForStatus"
-                    label="Use checkbox for status"
-                    tooltip="Use checkbox instead of select input for the status. i.e. to toggle TODO, Doing and Done"
-                    value={storedConfig.checkboxForStatus}
-                    onChange={setConfigFieldValue}
                 />
             </div>
         </div>

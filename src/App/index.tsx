@@ -50,6 +50,7 @@ const ME_QUERY = gql`
                 firstName
                 id
                 lastName
+                isStaff
             }
         }
     }

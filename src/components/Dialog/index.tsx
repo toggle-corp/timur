@@ -106,7 +106,7 @@ function Dialog(props: Props) {
                                 name={undefined}
                                 onClick={handleCloseButtonClick}
                                 title="Close dialog"
-                                variant="tertiary"
+                                variant="transparent"
                             >
                                 <IoCloseSharp />
                             </Button>

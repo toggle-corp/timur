@@ -149,7 +149,7 @@ function Link(props: Props) {
         linkElementClassName,
         withUnderline,
         withLinkIcon,
-        variant = 'tertiary',
+        variant = 'transparent',
         ellipsize,
         spacing,
 
@@ -283,7 +283,7 @@ function Link(props: Props) {
                 withUnderline && styles.underline,
                 disabled && styles.disabled,
                 variant === 'dropdown-item' && styles.dropdownItem,
-                variant === 'tertiary' && styles.tertiary,
+                variant === 'transparent' && styles.transparent,
                 ellipsize && styles.ellipsized,
                 className,
             )}

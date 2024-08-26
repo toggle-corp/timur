@@ -3,7 +3,7 @@ import { ConfigStorage } from './types';
 export const KEY_CONFIG_STORAGE = 'timur-config';
 
 export const defaultConfigValue: ConfigStorage = {
-    defaultTaskType: 'DEVELOPMENT',
+    defaultTaskType: undefined,
     defaultTaskStatus: 'DONE',
     editingMode: 'normal',
     compactTextArea: false,

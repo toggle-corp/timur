@@ -104,7 +104,7 @@ function EndSidebar(props: Props) {
                             )}
                             name={project.id}
                             onClick={setActiveProject}
-                            title={`Toggle project tasks for "${project.name}"`}
+                            title="Expand project tasks"
                         >
                             <DisplayPicture
                                 imageUrl={project.logo?.url}
@@ -133,7 +133,7 @@ function EndSidebar(props: Props) {
                                             name={task.id}
                                             onClick={onWorkItemCreate}
                                             key={task.id}
-                                            title={`Add entry for "${task.name}" from sidebar"`}
+                                            title="Add entry from sidebar"
                                         >
                                             <span className={styles.taskName}>
                                                 {task.name}

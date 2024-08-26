@@ -23,7 +23,7 @@
         }
     }
 
-    &:not(.tertiary):not(.dropdown-item) {
+    &:not(.transparent):not(.dropdown-item) {
         text-align: center;
     }
 

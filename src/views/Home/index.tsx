@@ -47,8 +47,8 @@ export function Component() {
             <MonthlyCalendar
                 selectedDate={undefined}
                 className={styles.calendar}
-                year={today.getFullYear()}
-                month={today.getMonth()}
+                initialYear={today.getFullYear()}
+                initialMonth={today.getMonth()}
                 onDateClick={handleDateClick}
             />
             <div className={styles.quickLinks}>

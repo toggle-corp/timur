@@ -26,7 +26,7 @@ export interface Props {
     className?: string;
     project: Project;
     contracts: ContractGroupedWorkItem[];
-    onWorkItemClone: (clientId: string) => void;
+    onWorkItemClone: (clientId: string, override?: Partial<WorkItem>) => void;
     onWorkItemChange: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
     onWorkItemDelete: (clientId: string) => void;
 }

@@ -46,7 +46,7 @@ function DropdownMenu(props: Props) {
         label,
         activeClassName,
         icons,
-        variant = 'secondary',
+        variant = 'quaternary',
         actions,
         withoutDropdownIcon,
         componentRef,

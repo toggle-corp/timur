@@ -3,6 +3,7 @@
         display: flex;
         flex-direction: column;
         gap: var(--spacing-md);
+        padding: var(--spacing-md);
 
         .task-list {
             display: flex;
@@ -22,22 +23,17 @@
                         display: flex;
                         color: var(--color-text-light);
                         font-size: var(--font-size-xs);
-                        gap: var(--spacing-sm);
-
-                        .badge {
-                            border: 1px solid var(--color-separator);
-                            border-radius: var(--border-radius-md);
-                            padding: 0 var(--spacing-xs);
-                        }
+                        gap: var(--spacing-xs);
                     }
                 }
 
                 .display-picture {
                     font-size: var(--font-size-xl);
                 }
+
                 .usage-count {
                     flex-shrink: 0;
-                    border-radius: 50%;
+                    border-radius: var(--border-radius-lg);
                     background-color: var(--color-quaternary);
                     padding: 0 var(--spacing-sm);
                 }

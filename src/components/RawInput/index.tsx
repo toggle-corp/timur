@@ -36,7 +36,8 @@ function RawInput<const N>(props: Props<N>) {
     React.useLayoutEffect(
         () => {
             if (containerRef.current) {
-                containerRef.current.dataset.replicatedValue = value ?? placeholder ?? '';
+                const val = value || placeholder || '';
+                containerRef.current.dataset.replicatedValue = val;
             }
         },
         [value, placeholder],

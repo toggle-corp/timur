@@ -13,7 +13,9 @@
         overflow: hidden;
         resize: none;
         text-overflow: ellipsis;
-        white-space: nowrap;
+        /* NOTE: We want to preserve whitespaces. We don't have new lines so we
+         * don't need to worry about it */
+        white-space: pre;
         color: inherit;
         font: inherit;
         grid-area: 1 / 2;

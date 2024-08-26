@@ -11,6 +11,7 @@ export interface LocalStorageContextProps {
     setStorageState: React.Dispatch<React.SetStateAction<StorageState>>;
 }
 
+// FIXME: replace this with simpler alternative
 const LocalStorageContext = createContext<LocalStorageContextProps>({
     storageState: {},
     setStorageState: () => {

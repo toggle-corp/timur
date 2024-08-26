@@ -114,13 +114,13 @@ function Navbar(props: Props) {
                 )}
                 {isDefined(userAuth) && (
                     <DropdownMenu
-                        variant="tertiary"
+                        variant="transparent"
                         withoutDropdownIcon
                         label={(
                             <DisplayPicture
                                 className={styles.displayPicture}
                                 imageUrl={userAuth.displayPicture}
-                                displayName={userAuth.displayName}
+                                displayName={userAuth.displayName ?? userAuth.email}
                             />
                         )}
                         title="Show user actions"
@@ -128,14 +128,16 @@ function Navbar(props: Props) {
                         <div className={styles.greetings}>
                             {`Hello ${userAuth.displayName}!`}
                         </div>
-                        <DropdownMenuItem
-                            type="link"
-                            external
-                            href={import.meta.env.APP_ADMIN_URL}
-                            icons={<IoShieldCheckmarkOutline />}
-                        >
-                            Admin Panel
-                        </DropdownMenuItem>
+                        {userAuth.isStaff && (
+                            <DropdownMenuItem
+                                type="link"
+                                external
+                                href={import.meta.env.APP_ADMIN_URL}
+                                icons={<IoShieldCheckmarkOutline />}
+                            >
+                                Admin Panel
+                            </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem
                             type="link"
                             to="settings"

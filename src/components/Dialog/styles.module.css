@@ -5,12 +5,12 @@
         border: none;
         box-shadow: var(--box-shadow-xl);
         background-color: var(--color-foreground);
-        padding: var(--spacing-md);
+        padding: unset;
         overflow: auto;
-        gap: var(--spacing-md);
 
         .header {
             display: flex;
+            padding: var(--spacing-md);
 
             .heading {
                 flex-grow: 1;

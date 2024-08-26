@@ -114,7 +114,6 @@ function AddWorkItemDialog(props: Props) {
                 {filteredTaskList.map((task) => {
                     const { contract } = task;
                     const { project } = contract;
-                    const { projectClient } = project;
                     const count = taskCountMapping?.[task.id] ?? 0;
 
                     return (
@@ -124,7 +123,7 @@ function AddWorkItemDialog(props: Props) {
                             name={task.id}
                             onClick={handleWorkItemCreate}
                             key={task.id}
-                            title={`Add entry for "${task.name}" from dialog`}
+                            title="Add entry from dialog"
                         >
                             <DisplayPicture
                                 className={styles.displayPicture}
@@ -132,18 +131,18 @@ function AddWorkItemDialog(props: Props) {
                                 displayName={project.name}
                             />
                             <div className={styles.details}>
-                                {task.name}
                                 <div className={styles.meta}>
-                                    <div className={styles.badge}>
-                                        {projectClient.name}
-                                    </div>
-                                    <div className={styles.badge}>
+                                    <div>
                                         {project.name}
                                     </div>
-                                    <div className={styles.badge}>
+                                    <div>
+                                        ›
+                                    </div>
+                                    <div>
                                         {contract.name}
                                     </div>
                                 </div>
+                                {task.name}
                             </div>
                             {count > 0 && (
                                 <div className={styles.usageCount}>

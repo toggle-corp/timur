@@ -1,5 +1,6 @@
 import {
     useCallback,
+    useEffect,
     useMemo,
     useState,
 } from 'react';
@@ -33,19 +34,24 @@ interface Day {
 }
 
 interface Props {
-    selectedDate: string | undefined;
-    year: number;
-    month: number;
     className?: string;
-    onDateClick?: (date: string) => void;
     weekDayNameClassName?: string;
     dateClassName?: string;
+    selectedDate: string | undefined;
+    initialYear: number;
+    initialMonth: number;
+    onDateClick?: (date: string) => void;
+    componentRef?: React.MutableRefObject<{
+        resetView: (year: number, month: number) => void;
+    } | null>;
 }
 
+// TODO: Show holidays, leaves on calendar
 function MonthlyCalendar(props: Props) {
     const {
-        year: initialYear,
-        month: initialMonth,
+        initialYear,
+        initialMonth,
+        componentRef,
         className,
         onDateClick,
         weekDayNameClassName,
@@ -57,6 +63,22 @@ function MonthlyCalendar(props: Props) {
     const [month, setMonth] = useState(initialMonth);
 
     const today = new Date();
+
+    const resetView = useCallback(
+        (newYear: number, newMonth: number) => {
+            setYear(newYear);
+            setMonth(newMonth);
+        },
+        [],
+    );
+
+    useEffect(() => {
+        if (componentRef) {
+            componentRef.current = {
+                resetView,
+            };
+        }
+    }, [componentRef, resetView]);
 
     const handlePrevMonth = useCallback(
         () => {
@@ -107,29 +129,29 @@ function MonthlyCalendar(props: Props) {
     return (
         <div className={_cs(styles.calendarContainer, className)}>
             <div className={styles.header}>
-                <div>
-                    {year}
-                    /
-                    {month + 1}
-                </div>
                 <Button
                     name={undefined}
-                    variant="secondary"
+                    variant="quaternary"
                     onClick={handlePrevMonth}
-                    title="See previous month"
+                    title="See previous month in calendar"
                     spacing="xs"
                 >
                     <IoChevronBackSharp />
                 </Button>
                 <Button
                     name={undefined}
-                    variant="secondary"
+                    variant="quaternary"
                     onClick={handleNextMonth}
-                    title="See next month"
+                    title="See next month in calendar"
                     spacing="xs"
                 >
                     <IoChevronForwardSharp />
                 </Button>
+                <div>
+                    {year}
+                    /
+                    {String(month + 1).padStart(2, '0')}
+                </div>
             </div>
             <div className={styles.monthlyCalendar}>
                 {weekDaysName.map((dayName, i) => (
@@ -148,18 +170,18 @@ function MonthlyCalendar(props: Props) {
                     const date = encodeDate(new Date(year, month, day.date));
                     let variant;
                     if (encodeDate(today) === date) {
-                        variant = 'primary' as const;
-                    } else if (selectedDate === date) {
                         variant = 'secondary' as const;
+                    } else if (selectedDate === date) {
+                        variant = 'quaternary' as const;
                     } else {
-                        variant = 'tertiary' as const;
+                        variant = 'transparent' as const;
                     }
                     return (
                         <Button
                             onClick={onDateClick}
                             className={_cs(styles.date, dateClassName)}
                             name={date}
-                            title={`Set date to ${date}`}
+                            title="Set date from calendar"
                             key={day.date}
                             style={{
                                 gridColumnStart: day.dayOfWeek + 1,

@@ -1,6 +1,18 @@
-.input {
-    border-radius: var(--border-radius-md);
-    padding: 0 var(--spacing-sm);
+.select-input-container {
+    .input {
+        border-radius: var(--border-radius-md);
+        padding: 0 var(--spacing-sm);
+    }
+
+    .clear-btn {
+        display: none;
+    }
+
+    &:focus-within {
+        .clear-btn {
+            display: unset;
+        }
+    }
 }
 
 .popup {
