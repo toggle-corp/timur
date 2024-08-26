@@ -63,10 +63,13 @@ if (dsn) {
         // tracing.
         tracesSampleRate: 1.0,
 
-        // FIXME: configure later
         // Set `tracePropagationTargets` to control for which URLs trace
         // propagation should be enabled
-        // tracePropagationTargets: [],
+        tracePropagationTargets: [
+            // FIXME: move this to .env
+            /^https:\/\/local\.timur\.dev\.togglecorp\.com:3000/,
+            /^https:\/\/timur\.dev\.togglecorp\.com/,
+        ],
 
         // Capture Replay for 10% of all sessions, plus for 100% of sessions
         // with an error
