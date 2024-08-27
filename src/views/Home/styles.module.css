@@ -8,6 +8,10 @@
         justify-content: center;
 
         .calendar {
+            border: var(--width-separator-sm) solid var(--color-separator);
+            border-radius: var(--border-radius-lg);
+            background-color: var(--color-foreground);
+            padding: var(--spacing-md);
             max-width: 30rem;
         }
 
@@ -24,7 +28,7 @@
                 font-size: var(--font-size-lg);
 
                 .icon {
-                    font-size: 8rem;
+                    font-size: 4rem;
                 }
             }
         }

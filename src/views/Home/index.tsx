@@ -3,9 +3,10 @@ import {
     useContext,
 } from 'react';
 import {
-    IoBookOutline,
-    IoDesktopOutline,
-} from 'react-icons/io5';
+    FcCalendar,
+    FcSettings,
+    FcVoicePresentation,
+} from 'react-icons/fc';
 import { useNavigate } from 'react-router-dom';
 import {
     encodeDate,
@@ -55,16 +56,23 @@ export function Component() {
                 <Link
                     linkElementClassName={styles.link}
                     to="dailyJournal"
-                    icons={<IoBookOutline className={styles.icon} />}
+                    icons={<FcCalendar className={styles.icon} />}
                 >
                     Daily Journal
                 </Link>
                 <Link
                     to="dailyStandup"
                     linkElementClassName={styles.link}
-                    icons={<IoDesktopOutline className={styles.icon} />}
+                    icons={<FcVoicePresentation className={styles.icon} />}
                 >
-                    Daily standup
+                    Standup Deck
+                </Link>
+                <Link
+                    to="settings"
+                    linkElementClassName={styles.link}
+                    icons={<FcSettings className={styles.icon} />}
+                >
+                    Settings
                 </Link>
             </div>
         </Page>

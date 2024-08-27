@@ -169,7 +169,7 @@ function WorkItemRow(props: Props) {
             }
             setDialogState(undefined);
         },
-        [onChange, onClone, setFieldValue, dialogState, workItem.clientId],
+        [onClone, setFieldValue, dialogState, workItem.clientId],
     );
 
     const handleClone = useCallback(

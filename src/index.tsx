@@ -37,8 +37,6 @@ const gqlClient = new UrqlClient({
             AppEnumCollectionTimeEntryStatus: (item) => String(item.key),
             AppEnumCollectionJournalLeaveType: (item) => String(item.key),
             DjangoImageType: (item) => String(item.url),
-            // FIXME: we don't have a key yet
-            // DailyStandUpProjectStatType: (item) => String(item.project.id),
         },
     }), fetchExchange],
     fetchOptions: () => ({
