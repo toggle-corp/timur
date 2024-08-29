@@ -1,17 +1,30 @@
-.monthly-calendar {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: var(--spacing-xs);
+.calendar-container {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-direction: column;
 
-    .day-name {
-        text-align: center;
-        color: var(--color-text-light);
+    .header {
+        display: flex;
+        gap: var(--spacing-sm);
+        align-items: baseline;
         font-size: var(--font-size-sm);
     }
 
-    .date {
-        &:hover {
-            background-color: var(--color-secondary);
+    .monthly-calendar {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: var(--spacing-sm);
+
+        .day-name {
+            padding: var(--spacing-2xs);
+            text-align: center;
+            color: var(--color-text-light);
+            font-size: var(--font-size-sm);
+        }
+
+        .date {
+            padding: var(--spacing-2xs);
+            font-size: var(--font-size-sm);
         }
     }
 }

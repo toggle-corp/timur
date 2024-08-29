@@ -28,6 +28,25 @@
         }
     }
 
+    .warning {
+        display: flex;
+        gap: var(--spacing-sm);
+
+        .warning-badge {
+            display: flex;
+            flex-shrink: 0;
+            border: 1px solid var(--color-separator);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            gap: var(--spacing-xs);
+        }
+    }
+
+    .bottom-actions {
+        display: flex;
+        gap: var(--spacing-sm);
+    }
+
     .content {
         display: flex;
         flex-direction: column;
@@ -66,16 +85,3 @@
         transform: rotate(0);
     }
 }
-
-.date-container {
-    display: flex;
-    position: relative;
-    flex-grow: 1;
-
-    .date-input {
-        position: absolute;
-        bottom: 0;
-        visibility: hidden;
-    }
-}
-

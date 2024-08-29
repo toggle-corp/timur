@@ -28,6 +28,7 @@ const login = customWrapRoute({
         render: () => import('#components/TemplateView'),
         props: {
             title: 'Login',
+            description: 'You need to login to continue',
         },
     },
     wrapperComponent: Auth,
@@ -83,8 +84,11 @@ const settings = customWrapRoute({
     parent: rootLayout,
     path: 'settings',
     component: {
-        render: () => import('#views/Settings'),
-        props: {},
+        render: () => import('#components/TemplateView'),
+        props: {
+            title: 'Settings',
+            description: 'No settings to configure',
+        },
     },
     wrapperComponent: Auth,
     context: {

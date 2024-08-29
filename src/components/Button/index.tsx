@@ -13,14 +13,14 @@ import { SpacingType } from '#utils/types';
 
 import styles from './styles.module.css';
 
-// NOTE: Adding a 'tertiary-on-dark' to use 'tertiary' button on darker backgrounds
-export type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'tertiary-on-dark' | 'dropdown-item';
+type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent' | 'dropdown-item';
 
 const buttonVariantToClassNameMap: Record<ButtonVariant, string> = {
     primary: styles.primary,
     secondary: styles.secondary,
     tertiary: styles.tertiary,
-    'tertiary-on-dark': styles.tertiaryOnDark,
+    quaternary: styles.quaternary,
+    transparent: styles.transparent,
     'dropdown-item': styles.dropdownItem,
 };
 

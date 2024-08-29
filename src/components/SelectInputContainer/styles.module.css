@@ -1,7 +1,17 @@
 .select-input-container {
     .input {
-        padding: 0 var(--spacing-2xs);
-        font-size: var(--font-size-sm);
+        border-radius: var(--border-radius-md);
+        padding: 0 var(--spacing-sm);
+    }
+
+    .clear-btn {
+        display: none;
+    }
+
+    &:focus-within {
+        .clear-btn {
+            display: unset;
+        }
     }
 }
 

@@ -1,6 +1,6 @@
 import { createPortal } from 'react-dom';
 
-export interface Props {
+interface Props {
     portalKey?: string;
     container?: React.RefObject<Element | DocumentFragment>;
     children: React.ReactNode;

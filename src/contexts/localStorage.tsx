@@ -4,13 +4,14 @@ export type StoredValue<VALUE = unknown> = {
     timestamp: number;
     value: VALUE;
 };
-export type StorageState<VALUE = unknown> = Record<string, StoredValue<VALUE>>;
+type StorageState<VALUE = unknown> = Record<string, StoredValue<VALUE>>;
 
 export interface LocalStorageContextProps {
     storageState: StorageState;
     setStorageState: React.Dispatch<React.SetStateAction<StorageState>>;
 }
 
+// FIXME: replace this with simpler alternative
 const LocalStorageContext = createContext<LocalStorageContextProps>({
     storageState: {},
     setStorageState: () => {

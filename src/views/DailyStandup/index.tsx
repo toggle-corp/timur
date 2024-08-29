@@ -24,6 +24,7 @@ import {
     AllProjectsQuery,
     AllProjectsQueryVariables,
 } from '#generated/types/graphql';
+import useKeybind from '#hooks/useKeybind';
 import useUrlQueryState from '#hooks/useUrlQueryState';
 
 import EndSection from './EndSection';
@@ -54,7 +55,9 @@ function getFormattedDaysRemaining(numDays: number) {
         return 'Yesterday';
     }
 
-    return numDays < 0 ? `${numDays} days ago` : `In ${numDays} days`;
+    return numDays < 0
+        ? `${numDays * -1} days ago`
+        : `In ${numDays} days`;
 }
 
 const ALL_PROJECTS_QUERY = gql`
@@ -74,7 +77,7 @@ const ALL_PROJECTS_QUERY = gql`
                     projectId
                 }
                 description
-                logo {
+                logoHd {
                     url
                 }
             }
@@ -174,7 +177,9 @@ export function Component() {
     }, [setUrlQuery]);
 
     const mapId = urlQuery.page ?? urlQuery.project;
-    const prevButtonName = isDefined(mapId) ? projectsMap?.[mapId]?.prev : undefined;
+    const prevButtonName = isDefined(mapId)
+        ? projectsMap?.[mapId]?.prev
+        : undefined;
     const prevButtonDisabled = isNotDefined(mapId) || isNotDefined(projectsMap?.[mapId]?.prev);
 
     const nextButtonName = isDefined(mapId)
@@ -183,6 +188,45 @@ export function Component() {
     const nextButtonDisabled = isNotDefined(mapId)
         ? false
         : isNotDefined(projectsMap?.[mapId].next);
+
+    const handleNextButtion = useCallback(
+        () => {
+            if (nextButtonDisabled) {
+                return;
+            }
+            updatePage(nextButtonName);
+        },
+        [nextButtonName, nextButtonDisabled, updatePage],
+    );
+    const handlePrevButton = useCallback(
+        () => {
+            if (prevButtonDisabled) {
+                return;
+            }
+            updatePage(prevButtonName);
+        },
+        [prevButtonName, prevButtonDisabled, updatePage],
+    );
+
+    const handleKeybindingsPress = useCallback(
+        (event: KeyboardEvent) => {
+            if (event.key === 'ArrowRight') {
+                event.preventDefault();
+                event.stopPropagation();
+                handleNextButtion();
+            } else if (event.key === 'ArrowLeft') {
+                event.preventDefault();
+                event.stopPropagation();
+                handlePrevButton();
+            }
+        },
+        [
+            handleNextButtion,
+            handlePrevButton,
+        ],
+    );
+
+    useKeybind(handleKeybindingsPress);
 
     return (
         <Page
@@ -208,6 +252,7 @@ export function Component() {
                             <h3 className={styles.deadlineHeading}>
                                 Upcoming Deadlines
                             </h3>
+                            <hr className={styles.separator} />
                             <div
                                 className={styles.projectList}
                                 role="list"
@@ -229,7 +274,7 @@ export function Component() {
                                             <header className={styles.projectHeader}>
                                                 <DisplayPicture
                                                     className={styles.projectDp}
-                                                    imageUrl={project.logo?.url}
+                                                    imageUrl={project.logoHd?.url}
                                                     displayName={project.name}
                                                 />
                                                 <h4>
@@ -282,7 +327,7 @@ export function Component() {
                 <Button
                     name={prevButtonName}
                     onClick={updatePage}
-                    variant="secondary"
+                    variant="quaternary"
                     disabled={prevButtonDisabled}
                     icons={<IoChevronBack />}
                     title="Previous standup slide"
@@ -292,7 +337,7 @@ export function Component() {
                 <Button
                     name={nextButtonName}
                     onClick={updatePage}
-                    variant="secondary"
+                    variant="quaternary"
                     disabled={nextButtonDisabled}
                     actions={<IoChevronForward />}
                     title="Next standup slide"

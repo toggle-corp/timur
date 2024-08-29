@@ -17,9 +17,8 @@ export type EditingMode = 'normal' | 'vim';
 export type Task = EnumsQuery['private']['allActiveTasks'][number];
 export type Contract = Task['contract'];
 export type Project = Contract['project'];
-export type Client = Contract['project']['projectClient'];
 
-export type WorkItemType = TimeEntryTypeEnum;
+type WorkItemType = TimeEntryTypeEnum;
 export type WorkItemStatus = TimeEntryStatusEnum;
 
 export type WorkItem = Omit<TimeEntryBulkCreateInput, 'clientId'> & { clientId: string };
@@ -31,11 +30,14 @@ export interface Note {
 }
 
 export type ConfigStorage = {
-    defaultTaskType: WorkItemType,
+    defaultTaskType: WorkItemType | undefined,
     defaultTaskStatus: WorkItemStatus,
     editingMode: EditingMode,
     checkboxForStatus: boolean,
     showInputIcons: boolean,
     startSidebarShown: boolean,
     endSidebarShown: boolean,
+    compactTextArea: boolean,
+
+    notes: Note[],
 }

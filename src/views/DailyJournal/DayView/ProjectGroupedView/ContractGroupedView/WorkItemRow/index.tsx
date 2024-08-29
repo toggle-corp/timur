@@ -2,6 +2,7 @@ import {
     useCallback,
     useContext,
     useMemo,
+    useState,
 } from 'react';
 import {
     FcClock,
@@ -13,15 +14,22 @@ import {
 import {
     IoCopyOutline,
     IoEllipsisVertical,
+    IoPencilOutline,
+    IoSwapHorizontal,
     IoTrashOutline,
 } from 'react-icons/io5';
-import { _cs } from '@togglecorp/fujs';
+import {
+    _cs,
+    isDefined,
+} from '@togglecorp/fujs';
 
 import Button from '#components/Button';
 import Checkbox from '#components/Checkbox';
+import Dialog from '#components/Dialog';
 import DropdownMenu from '#components/DropdownMenu';
 import DropdownMenuItem from '#components/DropdownMenuItem';
 import DurationInput from '#components/DurationInput';
+import MonthlyCalendar from '#components/MonthlyCalendar';
 import SelectInput from '#components/SelectInput';
 import TextArea from '#components/TextArea';
 import EnumsContext from '#contexts/enums';
@@ -30,6 +38,7 @@ import { EnumsQuery } from '#generated/types/graphql';
 import { useFocusClient } from '#hooks/useFocus';
 import useLocalStorage from '#hooks/useLocalStorage';
 import {
+    colorscheme,
     defaultConfigValue,
     KEY_CONFIG_STORAGE,
 } from '#utils/constants';
@@ -64,13 +73,26 @@ function workItemStatusKeySelector(item: WorkItemStatusOption) {
 function workItemStatusLabelSelector(item: WorkItemStatusOption) {
     return item.label;
 }
+function workItemStatusColorSelector(item: WorkItemStatusOption): [string, string] {
+    if (item.key === 'DOING') {
+        return colorscheme[1];
+    }
+    if (item.key === 'DONE') {
+        return colorscheme[5];
+    }
+    return colorscheme[7];
+}
+
+function defaultColorSelector<T>(_: T, i: number): [string, string] {
+    return colorscheme[i % colorscheme.length];
+}
 
 export interface Props {
     className?: string;
     workItem: WorkItem;
     contract: Contract;
 
-    onClone: (clientId: string) => void;
+    onClone: (clientId: string, override?: Partial<WorkItem>) => void;
     onChange: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
     onDelete: (clientId: string) => void;
 }
@@ -115,9 +137,51 @@ function WorkItemRow(props: Props) {
         );
     }, [workItem.status, setFieldValue]);
 
+    const [dialogState, setDialogState] = useState<'move' | 'copy' | undefined>(undefined);
+
+    const handleMoveDialogOpen = useCallback(
+        () => {
+            setDialogState('move');
+        },
+        [],
+    );
+
+    const handleCopyDialogOpen = useCallback(
+        () => {
+            setDialogState('copy');
+        },
+        [],
+    );
+
+    const handleDialogClose = useCallback(
+        () => {
+            setDialogState(undefined);
+        },
+        [],
+    );
+
+    const handleMoveOrCopyEntry = useCallback(
+        (newValue: string) => {
+            if (dialogState === 'move') {
+                setFieldValue(newValue, 'date');
+            } else if (dialogState === 'copy') {
+                onClone(workItem.clientId, { date: newValue });
+            }
+            setDialogState(undefined);
+        },
+        [onClone, setFieldValue, dialogState, workItem.clientId],
+    );
+
+    const handleClone = useCallback(
+        () => {
+            onClone(workItem.clientId);
+        },
+        [onClone, workItem.clientId],
+    );
+
     const statusInput = config.checkboxForStatus ? (
         <Checkbox
-            className={_cs(
+            checkmarkClassName={_cs(
                 styles.statusCheckbox,
                 workItem.status === 'DOING' && styles.doing,
                 workItem.status === 'DONE' && styles.done,
@@ -134,6 +198,7 @@ function WorkItemRow(props: Props) {
             options={enums?.enums?.TimeEntryStatus}
             keySelector={workItemStatusKeySelector}
             labelSelector={workItemStatusLabelSelector}
+            colorSelector={workItemStatusColorSelector}
             onChange={setFieldValue}
             value={workItem.status}
             nonClearable
@@ -148,24 +213,35 @@ function WorkItemRow(props: Props) {
             options={filteredTaskList}
             keySelector={taskKeySelector}
             labelSelector={taskLabelSelector}
+            // colorSelector={defaultColorSelector}
             onChange={setFieldValue}
             value={workItem.task}
             nonClearable
-            icons={config.showInputIcons && <FcPackage />}
+            icons={(
+                config.showInputIcons
+                // NOTE: hide/unhide icon wrt "checkbox for status" flag
+                && (windowWidth < 900 || !config.checkboxForStatus)
+                && <FcPackage />
+            )}
         />
     );
 
     const descriptionInput = (
-        <TextArea<'description'>
+        <TextArea
             className={styles.description}
             inputElementRef={inputRef}
             name="description"
             title="Description"
             value={workItem.description}
             onChange={setFieldValue}
-            icons={config.showInputIcons && <FcDocument />}
+            icons={(
+                config.showInputIcons
+                // NOTE: hide/unhide icon wrt "checkbox for status" flag
+                && (windowWidth >= 900 || !config.checkboxForStatus)
+                && <FcDocument />
+            )}
             placeholder="Description"
-            compact={windowWidth >= 900}
+            compact={config.compactTextArea}
         />
     );
 
@@ -173,12 +249,13 @@ function WorkItemRow(props: Props) {
         <SelectInput
             className={styles.type}
             name="type"
+            placeholder="Type"
             options={enums?.enums.TimeEntryType}
             keySelector={workItemTypeKeySelector}
             labelSelector={workItemTypeLabelSelector}
+            colorSelector={defaultColorSelector}
             onChange={setFieldValue}
             value={workItem.type}
-            nonClearable
             icons={config.showInputIcons && <FcRuler />}
         />
     );
@@ -198,10 +275,10 @@ function WorkItemRow(props: Props) {
     const actions = (
         <div className={styles.actions}>
             <Button
-                name={workItem.clientId}
-                variant="secondary"
+                name={undefined}
+                variant="quaternary"
                 title="Clone this entry"
-                onClick={onClone}
+                onClick={handleClone}
                 spacing="xs"
             >
                 <IoCopyOutline />
@@ -209,10 +286,38 @@ function WorkItemRow(props: Props) {
             <DropdownMenu
                 label={<IoEllipsisVertical />}
                 withoutDropdownIcon
-                variant="tertiary"
+                variant="transparent"
                 persistent
                 title="Show additional entry options"
             >
+                <DropdownMenuItem
+                    type="button"
+                    name={workItem.clientId}
+                    title="Edit this entry"
+                    onClick={undefined}
+                    icons={<IoPencilOutline />}
+                    disabled
+                >
+                    Edit entry
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                    type="button"
+                    name={workItem.clientId}
+                    title="Move this entry to another day"
+                    onClick={handleCopyDialogOpen}
+                    icons={<IoCopyOutline />}
+                >
+                    Copy to another day
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                    type="button"
+                    name={workItem.clientId}
+                    title="Move this entry to another day"
+                    onClick={handleMoveDialogOpen}
+                    icons={<IoSwapHorizontal />}
+                >
+                    Move to another day
+                </DropdownMenuItem>
                 <DropdownMenuItem
                     type="confirm-button"
                     name={workItem.clientId}
@@ -231,45 +336,68 @@ function WorkItemRow(props: Props) {
                     )}
                     icons={<IoTrashOutline />}
                 >
-                    Delete
+                    Delete entry
                 </DropdownMenuItem>
             </DropdownMenu>
         </div>
     );
 
+    const today = new Date();
+    const selectedDate = isDefined(workItem.date)
+        ? new Date(workItem.date)
+        : today;
+
     return (
-        <div
-            role="listitem"
-            className={_cs(
-                styles.workItemRow,
-                config.checkboxForStatus && styles.checkboxForStatus,
-                config.showInputIcons && styles.withIcons,
-                className,
-            )}
-        >
-            {windowWidth >= 900 ? (
-                <>
-                    {statusInput}
-                    {taskInput}
-                    {descriptionInput}
-                    {typeInput}
-                    {durationInput}
-                    {actions}
-                </>
-            ) : (
-                <>
-                    {config.checkboxForStatus && statusInput}
-                    {descriptionInput}
-                    <div className={styles.compactOptions}>
-                        {!config.checkboxForStatus && statusInput}
+        <>
+            <div
+                role="listitem"
+                className={_cs(
+                    styles.workItemRow,
+                    config.checkboxForStatus && styles.checkboxForStatus,
+                    config.showInputIcons && styles.withIcons,
+                    className,
+                )}
+            >
+                {windowWidth >= 900 ? (
+                    <>
+                        {statusInput}
                         {taskInput}
+                        {descriptionInput}
                         {typeInput}
                         {durationInput}
                         {actions}
-                    </div>
-                </>
-            )}
-        </div>
+                    </>
+                ) : (
+                    <>
+                        {config.checkboxForStatus && statusInput}
+                        {descriptionInput}
+                        <div className={styles.compactOptions}>
+                            {!config.checkboxForStatus && statusInput}
+                            {taskInput}
+                            {typeInput}
+                            {durationInput}
+                            {actions}
+                        </div>
+                    </>
+                )}
+            </div>
+            <Dialog
+                open={isDefined(dialogState)}
+                mode="center"
+                onClose={handleDialogClose}
+                heading="Select date"
+                contentClassName={styles.modalContent}
+                className={styles.calendarDialog}
+                size="auto"
+            >
+                <MonthlyCalendar
+                    selectedDate={workItem.date}
+                    initialYear={selectedDate.getFullYear()}
+                    initialMonth={selectedDate.getMonth()}
+                    onDateClick={handleMoveOrCopyEntry}
+                />
+            </Dialog>
+        </>
     );
 }
 

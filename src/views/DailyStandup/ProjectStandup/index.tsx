@@ -1,5 +1,7 @@
 import {
     _cs,
+    compareNumber,
+    compareString,
     isDefined,
 } from '@togglecorp/fujs';
 import {
@@ -11,9 +13,21 @@ import DisplayPicture from '#components/DisplayPicture';
 import {
     DailyStandupQuery,
     DailyStandupQueryVariables,
+    UserDepartmentTypeEnum,
 } from '#generated/types/graphql';
 
 import styles from './styles.module.css';
+
+const mapping: {
+    [key in UserDepartmentTypeEnum]: number;
+} = {
+    PROJECT_MANAGER: 1,
+    DEVELOPMENT: 2,
+    DESIGN: 3,
+    QUALITY_ASSURANCE: 4,
+    DATA_ANALYST: 5,
+    MANAGEMENT: 6,
+};
 
 interface Props {
     projectId: string;
@@ -27,6 +41,7 @@ const DAILY_STANDUP_QUERY = gql`
             id
             dailyStandup(date: $date) {
                 projectStat(pk: $projectId) {
+                    id
                     project {
                         id
                         name
@@ -39,7 +54,7 @@ const DAILY_STANDUP_QUERY = gql`
                             usedDays
                             remainingDays
                         }
-                        logo {
+                        logoHd {
                             url
                         }
                     }
@@ -47,8 +62,12 @@ const DAILY_STANDUP_QUERY = gql`
                         id
                         leave
                         workFromHome
-                        displayPicture
-                        displayName
+                        user {
+                            id
+                            displayPicture
+                            displayName
+                            department
+                        }
                     }
                 }
                 quote {
@@ -74,15 +93,25 @@ function ProjectStandup(props: Props) {
     });
 
     const stats = standupResponse.data?.private.dailyStandup.projectStat;
+    // FIXME: use memo
+    const sortedUsers = [...(stats?.users ?? [])].sort((foo, bar) => (
+        compareNumber(
+            foo.user.department ? mapping[foo.user.department] : undefined,
+            bar.user.department ? mapping[bar.user.department] : undefined,
+        ) || compareString(
+            foo.user.displayName,
+            bar.user.displayName,
+        )
+    ));
 
     return (
         <div className={_cs(styles.projectStandup, className)}>
             <header className={styles.header}>
-                {isDefined(stats?.project.logo) && (
+                {isDefined(stats?.project.logoHd) && (
                     <img
                         className={styles.logo}
                         alt=""
-                        src={stats?.project.logo?.url}
+                        src={stats?.project.logoHd?.url}
                     />
                 )}
                 <h2 className={styles.projectName}>
@@ -98,7 +127,7 @@ function ProjectStandup(props: Props) {
                     role="list"
                     className={styles.userList}
                 >
-                    {stats?.users.map((user) => (
+                    {sortedUsers?.map((user) => (
                         <div
                             key={user.id}
                             role="listitem"
@@ -106,11 +135,11 @@ function ProjectStandup(props: Props) {
                         >
                             <DisplayPicture
                                 className={styles.displayPicture}
-                                imageUrl={user.displayPicture}
-                                displayName={user.displayName}
+                                imageUrl={user.user.displayPicture}
+                                displayName={user.user.displayName ?? 'Anon'}
                             />
                             <div>
-                                {user.displayName}
+                                {user.user.displayName ?? 'Anon'}
                             </div>
                         </div>
                     ))}

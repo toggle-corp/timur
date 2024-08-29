@@ -20,16 +20,30 @@ import { EnumsQuery } from '#generated/types/graphql';
 import useLocalStorage from '#hooks/useLocalStorage';
 import useSetFieldValue from '#hooks/useSetFieldValue';
 import {
+    colorscheme,
     defaultConfigValue,
     KEY_CONFIG_STORAGE,
 } from '#utils/constants';
 import {
     ConfigStorage,
+    EditingMode,
     WorkItem,
     WorkItemStatus,
 } from '#utils/types';
 
 import styles from './styles.module.css';
+
+type EditingOption = { key: EditingMode, label: string };
+function editingOptionKeySelector(item: EditingOption) {
+    return item.key;
+}
+function editingOptionLabelSelector(item: EditingOption) {
+    return item.label;
+}
+const editingOptions: EditingOption[] = [
+    { key: 'normal', label: 'Normies' },
+    { key: 'vim', label: 'Vim Masterace' },
+];
 
 type WorkItemTypeOption = EnumsQuery['enums']['TimeEntryType'][number];
 function workItemTypeKeySelector(item: WorkItemTypeOption) {
@@ -46,17 +60,34 @@ function workItemStatusKeySelector(item: WorkItemStatusOption) {
 function workItemStatusLabelSelector(item: WorkItemStatusOption) {
     return item.label;
 }
+function workItemStatusColorSelector(item: WorkItemStatusOption): [string, string] {
+    if (item.key === 'DOING') {
+        return colorscheme[1];
+    }
+    if (item.key === 'DONE') {
+        return colorscheme[5];
+    }
+    return colorscheme[7];
+}
+
+function defaultColorSelector<T>(_: T, i: number): [string, string] {
+    return colorscheme[i % colorscheme.length];
+}
 
 interface Props {
     workItems: WorkItem[];
-    selecteDate: string;
+    selectedDate: string;
     setSelectedDate: (newDate: string) => void;
+    calendarComponentRef?: React.MutableRefObject<{
+        resetView: (year: number, month: number) => void;
+    } | null>;
 }
 
 function StartSidebar(props: Props) {
     const {
+        calendarComponentRef,
         workItems,
-        selecteDate,
+        selectedDate,
         setSelectedDate,
     } = props;
 
@@ -116,61 +147,46 @@ function StartSidebar(props: Props) {
         [workItems, taskById],
     );
 
-    const date = new Date(selecteDate);
+    const date = new Date(selectedDate);
 
     return (
         <div
             className={styles.startSidebar}
         >
             <MonthlyCalendar
-                className={styles.calendar}
-                year={date.getFullYear()}
-                month={date.getMonth()}
+                componentRef={calendarComponentRef}
+                selectedDate={selectedDate}
+                initialYear={date.getFullYear()}
+                initialMonth={date.getMonth()}
                 onDateClick={setSelectedDate}
             />
             <div className={styles.actions}>
-                {/*
-                <Button
-                    name
-                    onClick={handleShortcutsButtonClick}
-                    variant="secondary"
-                    title="Open shortcuts"
-                    spacing="sm"
-                    icons={(
-                        <IoInformation />
-                    )}
-                >
-                    Shortcuts
-                </Button>
-                        */}
                 <Link
                     to="dailyJournal"
-                    variant="secondary"
+                    variant="quaternary"
                 >
                     Go to today
                 </Link>
                 <Button
                     name={undefined}
                     onClick={handleCopyTextButtonClick}
-                    variant="secondary"
+                    variant="quaternary"
                     disabled={workItems.length === 0}
                     title="Copy standup text"
                 >
                     Copy standup text
                 </Button>
-                {/*
-                <Button
-                    name
-                    onClick={handleNoteUpdateClick}
-                    variant="secondary"
-                >
-                    {currentNote && !!currentNote.content
-                        ? 'Edit notes'
-                        : 'Add notes'}
-                </Button>
-                */}
             </div>
             <div className={styles.quickSettings}>
+                <h4>
+                    Quick Settings
+                </h4>
+                <Checkbox
+                    name="compactTextArea"
+                    label="Collapse text area on blur"
+                    value={storedConfig.compactTextArea}
+                    onChange={setConfigFieldValue}
+                />
                 <Checkbox
                     name="showInputIcons"
                     label="Show input icons"
@@ -186,24 +202,38 @@ function StartSidebar(props: Props) {
                 />
                 <SelectInput
                     name="defaultTaskStatus"
-                    label="Default Status"
+                    variant="general"
+                    label="Default Entry Status"
                     options={enums?.enums.TimeEntryStatus}
                     keySelector={workItemStatusKeySelector}
                     labelSelector={workItemStatusLabelSelector}
+                    colorSelector={workItemStatusColorSelector}
                     onChange={setConfigFieldValue}
                     value={storedConfig.defaultTaskStatus}
                     nonClearable
                 />
                 <SelectInput
                     name="defaultTaskType"
-                    label="Default Type"
+                    label="Default Entry Type"
+                    variant="general"
                     options={enums?.enums.TimeEntryType}
                     keySelector={workItemTypeKeySelector}
                     labelSelector={workItemTypeLabelSelector}
+                    colorSelector={defaultColorSelector}
                     onChange={setConfigFieldValue}
                     value={storedConfig.defaultTaskType}
+                />
+                <SelectInput
+                    name="editingMode"
+                    label="Note Editing Mode"
+                    variant="general"
+                    options={editingOptions}
+                    keySelector={editingOptionKeySelector}
+                    labelSelector={editingOptionLabelSelector}
+                    // colorSelector={defaultColorSelector}
+                    onChange={setConfigFieldValue}
+                    value={storedConfig.editingMode}
                     nonClearable
-                    // listContainerClassName={styles.typeOptionList}
                 />
             </div>
         </div>

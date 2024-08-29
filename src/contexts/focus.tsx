@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 
-export interface FocusContextProps {
+interface FocusContextProps {
     register: (key: string, inputRef: React.RefObject<HTMLElement>) => void;
     unregister: (key: string) => void;
 }

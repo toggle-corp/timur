@@ -100,7 +100,7 @@ export function useLink(props: {
     };
 }
 
-export type CommonLinkProps<OMISSION extends string = never> = Omit<RouterLinkProps, 'to' | OMISSION> &
+type CommonLinkProps<OMISSION extends string = never> = Omit<RouterLinkProps, 'to' | OMISSION> &
 Omit<{
     actions?: React.ReactNode;
     actionsContainerClassName?: string;
@@ -116,7 +116,7 @@ Omit<{
     spacing?: ButtonFeatureProps['spacing'];
 }, OMISSION>
 
-export type InternalLinkProps = {
+type InternalLinkProps = {
     external?: never;
     to: keyof WrappedRoutes | undefined | null;
     urlParams?: UrlParams;
@@ -125,7 +125,7 @@ export type InternalLinkProps = {
     href?: never;
 }
 
-export type ExternalLinkProps = {
+type ExternalLinkProps = {
     external: true;
     href: string | undefined | null;
     urlParams?: never;
@@ -149,7 +149,7 @@ function Link(props: Props) {
         linkElementClassName,
         withUnderline,
         withLinkIcon,
-        variant = 'tertiary',
+        variant = 'transparent',
         ellipsize,
         spacing,
 
@@ -283,7 +283,7 @@ function Link(props: Props) {
                 withUnderline && styles.underline,
                 disabled && styles.disabled,
                 variant === 'dropdown-item' && styles.dropdownItem,
-                variant === 'tertiary' && styles.tertiary,
+                variant === 'transparent' && styles.transparent,
                 ellipsize && styles.ellipsized,
                 className,
             )}

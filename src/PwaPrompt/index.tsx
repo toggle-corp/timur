@@ -35,7 +35,7 @@ function ReloadPrompt() {
         },
         onRegisterError: (error) => {
             // eslint-disable-next-line no-console
-            console.log('SW registration error', error);
+            console.info('SW registration error', error);
         },
     });
     const reload = useCallback(
@@ -77,7 +77,7 @@ function ReloadPrompt() {
                     title="Close SW update prompt"
                     name={undefined}
                     onClick={close}
-                    variant="secondary"
+                    variant="quaternary"
                 >
                     Close
                 </Button>

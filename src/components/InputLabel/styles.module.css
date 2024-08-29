@@ -1,6 +1,6 @@
 .input-label {
     display: flex;
-    padding: 0 var(--spacing-sm);
+    padding: 0 var(--spacing-2xs);
     line-height: 1;
     color: var(--color-text-light);
     font-size: var(--font-size-xs);

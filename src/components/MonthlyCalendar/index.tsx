@@ -1,21 +1,30 @@
-import { useMemo } from 'react';
+import {
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
+} from 'react';
+import {
+    IoChevronBackSharp,
+    IoChevronForwardSharp,
+} from 'react-icons/io5';
 import {
     _cs,
     encodeDate,
 } from '@togglecorp/fujs';
 
-import RawButton from '#components/RawButton';
+import Button from '#components/Button';
 
 import styles from './styles.module.css';
 
 const weekDaysName = [
-    'Sun',
-    'Mon',
-    'Tue',
-    'Wed',
-    'Thu',
-    'Fri',
-    'Sat',
+    'Su',
+    'Mo',
+    'Tu',
+    'We',
+    'Th',
+    'Fr',
+    'Sa',
 ];
 
 interface Day {
@@ -25,23 +34,76 @@ interface Day {
 }
 
 interface Props {
-    year: number;
-    month: number;
     className?: string;
-    onDateClick?: (date: string) => void;
     weekDayNameClassName?: string;
     dateClassName?: string;
+    selectedDate: string | undefined;
+    initialYear: number;
+    initialMonth: number;
+    onDateClick?: (date: string) => void;
+    componentRef?: React.MutableRefObject<{
+        resetView: (year: number, month: number) => void;
+    } | null>;
 }
 
+// TODO: Show holidays, leaves on calendar
 function MonthlyCalendar(props: Props) {
     const {
-        year,
-        month,
+        initialYear,
+        initialMonth,
+        componentRef,
         className,
         onDateClick,
         weekDayNameClassName,
         dateClassName,
+        selectedDate,
     } = props;
+
+    const [year, setYear] = useState(initialYear);
+    const [month, setMonth] = useState(initialMonth);
+
+    const today = new Date();
+
+    const resetView = useCallback(
+        (newYear: number, newMonth: number) => {
+            setYear(newYear);
+            setMonth(newMonth);
+        },
+        [],
+    );
+
+    useEffect(() => {
+        if (componentRef) {
+            componentRef.current = {
+                resetView,
+            };
+        }
+    }, [componentRef, resetView]);
+
+    const handlePrevMonth = useCallback(
+        () => {
+            const newMonth = month - 1;
+            if (newMonth === -1) {
+                setMonth(11);
+                setYear(year - 1);
+            } else {
+                setMonth(newMonth);
+            }
+        },
+        [month, year],
+    );
+    const handleNextMonth = useCallback(
+        () => {
+            const newMonth = month + 1;
+            if (newMonth === 12) {
+                setMonth(0);
+                setYear(year + 1);
+            } else {
+                setMonth(newMonth);
+            }
+        },
+        [month, year],
+    );
 
     const daysInMonth = useMemo(() => {
         // NOTE: getDate() starts at 1
@@ -65,38 +127,74 @@ function MonthlyCalendar(props: Props) {
     }, [year, month]);
 
     return (
-        <div className={_cs(styles.monthlyCalendar, className)}>
-            {weekDaysName.map((dayName, i) => (
-                <div
-                    className={_cs(styles.dayName, weekDayNameClassName)}
-                    key={dayName}
-                    style={{
-                        gridColumnStart: i + 1,
-                        gridRowStart: 1,
-                    }}
+        <div className={_cs(styles.calendarContainer, className)}>
+            <div className={styles.header}>
+                <Button
+                    name={undefined}
+                    variant="quaternary"
+                    onClick={handlePrevMonth}
+                    title="See previous month in calendar"
+                    spacing="xs"
                 >
-                    {dayName}
+                    <IoChevronBackSharp />
+                </Button>
+                <Button
+                    name={undefined}
+                    variant="quaternary"
+                    onClick={handleNextMonth}
+                    title="See next month in calendar"
+                    spacing="xs"
+                >
+                    <IoChevronForwardSharp />
+                </Button>
+                <div>
+                    {year}
+                    /
+                    {String(month + 1).padStart(2, '0')}
                 </div>
-            ))}
-            {daysInMonth.map((day) => {
-                const date = encodeDate(new Date(year, month, day.date));
-                return (
-                    <RawButton
-                        onClick={onDateClick}
-                        className={_cs(styles.date, dateClassName)}
-                        name={date}
-                        title={`Set date to ${date}`}
-                        key={day.date}
+            </div>
+            <div className={styles.monthlyCalendar}>
+                {weekDaysName.map((dayName, i) => (
+                    <div
+                        className={_cs(styles.dayName, weekDayNameClassName)}
+                        key={dayName}
                         style={{
-                            gridColumnStart: day.dayOfWeek + 1,
-                            // Note +2 is due to the week day name row
-                            gridRowStart: day.week + 2,
+                            gridColumnStart: i + 1,
+                            gridRowStart: 1,
                         }}
                     >
-                        {day.date}
-                    </RawButton>
-                );
-            })}
+                        {dayName}
+                    </div>
+                ))}
+                {daysInMonth.map((day) => {
+                    const date = encodeDate(new Date(year, month, day.date));
+                    let variant;
+                    if (encodeDate(today) === date) {
+                        variant = 'secondary' as const;
+                    } else if (selectedDate === date) {
+                        variant = 'quaternary' as const;
+                    } else {
+                        variant = 'transparent' as const;
+                    }
+                    return (
+                        <Button
+                            onClick={onDateClick}
+                            className={_cs(styles.date, dateClassName)}
+                            name={date}
+                            title="Set date from calendar"
+                            key={day.date}
+                            style={{
+                                gridColumnStart: day.dayOfWeek + 1,
+                                // Note +2 is due to the week day name row
+                                gridRowStart: day.week + 2,
+                            }}
+                            variant={variant}
+                        >
+                            {day.date}
+                        </Button>
+                    );
+                })}
+            </div>
         </div>
     );
 }

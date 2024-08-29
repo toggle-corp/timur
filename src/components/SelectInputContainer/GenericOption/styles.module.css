@@ -1,6 +1,7 @@
 .generic-option {
     display: flex;
     gap: var(--spacing-md);
+    outline-offset: calc(-1 * var(--width-separator-md));
     padding: var(--spacing-sm);
     text-align: left;
 

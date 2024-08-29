@@ -7,7 +7,7 @@ import styles from './styles.module.css';
 
 type MessageVariant = 'info' | 'error';
 
-export interface Props {
+interface Props {
     className?: string;
     variant?: MessageVariant;
     icon?: React.ReactNode;

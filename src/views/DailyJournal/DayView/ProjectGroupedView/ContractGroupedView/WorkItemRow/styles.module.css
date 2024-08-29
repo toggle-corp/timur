@@ -1,19 +1,19 @@
 .work-item-row {
     display: grid;
     align-items: flex-start;
-    grid-template-columns: 4rem 2fr 5fr 9rem 3rem 6rem;
+    grid-template-columns: 5rem 2fr 5fr 9rem 4rem 4rem;
     padding: var(--spacing-2xs) var(--spacing-xs);
-    gap: var(--spacing-sm);
+    gap: var(--spacing-xs);
 
     &.with-icons {
-        grid-template-columns: 4.5rem 2fr 5fr 12rem 4rem 6rem;
+        grid-template-columns: 5.5rem 2fr 5fr 12rem 5rem 4rem;
     }
 
     &.checkbox-for-status {
-        grid-template-columns: 1rem 2fr 5fr 10rem 3rem 6rem;
+        grid-template-columns: 1rem 2fr 5fr 10rem 4rem 4rem;
 
         &.with-icons {
-            grid-template-columns: 1rem 2fr 5fr 10rem 4rem 6rem;
+            grid-template-columns: 1rem 2fr 5fr 10rem 5rem 4rem;
         }
     }
 
@@ -25,13 +25,15 @@
         gap: var(--spacing-xs);
     }
 
+
+    /* TODO: sync this color from colorscheme */
     .status-checkbox {
         &.doing {
-            color: var(--color-secondary);
+            color: #039BE5;
         }
 
         &.done {
-            color: var(--color-primary);
+            color: #7CB342;
         }
     }
 
@@ -76,5 +78,14 @@
                 display: none;
             }
         }
+    }
+}
+
+.calendar-dialog {
+    .modal-content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-md);
+        padding: var(--spacing-md);
     }
 }

@@ -10,7 +10,7 @@ import { Component as RootLayout } from '#views/RootLayout';
 import Auth from './Auth';
 import PageError from './PageError';
 
-export interface Perms {
+interface Perms {
     isSuperUser: boolean,
 }
 
@@ -23,7 +23,7 @@ export type ExtendedProps = {
     ) => boolean;
 };
 
-export interface CustomWrapRoute {
+interface CustomWrapRoute {
     <T>(
         myRouteOptions: MyInputIndexRouteObject<T, ExtendedProps>
     ): MyOutputIndexRouteObject<ExtendedProps>

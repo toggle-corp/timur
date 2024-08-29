@@ -59,6 +59,12 @@
                         font-weight: var(--font-weight-normal);
                     }
 
+                    .separator {
+                        margin: 0;
+                        border-top: unset;
+                        border-bottom: var(--width-separator-md) solid var(--color-separator);
+                    }
+
                     .project-list {
                         display: flex;
                         flex-direction: column;
@@ -72,9 +78,10 @@
                             .project-header {
                                 display: flex;
                                 gap: var(--spacing-sm);
+                                font-size: var(--font-size-xl);
 
                                 .project-dp {
-                                    font-size: var(--font-size-lg);
+                                    font-size: var(--font-size-xl);
                                 }
                             }
 
@@ -86,13 +93,14 @@
                                 .deadline {
                                     display: flex;
                                     gap: var(--spacing-2xs);
+                                    font-size: var(--font-size-lg);
 
                                     .d-day {
                                         color: var(--color-text-light);
                                         font-weight: var(--font-weight-bold);
 
                                         &:before {
-                                            content: '- '
+                                            content: '• '
                                         }
 
                                         &:after {

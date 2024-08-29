@@ -5,6 +5,7 @@ import styles from './styles.module.css';
 interface Props {
     className?: string;
     title: string;
+    description?: React.ReactNode;
 }
 
 // eslint-disable-next-line import/prefer-default-export
@@ -12,6 +13,7 @@ export function Component(props: Props) {
     const {
         className,
         title,
+        description,
     } = props;
 
     return (
@@ -19,6 +21,11 @@ export function Component(props: Props) {
             <h2>
                 {title}
             </h2>
+            {description && (
+                <p>
+                    {description}
+                </p>
+            )}
         </div>
     );
 }

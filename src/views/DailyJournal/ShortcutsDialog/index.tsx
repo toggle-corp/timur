@@ -32,7 +32,6 @@ function ShortcutsDialog(props: Props) {
     return (
         <Dialog
             open={showDialog}
-            mode="right"
             onClose={handleModalClose}
             heading="Shortcuts"
             contentClassName={styles.modalContent}
@@ -72,13 +71,6 @@ function ShortcutsDialog(props: Props) {
                 <code>Ctrl+Shift+Down</code>
                 {' '}
                 to go to present day.
-            </div>
-            <div>
-                Hit
-                {' '}
-                <code>Ctrl+Shift+F</code>
-                {' '}
-                to toggle focus mode.
             </div>
             <div>
                 Hit

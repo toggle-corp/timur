@@ -2,7 +2,7 @@ import { _cs } from '@togglecorp/fujs';
 
 import styles from './styles.module.css';
 
-export interface Props {
+interface Props {
     children?: React.ReactNode;
     className?: string;
     disabled?: boolean;

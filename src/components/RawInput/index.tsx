@@ -26,8 +26,22 @@ function RawInput<const N>(props: Props<N>) {
         elementRef,
         value,
         name,
+        placeholder,
+        style,
         ...otherProps
     } = props;
+
+    const containerRef = React.useRef<HTMLDivElement>(null);
+
+    React.useLayoutEffect(
+        () => {
+            if (containerRef.current) {
+                const val = value || placeholder || '';
+                containerRef.current.dataset.replicatedValue = val;
+            }
+        },
+        [value, placeholder],
+    );
 
     const handleChange = React.useCallback((e: React.FormEvent<HTMLInputElement>) => {
         const v = e.currentTarget.value;
@@ -53,20 +67,30 @@ function RawInput<const N>(props: Props<N>) {
     }, [onFocus]);
 
     return (
-        <input
-            // eslint-disable-next-line react/jsx-props-no-spreading
-            {...otherProps}
-            ref={elementRef}
+        <div
+            ref={containerRef}
+            style={style}
             className={_cs(
-                styles.rawInput,
+                styles.growWrap,
                 className,
             )}
-            // FIXME: do we even need to pass name?
-            name={isDefined(name) ? String(name) : undefined}
-            onChange={handleChange}
-            value={value ?? ''}
-            onFocus={handleFocus}
-        />
+        >
+            <input
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                {...otherProps}
+                placeholder={placeholder}
+                ref={elementRef}
+                className={_cs(
+                    styles.rawInput,
+                )}
+                // FIXME: do we even need to pass name?
+                name={isDefined(name) ? String(name) : undefined}
+                onChange={handleChange}
+                value={value ?? ''}
+                onFocus={handleFocus}
+                size={1}
+            />
+        </div>
     );
 }
 

@@ -40,6 +40,7 @@ export type Props<
         searchOptions?: OPTION[] | undefined | null;
         keySelector: (option: OPTION) => OPTION_KEY;
         labelSelector: (option: OPTION) => string;
+        colorSelector?: (option: OPTION, index: number) => [string, string];
         descriptionSelector?: (option: OPTION) => string;
         hideOptionFilter?: (option: OPTION) => boolean;
         name: NAME;
@@ -108,6 +109,7 @@ function SearchSelectInput<
     const {
         keySelector,
         labelSelector,
+        colorSelector,
         descriptionSelector,
         name,
         onChange,
@@ -151,10 +153,10 @@ function SearchSelectInput<
     const valueDisplay = isDefined(value) ? optionsLabelMap[value] ?? '?' : '';
 
     // NOTE: we can skip this calculation if optionsShowInitially is false
-    const selectedOptions = useMemo(
+    const [selectedOption, selectedOptionIndex] = useMemo(
         () => {
-            const selectedValue = options?.find((item) => keySelector(item) === value);
-            return isNotDefined(selectedValue) ? [] : [selectedValue];
+            const selectedValueIndex = options?.findIndex((item) => keySelector(item) === value);
+            return [options?.[selectedValueIndex], selectedValueIndex];
         },
         [value, options, keySelector],
     );
@@ -162,7 +164,9 @@ function SearchSelectInput<
     const realOptions = useMemo(
         () => {
             const allOptions = unique(
-                [...searchOptions, ...selectedOptions],
+                isDefined(selectedOption)
+                    ? [...searchOptions, selectedOption]
+                    : searchOptions,
                 keySelector,
             );
 
@@ -199,7 +203,7 @@ function SearchSelectInput<
             searchInputValue,
             searchOptions,
             selectedKeys,
-            selectedOptions,
+            selectedOption,
             sortFunction,
             hideOptionFilter,
         ],
@@ -313,6 +317,10 @@ function SearchSelectInput<
         [name, props.onChange, props.nonClearable],
     );
 
+    const [fgColor, bgColor] = selectedOption && colorSelector
+        ? colorSelector(selectedOption, selectedOptionIndex)
+        : [];
+
     return (
         <SelectInputContainer
             // eslint-disable-next-line react/jsx-props-no-spreading
@@ -328,6 +336,8 @@ function SearchSelectInput<
             optionRendererParams={optionRendererParams}
             optionContainerClassName={styles.optionContainer}
             onOptionClick={handleOptionClick}
+            valueBgColor={bgColor}
+            valueFgColor={fgColor}
             valueDisplay={valueDisplay}
             onClearButtonClick={handleClear}
             searchText={searchInputValue}

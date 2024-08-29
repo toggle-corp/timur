@@ -61,7 +61,7 @@ interface Props {
     workItems: WorkItem[] | undefined;
     loading: boolean;
     errored: boolean;
-    onWorkItemClone: (clientId: string) => void;
+    onWorkItemClone: (clientId: string, override?: Partial<WorkItem>) => void;
     onWorkItemChange: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
     onWorkItemDelete: (clientId: string) => void;
     selectedDate: string;

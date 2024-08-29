@@ -4,7 +4,7 @@ import { rankedSearchOnList } from '#utils/common';
 type Def = { containerClassName?: string, title: string };
 type OptionKey = string | number;
 
-export type Props<
+type Props<
     OPTION_KEY extends OptionKey,
     NAME,
     // eslint-disable-next-line @typescript-eslint/ban-types

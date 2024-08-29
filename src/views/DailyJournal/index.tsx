@@ -1,16 +1,20 @@
 import {
     useCallback,
     useContext,
+    useEffect,
     useLayoutEffect,
     useMemo,
     useRef,
     useState,
 } from 'react';
+import { FcHighPriority } from 'react-icons/fc';
 import {
     IoAdd,
     IoCalendarOutline,
     IoChevronBackSharp,
     IoChevronForwardSharp,
+    IoNewspaperOutline,
+    IoTerminalOutline,
 } from 'react-icons/io5';
 import {
     useNavigate,
@@ -30,10 +34,10 @@ import {
 } from 'urql';
 
 import Button from '#components/Button';
+import CalendarInput from '#components/CalendarInput';
 import Link, { resolvePath } from '#components/Link';
 import Page from '#components/Page';
 import Portal from '#components/Portal';
-import RawInput from '#components/RawInput';
 import FocusContext from '#contexts/focus';
 import NavbarContext from '#contexts/navbar';
 import RouteContext from '#contexts/route';
@@ -48,6 +52,7 @@ import useBackgroundSync from '#hooks/useBackgroundSync';
 import { useFocusManager } from '#hooks/useFocus';
 import useKeybind from '#hooks/useKeybind';
 import useLocalStorage from '#hooks/useLocalStorage';
+import useSetFieldValue from '#hooks/useSetFieldValue';
 import {
     addDays,
     getNewId,
@@ -69,8 +74,11 @@ import DayView from './DayView';
 import EndSidebar from './EndSidebar';
 import ShortcutsDialog from './ShortcutsDialog';
 import StartSidebar from './StartSidebar';
+import UpdateNoteDialog from './UpdateNoteDialog';
 
 import styles from './styles.module.css';
+
+const emptyArray: unknown[] = [];
 
 const MY_TIME_ENTRIES_QUERY = gql`
     query MyTimeEntries($date: Date!) {
@@ -135,6 +143,14 @@ export function Component() {
 
     const { date: dateFromParams } = useParams<{ date: string | undefined}>();
 
+    // NOTE: We are opening the dialog from this parent component
+    const dialogOpenTriggerRef = useRef<(() => void) | undefined>();
+    const noteDialogOpenTriggerRef = useRef<(() => void) | undefined>();
+    const shortcutsDialogOpenTriggerRef = useRef<(() => void) | undefined>();
+    const calendarRef = useRef<
+        { resetView:(year: number, month: number) => void; }
+            >(null);
+
     const selectedDate = useMemo(() => {
         const today = new Date();
 
@@ -151,6 +167,19 @@ export function Component() {
         return encodeDate(date);
     }, [dateFromParams]);
 
+    useEffect(
+        () => {
+            if (calendarRef.current && selectedDate) {
+                const selectedDateObj = new Date(selectedDate);
+                calendarRef.current.resetView(
+                    selectedDateObj.getFullYear(),
+                    selectedDateObj.getMonth(),
+                );
+            }
+        },
+        [selectedDate],
+    );
+
     const setSelectedDate = useCallback((newDateStr: string | undefined) => {
         const today = encodeDate(new Date());
         const newDate = newDateStr === today ? undefined : newDateStr;
@@ -164,9 +193,9 @@ export function Component() {
     }, [routes, navigate]);
 
     const getNextDay = useCallback(() => {
-        const today = encodeDate(new Date());
         const nextDay = addDays(selectedDate, 1);
 
+        const today = encodeDate(new Date());
         if (today === nextDay) {
             return undefined;
         }
@@ -175,9 +204,9 @@ export function Component() {
     }, [selectedDate]);
 
     const getPrevDay = useCallback(() => {
-        const today = encodeDate(new Date());
         const prevDay = addDays(selectedDate, -1);
 
+        const today = encodeDate(new Date());
         if (today === prevDay) {
             return undefined;
         }
@@ -185,48 +214,36 @@ export function Component() {
         return prevDay;
     }, [selectedDate]);
 
-    // NOTE: We are hiding the native dateinput and triggering calender popup
-    // using a separate button
-    const dateInputRef = useRef<HTMLInputElement>(null);
-    // NOTE: We are opening the dialog from this parent component
-    const dialogOpenTriggerRef = useRef<(() => void) | undefined>();
-    // const noteDialogOpenTriggerRef = useRef<(() => void) | undefined>();
-    const shortcutsDialogOpenTriggerRef = useRef<(() => void) | undefined>();
-
-    /*
-    const [storedData, setStoredDataState] = useLocalStorage<{
-        appVersion: string,
-        notes: Note[]
-    }>(
-        KEY_DATA_STORAGE,
-        {
-            appVersion: APP_VERSION,
-            notes: [],
-        },
-    );
-    */
-
-    const [storedConfig] = useLocalStorage<ConfigStorage>(
+    const [storedConfig, setStoredConfig] = useLocalStorage<ConfigStorage>(
         KEY_CONFIG_STORAGE,
         defaultConfigValue,
     );
 
     // Read state from the stored state
-    // const notes = storedData.notes ?? emptyArray;
+    const notes = storedConfig.notes ?? emptyArray;
+    // FIXME: memoize this
+    const currentNote = notes.find((item) => item.date === selectedDate);
+    const editMode = storedConfig.editingMode ?? defaultConfigValue.editingMode;
+    const setFieldValue = useSetFieldValue(setStoredConfig);
 
-    /*
-    const setNotes: Dispatch<SetStateAction<Note[]>> = useCallback(
-        (func) => {
-            setStoredDataState((oldValue) => ({
-                ...oldValue,
-                notes: typeof func === 'function'
-                    ? func(oldValue.notes)
-                    : func,
-            }));
-        },
-        [setStoredDataState],
-    );
-    */
+    const handleCurrentNoteChange = (value: string | undefined, id: string | undefined) => {
+        const newNotes = [...notes];
+        const index = newNotes.findIndex((item) => item.id === id);
+        if (id && index !== -1) {
+            const note = newNotes[index];
+            newNotes.splice(index, 1, {
+                ...note,
+                content: value,
+            });
+        } else {
+            newNotes.push({
+                id: getNewId(),
+                date: selectedDate,
+                content: value,
+            });
+        }
+        setFieldValue(newNotes, 'notes');
+    };
 
     const [
         bulkMutationState,
@@ -371,7 +388,7 @@ export function Component() {
     );
 
     const handleWorkItemClone = useCallback(
-        (workItemClientId: string) => {
+        (workItemClientId: string, override?: Partial<WorkItem>) => {
             const newId = getNewId();
             setWorkItems((oldWorkItems) => {
                 if (isNotDefined(oldWorkItems)) {
@@ -386,11 +403,16 @@ export function Component() {
 
                 const targetItem = {
                     ...oldWorkItems[sourceItemIndex],
+                    ...override,
                     clientId: newId,
                 };
                 delete targetItem.id;
-                delete targetItem.description;
-                delete targetItem.duration;
+                // NOTE: If we have defined overrides, we don't need to clear
+                // description and duration
+                if (!override) {
+                    delete targetItem.description;
+                    delete targetItem.duration;
+                }
 
                 const newWorkItems = [...oldWorkItems];
                 newWorkItems.splice(sourceItemIndex + 1, 0, targetItem);
@@ -474,9 +496,11 @@ export function Component() {
         [setWorkItems, addOrUpdateStateData],
     );
 
-    const handleDateButtonClick = useCallback(
+    const handleNoteUpdateClick = useCallback(
         () => {
-            dateInputRef.current?.showPicker();
+            if (noteDialogOpenTriggerRef.current) {
+                noteDialogOpenTriggerRef.current();
+            }
         },
         [],
     );
@@ -508,7 +532,7 @@ export function Component() {
             } else if (event.ctrlKey && event.key === 'Enter') {
                 event.preventDefault();
                 event.stopPropagation();
-                // FIXME: this binding is empty
+                handleNoteUpdateClick();
             } else if (event.ctrlKey && event.shiftKey && event.key === 'ArrowLeft') {
                 event.preventDefault();
                 event.stopPropagation();
@@ -532,6 +556,7 @@ export function Component() {
             setSelectedDate,
             handleAddEntryClick,
             handleShortcutsButtonClick,
+            handleNoteUpdateClick,
         ],
     );
 
@@ -569,6 +594,16 @@ export function Component() {
         [selectedDate, handleDateSelection],
     );
 
+    // FIXME: memoize this
+    const filteredWorkItems = workItems.filter((item) => item.date === selectedDate);
+
+    const entriesWithoutTask = filteredWorkItems
+        .filter((item) => isNotDefined(item.type) && item.status !== 'TODO')
+        .length;
+    const entriesWithoutHours = filteredWorkItems
+        .filter((item) => isNotDefined(item.duration) && item.status !== 'TODO')
+        .length;
+
     return (
         <Page
             documentTitle="Timur - Daily Journal"
@@ -577,14 +612,15 @@ export function Component() {
             startAsideContainerClassName={styles.startAside}
             startAsideContent={(
                 <StartSidebar
-                    selecteDate={selectedDate}
-                    workItems={workItems}
+                    calendarComponentRef={calendarRef}
+                    selectedDate={selectedDate}
+                    workItems={filteredWorkItems}
                     setSelectedDate={setSelectedDate}
                 />
             )}
             endAsideContent={(
                 <EndSidebar
-                    workItems={workItems}
+                    workItems={filteredWorkItems}
                     onWorkItemCreate={handleWorkItemCreate}
                 />
             )}
@@ -613,7 +649,7 @@ export function Component() {
                             <Link
                                 to="dailyJournal"
                                 urlParams={{ date: getPrevDay() }}
-                                variant="secondary"
+                                variant="quaternary"
                                 title="Previous day"
                             >
                                 <IoChevronBackSharp />
@@ -621,31 +657,22 @@ export function Component() {
                             <Link
                                 to="dailyJournal"
                                 urlParams={{ date: getNextDay() }}
-                                variant="secondary"
+                                variant="quaternary"
                                 title="Next day"
                             >
                                 <IoChevronForwardSharp />
                             </Link>
                         </>
                     )}
-                    <div className={styles.dateContainer}>
-                        <RawInput
-                            elementRef={dateInputRef}
-                            type="date"
-                            className={styles.dateInput}
-                            name={undefined}
-                            value={selectedDate}
-                            onChange={setSelectedDate}
-                        />
-                        <Button
-                            title="Open calendar"
-                            name={undefined}
-                            variant="secondary"
-                            onClick={handleDateButtonClick}
-                        >
-                            <IoCalendarOutline />
-                        </Button>
-                    </div>
+                    <CalendarInput
+                        title="Open calendar"
+                        name={undefined}
+                        variant="quaternary"
+                        value={selectedDate}
+                        onChange={setSelectedDate}
+                    >
+                        <IoCalendarOutline />
+                    </CalendarInput>
                 </div>
             </Portal>
             <FocusContext.Provider
@@ -654,36 +681,74 @@ export function Component() {
                 <DayView
                     loading={myTimeEntriesResult.fetching}
                     errored={!!myTimeEntriesResult.error}
-                    workItems={workItems}
+                    workItems={filteredWorkItems}
                     onWorkItemClone={handleWorkItemClone}
                     onWorkItemChange={handleWorkItemChange}
                     onWorkItemDelete={handleWorkItemDelete}
                     selectedDate={selectedDate}
                 />
             </FocusContext.Provider>
-            <Button
-                name={undefined}
-                onClick={handleAddEntryClick}
-                icons={<IoAdd />}
-                title="Add entry"
-            >
-                Add entry
-            </Button>
+            {entriesWithoutTask + entriesWithoutHours > 0 && (
+                <div className={styles.warning}>
+                    {entriesWithoutTask > 0 && (
+                        <div className={styles.warningBadge}>
+                            <FcHighPriority />
+                            <span>
+                                {`${entriesWithoutTask} uncategorized entries`}
+                            </span>
+                        </div>
+                    )}
+                    {entriesWithoutHours > 0 && (
+                        <div className={styles.warningBadge}>
+                            <FcHighPriority />
+                            <span>
+                                {`${entriesWithoutHours} untracked entries`}
+                            </span>
+                        </div>
+                    )}
+                </div>
+            )}
+            <div className={styles.bottomActions}>
+                <Button
+                    name={undefined}
+                    onClick={handleAddEntryClick}
+                    icons={<IoAdd />}
+                    title="Add entry"
+                >
+                    Add entry
+                </Button>
+                <Button
+                    name={undefined}
+                    onClick={handleNoteUpdateClick}
+                    icons={<IoNewspaperOutline />}
+                    title={currentNote ? 'Update Note' : 'Add note'}
+                    variant="quaternary"
+                >
+                    {currentNote ? 'Update Note' : 'Add note'}
+                </Button>
+                {windowWidth >= 900 && (
+                    <Button
+                        title="Show shortcuts"
+                        name={undefined}
+                        variant="quaternary"
+                        onClick={handleShortcutsButtonClick}
+                    >
+                        <IoTerminalOutline />
+                    </Button>
+                )}
+            </div>
             <ShortcutsDialog
                 dialogOpenTriggerRef={shortcutsDialogOpenTriggerRef}
             />
-            {/*
             <UpdateNoteDialog
                 dialogOpenTriggerRef={noteDialogOpenTriggerRef}
                 note={currentNote}
-                onNoteContentUpdate={handleNoteUpdate}
-                editingMode={configEditingMode}
-                onEditingModeChange={setEditingModeChange}
+                onNoteContentUpdate={handleCurrentNoteChange}
+                editingMode={editMode}
             />
-            */}
             <AddWorkItemDialog
                 dialogOpenTriggerRef={dialogOpenTriggerRef}
-                workItems={workItems}
+                workItems={filteredWorkItems}
                 onWorkItemCreate={handleWorkItemCreate}
             />
         </Page>

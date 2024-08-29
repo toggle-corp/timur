@@ -13,7 +13,7 @@ import DialogContext from '#contexts/dialog';
 
 import styles from './styles.module.css';
 
-export interface Props {
+interface Props {
     className?: string;
     open?: boolean;
     onClose: (show: boolean) => void;
@@ -23,6 +23,7 @@ export interface Props {
 
     mode?: 'right' | 'center';
     size?: 'auto';
+    escapeDisabled?: boolean;
 
     focusElementRef?: RefObject<HTMLElement>;
 }
@@ -37,6 +38,7 @@ function Dialog(props: Props) {
         contentClassName,
         focusElementRef,
         mode = 'center',
+        escapeDisabled,
         size,
     } = props;
 
@@ -61,6 +63,12 @@ function Dialog(props: Props) {
         [],
     );
 
+    const handleCancel: React.ReactEventHandler<HTMLDialogElement> = useCallback((e) => {
+        if (escapeDisabled) {
+            e.preventDefault();
+        }
+    }, [escapeDisabled]);
+
     const handleClose = useCallback(() => {
         onClose(false);
     }, [onClose]);
@@ -84,6 +92,7 @@ function Dialog(props: Props) {
                     mode === 'center' && styles.centerMode,
                     size === 'auto' && styles.autoSize,
                 )}
+                onCancel={handleCancel}
                 onClose={handleClose}
             >
                 {open && (
@@ -97,7 +106,7 @@ function Dialog(props: Props) {
                                 name={undefined}
                                 onClick={handleCloseButtonClick}
                                 title="Close dialog"
-                                variant="tertiary"
+                                variant="transparent"
                             >
                                 <IoCloseSharp />
                             </Button>

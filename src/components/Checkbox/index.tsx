@@ -10,7 +10,7 @@ import DefaultCheckmark, { CheckmarkProps } from './Checkmark';
 import styles from './styles.module.css';
 
 // FIXME extend with input prop
-export interface Props<NAME> {
+interface Props<NAME> {
     className?: string;
     checkmark?: (p: CheckmarkProps) => React.ReactElement;
     checkmarkClassName?: string;

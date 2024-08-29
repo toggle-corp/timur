@@ -2,7 +2,10 @@ import { createContext } from 'react';
 
 import { UserMeType } from '#generated/types/graphql';
 
-export type UserAuth = UserMeType;
+export type UserAuth = Pick<
+    UserMeType,
+    'displayName' | 'displayPicture' | 'email' | 'firstName' | 'id' | 'lastName' | 'isStaff'
+>;
 
 export interface UserContextProps {
     userAuth: UserAuth | undefined,

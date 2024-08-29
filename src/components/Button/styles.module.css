@@ -40,7 +40,9 @@
     }
 
     &.primary,
-    &.secondary {
+    &.secondary,
+    &.tertiary,
+    &.quaternary {
         .children {
             text-align: center;
         }
@@ -88,12 +90,42 @@
 
         &:not(.disabled) {
             &:hover {
-                filter: saturate(150%);
+                filter: saturate(120%);
             }
         }
     }
 
     &.secondary {
+        --color-background: var(--color-secondary);
+        --color-text: var(--color-text-on-dark);
+
+        &.disabled {
+            filter: saturate(50%);
+        }
+
+        &:not(.disabled) {
+            &:hover {
+                filter: saturate(120%);
+            }
+        }
+    }
+
+    &.tertiary {
+        --color-background: var(--color-tertiary);
+        --color-text: var(--color-text-light);
+
+        &.disabled {
+            filter: saturate(50%);
+        }
+
+        &:not(.disabled) {
+            &:hover {
+                filter: saturate(200%);
+            }
+        }
+    }
+
+    &.quaternary {
         --color-background: var(--color-quaternary);
         --color-text: var(--color-text-light);
 
@@ -103,13 +135,12 @@
 
         &:not(.disabled) {
             &:hover {
-                background-color: var(--color-primary);
-                color: var(--color-text-on-dark);
+                filter: saturate(200%);
             }
         }
     }
 
-    &.tertiary {
+    &.transparent {
         --color-background: transparent;
         --color-text: inherit;
         --padding: 0;
@@ -122,19 +153,6 @@
         }
     }
 
-    &.tertiary-on-dark {
-        --color-background: transparent;
-        --color-text: var(--color-text-on-dark);
-        --padding: 0;
-        --border-radius: unset;
-
-        &:not(.disabled) {
-            &:hover {
-                opacity: 0.8;
-            }
-        }
-    }
-
     &.dropdown-item {
         display: flex;
         width: 100%;
@@ -143,7 +161,7 @@
         --padding: var(--spacing-sm) var(--spacing-md);
 
         &:hover {
-            background-color: var(--color-quaternary);
+            background-color: var(--color-tertiary);
         }
     }
 

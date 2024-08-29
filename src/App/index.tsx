@@ -9,6 +9,7 @@ import {
     createBrowserRouter,
     RouterProvider,
 } from 'react-router-dom';
+import * as Sentry from '@sentry/react';
 import { listToMap } from '@togglecorp/fujs';
 import {
     gql,
@@ -49,6 +50,7 @@ const ME_QUERY = gql`
                 firstName
                 id
                 lastName
+                isStaff
             }
         }
     }
@@ -95,7 +97,11 @@ const ENUMS_QUERY = gql`
     }
 `;
 
-const router = createBrowserRouter(unwrappedRoutes);
+const sentryCreateBrowserRouter = Sentry.wrapCreateBrowserRouter(
+    createBrowserRouter,
+);
+
+const router = sentryCreateBrowserRouter(unwrappedRoutes);
 
 function App() {
     const [userAuth, setUserAuth] = useState<UserAuth>();
