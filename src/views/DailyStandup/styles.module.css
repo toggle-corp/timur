@@ -1,110 +1,115 @@
 .daily-standup {
     overflow: auto;
 
-    .page-content {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-lg);
-        overflow: auto;
+    .content-container {
+        padding: 0;
 
-        .content {
+        .page-content {
             display: flex;
             flex-direction: column;
-            flex-grow: 1;
-            border: var(--width-separator-sm) solid var(--color-primary);
+            gap: var(--spacing-lg);
             overflow: auto;
 
-            .welcome-section {
+            .content {
                 display: flex;
+                flex-direction: column;
                 flex-grow: 1;
-                flex-wrap: wrap;
+                background-color: var(--color-background);
+                overflow: auto;
 
-                .welcome-header {
+                .welcome-section {
                     display: flex;
-                    flex-basis: 50%;
-                    flex-direction: column;
-                    flex-grow: 0;
-                    flex-shrink: 0;
-                    justify-content: center;
-                    padding: var(--spacing-xl);
-                    gap: var(--spacing-md);
-
-                    .welcome-label {
-                        font-size: var(--font-size-xl);
-                    }
-
-                    .welcome-heading {
-                        color: var(--color-primary);
-                        font-size: var(--font-size-4xl);
-                        font-weight: var(--font-weight-light);
-                    }
-
-                    .date {
-                        color: var(--color-text-light);
-                        font-size: var(--font-size-xl);
-                    }
-                }
-
-                .deadline-section {
-                    display: flex;
-                    flex-direction: column;
                     flex-grow: 1;
-                    background-color: var(--color-foreground);
-                    padding: var(--spacing-xl);
-                    gap: var(--spacing-lg);
+                    flex-wrap: wrap;
 
-                    .deadline-heading {
-                        color: var(--color-secondary);
-                        font-size: var(--font-size-2xl);
-                        font-weight: var(--font-weight-normal);
-                    }
-
-                    .separator {
-                        margin: 0;
-                        border-top: unset;
-                        border-bottom: var(--width-separator-md) solid var(--color-separator);
-                    }
-
-                    .project-list {
+                    .welcome-header {
                         display: flex;
+                        flex-basis: 50%;
                         flex-direction: column;
+                        flex-grow: 0;
+                        flex-shrink: 0;
+                        justify-content: center;
+                        padding: var(--spacing-xl);
                         gap: var(--spacing-md);
 
-                        .project {
+                        .welcome-label {
+                            font-size: var(--font-size-xl);
+                        }
+
+                        .welcome-heading {
+                            color: var(--color-primary);
+                            font-size: var(--font-size-4xl);
+                            font-weight: var(--font-weight-light);
+                        }
+
+                        .date {
+                            color: var(--color-text-light);
+                            font-size: var(--font-size-xl);
+                        }
+                    }
+
+                    .deadline-section {
+                        display: flex;
+                        flex-direction: column;
+                        flex-grow: 1;
+                        background-color: var(--color-foreground);
+                        padding: var(--spacing-xl);
+                        gap: var(--spacing-lg);
+
+                        .deadline-heading {
+                            color: var(--color-secondary);
+                            font-size: var(--font-size-2xl);
+                            font-weight: var(--font-weight-normal);
+                        }
+
+                        .separator {
+                            margin: 0;
+                            border-top: unset;
+                            border-bottom: var(--width-separator-md) solid var(--color-separator);
+                        }
+
+                        .project-list {
                             display: flex;
                             flex-direction: column;
-                            gap: var(--spacing-sm);
+                            gap: var(--spacing-md);
 
-                            .project-header {
-                                display: flex;
-                                gap: var(--spacing-sm);
-                                font-size: var(--font-size-xl);
-
-                                .project-dp {
-                                    font-size: var(--font-size-xl);
-                                }
-                            }
-
-                            .deadline-list {
+                            .project {
                                 display: flex;
                                 flex-direction: column;
-                                gap: var(--spacing-xs);
+                                gap: var(--spacing-sm);
 
-                                .deadline {
+                                .project-header {
                                     display: flex;
-                                    gap: var(--spacing-2xs);
-                                    font-size: var(--font-size-lg);
+                                    font-size: var(--font-size-xl);
+                                    gap: var(--spacing-sm);
 
-                                    .d-day {
-                                        color: var(--color-text-light);
-                                        font-weight: var(--font-weight-bold);
+                                    .project-dp {
+                                        font-size: var(--font-size-xl);
+                                    }
+                                }
 
-                                        &:before {
-                                            content: '• '
-                                        }
+                                .deadline-list {
+                                    display: flex;
+                                    flex-direction: column;
+                                    gap: var(--spacing-xs);
 
-                                        &:after {
-                                            content: ':'
+                                    .deadline {
+                                        display: flex;
+                                        font-size: var(--font-size-lg);
+                                        gap: var(--spacing-2xs);
+
+                                        .d-day {
+                                            flex-shrink: 0;
+                                            color: var(--color-text-light);
+                                            font-weight: var(--font-weight-bold);
+
+                                            &:before {
+                                                content: '• '
+                                            }
+
+                                            &:after {
+                                                content: ':'
+                                            }
                                         }
                                     }
                                 }
@@ -112,21 +117,22 @@
                         }
                     }
                 }
-            }
 
-            .project-standup {
-                flex-grow: 1;
-            }
+                .project-standup {
+                    flex-grow: 1;
+                }
 
-            .end-section {
-                flex-grow: 1;
+                .end-section {
+                    flex-grow: 1;
+                }
             }
         }
 
-        .actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: var(--spacing-sm);
-        }
     }
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
 }

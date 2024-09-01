@@ -14,8 +14,8 @@
         gap: var(--spacing-md);
 
         .logo {
-            width: 16rem;
-            height: 16rem;
+            width: 12rem;
+            height: 12rem;
             object-fit: contain;
             object-position: center center;
         }
@@ -58,6 +58,11 @@
 
                 .display-picture {
                     font-size: var(--font-size-xl);
+                }
+
+                .name {
+                    display: inline-flex;
+                    gap: var(--spacing-xs);
                 }
             }
         }

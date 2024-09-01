@@ -9,6 +9,7 @@ import {
     useQuery,
 } from 'urql';
 
+import AvailabilityIndicator from '#components/AvailabilityIndicator';
 import DisplayPicture from '#components/DisplayPicture';
 import {
     DailyStandupQuery,
@@ -138,8 +139,13 @@ function ProjectStandup(props: Props) {
                                 imageUrl={user.user.displayPicture}
                                 displayName={user.user.displayName ?? 'Anon'}
                             />
-                            <div>
+                            <div className={styles.name}>
                                 {user.user.displayName ?? 'Anon'}
+                                {' '}
+                                <AvailabilityIndicator
+                                    wfhType={user.workFromHome}
+                                    leaveType={user.leave}
+                                />
                             </div>
                         </div>
                     ))}

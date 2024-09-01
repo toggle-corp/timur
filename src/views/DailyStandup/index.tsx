@@ -1,13 +1,18 @@
 import {
     useCallback,
+    useContext,
     useMemo,
+    useRef,
 } from 'react';
+import { FcHighPriority } from 'react-icons/fc';
 import {
     IoChevronBack,
     IoChevronForward,
+    IoExpandOutline,
 } from 'react-icons/io5';
 import { useParams } from 'react-router-dom';
 import {
+    compareNumber,
     encodeDate,
     isDefined,
     isNotDefined,
@@ -20,6 +25,8 @@ import {
 import Button from '#components/Button';
 import DisplayPicture from '#components/DisplayPicture';
 import Page from '#components/Page';
+import Portal from '#components/Portal';
+import NavbarContext from '#contexts/navbar';
 import {
     AllProjectsQuery,
     AllProjectsQueryVariables,
@@ -88,6 +95,9 @@ const ALL_PROJECTS_QUERY = gql`
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
     const { date: dateFromParams } = useParams<{ date: string | undefined}>();
+
+    const { midActionsRef } = useContext(NavbarContext);
+    const contentRef = useRef<HTMLDivElement>(null);
 
     const selectedDate = useMemo(() => {
         const today = new Date();
@@ -226,6 +236,23 @@ export function Component() {
         ],
     );
 
+    const toggleFullScreen = async () => {
+        const elem = contentRef.current;
+        if (elem && !document.fullscreenElement) {
+            try {
+                await elem.requestFullscreen({ navigationUI: 'show' });
+            } catch (err) {
+                const castErr = err as { message: string, name: string };
+                // eslint-disable-next-line no-alert
+                alert(
+                    `Error attempting to enable fullscreen mode: ${castErr.message} (${castErr.name})`,
+                );
+            }
+        } else {
+            document.exitFullscreen();
+        }
+    };
+
     useKeybind(handleKeybindingsPress);
 
     return (
@@ -233,8 +260,42 @@ export function Component() {
             className={styles.dailyStandup}
             documentTitle="Timur - Daily Standup"
             contentClassName={styles.pageContent}
+            contentContainerClassName={styles.contentContainer}
         >
-            <div className={styles.content}>
+            <Portal container={midActionsRef}>
+                <div className={styles.actions}>
+                    <Button
+                        name={prevButtonName}
+                        onClick={updatePage}
+                        variant="quaternary"
+                        disabled={prevButtonDisabled}
+                        title="Previous standup slide"
+                    >
+                        <IoChevronBack />
+                    </Button>
+                    <Button
+                        name={nextButtonName}
+                        onClick={updatePage}
+                        variant="quaternary"
+                        disabled={nextButtonDisabled}
+                        title="Next standup slide"
+                    >
+                        <IoChevronForward />
+                    </Button>
+                    <Button
+                        name={undefined}
+                        onClick={toggleFullScreen}
+                        variant="quaternary"
+                        title="Enter full screen"
+                    >
+                        <IoExpandOutline />
+                    </Button>
+                </div>
+            </Portal>
+            <div
+                className={styles.content}
+                ref={contentRef}
+            >
                 {isNotDefined(mapId) && (
                     <section className={styles.welcomeSection}>
                         <header className={styles.welcomeHeader}>
@@ -265,6 +326,12 @@ export function Component() {
                                         return null;
                                     }
 
+                                    // FIXME: get this sorted from the server
+                                    const sortedDeadlines = [...project.deadlines]
+                                        .sort((foo, bar) => (
+                                            compareNumber(foo.remainingDays, bar.remainingDays)
+                                        ));
+
                                     return (
                                         <section
                                             key={project.id}
@@ -285,7 +352,7 @@ export function Component() {
                                                 className={styles.deadlineList}
                                                 role="list"
                                             >
-                                                {project.deadlines.map((deadline) => (
+                                                {sortedDeadlines.map((deadline) => (
                                                     <div
                                                         role="listitem"
                                                         key={deadline.id}
@@ -298,6 +365,12 @@ export function Component() {
                                                         </div>
                                                         <div>
                                                             {deadline.name}
+                                                            {deadline.remainingDays < 0 && (
+                                                                <>
+                                                                    {' '}
+                                                                    <FcHighPriority />
+                                                                </>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 ))}
@@ -322,28 +395,6 @@ export function Component() {
                         className={styles.endSection}
                     />
                 )}
-            </div>
-            <div className={styles.actions}>
-                <Button
-                    name={prevButtonName}
-                    onClick={updatePage}
-                    variant="quaternary"
-                    disabled={prevButtonDisabled}
-                    icons={<IoChevronBack />}
-                    title="Previous standup slide"
-                >
-                    Prev
-                </Button>
-                <Button
-                    name={nextButtonName}
-                    onClick={updatePage}
-                    variant="quaternary"
-                    disabled={nextButtonDisabled}
-                    actions={<IoChevronForward />}
-                    title="Next standup slide"
-                >
-                    Next
-                </Button>
             </div>
         </Page>
     );

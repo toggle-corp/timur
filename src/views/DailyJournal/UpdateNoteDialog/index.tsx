@@ -160,7 +160,7 @@ function AddNoteDialog(props: Props) {
                 journalText: dialogState ?? '',
             });
         },
-        [date, dialogState],
+        [date, dialogState, updateNote],
     );
 
     useEffect(() => {

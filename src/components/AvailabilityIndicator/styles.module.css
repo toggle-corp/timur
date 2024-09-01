@@ -1,0 +1,4 @@
+.indicator {
+    display: inline-flex;
+    gap: var(--spacing-xs);
+}

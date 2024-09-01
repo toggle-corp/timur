@@ -172,7 +172,7 @@ function AvailabilityDialog(props: Props) {
             });
             handleModalClose();
         },
-        [date, dialogState],
+        [date, dialogState, handleModalClose, updateAvailability],
     );
     const formattedDate = dateFormatter.format(new Date(date));
 

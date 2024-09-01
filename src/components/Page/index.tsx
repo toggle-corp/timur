@@ -39,6 +39,7 @@ interface Props {
     endAsideContent?: React.ReactNode;
     children: React.ReactNode;
     contentClassName?: string;
+    contentContainerClassName?: string;
     onSwipeLeft?: () => void;
     onSwipeRight?: () => void;
 }
@@ -52,6 +53,7 @@ function Page(props: Props) {
         endAsideContent,
         children,
         contentClassName,
+        contentContainerClassName,
         endAsideContainerClassName,
         onSwipeLeft,
         onSwipeRight,
@@ -149,7 +151,7 @@ function Page(props: Props) {
                     {startAsideContent}
                 </aside>
             )}
-            <main className={styles.main}>
+            <main className={_cs(styles.main, contentContainerClassName)}>
                 <div className={_cs(styles.content, contentClassName)}>
                     {children}
                 </div>

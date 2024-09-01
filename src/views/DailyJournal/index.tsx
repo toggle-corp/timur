@@ -34,6 +34,7 @@ import {
     useQuery,
 } from 'urql';
 
+import AvailabilityIndicator from '#components/AvailabilityIndicator';
 import Button from '#components/Button';
 import CalendarInput from '#components/CalendarInput';
 import Link, { resolvePath } from '#components/Link';
@@ -93,6 +94,12 @@ const MY_TIME_ENTRIES_QUERY = gql`
                 status
                 taskId
                 type
+            }
+            journal(date: $date) {
+                id
+                date
+                leaveType
+                wfhType
             }
         }
     }
@@ -589,6 +596,9 @@ export function Component() {
         .filter((item) => isNotDefined(item.duration) && item.status !== 'TODO')
         .length;
 
+    const leaveType = myTimeEntriesResult.data?.private.journal?.leaveType;
+    const wfhType = myTimeEntriesResult.data?.private.journal?.wfhType;
+
     return (
         <Page
             documentTitle="Timur - Daily Journal"
@@ -665,16 +675,22 @@ export function Component() {
                         title="Update availability"
                         variant="quaternary"
                     >
-                        <IoStorefrontOutline />
+                        <AvailabilityIndicator
+                            wfhType={wfhType}
+                            leaveType={leaveType}
+                            fallback={<IoStorefrontOutline />}
+                        />
                     </Button>
-                    <Button
-                        name={undefined}
-                        onClick={handleNoteUpdateClick}
-                        title="Update Note"
-                        variant="quaternary"
-                    >
-                        <IoNewspaperOutline />
-                    </Button>
+                    {windowWidth >= 900 && (
+                        <Button
+                            name={undefined}
+                            onClick={handleNoteUpdateClick}
+                            title="Update Note"
+                            variant="quaternary"
+                        >
+                            <IoNewspaperOutline />
+                        </Button>
+                    )}
                     {windowWidth >= 900 && (
                         <Button
                             title="Show shortcuts"
