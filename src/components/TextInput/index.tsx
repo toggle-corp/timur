@@ -16,8 +16,6 @@ function TextInput<const T>(props: Props<T>) {
         actions,
         className,
         disabled,
-        error,
-        errorOnTooltip,
         hint,
         icons,
         inputClassName,
@@ -40,8 +38,6 @@ function TextInput<const T>(props: Props<T>) {
             className={className}
             actions={actions}
             disabled={disabled}
-            error={error}
-            errorOnTooltip={errorOnTooltip}
             hint={hint}
             icons={icons}
             inputSectionClassName={inputSectionClassName}

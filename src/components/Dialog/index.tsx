@@ -22,7 +22,7 @@ interface Props {
     contentClassName?: string;
 
     mode?: 'right' | 'center';
-    size?: 'auto';
+    size?: 'auto-height' | 'auto';
     escapeDisabled?: boolean;
 
     focusElementRef?: RefObject<HTMLElement>;
@@ -91,6 +91,7 @@ function Dialog(props: Props) {
                     mode === 'right' && styles.rightMode,
                     mode === 'center' && styles.centerMode,
                     size === 'auto' && styles.autoSize,
+                    size === 'auto-height' && styles.autoHeight,
                 )}
                 onCancel={handleCancel}
                 onClose={handleClose}

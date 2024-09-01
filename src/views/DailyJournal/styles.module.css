@@ -56,7 +56,12 @@
 
 .date-navigation {
     display: flex;
-    gap: var(--spacing-xs)
+    width: 100%;
+    gap: var(--spacing-xs);
+
+    .spacer {
+        flex-grow: 1;
+    }
 }
 
 @keyframes shake-it-off {

@@ -11,7 +11,6 @@ export const defaultConfigValue: ConfigStorage = {
     showInputIcons: false,
     startSidebarShown: window.innerWidth >= 900,
     endSidebarShown: false,
-    notes: [],
 };
 
 export const colorscheme: [string, string][] = [

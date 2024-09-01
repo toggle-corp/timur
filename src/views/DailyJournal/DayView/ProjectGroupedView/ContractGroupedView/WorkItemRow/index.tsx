@@ -43,6 +43,7 @@ import {
     KEY_CONFIG_STORAGE,
 } from '#utils/constants';
 import {
+    ConfigStorage,
     Contract,
     EntriesAsList,
     Task,
@@ -110,7 +111,10 @@ function WorkItemRow(props: Props) {
     const { enums } = useContext(EnumsContext);
     const { width: windowWidth } = useContext(SizeContext);
     const inputRef = useFocusClient<HTMLTextAreaElement>(workItem.clientId);
-    const [config] = useLocalStorage(KEY_CONFIG_STORAGE, defaultConfigValue);
+    const [config] = useLocalStorage<ConfigStorage>(
+        KEY_CONFIG_STORAGE,
+        defaultConfigValue,
+    );
 
     const setFieldValue = useCallback(
         (...entries: EntriesAsList<WorkItem>) => {

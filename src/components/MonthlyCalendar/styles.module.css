@@ -13,7 +13,7 @@
     .monthly-calendar {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: var(--spacing-sm);
+        gap: var(--spacing-2xs);
 
         .day-name {
             padding: var(--spacing-2xs);
@@ -23,7 +23,7 @@
         }
 
         .date {
-            padding: var(--spacing-2xs);
+            padding: var(--spacing-3xs) var(--spacing-xs);
             font-size: var(--font-size-sm);
         }
     }

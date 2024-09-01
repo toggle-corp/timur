@@ -6,16 +6,16 @@
     padding: var(--spacing-sm) var(--spacing-md);
     gap: var(--spacing-md);
 
-    .spacer {
-        flex-grow: 1;
-    }
-
     .start-actions,
     .middle-actions,
     .end-actions {
         display: flex;
         align-items: center;
         flex-shrink: 0;
+    }
+
+    .middle-actions {
+        flex-grow: 1;
     }
 
     .brand {

@@ -210,11 +210,11 @@ export function Component() {
 
     const handleKeybindingsPress = useCallback(
         (event: KeyboardEvent) => {
-            if (event.key === 'ArrowRight') {
+            if (event.key === 'ArrowRight' || event.key === 'PageDown') {
                 event.preventDefault();
                 event.stopPropagation();
                 handleNextButtion();
-            } else if (event.key === 'ArrowLeft') {
+            } else if (event.key === 'ArrowLeft' || event.key === 'PageUp') {
                 event.preventDefault();
                 event.stopPropagation();
                 handlePrevButton();

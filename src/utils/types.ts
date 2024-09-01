@@ -38,6 +38,4 @@ export type ConfigStorage = {
     startSidebarShown: boolean,
     endSidebarShown: boolean,
     compactTextArea: boolean,
-
-    notes: Note[],
 }

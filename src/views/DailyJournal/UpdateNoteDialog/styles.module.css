@@ -14,5 +14,11 @@
                 border-color: var(--color-secondary);
             }
         }
+
+        .actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            justify-content: flex-end;
+        }
     }
 }

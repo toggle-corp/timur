@@ -4,7 +4,6 @@ import {
 } from 'react';
 import { _cs } from '@togglecorp/fujs';
 
-import InputError from '../InputError';
 import DefaultCheckmark, { CheckmarkProps } from './Checkmark';
 
 import styles from './styles.module.css';
@@ -15,7 +14,6 @@ interface Props<NAME> {
     checkmark?: (p: CheckmarkProps) => React.ReactElement;
     checkmarkClassName?: string;
     disabled?: boolean;
-    error?: React.ReactNode;
     indeterminate?: boolean;
     inputClassName?: string;
     invertedLogic?: boolean;
@@ -35,7 +33,6 @@ function Checkbox<const NAME>(props: Props<NAME>) {
         checkmark: Checkmark = DefaultCheckmark,
         checkmarkClassName,
         disabled,
-        error,
         indeterminate,
         inputClassName,
         invertedLogic = false,
@@ -108,11 +105,6 @@ function Checkbox<const NAME>(props: Props<NAME>) {
                         </div>
                     )}
                 </div>
-            )}
-            {error && (
-                <InputError>
-                    {error}
-                </InputError>
             )}
         </label>
     );

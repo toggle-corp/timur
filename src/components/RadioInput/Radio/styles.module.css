@@ -45,6 +45,10 @@
             }
         }
 
+        &:focus-within {
+            outline: var(--width-separator-md) solid var(--color-secondary);
+        }
+
         &:not(.read-only) {
             --cursor: pointer;
         }

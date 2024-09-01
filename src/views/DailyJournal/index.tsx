@@ -14,6 +14,7 @@ import {
     IoChevronBackSharp,
     IoChevronForwardSharp,
     IoNewspaperOutline,
+    IoStorefrontOutline,
     IoTerminalOutline,
 } from 'react-icons/io5';
 import {
@@ -52,7 +53,6 @@ import useBackgroundSync from '#hooks/useBackgroundSync';
 import { useFocusManager } from '#hooks/useFocus';
 import useKeybind from '#hooks/useKeybind';
 import useLocalStorage from '#hooks/useLocalStorage';
-import useSetFieldValue from '#hooks/useSetFieldValue';
 import {
     addDays,
     getNewId,
@@ -70,6 +70,7 @@ import {
 
 import timurLogo from '../../App/icon.svg';
 import AddWorkItemDialog from './AddWorkItemDialog';
+import AvailabilityDialog from './AvailabilityDialog';
 import DayView from './DayView';
 import EndSidebar from './EndSidebar';
 import ShortcutsDialog from './ShortcutsDialog';
@@ -77,8 +78,6 @@ import StartSidebar from './StartSidebar';
 import UpdateNoteDialog from './UpdateNoteDialog';
 
 import styles from './styles.module.css';
-
-const emptyArray: unknown[] = [];
 
 const MY_TIME_ENTRIES_QUERY = gql`
     query MyTimeEntries($date: Date!) {
@@ -147,6 +146,7 @@ export function Component() {
     const dialogOpenTriggerRef = useRef<(() => void) | undefined>();
     const noteDialogOpenTriggerRef = useRef<(() => void) | undefined>();
     const shortcutsDialogOpenTriggerRef = useRef<(() => void) | undefined>();
+    const availabilityDialogOpenTriggerRef = useRef<(() => void) | undefined>();
     const calendarRef = useRef<
         { resetView:(year: number, month: number) => void; }
             >(null);
@@ -214,36 +214,12 @@ export function Component() {
         return prevDay;
     }, [selectedDate]);
 
-    const [storedConfig, setStoredConfig] = useLocalStorage<ConfigStorage>(
+    const [storedConfig] = useLocalStorage<ConfigStorage>(
         KEY_CONFIG_STORAGE,
         defaultConfigValue,
     );
 
-    // Read state from the stored state
-    const notes = storedConfig.notes ?? emptyArray;
-    // FIXME: memoize this
-    const currentNote = notes.find((item) => item.date === selectedDate);
     const editMode = storedConfig.editingMode ?? defaultConfigValue.editingMode;
-    const setFieldValue = useSetFieldValue(setStoredConfig);
-
-    const handleCurrentNoteChange = (value: string | undefined, id: string | undefined) => {
-        const newNotes = [...notes];
-        const index = newNotes.findIndex((item) => item.id === id);
-        if (id && index !== -1) {
-            const note = newNotes[index];
-            newNotes.splice(index, 1, {
-                ...note,
-                content: value,
-            });
-        } else {
-            newNotes.push({
-                id: getNewId(),
-                date: selectedDate,
-                content: value,
-            });
-        }
-        setFieldValue(newNotes, 'notes');
-    };
 
     const [
         bulkMutationState,
@@ -523,6 +499,15 @@ export function Component() {
         [],
     );
 
+    const handleAvailabilityButtonClick = useCallback(
+        () => {
+            if (availabilityDialogOpenTriggerRef.current) {
+                availabilityDialogOpenTriggerRef.current();
+            }
+        },
+        [],
+    );
+
     const handleKeybindingsPress = useCallback(
         (event: KeyboardEvent) => {
             if (event.ctrlKey && (event.key === ' ' || event.code === 'Space')) {
@@ -673,6 +658,33 @@ export function Component() {
                     >
                         <IoCalendarOutline />
                     </CalendarInput>
+                    <div className={styles.spacer} />
+                    <Button
+                        name={undefined}
+                        onClick={handleAvailabilityButtonClick}
+                        title="Update availability"
+                        variant="quaternary"
+                    >
+                        <IoStorefrontOutline />
+                    </Button>
+                    <Button
+                        name={undefined}
+                        onClick={handleNoteUpdateClick}
+                        title="Update Note"
+                        variant="quaternary"
+                    >
+                        <IoNewspaperOutline />
+                    </Button>
+                    {windowWidth >= 900 && (
+                        <Button
+                            title="Show shortcuts"
+                            name={undefined}
+                            variant="quaternary"
+                            onClick={handleShortcutsButtonClick}
+                        >
+                            <IoTerminalOutline />
+                        </Button>
+                    )}
                 </div>
             </Portal>
             <FocusContext.Provider
@@ -717,33 +729,17 @@ export function Component() {
                 >
                     Add entry
                 </Button>
-                <Button
-                    name={undefined}
-                    onClick={handleNoteUpdateClick}
-                    icons={<IoNewspaperOutline />}
-                    title={currentNote ? 'Update Note' : 'Add note'}
-                    variant="quaternary"
-                >
-                    {currentNote ? 'Update Note' : 'Add note'}
-                </Button>
-                {windowWidth >= 900 && (
-                    <Button
-                        title="Show shortcuts"
-                        name={undefined}
-                        variant="quaternary"
-                        onClick={handleShortcutsButtonClick}
-                    >
-                        <IoTerminalOutline />
-                    </Button>
-                )}
             </div>
             <ShortcutsDialog
                 dialogOpenTriggerRef={shortcutsDialogOpenTriggerRef}
             />
+            <AvailabilityDialog
+                dialogOpenTriggerRef={availabilityDialogOpenTriggerRef}
+                date={selectedDate}
+            />
             <UpdateNoteDialog
                 dialogOpenTriggerRef={noteDialogOpenTriggerRef}
-                note={currentNote}
-                onNoteContentUpdate={handleCurrentNoteChange}
+                date={selectedDate}
                 editingMode={editMode}
             />
             <AddWorkItemDialog
