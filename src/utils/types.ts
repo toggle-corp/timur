@@ -30,6 +30,17 @@ export interface Note {
     content: string | undefined;
 }
 
+export type DailyJournalAttributeKeys = 'project' | 'contract' | 'task' | 'status';
+export interface DailyJournalAttributeOrder {
+    key: DailyJournalAttributeKeys;
+    sortDirection: number;
+}
+
+export interface DailyJournalGrouping {
+    groupLevel: number;
+    joinLevel: number;
+}
+
 export type ConfigStorage = {
     defaultTaskType: WorkItemType | undefined,
     defaultTaskStatus: WorkItemStatus,
@@ -39,6 +50,8 @@ export type ConfigStorage = {
     startSidebarShown: boolean,
     endSidebarShown: boolean,
     compactTextArea: boolean,
+    dailyJournalAttributeOrder: DailyJournalAttributeOrder[];
+    dailyJournalGrouping: DailyJournalGrouping;
 }
 
 export interface GeneralEvent {
@@ -49,4 +62,9 @@ export interface GeneralEvent {
     name: string;
     date: string;
     remainingDays: number;
+}
+
+export interface NumericOption {
+    key: number;
+    label: string;
 }

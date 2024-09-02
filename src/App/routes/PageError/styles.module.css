@@ -8,56 +8,54 @@
     .container {
         display: flex;
         flex-direction: column;
-        /*
-        border-top: var(--go-ui-width-separator-large) solid var(--go-ui-color-primary-red);
-        border-radius: var(--go-ui-border-radius-xl);
-        box-shadow: var(--go-ui-box-shadow-2xl);
-        background-color: var(--go-ui-color-white);
-        padding: var(--go-ui-spacing-2xl);
-        width: calc(100% - var(--go-ui-spacing-2xl));
-        */
+        border-top: var(--width-separator-lg) solid var(--color-primary);
+        border-radius: var(--border-radius-xl);
+        box-shadow: var(--box-shadow-lg);
+        background-color: var(--color-foreground);
+        padding: var(--spacing-2xl);
+        width: calc(100% - var(--spacing-2xl));
         max-width: 60rem;
         max-height: 60rem;
-        /*
-        gap: var(--go-ui-spacing-2xl);
-        */
+        gap: var(--spacing-lg);
 
         .content {
             display: flex;
             flex-direction: column;
-            /*
-            gap: var(--go-ui-spacing-md);
-            */
+            gap: var(--spacing-md);
 
             .heading {
                 margin: 0;
-                /*
-                font-weight: var(--go-ui-font-weight-medium);
-                */
+                font-weight: var(--font-weight-semibold);
+            }
+
+            .message {
+                font-family: var(--font-family-mono);
             }
 
             .stack {
                 flex-grow: 1;
-                /*
-                background-color: var(--go-ui-color-background);
-                padding: var(--go-ui-spacing-md);
-                */
+                background-color: var(--color-background);
+                padding: var(--spacing-md);
                 width: 100%;
                 overflow: auto;
                 white-space: pre;
-                /*
-                font-family: var(--go-ui-font-family-mono);
-                */
+                font-family: var(--font-family-mono);
             }
         }
 
         .footer {
             display: flex;
             align-items: center;
-            justify-content: flex-end;
-            /*
-            gap: var(--go-ui-spacing-md);
-            */
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+
+            .actions {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                gap: var(--spacing-sm);
+            }
         }
     }
 }

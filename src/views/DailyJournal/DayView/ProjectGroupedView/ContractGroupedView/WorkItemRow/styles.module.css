@@ -2,7 +2,7 @@
     display: grid;
     align-items: flex-start;
     grid-template-columns: 5rem 2fr 5fr 9rem 4rem 4rem;
-    padding: var(--spacing-2xs) var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
     gap: var(--spacing-xs);
 
     &.with-icons {

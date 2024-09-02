@@ -1,4 +1,6 @@
 import {
+    ElementType,
+    Fragment,
     useCallback,
     useContext,
     useMemo,
@@ -6,33 +8,37 @@ import {
 import { FcClock } from 'react-icons/fc';
 import {
     _cs,
+    bound,
+    compareString,
     isDefined,
     isNotDefined,
-    listToGroupList,
-    mapToList,
     sum,
 } from '@togglecorp/fujs';
 
-import List from '#components/List';
+import DefaultMessage from '#components/DefaultMessage';
 import EnumsContext from '#contexts/enums';
 import useFormattedRelativeDate from '#hooks/useFormattedRelativeDate';
 import useLocalStorage from '#hooks/useLocalStorage';
-import { getDurationString } from '#utils/common';
+import {
+    getDurationString,
+    groupListByAttributes,
+    sortByAttributes,
+} from '#utils/common';
 import {
     defaultConfigValue,
     KEY_CONFIG_STORAGE,
 } from '#utils/constants';
 import {
     ConfigStorage,
-    Contract,
+    DailyJournalAttributeOrder,
     EntriesAsList,
-    Project,
     WorkItem,
 } from '#utils/types';
 
-import ProjectGroupedView, { Props as ProjectGroupedViewProps } from './ProjectGroupedView';
+import WorkItemRow from './ProjectGroupedView/ContractGroupedView/WorkItemRow';
 
 import styles from './styles.module.css';
+import Indent from '#components/Indent';
 
 const dateFormatter = new Intl.DateTimeFormat(
     [],
@@ -43,18 +49,6 @@ const dateFormatter = new Intl.DateTimeFormat(
         weekday: 'short',
     },
 );
-
-interface ProjectGroupedWorkItem {
-    project: Project,
-    contracts: {
-        contract: Contract,
-        workItems: WorkItem[],
-    }[],
-}
-
-function getId(item: ProjectGroupedWorkItem) {
-    return item.project.id;
-}
 
 interface Props {
     className?: string;
@@ -85,54 +79,37 @@ function DayView(props: Props) {
         defaultConfigValue,
     );
 
-    const groupedWorkItems = useMemo(
-        (): ProjectGroupedWorkItem[] | undefined => {
-            if (isNotDefined(workItems) || isNotDefined(taskById)) {
-                return undefined;
-            }
+    const getWorkItemAttribute = useCallback((
+        item: WorkItem,
+        attr: DailyJournalAttributeOrder,
+    ) => {
+        if (attr.key === 'status') {
+            return item.status;
+        }
 
-            return mapToList(listToGroupList(
-                mapToList(listToGroupList(
-                    workItems,
-                    (workItem) => taskById[workItem.task].contract.id,
-                    undefined,
-                    (list) => ({
-                        contract: taskById[list[0].task].contract,
-                        workItems: list,
-                    }),
-                )),
-                (contractGrouped) => contractGrouped.contract.project.id,
-                undefined,
-                (list) => ({
-                    project: list[0].contract.project,
-                    contracts: list,
-                }),
-            ));
-        },
-        [workItems, taskById],
-    );
+        if (isNotDefined(taskById)) {
+            return undefined;
+        }
 
-    type GroupedWorkItem = NonNullable<(typeof groupedWorkItems)>[number];
+        const taskDetails = taskById[item.task];
 
-    const rendererParams = useCallback(
-        (_: string, item: GroupedWorkItem): ProjectGroupedViewProps => ({
-            contracts: item.contracts,
-            project: item.project,
-            onWorkItemClone,
-            onWorkItemChange,
-            onWorkItemDelete,
-        }),
-        [
-            onWorkItemClone,
-            onWorkItemChange,
-            onWorkItemDelete,
-        ],
-    );
+        if (attr.key === 'task') {
+            return taskDetails.name;
+        }
+
+        if (attr.key === 'contract') {
+            return taskDetails.contract.name;
+        }
+
+        if (attr.key === 'project') {
+            return taskDetails.contract.project.name;
+        }
+
+        return undefined;
+    }, [taskById]);
 
     const formattedDate = dateFormatter.format(new Date(selectedDate));
-
     const formattedRelativeDate = useFormattedRelativeDate(selectedDate);
-
     const totalHours = useMemo(
         () => {
             if (isDefined(workItems)) {
@@ -143,6 +120,48 @@ function DayView(props: Props) {
         },
         [workItems],
     );
+
+    const {
+        dailyJournalAttributeOrder,
+        dailyJournalGrouping,
+    } = storedConfig;
+
+    const { groupLevel, joinLevel } = dailyJournalGrouping;
+
+    const groupedItems = useMemo(() => {
+        if (isNotDefined(taskById) || isNotDefined(workItems)) {
+            return [];
+        }
+
+        const sortedWorkItems = sortByAttributes(
+            workItems,
+            dailyJournalAttributeOrder,
+            (a, b, attr) => (
+                compareString(
+                    getWorkItemAttribute(a, attr),
+                    getWorkItemAttribute(b, attr),
+                    attr.sortDirection,
+                )
+            ),
+        );
+
+        return groupListByAttributes(
+            sortedWorkItems,
+            dailyJournalAttributeOrder.slice(0, groupLevel),
+            (a, b, attr) => {
+                const aValue = getWorkItemAttribute(a, attr);
+                const bValue = getWorkItemAttribute(b, attr);
+
+                return aValue === bValue;
+            },
+        );
+    }, [
+        taskById,
+        workItems,
+        getWorkItemAttribute,
+        dailyJournalAttributeOrder,
+        groupLevel,
+    ]);
 
     return (
         <section className={_cs(styles.dayView, className)}>
@@ -170,29 +189,97 @@ function DayView(props: Props) {
                     </div>
                 )}
             </header>
-            <List
-                className={styles.projectList}
-                compact={!!groupedWorkItems?.length}
+            <DefaultMessage
+                filtered={false}
+                empty={groupedItems.length === 0}
                 pending={loading}
                 errored={errored}
-                filtered={false}
-                data={groupedWorkItems}
-                keySelector={getId}
-                renderer={ProjectGroupedView}
-                rendererParams={rendererParams}
-                emptyMessage="No entries here!"
-                pendingMessage="Getting your entries..."
-                pendingDescription="This should not take much time."
-                emptyDescription={(
-                    <>
-                        Click on
-                        {' '}
-                        <em>Add entry</em>
-                        {' '}
-                        to create a new entry.
-                    </>
-                )}
             />
+            {!errored && !loading && (
+                <div className={styles.newGroup}>
+                    {groupedItems.map((groupedItem) => {
+                        if (groupedItem.type === 'heading') {
+                            const levelDiff = groupLevel - joinLevel;
+
+                            const headingText = getWorkItemAttribute(
+                                groupedItem.value,
+                                groupedItem.attribute,
+                            );
+
+                            if (groupedItem.level < levelDiff) {
+                                const Heading = `h${bound(groupedItem.level + 2, 2, 4)}` as unknown as ElementType;
+
+                                return (
+                                    <Heading
+                                        key={groupedItem.key}
+                                        className={styles.nestedHeading}
+                                    >
+                                        <Indent level={groupedItem.level} />
+                                        {headingText}
+                                    </Heading>
+                                );
+                            }
+
+                            if (groupedItem.level < (groupLevel - 1)) {
+                                return null;
+                            }
+
+                            return (
+                                <h4
+                                    className={styles.joinedHeading}
+                                    key={groupedItem.key}
+                                >
+                                    <Indent level={groupedItem.level - joinLevel + 1} />
+                                    {dailyJournalAttributeOrder.map((attribute, i) => {
+                                        if (i >= groupLevel) {
+                                            return null;
+                                        }
+
+                                        const currentLabel = getWorkItemAttribute(
+                                            groupedItem.value,
+                                            attribute,
+                                        );
+
+                                        if (i < (groupLevel - joinLevel)) {
+                                            return null;
+                                        }
+
+                                        return (
+                                            <Fragment key={attribute.key}>
+                                                {i > (groupLevel - joinLevel) && (
+                                                    <div className={styles.separator} />
+                                                )}
+                                                <div>{currentLabel}</div>
+                                            </Fragment>
+                                        );
+                                    })}
+                                </h4>
+                            );
+                        }
+
+                        const taskDetails = taskById?.[groupedItem.value.task];
+
+                        if (!taskDetails) {
+                            return null;
+                        }
+
+                        return (
+                            <div className={styles.workItemContainer}>
+                                <Indent level={groupedItem.level - joinLevel} />
+                                <WorkItemRow
+                                    key={groupedItem.value.clientId}
+                                    className={styles.workItem}
+                                    workItem={groupedItem.value}
+                                    onClone={onWorkItemClone}
+                                    onChange={onWorkItemChange}
+                                    onDelete={onWorkItemDelete}
+                                    contract={taskDetails?.contract}
+                                />
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
         </section>
     );
 }

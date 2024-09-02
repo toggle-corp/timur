@@ -1,4 +1,7 @@
-import { ConfigStorage } from './types';
+import {
+    ConfigStorage,
+    NumericOption,
+} from './types';
 
 export const KEY_CONFIG_STORAGE = 'timur-config';
 
@@ -11,6 +14,16 @@ export const defaultConfigValue: ConfigStorage = {
     showInputIcons: false,
     startSidebarShown: window.innerWidth >= 900,
     endSidebarShown: false,
+    dailyJournalGrouping: {
+        groupLevel: 2,
+        joinLevel: 2,
+    },
+    dailyJournalAttributeOrder: [
+        { key: 'project', sortDirection: 1 },
+        { key: 'contract', sortDirection: 1 },
+        { key: 'task', sortDirection: 1 },
+        { key: 'status', sortDirection: 1 },
+    ],
 };
 
 export const colorscheme: [string, string][] = [
@@ -33,3 +46,21 @@ export const colorscheme: [string, string][] = [
     // horchata 8
     ['#7d5327', '#ecdecc'],
 ];
+
+export const numericOptions: NumericOption[] = [
+    { key: 1, label: '1' },
+    { key: 2, label: '2' },
+    { key: 3, label: '3' },
+    { key: 4, label: '4' },
+    { key: 5, label: '5' },
+    { key: 6, label: '6' },
+    { key: 7, label: '7' },
+    { key: 8, label: '8' },
+    { key: 9, label: '9' },
+];
+export function numericOptionKeySelector(option: NumericOption) {
+    return option.key;
+}
+export function numericOptionLabelSelector(option: NumericOption) {
+    return option.label;
+}

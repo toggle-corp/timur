@@ -3,8 +3,15 @@ import {
     useEffect,
     useState,
 } from 'react';
+import {
+    IoCaretDown,
+    IoCaretUp,
+    IoHome,
+    IoReload,
+} from 'react-icons/io5';
 import { useRouteError } from 'react-router-dom';
 
+import Button from '#components/Button';
 import Link from '#components/Link';
 
 import styles from './styles.module.css';
@@ -24,14 +31,7 @@ function PageError() {
     const [
         fullErrorVisible,
         setFullErrorVisible,
-    ] = useState(false);
-
-    const handleErrorVisibleToggle = useCallback(
-        () => {
-            setFullErrorVisible((oldValue) => !oldValue);
-        },
-        [setFullErrorVisible],
-    );
+    ] = useState(import.meta.env.DEV);
 
     const handleReloadButtonClick = useCallback(
         () => {
@@ -49,45 +49,53 @@ function PageError() {
                     <h1 className={styles.heading}>
                         Looks like we ran into some issue!
                     </h1>
-                    <div className={styles.message}>
-                        {errorResponse?.error?.message
-                            ?? errorResponse?.message
-                            ?? 'Something unexpected happended!'}
-                    </div>
-                    <button
-                        type="button"
-                        name={undefined}
-                        onClick={handleErrorVisibleToggle}
-                    >
-                        {fullErrorVisible ? 'Hide Error' : 'Show Error'}
-                    </button>
+                    {!fullErrorVisible && (
+                        <div className={styles.stack}>
+                            {errorResponse?.error?.message
+                                ?? errorResponse?.message
+                                ?? 'Something unexpected happended!'}
+                        </div>
+                    )}
                     {fullErrorVisible && (
-                        <>
-                            <div className={styles.stack}>
-                                {errorResponse?.error?.stack
-                                    ?? errorResponse?.stack ?? 'Stack trace not available!'}
-                            </div>
-                            <div className={styles.actions}>
-                                See the developer console for more details.
-                            </div>
-                        </>
+                        <div className={styles.stack}>
+                            {errorResponse?.error?.stack
+                                ?? errorResponse?.stack ?? 'Stack trace not available!'}
+                        </div>
                     )}
                 </div>
+                <div>
+                    See the developer console for more details.
+                </div>
                 <div className={styles.footer}>
-                    {/* NOTE: using the anchor element as it will refresh the page */}
-                    <Link
-                        href="/"
-                        external
-                    >
-                        Go back to homepage
-                    </Link>
-                    <button
+                    <Button
                         type="button"
-                        name={undefined}
-                        onClick={handleReloadButtonClick}
+                        name={!fullErrorVisible}
+                        variant="transparent"
+                        onClick={setFullErrorVisible}
+                        title="Toggle error detail"
+                        actions={fullErrorVisible ? <IoCaretUp /> : <IoCaretDown />}
                     >
-                        Reload
-                    </button>
+                        {fullErrorVisible ? 'Hide details' : 'Show details'}
+                    </Button>
+                    <div className={styles.actions}>
+                        {/* NOTE: using the anchor element as it will refresh the page */}
+                        <Link
+                            href="/"
+                            external
+                            icons={<IoHome />}
+                            variant="quaternary"
+                        >
+                            Go to homepage
+                        </Link>
+                        <Button
+                            name={undefined}
+                            title="Reload page"
+                            onClick={handleReloadButtonClick}
+                            icons={<IoReload />}
+                        >
+                            Reload
+                        </Button>
+                    </div>
                 </div>
             </div>
         </div>

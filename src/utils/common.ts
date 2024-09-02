@@ -212,3 +212,123 @@ export function fuzzySearch<ItemType = string>(
         rows,
     );
 }
+
+export function sortByAttributes<LIST_ITEM, ATTRIBUTE>(
+    list: LIST_ITEM[],
+    attributes: ATTRIBUTE[],
+    sortFn: (a: LIST_ITEM, b: LIST_ITEM, attr: ATTRIBUTE) => number,
+): LIST_ITEM[] {
+    const newList = [...list];
+    newList.sort(
+        (a, b) => {
+            let sortResult = 0;
+
+            for (let i = 0; i < attributes.length; i += 1) {
+                const currentSortResult = sortFn(
+                    a,
+                    b,
+                    attributes[i],
+                );
+
+                if (currentSortResult !== 0) {
+                    sortResult = currentSortResult;
+                    break;
+                }
+            }
+
+            return sortResult;
+        },
+    );
+
+    return newList;
+}
+
+type GroupedItem<LIST_ITEM, ATTRIBUTE> = {
+    key: string;
+    type: 'heading';
+    value: LIST_ITEM;
+    attribute: ATTRIBUTE;
+    level: number;
+} | {
+    type: 'list-item';
+    value: LIST_ITEM;
+    level: number;
+};
+
+// NOTE: the list must be sorted before grouping
+export function groupListByAttributes<LIST_ITEM, ATTRIBUTE>(
+    list: LIST_ITEM[],
+    attributes: ATTRIBUTE[],
+    compareItemAttributes: (a: LIST_ITEM, b: LIST_ITEM, attribute: ATTRIBUTE) => boolean,
+): GroupedItem<LIST_ITEM, ATTRIBUTE>[] {
+    if (isNotDefined(list) || list.length === 0) {
+        return [];
+    }
+
+    const groupedItems = list.flatMap((listItem, listIndex) => {
+        if (listIndex === 0) {
+            const headings = attributes.map((attribute, i) => ({
+                type: 'heading' as const,
+                value: listItem,
+                attribute,
+                level: i,
+                key: `heading-${listIndex}-${i}`,
+            }));
+
+            return [
+                ...headings,
+                {
+                    type: 'list-item' as const,
+                    value: listItem,
+                    level: attributes.length,
+                },
+            ];
+        }
+
+        const prevListItem = list[listIndex - 1];
+        const attributeMismatchIndex = attributes.findIndex((attribute) => {
+            const hasSameCurrentAttribute = compareItemAttributes(
+                listItem,
+                prevListItem,
+                attribute,
+            );
+
+            return !hasSameCurrentAttribute;
+        });
+
+        if (attributeMismatchIndex === -1) {
+            return [
+                {
+                    type: 'list-item' as const,
+                    value: listItem,
+                    level: attributes.length,
+                },
+            ];
+        }
+
+        const headings = attributes.map((attribute, i) => {
+            if (i < attributeMismatchIndex) {
+                return undefined;
+            }
+
+            return {
+                type: 'heading' as const,
+                value: listItem,
+                attribute,
+                level: i,
+                key: `heading-${listIndex}-${i}`,
+            };
+        }).filter(isDefined);
+
+        return [
+            ...headings,
+            {
+                type: 'list-item' as const,
+                value: listItem,
+                level: attributes.length,
+            },
+        ];
+    });
+
+    return groupedItems;
+}

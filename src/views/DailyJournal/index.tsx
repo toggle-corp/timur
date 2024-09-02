@@ -27,6 +27,7 @@ import {
     encodeDate,
     isDefined,
     isNotDefined,
+    isTruthyString,
 } from '@togglecorp/fujs';
 import {
     gql,
@@ -745,6 +746,14 @@ export function Component() {
                 >
                     Add entry
                 </Button>
+                {!isTruthyString(dateFromParams) && (
+                    <Link
+                        to="dailyJournal"
+                        variant="quaternary"
+                    >
+                        Go to today
+                    </Link>
+                )}
             </div>
             <ShortcutsDialog
                 dialogOpenTriggerRef={shortcutsDialogOpenTriggerRef}
