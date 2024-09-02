@@ -36,6 +36,7 @@ const gqlClient = new UrqlClient({
             AppEnumCollectionTimeEntryType: (item) => String(item.key),
             AppEnumCollectionTimeEntryStatus: (item) => String(item.key),
             AppEnumCollectionJournalLeaveType: (item) => String(item.key),
+            AppEnumCollectionJournalWfhType: (item) => String(item.key),
             DjangoImageType: (item) => String(item.url),
         },
     }), fetchExchange],

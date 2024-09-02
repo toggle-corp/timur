@@ -1,10 +1,19 @@
 import {
+    Fragment,
     useCallback,
     useContext,
+    useEffect,
     useMemo,
     useRef,
+    useState,
 } from 'react';
-import { FcHighPriority } from 'react-icons/fc';
+import {
+    FcLandscape,
+    FcLeave,
+    FcNews,
+    FcNightLandscape,
+    FcSportsMode,
+} from 'react-icons/fc';
 import {
     IoChevronBack,
     IoChevronForward,
@@ -12,8 +21,10 @@ import {
 } from 'react-icons/io5';
 import { useParams } from 'react-router-dom';
 import {
-    compareNumber,
+    _cs,
+    compareDate,
     encodeDate,
+    getDifferenceInDays,
     isDefined,
     isNotDefined,
 } from '@togglecorp/fujs';
@@ -23,19 +34,21 @@ import {
 } from 'urql';
 
 import Button from '#components/Button';
-import DisplayPicture from '#components/DisplayPicture';
 import Page from '#components/Page';
 import Portal from '#components/Portal';
 import NavbarContext from '#contexts/navbar';
 import {
-    AllProjectsQuery,
-    AllProjectsQueryVariables,
+    AllProjectsAndEventsQuery,
+    AllProjectsAndEventsQueryVariables,
 } from '#generated/types/graphql';
 import useKeybind from '#hooks/useKeybind';
 import useUrlQueryState from '#hooks/useUrlQueryState';
+import { type GeneralEvent } from '#utils/types';
 
 import EndSection from './EndSection';
+import GeneralEventOutput from './GeneralEvent';
 import ProjectStandup from './ProjectStandup';
+import Slide from './Slide';
 
 import styles from './styles.module.css';
 
@@ -49,26 +62,8 @@ const dateFormatter = new Intl.DateTimeFormat(
     },
 );
 
-function getFormattedDaysRemaining(numDays: number) {
-    if (numDays === 0) {
-        return 'Today';
-    }
-
-    if (numDays === 1) {
-        return 'Tomorrow';
-    }
-
-    if (numDays === -1) {
-        return 'Yesterday';
-    }
-
-    return numDays < 0
-        ? `${numDays * -1} days ago`
-        : `In ${numDays} days`;
-}
-
-const ALL_PROJECTS_QUERY = gql`
-    query AllProjects {
+const ALL_PROJECTS_AND_EVENTS_QUERY = gql`
+    query AllProjectsAndEvents {
         private {
             id
             allProjects {
@@ -78,7 +73,7 @@ const ALL_PROJECTS_QUERY = gql`
                     id
                     name
                     remainingDays
-                    startDate
+                    endDate
                     totalDays
                     usedDays
                     projectId
@@ -87,6 +82,15 @@ const ALL_PROJECTS_QUERY = gql`
                 logoHd {
                     url
                 }
+            }
+            relativeEvents {
+                id
+                name
+                startDate
+                typeDisplay
+                dates
+                endDate
+                type
             }
         }
     }
@@ -115,8 +119,11 @@ export function Component() {
         return encodeDate(date);
     }, [dateFromParams]);
 
-    const [allProjectsResponse] = useQuery<AllProjectsQuery, AllProjectsQueryVariables>({
-        query: ALL_PROJECTS_QUERY,
+    const [allProjectsResponse] = useQuery<
+        AllProjectsAndEventsQuery,
+        AllProjectsAndEventsQueryVariables
+    >({
+        query: ALL_PROJECTS_AND_EVENTS_QUERY,
     });
 
     type UrlQueryKey = 'project' | 'page';
@@ -236,31 +243,73 @@ export function Component() {
         ],
     );
 
-    const toggleFullScreen = async () => {
-        const elem = contentRef.current;
-        if (elem && !document.fullscreenElement) {
-            try {
-                await elem.requestFullscreen({ navigationUI: 'show' });
-            } catch (err) {
-                const castErr = err as { message: string, name: string };
-                // eslint-disable-next-line no-alert
-                alert(
-                    `Error attempting to enable fullscreen mode: ${castErr.message} (${castErr.name})`,
-                );
-            }
-        } else {
-            document.exitFullscreen();
-        }
-    };
-
     useKeybind(handleKeybindingsPress);
+
+    const [isFullScreen, setIsFullScreen] = useState(false);
+
+    useEffect(() => {
+        function fullscreenChangeHandler() {
+            setIsFullScreen(isDefined(document.fullscreenElement));
+        }
+
+        document.addEventListener('fullscreenchange', fullscreenChangeHandler, false);
+
+        return () => {
+            document.removeEventListener('fullscreenchange', fullscreenChangeHandler, false);
+        };
+    }, []);
+
+    const handlePresentClick = useCallback(() => {
+        contentRef.current?.requestFullscreen();
+    }, []);
+
+    const events = useMemo<GeneralEvent[]>(() => {
+        const allDeadlines = allProjectsResponse.data?.private.allProjects.flatMap(
+            (project) => project.deadlines.map((deadline) => ({
+                ...deadline,
+                name: `${project.name}: ${deadline.name}`,
+            })),
+        );
+
+        const otherEvents = allProjectsResponse.data?.private.relativeEvents;
+
+        const iconsMap: Record<GeneralEvent['type'], React.ReactNode> = {
+            DEADLINE: <FcLeave />,
+            HOLIDAY: <FcLandscape />,
+            RETREAT: <FcNightLandscape />,
+            MISC: <FcNews />,
+        };
+
+        return [
+            ...(allDeadlines?.map((deadline) => ({
+                key: `DEADLINE-${deadline.id}`,
+                type: 'DEADLINE' as const,
+                typeDisplay: 'Deadline',
+                icon: iconsMap.DEADLINE,
+                name: deadline.name,
+                date: deadline.endDate,
+                remainingDays: deadline.remainingDays,
+            })) ?? []),
+            ...(otherEvents?.map((otherEvent) => ({
+                key: `${otherEvent.type}-${otherEvent.id}`,
+                type: otherEvent.type,
+                icon: iconsMap[otherEvent.type],
+                typeDisplay: otherEvent.typeDisplay,
+                name: otherEvent.name,
+                date: otherEvent.startDate,
+                remainingDays: getDifferenceInDays(
+                    otherEvent.startDate,
+                    encodeDate(new Date()),
+                ),
+            })) ?? []),
+        ].sort((a, b) => compareDate(a.date, b.date));
+    }, [allProjectsResponse]);
 
     return (
         <Page
             className={styles.dailyStandup}
             documentTitle="Timur - Daily Standup"
             contentClassName={styles.pageContent}
-            contentContainerClassName={styles.contentContainer}
         >
             <Portal container={midActionsRef}>
                 <div className={styles.actions}>
@@ -284,7 +333,7 @@ export function Component() {
                     </Button>
                     <Button
                         name={undefined}
-                        onClick={toggleFullScreen}
+                        onClick={handlePresentClick}
                         variant="quaternary"
                         title="Enter full screen"
                     >
@@ -293,98 +342,38 @@ export function Component() {
                 </div>
             </Portal>
             <div
-                className={styles.content}
                 ref={contentRef}
+                className={_cs(styles.content, isFullScreen && styles.presentationMode)}
             >
                 {isNotDefined(mapId) && (
-                    <section className={styles.welcomeSection}>
-                        <header className={styles.welcomeHeader}>
-                            <div className={styles.welcomeLabel}>
-                                Welcome to
-                            </div>
-                            <h2 className={styles.welcomeHeading}>
-                                Daily Standup
-                            </h2>
-                            <div className={styles.date}>
-                                {formattedDate}
-                            </div>
-                        </header>
-                        <section className={styles.deadlineSection}>
-                            <h3 className={styles.deadlineHeading}>
-                                Upcoming Deadlines
-                            </h3>
-                            <hr className={styles.separator} />
-                            <div
-                                className={styles.projectList}
-                                role="list"
-                            >
-                                {allProjectsResponse.data?.private.allProjects.map((project) => {
-                                    if (
-                                        isNotDefined(project.deadlines)
-                                        || project.deadlines.length === 0
-                                    ) {
-                                        return null;
-                                    }
-
-                                    // FIXME: get this sorted from the server
-                                    const sortedDeadlines = [...project.deadlines]
-                                        .sort((foo, bar) => (
-                                            compareNumber(foo.remainingDays, bar.remainingDays)
-                                        ));
-
-                                    return (
-                                        <section
-                                            key={project.id}
-                                            role="listitem"
-                                            className={styles.project}
-                                        >
-                                            <header className={styles.projectHeader}>
-                                                <DisplayPicture
-                                                    className={styles.projectDp}
-                                                    imageUrl={project.logoHd?.url}
-                                                    displayName={project.name}
-                                                />
-                                                <h4>
-                                                    {project.name}
-                                                </h4>
-                                            </header>
-                                            <div
-                                                className={styles.deadlineList}
-                                                role="list"
-                                            >
-                                                {sortedDeadlines.map((deadline) => (
-                                                    <div
-                                                        role="listitem"
-                                                        key={deadline.id}
-                                                        className={styles.deadline}
-                                                    >
-                                                        <div className={styles.dDay}>
-                                                            {getFormattedDaysRemaining(
-                                                                deadline.remainingDays,
-                                                            )}
-                                                        </div>
-                                                        <div>
-                                                            {deadline.name}
-                                                            {deadline.remainingDays < 0 && (
-                                                                <>
-                                                                    {' '}
-                                                                    <FcHighPriority />
-                                                                </>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                ))}
+                    <Slide
+                        variant="split"
+                        primaryPreText="Welcome to"
+                        primaryHeading="Daily Standup"
+                        primaryDescription={formattedDate}
+                        secondaryHeading="Upcoming Events"
+                        secondaryContent={events.map(
+                            (generalEvent, i) => (
+                                <Fragment key={generalEvent.key}>
+                                    <GeneralEventOutput
+                                        generalEvent={generalEvent}
+                                    />
+                                    {generalEvent.remainingDays < 0
+                                        && events[i + 1]?.remainingDays >= 0
+                                        && (
+                                            <div className={styles.separator}>
+                                                <div className={styles.line} />
+                                                <FcSportsMode className={styles.icon} />
+                                                <div className={styles.line} />
                                             </div>
-                                        </section>
-                                    );
-                                })}
-                            </div>
-                        </section>
-                    </section>
+                                        )}
+                                </Fragment>
+                            ),
+                        )}
+                    />
                 )}
                 {isNotDefined(urlQuery.page) && isDefined(urlQuery.project) && (
                     <ProjectStandup
-                        className={styles.projectStandup}
                         date={selectedDate}
                         projectId={urlQuery.project}
                     />
@@ -392,7 +381,6 @@ export function Component() {
                 {urlQuery.page === 'end' && (
                     <EndSection
                         date={selectedDate}
-                        className={styles.endSection}
                     />
                 )}
             </div>

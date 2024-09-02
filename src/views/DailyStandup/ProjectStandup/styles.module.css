@@ -1,70 +1,23 @@
 .project-standup {
-    display: flex;
-    flex-wrap: wrap;
-
-    .header {
-        display: flex;
-        align-items: center;
-        flex-basis: 50%;
-        flex-direction: column;
-        flex-grow: 0;
-        flex-shrink: 0;
-        justify-content: center;
-        padding: var(--spacing-xl);
-        gap: var(--spacing-md);
-
-        .logo {
-            width: 12rem;
-            height: 12rem;
-            object-fit: contain;
-            object-position: center center;
-        }
-
-        .project-name {
-            font-size: var(--font-size-4xl);
-            font-weight: var(--font-weight-light);
-        }
+    .project-icon {
+        width: 10rem;
+        height: 10rem;
+        object-fit: contain;
+        object-position: center center;
     }
 
-    .content {
+    .user {
         display: flex;
-        flex-direction: column;
-        flex-grow: 1;
-        background-color: var(--color-foreground);
-        padding: var(--spacing-xl);
-        gap: var(--spacing-lg);
+        font-size: var(--font-size-lg);
+        gap: var(--spacing-xs);
 
-        .team-heading {
-            color: var(--color-secondary);
-            font-size: var(--font-size-2xl);
-            font-weight: var(--font-weight-normal);
+        .display-picture {
+            font-size: var(--font-size-xl);
         }
 
-        .separator {
-            margin: 0;
-            border-top: unset;
-            border-bottom: var(--width-separator-md) solid var(--color-separator);
-        }
-
-        .user-list {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-md);
-
-            .user {
-                display: flex;
-                font-size: var(--font-size-lg);
-                gap: var(--spacing-xs);
-
-                .display-picture {
-                    font-size: var(--font-size-xl);
-                }
-
-                .name {
-                    display: inline-flex;
-                    gap: var(--spacing-xs);
-                }
-            }
+        .name {
+            display: inline-flex;
+            gap: var(--spacing-xs);
         }
     }
 }

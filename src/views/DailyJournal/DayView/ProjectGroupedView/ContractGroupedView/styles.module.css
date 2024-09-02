@@ -6,7 +6,7 @@
     .heading {
         display: flex;
         gap: var(--spacing-sm);
-        align-items: center;
+        align-items: flex-start;
 
         .display-picture {
             font-size: var(--font-size-xl);
@@ -15,7 +15,7 @@
         .text-section {
             display: flex;
             align-items: baseline;
-            gap: var(--spacing-sm);
+            gap: 0 var(--spacing-sm);
             flex-grow: 1;
             flex-wrap: wrap;
 

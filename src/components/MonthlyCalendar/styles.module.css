@@ -17,7 +17,6 @@
 
         .day-name {
             padding: var(--spacing-2xs);
-            text-align: center;
             color: var(--color-text-light);
             font-size: var(--font-size-sm);
         }

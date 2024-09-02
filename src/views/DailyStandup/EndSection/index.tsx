@@ -9,6 +9,8 @@ import {
     DailyQuoteQueryVariables,
 } from '#generated/types/graphql';
 
+import Slide from '../Slide';
+
 import styles from './styles.module.css';
 
 const DAILY_QUOTE_QUERY = gql`
@@ -45,7 +47,10 @@ function EndSection(props: Props) {
     const dailyQuote = quoteResponse.data?.private.dailyStandup.quote;
 
     return (
-        <div className={_cs(styles.endSection, className)}>
+        <Slide
+            className={_cs(styles.endSection, className)}
+            variant="general"
+        >
             <section className={styles.quoteSection}>
                 <div className={styles.quote}>
                     {dailyQuote?.text}
@@ -54,7 +59,7 @@ function EndSection(props: Props) {
                     {dailyQuote?.author}
                 </p>
             </section>
-        </div>
+        </Slide>
     );
 }
 

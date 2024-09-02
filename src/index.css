@@ -69,7 +69,9 @@
     --spacing-4xl: calc(var(--base-spacing) * 6);
     --spacing-5xl: calc(var(--base-spacing) * 7.25);
 
-    @media screen and (max-width: 40rem) {
+    @media screen and (max-width: 900px) {
+        --base-spacing: 0.75rem;
+
         --spacing-4xs: calc(var(--base-spacing) * 0.0625);
         --spacing-3xs: calc(var(--base-spacing) * 0.125);
         --spacing-2xs: calc(var(--base-spacing) * 0.25);

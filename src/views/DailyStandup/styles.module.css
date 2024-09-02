@@ -1,133 +1,55 @@
 .daily-standup {
     overflow: auto;
 
-    .content-container {
-        padding: 0;
+    .page-content {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        background-color: var(--color-background);
+        gap: var(--spacing-lg);
+        overflow: auto;
 
-        .page-content {
+        &:not(.presentation-mode) {
+            border: var(--width-separator-sm) solid var(--color-separator);
+        }
+
+        .content {
             display: flex;
             flex-direction: column;
-            gap: var(--spacing-lg);
+            flex-grow: 1;
+            background-color: var(--color-background);
             overflow: auto;
 
-            .content {
+            .separator {
                 display: flex;
-                flex-direction: column;
-                flex-grow: 1;
-                background-color: var(--color-background);
-                overflow: auto;
+                align-items: center;
+                gap: var(--spacing-sm);
+                padding: 0 var(--spacing-lg);
 
-                .welcome-section {
-                    display: flex;
-                    flex-grow: 1;
-                    flex-wrap: wrap;
-
-                    .welcome-header {
-                        display: flex;
-                        flex-basis: 50%;
-                        flex-direction: column;
-                        flex-grow: 0;
-                        flex-shrink: 0;
-                        justify-content: center;
-                        padding: var(--spacing-xl);
-                        gap: var(--spacing-md);
-
-                        .welcome-label {
-                            font-size: var(--font-size-xl);
-                        }
-
-                        .welcome-heading {
-                            color: var(--color-primary);
-                            font-size: var(--font-size-4xl);
-                            font-weight: var(--font-weight-light);
-                        }
-
-                        .date {
-                            color: var(--color-text-light);
-                            font-size: var(--font-size-xl);
-                        }
-                    }
-
-                    .deadline-section {
-                        display: flex;
-                        flex-direction: column;
-                        flex-grow: 1;
-                        background-color: var(--color-foreground);
-                        padding: var(--spacing-xl);
-                        gap: var(--spacing-lg);
-
-                        .deadline-heading {
-                            color: var(--color-secondary);
-                            font-size: var(--font-size-2xl);
-                            font-weight: var(--font-weight-normal);
-                        }
-
-                        .separator {
-                            margin: 0;
-                            border-top: unset;
-                            border-bottom: var(--width-separator-md) solid var(--color-separator);
-                        }
-
-                        .project-list {
-                            display: flex;
-                            flex-direction: column;
-                            gap: var(--spacing-md);
-
-                            .project {
-                                display: flex;
-                                flex-direction: column;
-                                gap: var(--spacing-sm);
-
-                                .project-header {
-                                    display: flex;
-                                    font-size: var(--font-size-xl);
-                                    gap: var(--spacing-sm);
-
-                                    .project-dp {
-                                        font-size: var(--font-size-xl);
-                                    }
-                                }
-
-                                .deadline-list {
-                                    display: flex;
-                                    flex-direction: column;
-                                    gap: var(--spacing-xs);
-
-                                    .deadline {
-                                        display: flex;
-                                        font-size: var(--font-size-lg);
-                                        gap: var(--spacing-2xs);
-
-                                        .d-day {
-                                            flex-shrink: 0;
-                                            color: var(--color-text-light);
-                                            font-weight: var(--font-weight-bold);
-
-                                            &:before {
-                                                content: '• '
-                                            }
-
-                                            &:after {
-                                                content: ':'
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                .icon {
+                    animation: run var(--duration-animation-fast) ease-in-out infinite;
+                    font-size: var(--font-size-xl);
                 }
 
-                .project-standup {
+                .line {
                     flex-grow: 1;
-                }
-
-                .end-section {
-                    flex-grow: 1;
+                    border-bottom: var(--width-separator-sm) solid var(--color-separator);
                 }
             }
         }
+    }
+}
 
+@keyframes run {
+    0% {
+        transform: rotate(0);
+    }
+
+    30% {
+        transform: rotate(5deg) translateY(2px);
+    }
+    70% {
+        transform: rotate(-4deg) translateX(-2px);
     }
 }
 
