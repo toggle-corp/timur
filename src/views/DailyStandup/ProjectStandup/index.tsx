@@ -9,12 +9,15 @@ import {
     useQuery,
 } from 'urql';
 
+import AvailabilityIndicator from '#components/AvailabilityIndicator';
 import DisplayPicture from '#components/DisplayPicture';
 import {
     DailyStandupQuery,
     DailyStandupQueryVariables,
     UserDepartmentTypeEnum,
 } from '#generated/types/graphql';
+
+import Slide from '../Slide';
 
 import styles from './styles.module.css';
 
@@ -105,47 +108,40 @@ function ProjectStandup(props: Props) {
     ));
 
     return (
-        <div className={_cs(styles.projectStandup, className)}>
-            <header className={styles.header}>
-                {isDefined(stats?.project.logoHd) && (
-                    <img
-                        className={styles.logo}
-                        alt=""
-                        src={stats?.project.logoHd?.url}
-                    />
-                )}
-                <h2 className={styles.projectName}>
-                    {stats?.project.name}
-                </h2>
-            </header>
-            <div className={styles.content}>
-                <h3 className={styles.teamHeading}>
-                    Team members
-                </h3>
-                <hr className={styles.separator} />
+        <Slide
+            variant="split"
+            className={_cs(styles.projectStandup, className)}
+            primaryPreText={isDefined(stats?.project.logoHd) && (
+                <img
+                    className={styles.projectIcon}
+                    alt=""
+                    src={stats?.project.logoHd?.url}
+                />
+            )}
+            primaryHeading={stats?.project.name}
+            secondaryHeading="Team members"
+            secondaryContent={sortedUsers?.map((user) => (
                 <div
-                    role="list"
-                    className={styles.userList}
+                    key={user.id}
+                    role="listitem"
+                    className={styles.user}
                 >
-                    {sortedUsers?.map((user) => (
-                        <div
-                            key={user.id}
-                            role="listitem"
-                            className={styles.user}
-                        >
-                            <DisplayPicture
-                                className={styles.displayPicture}
-                                imageUrl={user.user.displayPicture}
-                                displayName={user.user.displayName ?? 'Anon'}
-                            />
-                            <div>
-                                {user.user.displayName ?? 'Anon'}
-                            </div>
-                        </div>
-                    ))}
+                    <DisplayPicture
+                        className={styles.displayPicture}
+                        imageUrl={user.user.displayPicture}
+                        displayName={user.user.displayName ?? 'Anon'}
+                    />
+                    <div className={styles.name}>
+                        {user.user.displayName ?? 'Anon'}
+                        {' '}
+                        <AvailabilityIndicator
+                            wfhType={user.workFromHome}
+                            leaveType={user.leave}
+                        />
+                    </div>
                 </div>
-            </div>
-        </div>
+            ))}
+        />
     );
 }
 

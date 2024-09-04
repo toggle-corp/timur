@@ -13,17 +13,16 @@
     .monthly-calendar {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: var(--spacing-sm);
+        gap: var(--spacing-2xs);
 
         .day-name {
             padding: var(--spacing-2xs);
-            text-align: center;
             color: var(--color-text-light);
             font-size: var(--font-size-sm);
         }
 
         .date {
-            padding: var(--spacing-2xs);
+            padding: var(--spacing-3xs) var(--spacing-xs);
             font-size: var(--font-size-sm);
         }
     }

@@ -46,6 +46,10 @@
         width: 60rem;
         height: 70vh;
 
+        &.auto-height {
+            height: fit-content;
+        }
+
         &.auto-size {
             width: fit-content;
             height: fit-content;

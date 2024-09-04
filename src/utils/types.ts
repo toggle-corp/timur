@@ -1,5 +1,6 @@
 import {
     EnumsQuery,
+    EventTypeEnum,
     TimeEntryBulkCreateInput,
     TimeEntryStatusEnum,
     TimeEntryTypeEnum,
@@ -38,6 +39,14 @@ export type ConfigStorage = {
     startSidebarShown: boolean,
     endSidebarShown: boolean,
     compactTextArea: boolean,
+}
 
-    notes: Note[],
+export interface GeneralEvent {
+    key: string;
+    type: EventTypeEnum | 'DEADLINE';
+    typeDisplay: string;
+    icon: React.ReactNode;
+    name: string;
+    date: string;
+    remainingDays: number;
 }

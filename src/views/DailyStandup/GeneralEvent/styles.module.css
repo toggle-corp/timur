@@ -1,0 +1,13 @@
+.general-event {
+    display: flex;
+    gap: var(--spacing-sm);
+
+    .icon {
+        font-size: var(--font-size-lg);
+    }
+
+    .days {
+        width: 5rem;
+        color: var(--color-text-light);
+    }
+}

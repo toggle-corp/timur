@@ -50,7 +50,6 @@ function ConfirmButton<const N>(props: Props<N>) {
             />
             <Dialog
                 open={confirmationShown}
-                mode="center"
                 onClose={handleModalClose}
                 heading={confirmHeading}
                 contentClassName={styles.modalContent}

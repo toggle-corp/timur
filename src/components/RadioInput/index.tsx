@@ -4,7 +4,6 @@ import {
     isDefined,
 } from '@togglecorp/fujs';
 
-import InputError from '#components/InputError';
 import RawList from '#components/RawList';
 
 import Radio, { Props as RadioProps } from './Radio';
@@ -21,7 +20,6 @@ export interface BaseProps<N, O, V, RRP extends RadioProps<V, N>> {
     descriptionSelector?: (option: O) => React.ReactNode;
     label?: React.ReactNode;
     hint?: React.ReactNode;
-    error?: React.ReactNode;
     labelContainerClassName?: string;
     hintContainerClassName?: string;
     listContainerClassName?: string;
@@ -79,7 +77,6 @@ function RadioInput<
         hint,
         hintContainerClassName,
         listContainerClassName,
-        error,
         renderer = Radio,
         rendererParams: radioRendererParamsFromProps,
         disabled,
@@ -169,9 +166,6 @@ function RadioInput<
                     {hint}
                 </div>
             )}
-            <InputError>
-                {error}
-            </InputError>
         </div>
     );
 }

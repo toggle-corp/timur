@@ -14,12 +14,10 @@ function DateInput<const T>(props: Props<T>) {
         className,
         actions,
         icons,
-        error,
         hint,
         label,
         disabled,
         readOnly,
-        errorOnTooltip,
         inputClassName,
         withAsterisk,
         inputSectionClassName,
@@ -38,8 +36,6 @@ function DateInput<const T>(props: Props<T>) {
             actions={actions}
             className={className}
             disabled={disabled}
-            error={error}
-            errorOnTooltip={errorOnTooltip}
             hint={hint}
             icons={icons}
             inputSectionClassName={inputSectionClassName}

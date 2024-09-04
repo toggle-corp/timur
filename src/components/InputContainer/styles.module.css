@@ -28,10 +28,6 @@
         cursor: not-allowed;
     }
 
-    &.errored {
-        border-color: var(--color-primary);
-    }
-
     &.read-only {
         background-color: var(--color-background);
     }
@@ -39,11 +35,6 @@
     .input-hint {
         color: var(--color-text-light);
         font-size: var(--font-size-sm);
-    }
-
-    .input-error {
-        position: absolute;
-        min-width: 10rem;
     }
 
     &:focus-within {

@@ -18,6 +18,7 @@ import {
     KEY_CONFIG_STORAGE,
 } from '#utils/constants';
 import {
+    ConfigStorage,
     Contract,
     EntriesAsList,
     Project,
@@ -53,7 +54,10 @@ function ContractGroupedView(props: Props) {
         onWorkItemDelete,
     } = props;
 
-    const [config] = useLocalStorage(KEY_CONFIG_STORAGE, defaultConfigValue);
+    const [config] = useLocalStorage<ConfigStorage>(
+        KEY_CONFIG_STORAGE,
+        defaultConfigValue,
+    );
 
     const totalHours = useMemo(
         () => (

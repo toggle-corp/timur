@@ -91,8 +91,6 @@ function SelectInputContainer<
         actionsContainerClassName,
         className,
         disabled,
-        error,
-        errorContainerClassName,
         hint,
         hintContainerClassName,
         icons,
@@ -135,7 +133,6 @@ function SelectInputContainer<
         withAsterisk,
         required,
         variant,
-        errorOnTooltip,
         dropdownHidden,
     } = props;
 
@@ -282,9 +279,6 @@ function SelectInputContainer<
                 className={_cs(styles.selectInputContainer, className)}
                 containerRef={containerRef}
                 disabled={disabled}
-                errorContainerClassName={errorContainerClassName}
-                error={error}
-                errorOnTooltip={errorOnTooltip}
                 hintContainerClassName={hintContainerClassName}
                 hint={hint}
                 iconsContainerClassName={iconsContainerClassName}

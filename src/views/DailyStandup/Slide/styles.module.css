@@ -1,0 +1,89 @@
+.slide {
+    display: flex;
+    flex-grow: 1;
+    background-color: var(--color-background);
+    overflow: auto;
+
+    &.general-variant {
+        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+        gap: var(--spacing-lg);
+
+        .heading {
+            word-break: break-word;
+            color: var(--color-primary);
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-light);
+        }
+    }
+
+    &.split-variant {
+        overflow: auto;
+
+        @media screen and (max-width: 768px) {
+            flex-direction: column;
+        }
+
+        .start-section {
+            display: flex;
+            align-items: center;
+            flex-basis: 40%;
+            flex-direction: column;
+            flex-grow: 0;
+            flex-shrink: 0;
+            justify-content: center;
+            padding: var(--spacing-lg);
+            gap: var(--spacing-sm);
+            text-align: center;
+
+            .primary-pre-text {
+                word-break: break-word;
+                font-size: var(--font-size-xl);
+            }
+
+            .primary-heading {
+                word-break: break-word;
+                color: var(--color-primary);
+                font-size: var(--font-size-3xl);
+                font-weight: var(--font-weight-light);
+            }
+
+            .primary-description {
+                word-break: break-word;
+                color: var(--color-text-light);
+                font-size: var(--font-size-xl);
+            }
+        }
+
+        .end-section {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            background-color: var(--color-foreground);
+            padding: var(--spacing-lg);
+            gap: var(--spacing-md);
+
+            .secondary-heading {
+                color: var(--color-secondary);
+                font-size: var(--font-size-xl);
+                font-weight: var(--font-weight-normal);
+            }
+
+            .separator {
+                margin: 0;
+                border-top: unset;
+                border-bottom: var(--width-separator-sm) solid var(--color-separator);
+            }
+
+            .secondary-content {
+                display: flex;
+                flex-direction: column;
+                flex-grow: 1;
+                flex-wrap: wrap;
+                overflow: auto;
+                gap: var(--spacing-md);
+            }
+        }
+    }
+}

@@ -98,11 +98,6 @@ function Navbar(props: Props) {
                 className={styles.middleActions}
                 ref={midActionsRef}
             />
-            <div className={styles.spacer} />
-            <div
-                className={styles.endActions}
-                ref={endActionsRef}
-            />
             <div className={styles.auth}>
                 {isNotDefined(userAuth) && (
                     <Link
@@ -158,6 +153,10 @@ function Navbar(props: Props) {
                     </DropdownMenu>
                 )}
             </div>
+            <div
+                className={styles.endActions}
+                ref={endActionsRef}
+            />
         </nav>
     );
 }

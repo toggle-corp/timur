@@ -1,6 +1,5 @@
 import { _cs } from '@togglecorp/fujs';
 
-import InputError from '#components/InputError';
 import InputLabel from '#components/InputLabel';
 import useBasicLayout from '#hooks/useBasicLayout';
 import { type SpacingType } from '#utils/types';
@@ -10,12 +9,9 @@ import styles from './styles.module.css';
 export interface Props {
     actions?: React.ReactNode;
     actionsContainerClassName?: string;
-    errorContainerClassName?: string;
     hintContainerClassName?: string;
     iconsContainerClassName?: string;
     disabled?: boolean;
-    error?: React.ReactNode;
-    errorOnTooltip?: boolean;
     hint?: React.ReactNode;
     icons?: React.ReactNode;
     input: React.ReactNode;
@@ -40,8 +36,6 @@ function InputContainer(props: Props) {
         actions,
         className,
         disabled,
-        error,
-        errorOnTooltip = false,
         hint,
         icons,
         input,
@@ -53,7 +47,6 @@ function InputContainer(props: Props) {
         variant = 'form',
         withAsterisk,
         actionsContainerClassName,
-        errorContainerClassName,
         hintContainerClassName,
         iconsContainerClassName,
         spacing = 'sm',
@@ -83,16 +76,12 @@ function InputContainer(props: Props) {
             ref={containerRef}
             className={_cs(
                 styles.inputContainer,
-                !!error && styles.errored,
                 readOnly && styles.readOnly,
                 variant === 'form' && styles.form,
                 variant === 'general' && styles.general,
                 disabled && styles.disabled,
                 className,
             )}
-            title={(errorOnTooltip && !!error && typeof error === 'string')
-                ? error
-                : undefined}
         >
             <InputLabel
                 className={labelClassName}
@@ -111,14 +100,6 @@ function InputContainer(props: Props) {
                 <div className={_cs(styles.inputHint, hintContainerClassName)}>
                     {hint}
                 </div>
-            )}
-            {!errorOnTooltip && (
-                <InputError
-                    disabled={disabled}
-                    className={_cs(styles.inputError, errorContainerClassName)}
-                >
-                    {error}
-                </InputError>
             )}
         </label>
     );

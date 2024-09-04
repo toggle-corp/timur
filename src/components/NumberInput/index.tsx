@@ -31,14 +31,12 @@ function NumberInput<const T>(props: Props<T>) {
         actions,
         inputSectionClassName,
         icons,
-        error,
         hint,
         label,
         disabled,
         readOnly,
         inputClassName,
         value: valueFromProps,
-        errorOnTooltip,
         withAsterisk,
         labelClassName,
         required,
@@ -79,8 +77,6 @@ function NumberInput<const T>(props: Props<T>) {
             actions={actions}
             className={className}
             disabled={disabled}
-            error={error}
-            errorOnTooltip={errorOnTooltip}
             hint={hint}
             icons={icons}
             inputSectionClassName={inputSectionClassName}

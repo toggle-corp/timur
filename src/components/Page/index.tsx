@@ -5,6 +5,7 @@ import {
     useRef,
 } from 'react';
 import {
+    IoChevronBack,
     IoList,
     IoMenu,
 } from 'react-icons/io5';
@@ -39,6 +40,7 @@ interface Props {
     endAsideContent?: React.ReactNode;
     children: React.ReactNode;
     contentClassName?: string;
+    contentContainerClassName?: string;
     onSwipeLeft?: () => void;
     onSwipeRight?: () => void;
 }
@@ -52,6 +54,7 @@ function Page(props: Props) {
         endAsideContent,
         children,
         contentClassName,
+        contentContainerClassName,
         endAsideContainerClassName,
         onSwipeLeft,
         onSwipeRight,
@@ -71,7 +74,7 @@ function Page(props: Props) {
 
     const setFieldValue = useSetFieldValue(setStoredState);
 
-    const handleStartSidebarToggle = useCallback(
+    const setSidebarShown = useCallback(
         (newValue: boolean) => setFieldValue(newValue, 'startSidebarShown'),
         [setFieldValue],
     );
@@ -135,7 +138,7 @@ function Page(props: Props) {
                 <Portal container={startActionsRef}>
                     <Button
                         name={!startSidebarShown}
-                        onClick={handleStartSidebarToggle}
+                        onClick={setSidebarShown}
                         className={styles.toggleCollapsedButton}
                         variant="transparent"
                         title="Toggle left pane"
@@ -147,9 +150,20 @@ function Page(props: Props) {
             {startAsideContent && (
                 <aside className={_cs(styles.startAside, startAsideContainerClassName)}>
                     {startAsideContent}
+                    {startSidebarShown && (
+                        <Button
+                            name={false}
+                            onClick={setSidebarShown}
+                            className={styles.closeLeftPaneButton}
+                            variant="transparent"
+                            title="Close left pane"
+                        >
+                            <IoChevronBack />
+                        </Button>
+                    )}
                 </aside>
             )}
-            <main className={styles.main}>
+            <main className={_cs(styles.main, contentContainerClassName)}>
                 <div className={_cs(styles.content, contentClassName)}>
                     {children}
                 </div>

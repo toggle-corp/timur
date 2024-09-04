@@ -59,6 +59,10 @@ const ME_QUERY = gql`
 const ENUMS_QUERY = gql`
     query Enums {
         enums {
+            JournalWfhType {
+                key
+                label
+            }
             JournalLeaveType {
                 key
                 label
