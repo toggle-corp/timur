@@ -1,15 +1,20 @@
 import { ValidateEnv as validateEnv } from '@julr/vite-plugin-validate-env';
-import { type HtmlTagDescriptor, defineConfig, loadEnv } from 'vite';
-import tsconfigPaths from 'vite-tsconfig-paths';
-import webfontDownload from 'vite-plugin-webfont-dl';
+import basicSsl from '@vitejs/plugin-basic-ssl';
 import reactSwc from '@vitejs/plugin-react-swc';
 import { execSync } from 'child_process';
 import { visualizer } from 'rollup-plugin-visualizer';
+import {
+    defineConfig,
+    type HtmlTagDescriptor,
+    loadEnv,
+    type UserConfig,
+} from 'vite';
 import checker from 'vite-plugin-checker';
 import { compression } from 'vite-plugin-compression2';
-import svgr from 'vite-plugin-svgr';
 import { VitePWA } from 'vite-plugin-pwa';
-import basicSsl from '@vitejs/plugin-basic-ssl';
+import svgr from 'vite-plugin-svgr';
+import webfontDownload from 'vite-plugin-webfont-dl';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 import envConfig from './env';
 
@@ -18,7 +23,7 @@ const commitHash = execSync('git rev-parse --short HEAD').toString();
 
 function umamiPlugin(options: { id: string | undefined, src: string | undefined }) {
     return {
-        name: "html-transform",
+        name: 'html-transform',
         transformIndexHtml: () => {
             if (!options.id || !options.src) {
                 console.warn('Umami src and id not set.');
@@ -28,24 +33,24 @@ function umamiPlugin(options: { id: string | undefined, src: string | undefined 
                 {
                     tag: 'script',
                     attrs: {
-                        'async': true,
-                        'defer': true,
+                        async: true,
+                        defer: true,
                         'data-website-id': options.id,
-                        'src': options.src,
+                        src: options.src,
                     },
-                }
+                },
             ];
             return tags;
         },
     };
-};
+}
 
 export default defineConfig(({ mode }) => {
     const isProd = mode === 'production';
     console.log('Mode:', mode);
-    const env = loadEnv(mode, process.cwd(), '')
+    const env = loadEnv(mode, process.cwd(), '');
 
-    return {
+    const config: UserConfig = {
         define: {
             'import.meta.env.APP_COMMIT_HASH': JSON.stringify(commitHash),
             'import.meta.env.APP_VERSION': JSON.stringify(env.npm_package_version),
@@ -106,7 +111,6 @@ export default defineConfig(({ mode }) => {
             port: 3000,
             host: 'local.timur.dev.togglecorp.com',
             strictPort: true,
-            https: true,
         },
         build: {
             outDir: './build',
@@ -123,8 +127,8 @@ export default defineConfig(({ mode }) => {
                             '@uiw/codemirror-theme-github',
                             '@uiw/react-codemirror',
                         ],
-                        'codemirror-vim-mode': ['@replit/codemirror-vim']
-                    }
+                        'codemirror-vim-mode': ['@replit/codemirror-vim'],
+                    },
                 },
             },
         },
@@ -136,4 +140,5 @@ export default defineConfig(({ mode }) => {
             },
         },
     };
+    return config;
 });

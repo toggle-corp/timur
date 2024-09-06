@@ -10,7 +10,7 @@ import MonthlyCalendar from '#components/MonthlyCalendar';
 
 import styles from './styles.module.css';
 
-export interface Props<N> extends Omit<ButtonProps<N>, 'onClick' | 'onChange'> {
+interface Props<N> extends Omit<ButtonProps<N>, 'onClick' | 'onChange'> {
     value: string | undefined,
     onChange: (value: string | undefined) => void;
 }

@@ -350,7 +350,7 @@ export function putNull<T extends object>(value: T) {
 
     return copy as PutNull<T>;
 }
-export type PutUndefined<T extends object> = {
+type PutUndefined<T extends object> = {
     [key in keyof T]: T[key] extends null ? undefined : T[key];
 }
 export function putUndefined<T extends object>(value: T) {

@@ -20,6 +20,7 @@ import RouteContext from '#contexts/route';
 
 import styles from './styles.module.css';
 
+/** @knipignore */
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
     const routes = useContext(RouteContext);

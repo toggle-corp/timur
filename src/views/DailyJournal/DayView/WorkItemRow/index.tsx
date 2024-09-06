@@ -82,7 +82,7 @@ function defaultColorSelector<T>(_: T, i: number): [string, string] {
     return colorscheme[i % colorscheme.length];
 }
 
-export interface Props {
+interface Props {
     className?: string;
     workItem: WorkItem;
     contractId: string;

@@ -4,7 +4,7 @@ import { PutNull } from '#utils/common';
 import { defaultConfigValue } from '#utils/constants';
 import { ConfigStorage } from '#utils/types';
 
-export type StoredValue<VALUE extends object> = {
+type StoredValue<VALUE extends object> = {
     value?: PutNull<VALUE>;
     defaultValue: VALUE;
 };

@@ -1,5 +1,20 @@
 {
     "$schema": "https://unpkg.com/knip@5/schema.json",
-    "entry": ["src/index.tsx!"],
-    "project": ["src/**/*.tsx!", "src/**/*.ts!"]
+    "ignoreDependencies": [
+        "virtual:pwa-info",
+        "virtual:pwa-register"
+    ],
+    "entry": [
+        "src/**/*.test.ts",
+        "src/**/*.test.tsx",
+        "generated/**/*.ts",
+        "src/index.tsx!"
+    ],
+    "project": [
+        "src/**/*.d.ts",
+        "src/**/*.test.ts",
+        "src/**/*.test.tsx",
+        "src/**/*.tsx!",
+        "src/**/*.ts!"
+    ]
 }

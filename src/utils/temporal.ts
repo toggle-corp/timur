@@ -1,11 +1,5 @@
 import { isNotDefined } from '@togglecorp/fujs';
 
-export interface RelativeTime {
-    direction: 'past' | 'present' | 'future',
-    resolution: 'second' | 'minute' | 'hour' | 'day';
-    value: number;
-}
-
 export interface RelativeDate {
     direction: 'past' | 'present' | 'future',
     resolution: 'day' | 'week' | 'month' | 'year';
@@ -14,22 +8,14 @@ export interface RelativeDate {
 
 export type DateLike = string | number | Date;
 
-export function incrementDate(date: Date, days = 1) {
+function incrementDate(date: Date, days = 1) {
     const newDate = new Date(date);
     newDate.setDate(date.getDate() + days);
     newDate.setHours(0, 0, 0, 0);
     return newDate;
 }
 
-export function incrementMonth(date: Date, months = 1) {
-    const newDate = new Date(date);
-    newDate.setDate(1);
-    newDate.setMonth(date.getMonth() + months);
-    newDate.setHours(0, 0, 0, 0);
-    return newDate;
-}
-
-export function getNumberOfDays(start: Date, end: Date) {
+function getNumberOfDays(start: Date, end: Date) {
     const startDate = new Date(start);
     startDate.setHours(0, 0, 0, 0);
 
@@ -44,7 +30,7 @@ export function getNumberOfDays(start: Date, end: Date) {
     return numDays;
 }
 
-export function getNumberOfMonths(start: Date, end: Date) {
+function getNumberOfMonths(start: Date, end: Date) {
     const monthDiff = Math.abs(
         ((12 * end.getFullYear()) + end.getMonth())
         - ((12 * start.getFullYear()) + start.getMonth()),
@@ -52,7 +38,7 @@ export function getNumberOfMonths(start: Date, end: Date) {
     return monthDiff;
 }
 
-export function getTemporalDiff(min: DateLike, max: DateLike) {
+function getTemporalDiff(min: DateLike, max: DateLike) {
     const minDate = new Date(min);
     const maxDate = new Date(max);
 
@@ -156,75 +142,6 @@ export function formatRelativeDateToString(relativeDate: RelativeDate | undefine
 
     if (resolution === 'day' && value === 1) {
         return 'Tomorrow';
-    }
-
-    return value === 1 ? `In a ${resolution}` : `In ${value} ${resolution}s`;
-}
-
-export function toRelativeTime(timestamp: number): RelativeTime {
-    const now = Date.now();
-    const diff = now - timestamp;
-
-    if (diff === 0) {
-        return {
-            direction: 'present',
-            resolution: 'second',
-            value: 0,
-        };
-    }
-
-    const direction = diff < 0 ? 'future' : 'past';
-    const absDiff = Math.abs(diff);
-
-    const seconds = Math.floor((absDiff / 1000) % 60);
-    const minutes = Math.floor((absDiff / (1000 * 60)) % 60);
-    const hours = Math.floor((absDiff / (1000 * 60 * 60)) % 24);
-    const days = Math.floor(absDiff / (1000 * 60 * 60 * 24));
-
-    if (days > 0) {
-        return {
-            direction,
-            resolution: 'day',
-            value: days,
-        };
-    }
-
-    if (hours > 0) {
-        return {
-            direction,
-            resolution: 'hour',
-            value: hours,
-        };
-    }
-
-    if (minutes > 0) {
-        return {
-            direction,
-            resolution: 'minute',
-            value: minutes,
-        };
-    }
-
-    return {
-        direction,
-        resolution: 'second',
-        value: Math.max(1, seconds),
-    };
-}
-
-export function formatRelativeTimeToString(relativeTime: RelativeTime) {
-    const {
-        direction,
-        resolution,
-        value,
-    } = relativeTime;
-
-    if (direction === 'present') {
-        return 'now';
-    }
-
-    if (direction === 'past') {
-        return value === 1 ? `A ${resolution} ago` : `${value} ${resolution}s ago`;
     }
 
     return value === 1 ? `In a ${resolution}` : `In ${value} ${resolution}s`;

@@ -30,7 +30,7 @@ import { type WrappedRoutes } from '../../App/routes';
 
 import styles from './styles.module.css';
 
-export interface UrlParams {
+interface UrlParams {
     [key: string]: string | number | null | undefined;
 }
 

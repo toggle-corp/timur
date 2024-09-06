@@ -96,6 +96,7 @@ const ALL_PROJECTS_AND_EVENTS_QUERY = gql`
     }
 `;
 
+/** @knipignore */
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
     const { date: dateFromParams } = useParams<{ date: string | undefined}>();

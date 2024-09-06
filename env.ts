@@ -10,4 +10,4 @@ export default defineConfig({
     APP_UMAMI_SRC: Schema.string.optional(),
     APP_UMAMI_ID: Schema.string.optional(),
     APP_SENTRY_DSN: Schema.string.optional(),
-})
+});

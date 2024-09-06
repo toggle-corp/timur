@@ -132,6 +132,7 @@ const BULK_TIME_ENTRY_MUTATION = gql`
 
 // TODO: Do not use JSON.stringify for comparison
 // TODO: use filtered localState instead of workItems
+/** @knipignore */
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
     const [workItems, setWorkItems] = useState<WorkItem[]>([]);

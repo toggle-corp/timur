@@ -11,7 +11,7 @@ import {
 
 import styles from './styles.module.css';
 
-export interface Props {
+interface Props {
     className?: string;
     wfhType: JournalWorkFromHomeTypeEnum | null | undefined;
     leaveType: JournalLeaveTypeEnum | null | undefined;
