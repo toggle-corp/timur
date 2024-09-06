@@ -563,7 +563,7 @@ export function Component() {
     );
 
     const { midActionsRef } = useContext(NavbarContext);
-    const { width: windowWidth } = useContext(SizeContext);
+    const { screen } = useContext(SizeContext);
 
     const handleSwipeLeft = useCallback(
         () => {
@@ -631,7 +631,7 @@ export function Component() {
             </div>
             <Portal container={midActionsRef}>
                 <div className={styles.dateNavigation}>
-                    {windowWidth >= 900 && (
+                    {screen === 'desktop' && (
                         <>
                             <Link
                                 to="dailyJournal"
@@ -673,7 +673,7 @@ export function Component() {
                             fallback={<IoStorefrontOutline />}
                         />
                     </Button>
-                    {windowWidth >= 900 && (
+                    {screen === 'desktop' && (
                         <Button
                             name={undefined}
                             onClick={handleNoteUpdateClick}
@@ -683,7 +683,7 @@ export function Component() {
                             <IoNewspaperOutline />
                         </Button>
                     )}
-                    {windowWidth >= 900 && (
+                    {screen === 'desktop' && (
                         <Button
                             title="Show shortcuts"
                             name={undefined}

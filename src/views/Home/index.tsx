@@ -8,10 +8,7 @@ import {
     FcVoicePresentation,
 } from 'react-icons/fc';
 import { useNavigate } from 'react-router-dom';
-import {
-    encodeDate,
-    isNotDefined,
-} from '@togglecorp/fujs';
+import { isNotDefined } from '@togglecorp/fujs';
 
 import Link, { resolvePath } from '#components/Link';
 import MonthlyCalendar from '#components/MonthlyCalendar';

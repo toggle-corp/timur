@@ -5,7 +5,7 @@ import styles from './styles.module.css';
 interface SplitVariantProps {
     variant: 'split';
     primaryPreText?: React.ReactNode;
-    primaryHeading: React.ReactNode;
+    primaryHeading?: React.ReactNode;
     primaryDescription?: React.ReactNode;
     secondaryHeading: React.ReactNode;
     secondaryContent: React.ReactNode;

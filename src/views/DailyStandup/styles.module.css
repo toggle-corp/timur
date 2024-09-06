@@ -19,37 +19,7 @@
             flex-grow: 1;
             background-color: var(--color-background);
             overflow: auto;
-
-            .separator {
-                display: flex;
-                align-items: center;
-                gap: var(--spacing-sm);
-                padding: 0 var(--spacing-lg);
-
-                .icon {
-                    animation: run var(--duration-animation-fast) ease-in-out infinite;
-                    font-size: var(--font-size-xl);
-                }
-
-                .line {
-                    flex-grow: 1;
-                    border-bottom: var(--width-separator-sm) solid var(--color-separator);
-                }
-            }
         }
-    }
-}
-
-@keyframes run {
-    0% {
-        transform: rotate(0);
-    }
-
-    30% {
-        transform: rotate(5deg) translateY(2px);
-    }
-    70% {
-        transform: rotate(-4deg) translateX(-2px);
     }
 }
 

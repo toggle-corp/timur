@@ -104,7 +104,7 @@ function WorkItemRow(props: Props) {
     } = props;
 
     const { enums } = useContext(EnumsContext);
-    const { width: windowWidth } = useContext(SizeContext);
+    const { screen } = useContext(SizeContext);
 
     const inputRef = useFocusClient<HTMLTextAreaElement>(workItem.clientId);
     const [config] = useLocalStorage('timur-config');
@@ -217,7 +217,7 @@ function WorkItemRow(props: Props) {
             icons={(
                 config.showInputIcons
                 // NOTE: hide/unhide icon wrt "checkbox for status" flag
-                && (windowWidth < 900 || !config.checkboxForStatus)
+                && (screen === 'mobile' || !config.checkboxForStatus)
                 && <FcPackage />
             )}
         />
@@ -234,7 +234,7 @@ function WorkItemRow(props: Props) {
             icons={(
                 config.showInputIcons
                 // NOTE: hide/unhide icon wrt "checkbox for status" flag
-                && (windowWidth >= 900 || !config.checkboxForStatus)
+                && (screen === 'desktop' || !config.checkboxForStatus)
                 && <FcDocument />
             )}
             placeholder="Description"
@@ -352,7 +352,7 @@ function WorkItemRow(props: Props) {
                     className,
                 )}
             >
-                {windowWidth >= 900 ? (
+                {screen === 'desktop' ? (
                     <>
                         {statusInput}
                         {taskInput}

@@ -24,11 +24,15 @@ export function isCallable<T, X extends Func>(value: T | X): value is X {
 export interface Size {
     width: number;
     height: number;
+    screen: 'desktop' | 'mobile';
 }
 export function getWindowSize(): Size {
     return {
         width: window.innerWidth,
         height: window.innerHeight,
+        screen: window.innerWidth >= 900
+            ? 'desktop'
+            : 'mobile',
     };
 }
 

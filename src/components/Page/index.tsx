@@ -55,7 +55,7 @@ function Page(props: Props) {
         onSwipeRight,
     } = props;
 
-    const { width } = useContext(SizeContext);
+    const { screen } = useContext(SizeContext);
 
     const [storedConfig, setStoredConfig] = useLocalStorage('timur-config');
 
@@ -117,11 +117,11 @@ function Page(props: Props) {
                 !startSidebarShown && styles.startSidebarCollapsed,
                 debouncedStartSidebarCollapsed && styles.debouncedStartSidebarCollapsed,
                 debouncedEndSidebarCollapsed && styles.debouncedEndSidebarCollapsed,
-                (!endSidebarShown || width <= 900) && styles.endSidebarCollapsed,
+                (!endSidebarShown || screen === 'mobile') && styles.endSidebarCollapsed,
                 startSidebarShown && !!startAsideContent && styles.startSidebarVisible,
                 endSidebarShown
                     && !!endAsideContent
-                    && width > 900
+                    && screen === 'desktop'
                     && styles.endSidebarVisible,
                 className,
             )}
@@ -160,7 +160,7 @@ function Page(props: Props) {
                     {children}
                 </div>
             </main>
-            {endAsideContent && width > 900 && (
+            {endAsideContent && screen === 'desktop' && (
                 <Portal container={endActionsRef}>
                     <Button
                         name={!endSidebarShown}
@@ -172,7 +172,7 @@ function Page(props: Props) {
                     </Button>
                 </Portal>
             )}
-            {endAsideContent && width > 900 && (
+            {endAsideContent && screen === 'desktop' && (
                 <aside className={_cs(styles.endAside, endAsideContainerClassName)}>
                     {endAsideContent}
                 </aside>
