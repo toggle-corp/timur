@@ -37,7 +37,7 @@ import useUrlQueryState from '#hooks/useUrlQueryState';
 
 import DeadlineSection from './DeadlineSection';
 import EndSection from './EndSection';
-import ProjectStandup from './ProjectStandup';
+import ProjectSection from './ProjectSection';
 import StartSection from './StartSection';
 
 import styles from './styles.module.css';
@@ -281,7 +281,7 @@ export function Component() {
                     />
                 )}
                 {mapId !== 'start' && mapId !== 'end' && mapId !== 'deadlines' && (
-                    <ProjectStandup
+                    <ProjectSection
                         date={selectedDate}
                         projectId={mapId}
                     />

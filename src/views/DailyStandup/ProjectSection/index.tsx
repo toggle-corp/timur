@@ -48,15 +48,6 @@ const DAILY_STANDUP_QUERY = gql`
                     project {
                         id
                         name
-                        description
-                        deadlines {
-                            id
-                            name
-                            startDate
-                            totalDays
-                            usedDays
-                            remainingDays
-                        }
                         logoHd {
                             url
                         }
@@ -73,17 +64,12 @@ const DAILY_STANDUP_QUERY = gql`
                         }
                     }
                 }
-                quote {
-                    id
-                    text
-                    author
-                }
             }
         }
     }
 `;
 
-function ProjectStandup(props: Props) {
+function ProjectSection(props: Props) {
     const {
         projectId,
         date,
@@ -110,7 +96,7 @@ function ProjectStandup(props: Props) {
     return (
         <Slide
             variant="split"
-            className={_cs(styles.projectStandup, className)}
+            className={_cs(styles.projectSection, className)}
             primaryPreText={isDefined(stats?.project.logoHd) && (
                 <img
                     className={styles.projectIcon}
@@ -145,4 +131,4 @@ function ProjectStandup(props: Props) {
     );
 }
 
-export default ProjectStandup;
+export default ProjectSection;

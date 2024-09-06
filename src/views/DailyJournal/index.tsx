@@ -660,6 +660,22 @@ export function Component() {
                     >
                         <IoCalendarOutline />
                     </CalendarInput>
+                    {entriesWithoutTask > 0 && (
+                        <div className={styles.warningBadge}>
+                            <FcHighPriority />
+                            <span>
+                                {`${entriesWithoutTask} uncategorized`}
+                            </span>
+                        </div>
+                    )}
+                    {entriesWithoutHours > 0 && (
+                        <div className={styles.warningBadge}>
+                            <FcHighPriority />
+                            <span>
+                                {`${entriesWithoutHours} untracked`}
+                            </span>
+                        </div>
+                    )}
                     <div className={styles.spacer} />
                     <Button
                         name={undefined}
@@ -708,26 +724,6 @@ export function Component() {
                     selectedDate={selectedDate}
                 />
             </FocusContext.Provider>
-            {entriesWithoutTask + entriesWithoutHours > 0 && (
-                <div className={styles.warning}>
-                    {entriesWithoutTask > 0 && (
-                        <div className={styles.warningBadge}>
-                            <FcHighPriority />
-                            <span>
-                                {`${entriesWithoutTask} uncategorized entries`}
-                            </span>
-                        </div>
-                    )}
-                    {entriesWithoutHours > 0 && (
-                        <div className={styles.warningBadge}>
-                            <FcHighPriority />
-                            <span>
-                                {`${entriesWithoutHours} untracked entries`}
-                            </span>
-                        </div>
-                    )}
-                </div>
-            )}
             <div className={styles.bottomActions}>
                 <Button
                     name={undefined}

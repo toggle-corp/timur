@@ -52,7 +52,6 @@ export interface GeneralEvent {
     typeDisplay: string;
     icon: React.ReactNode;
     name: string;
-    date: string;
     remainingDays: number;
 }
 

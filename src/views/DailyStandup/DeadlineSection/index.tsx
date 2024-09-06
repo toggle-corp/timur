@@ -9,10 +9,7 @@ import {
     FcNightLandscape,
     FcSportsMode,
 } from 'react-icons/fc';
-import {
-    compareDate,
-    getDifferenceInDays,
-} from '@togglecorp/fujs';
+import { compareNumber } from '@togglecorp/fujs';
 import {
     gql,
     useQuery,
@@ -24,8 +21,8 @@ import {
 } from '#generated/types/graphql';
 import { type GeneralEvent } from '#utils/types';
 
-import GeneralEventOutput from '../GeneralEvent';
 import Slide from '../Slide';
+import GeneralEventOutput from './GeneralEvent';
 
 import styles from './styles.module.css';
 
@@ -50,19 +47,13 @@ const DEADLINES_AND_EVENTS = gql`
                     id
                     name
                     remainingDays
-                    endDate
-                    totalDays
-                    usedDays
-                    projectId
                 }
             }
             relativeEvents {
                 id
                 name
-                startDate
+                remainingDaysToStart
                 typeDisplay
-                dates
-                endDate
                 type
             }
         }
@@ -112,7 +103,6 @@ function DeadlineSection(props: Props) {
                 typeDisplay: 'Deadline',
                 icon: iconsMap.DEADLINE,
                 name: deadline.name,
-                date: deadline.endDate,
                 remainingDays: deadline.remainingDays,
             })) ?? []),
             ...(events?.map((otherEvent) => ({
@@ -121,14 +111,10 @@ function DeadlineSection(props: Props) {
                 icon: iconsMap[otherEvent.type],
                 typeDisplay: otherEvent.typeDisplay,
                 name: otherEvent.name,
-                date: otherEvent.startDate,
-                remainingDays: getDifferenceInDays(
-                    otherEvent.startDate,
-                    date,
-                ),
+                remainingDays: otherEvent.remainingDaysToStart,
             })) ?? []),
-        ].sort((a, b) => compareDate(a.date, b.date));
-    }, [events, projects, date]);
+        ].sort((a, b) => compareNumber(a.remainingDays, b.remainingDays));
+    }, [events, projects]);
 
     return (
         <Slide
