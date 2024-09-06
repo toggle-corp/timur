@@ -107,7 +107,7 @@ export function getDurationNumber(value: string | undefined) {
     }
     // decimal
     if (value.match(/^\d{0,2}\.\d{1,2}$/)) {
-        return Number(value);
+        return Math.round(Number(value) * 60);
     }
     // hh:mm
     // hh:m
@@ -331,4 +331,36 @@ export function groupListByAttributes<LIST_ITEM, ATTRIBUTE>(
     });
 
     return groupedItems;
+}
+
+export type PutNull<T extends object> = {
+    [key in keyof T]: T[key] extends undefined ? null : T[key];
+}
+export function putNull<T extends object>(value: T) {
+    type PartialWithNull<Q> = {
+      [P in keyof Q]: Q[P] | null;
+    };
+    const copy: PartialWithNull<T> = { ...value };
+    Object.keys(copy).forEach((key) => {
+        const safeKey = key as keyof T;
+        if (copy[safeKey] === undefined) {
+            copy[safeKey] = null;
+        }
+    });
+
+    return copy as PutNull<T>;
+}
+export type PutUndefined<T extends object> = {
+    [key in keyof T]: T[key] extends null ? undefined : T[key];
+}
+export function putUndefined<T extends object>(value: T) {
+    const copy: Partial<T> = { ...value };
+    Object.keys(copy).forEach((key) => {
+        const safeKey = key as keyof T;
+        if (copy[safeKey] === null) {
+            copy[safeKey] = undefined;
+        }
+    });
+
+    return copy as PutUndefined<T>;
 }

@@ -59,13 +59,9 @@ import {
     addDays,
     getNewId,
 } from '#utils/common';
-import {
-    defaultConfigValue,
-    KEY_CONFIG_STORAGE,
-} from '#utils/constants';
+import { defaultConfigValue } from '#utils/constants';
 import { removeNull } from '#utils/nullHelper';
 import {
-    ConfigStorage,
     EntriesAsList,
     WorkItem,
 } from '#utils/types';
@@ -222,10 +218,7 @@ export function Component() {
         return prevDay;
     }, [selectedDate]);
 
-    const [storedConfig] = useLocalStorage<ConfigStorage>(
-        KEY_CONFIG_STORAGE,
-        defaultConfigValue,
-    );
+    const [storedConfig] = useLocalStorage('timur-config');
 
     const editMode = storedConfig.editingMode ?? defaultConfigValue.editingMode;
 
@@ -610,7 +603,6 @@ export function Component() {
                 <StartSidebar
                     calendarComponentRef={calendarRef}
                     selectedDate={selectedDate}
-                    workItems={filteredWorkItems}
                     setSelectedDate={setSelectedDate}
                 />
             )}

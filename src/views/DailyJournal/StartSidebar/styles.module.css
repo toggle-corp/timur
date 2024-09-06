@@ -32,9 +32,9 @@
                 gap: var(--spacing-xs);
 
                 &.dragging {
+                    opacity: 0.8;
                     z-index: 1;
                     box-shadow: var(--box-shadow-md);
-                    opacity: 0.8;
                 }
 
                 .drag-handle {

@@ -36,13 +36,11 @@ import useSetFieldValue from '#hooks/useSetFieldValue';
 import {
     colorscheme,
     defaultConfigValue,
-    KEY_CONFIG_STORAGE,
     numericOptionKeySelector,
     numericOptionLabelSelector,
     numericOptions,
 } from '#utils/constants';
 import {
-    ConfigStorage,
     DailyJournalAttributeKeys,
     DailyJournalAttributeOrder,
     DailyJournalGrouping,
@@ -215,10 +213,7 @@ function StartSidebar(props: Props) {
 
     const { enums } = useContext(EnumsContext);
 
-    const [storedConfig, setStoredConfig] = useLocalStorage<ConfigStorage>(
-        KEY_CONFIG_STORAGE,
-        defaultConfigValue,
-    );
+    const [storedConfig, setStoredConfig] = useLocalStorage('timur-config');
 
     const setConfigFieldValue = useSetFieldValue(setStoredConfig);
 

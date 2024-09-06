@@ -2,65 +2,87 @@ import {
     useCallback,
     useContext,
     useEffect,
-    useState,
+    useMemo,
 } from 'react';
+import { isDefined } from '@togglecorp/fujs';
 
-import LocalStorageContext, { StoredValue } from '#contexts/localStorage';
-import { isCallable } from '#utils/common';
-import { getFromStorage } from '#utils/localStorage';
+import LocalStorageContext, { StorageState } from '#contexts/localStorage';
+import {
+    isCallable,
+    putNull,
+    putUndefined,
+} from '#utils/common';
+import {
+    getFromStorage,
+    setToStorage,
+} from '#utils/localStorage';
 
-import useDebouncedValue from './useDebouncedValue';
+function useLocalStorage<K extends keyof StorageState>(key: K) {
+    const {
+        storageState,
+        setStorageState,
+    } = useContext(LocalStorageContext);
 
-function useLocalStorage<T>(
-    key: string,
-    defaultValue: T,
-    debounce = 200,
-) {
-    const [value, setValue] = useState<StoredValue<T>>(
+    type T = StorageState[K];
+
+    const hasReadValue = isDefined(storageState[key].value);
+
+    useEffect(
         () => {
-            const fromStorage = getFromStorage<T>(key);
-
-            return {
-                timestamp: new Date().getTime(),
-                value: fromStorage ?? defaultValue,
-            };
+            if (hasReadValue) {
+                return;
+            }
+            const val = getFromStorage<T['value']>(key);
+            setStorageState((oldValue) => ({
+                ...oldValue,
+                [key]: {
+                    ...oldValue[key],
+                    value: val,
+                },
+            }));
         },
+        [key, hasReadValue, setStorageState],
     );
 
-    const { storageState, setStorageState } = useContext(LocalStorageContext);
-    const debouncedValue = useDebouncedValue(value, debounce);
+    const setValue: React.Dispatch<React.SetStateAction<NonNullable<T['value']>>> = useCallback(
+        (newValue) => {
+            setStorageState((oldValue) => {
+                const oldValueValue = oldValue[key].value;
+                const oldValueDefaultValue = oldValue[key].defaultValue;
 
-    useEffect(() => {
-        if (!storageState[key]) {
-            return;
-        }
+                const resolvedValue = isCallable(newValue)
+                    ? newValue(oldValueValue ?? oldValueDefaultValue)
+                    : newValue;
 
-        if (storageState[key].timestamp > value.timestamp) {
-            setValue(storageState[key] as StoredValue<T>);
-        }
-    }, [storageState, key, value]);
+                setToStorage(key, putNull(resolvedValue));
 
-    useEffect(() => {
-        setStorageState((oldStorageValue) => ({
-            ...oldStorageValue,
-            [key]: debouncedValue,
-        }));
-    }, [debouncedValue, key, setStorageState]);
+                return {
+                    ...oldValue,
+                    [key]: {
+                        ...oldValue[key],
+                        value: resolvedValue,
+                    },
+                } satisfies StorageState;
+            });
+        },
+        [key, setStorageState],
+    );
 
-    const setValueSafe = useCallback((newValue: T | ((v: T) => T)) => {
-        setValue((oldValue) => {
-            const resolvedValue = isCallable(newValue)
-                ? newValue(oldValue.value)
-                : newValue;
+    const { value } = storageState[key];
+    const { defaultValue } = storageState[key];
 
-            return {
-                timestamp: new Date().getTime(),
-                value: resolvedValue,
-            } satisfies StoredValue<T>;
-        });
-    }, []);
+    const finalValue = useMemo(
+        () => putUndefined({
+            ...defaultValue,
+            ...value,
+        }),
+        [defaultValue, value],
+    );
 
-    return [value.value, setValueSafe] as const;
+    return [
+        finalValue,
+        setValue,
+    ] as const;
 }
 
 export default useLocalStorage;

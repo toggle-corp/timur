@@ -37,13 +37,8 @@ import SizeContext from '#contexts/size';
 import { EnumsQuery } from '#generated/types/graphql';
 import { useFocusClient } from '#hooks/useFocus';
 import useLocalStorage from '#hooks/useLocalStorage';
+import { colorscheme } from '#utils/constants';
 import {
-    colorscheme,
-    defaultConfigValue,
-    KEY_CONFIG_STORAGE,
-} from '#utils/constants';
-import {
-    ConfigStorage,
     Contract,
     EntriesAsList,
     Task,
@@ -111,10 +106,7 @@ function WorkItemRow(props: Props) {
     const { enums } = useContext(EnumsContext);
     const { width: windowWidth } = useContext(SizeContext);
     const inputRef = useFocusClient<HTMLTextAreaElement>(workItem.clientId);
-    const [config] = useLocalStorage<ConfigStorage>(
-        KEY_CONFIG_STORAGE,
-        defaultConfigValue,
-    );
+    const [config] = useLocalStorage('timur-config');
 
     const setFieldValue = useCallback(
         (...entries: EntriesAsList<WorkItem>) => {

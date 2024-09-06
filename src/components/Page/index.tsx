@@ -23,11 +23,6 @@ import SizeContext from '#contexts/size';
 import useDebouncedValue from '#hooks/useDebouncedValue';
 import useLocalStorage from '#hooks/useLocalStorage';
 import useSetFieldValue from '#hooks/useSetFieldValue';
-import {
-    defaultConfigValue,
-    KEY_CONFIG_STORAGE,
-} from '#utils/constants';
-import { ConfigStorage } from '#utils/types';
 
 import styles from './styles.module.css';
 
@@ -62,17 +57,14 @@ function Page(props: Props) {
 
     const { width } = useContext(SizeContext);
 
-    const [storedState, setStoredState] = useLocalStorage<ConfigStorage>(
-        KEY_CONFIG_STORAGE,
-        defaultConfigValue,
-    );
+    const [storedConfig, setStoredConfig] = useLocalStorage('timur-config');
 
     const {
         startSidebarShown,
         endSidebarShown,
-    } = storedState;
+    } = storedConfig;
 
-    const setFieldValue = useSetFieldValue(setStoredState);
+    const setFieldValue = useSetFieldValue(setStoredConfig);
 
     const setSidebarShown = useCallback(
         (newValue: boolean) => setFieldValue(newValue, 'startSidebarShown'),

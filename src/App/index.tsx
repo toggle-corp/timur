@@ -33,7 +33,7 @@ import {
 } from '#generated/types/graphql';
 import useThrottledValue from '#hooks/useThrottledValue';
 import { getWindowSize } from '#utils/common';
-import { setToStorage } from '#utils/localStorage';
+import { defaultConfigValue } from '#utils/constants';
 
 import wrappedRoutes, { unwrappedRoutes } from './routes';
 
@@ -111,13 +111,11 @@ function App() {
     const [userAuth, setUserAuth] = useState<UserAuth>();
     const [size, setSize] = useState<SizeContextProps>(getWindowSize);
     const [ready, setReady] = useState(false);
-    const [storageState, setStorageState] = useState<LocalStorageContextProps['storageState']>({});
-
-    useEffect(() => {
-        Object.keys(storageState).forEach((key) => {
-            setToStorage(key, storageState[key].value);
-        });
-    }, [storageState]);
+    const [storageState, setStorageState] = useState<LocalStorageContextProps['storageState']>({
+        'timur-config': {
+            defaultValue: defaultConfigValue,
+        },
+    });
 
     const debouncedSize = useThrottledValue(size);
 

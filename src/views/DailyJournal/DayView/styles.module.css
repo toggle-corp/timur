@@ -58,6 +58,7 @@
     .new-group {
         display: flex;
         flex-direction: column;
+        gap: var(--spacing-2xs);
 
         .nested-heading {
             display: flex;
@@ -74,13 +75,13 @@
         .joined-heading {
             display: flex;
             align-items: center;
-            gap: var(--spacing-sm);
-            color: var(--color-secondary);
+            gap: var(--spacing-md);
+            color: var(--color-text-light);
             font-weight: var(--font-weight-semibold);
 
             .separator {
                 border-radius: 0.5rem;
-                background-color: var(--color-text-light);
+                background-color: var(--color-separator);
                 width: 0.5rem;
                 height: 0.5rem;
             }

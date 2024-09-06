@@ -16,6 +16,7 @@ import {
 } from '@togglecorp/fujs';
 
 import DefaultMessage from '#components/DefaultMessage';
+import Indent from '#components/Indent';
 import EnumsContext from '#contexts/enums';
 import useFormattedRelativeDate from '#hooks/useFormattedRelativeDate';
 import useLocalStorage from '#hooks/useLocalStorage';
@@ -25,20 +26,14 @@ import {
     sortByAttributes,
 } from '#utils/common';
 import {
-    defaultConfigValue,
-    KEY_CONFIG_STORAGE,
-} from '#utils/constants';
-import {
-    ConfigStorage,
     DailyJournalAttributeOrder,
     EntriesAsList,
     WorkItem,
 } from '#utils/types';
 
-import WorkItemRow from './ProjectGroupedView/ContractGroupedView/WorkItemRow';
+import WorkItemRow from './WorkItemRow';
 
 import styles from './styles.module.css';
-import Indent from '#components/Indent';
 
 const dateFormatter = new Intl.DateTimeFormat(
     [],
@@ -74,10 +69,8 @@ function DayView(props: Props) {
     } = props;
 
     const { taskById } = useContext(EnumsContext);
-    const [storedConfig] = useLocalStorage<ConfigStorage>(
-        KEY_CONFIG_STORAGE,
-        defaultConfigValue,
-    );
+
+    const [storedConfig] = useLocalStorage('timur-config');
 
     const getWorkItemAttribute = useCallback((
         item: WorkItem,
