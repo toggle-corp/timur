@@ -1,5 +1,6 @@
 import {
     useCallback,
+    useContext,
     useMemo,
 } from 'react';
 import { MdDragIndicator } from 'react-icons/md';
@@ -26,6 +27,7 @@ import {
 
 import MonthlyCalendar from '#components/MonthlyCalendar';
 import RadioInput from '#components/RadioInput';
+import DateContext from '#contexts/date';
 import useLocalStorage from '#hooks/useLocalStorage';
 import useSetFieldValue from '#hooks/useSetFieldValue';
 import {
@@ -167,7 +169,7 @@ function StartSidebar(props: Props) {
 
     const setConfigFieldValue = useSetFieldValue(setStoredConfig);
 
-    const date = new Date(selectedDate);
+    const { year, month } = useContext(DateContext);
 
     const updateJournalGrouping = useCallback((value: number, name: 'groupLevel' | 'joinLevel') => {
         const oldValue = storedConfig.dailyJournalGrouping
@@ -226,8 +228,8 @@ function StartSidebar(props: Props) {
             <MonthlyCalendar
                 componentRef={calendarComponentRef}
                 selectedDate={selectedDate}
-                initialYear={date.getFullYear()}
-                initialMonth={date.getMonth()}
+                initialYear={selectedDate ? new Date(selectedDate).getFullYear() : year}
+                initialMonth={selectedDate ? new Date(selectedDate).getMonth() : month}
                 onDateClick={setSelectedDate}
             />
             <div className={styles.attributes}>

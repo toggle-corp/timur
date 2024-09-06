@@ -16,6 +16,7 @@ import {
 import Link, { resolvePath } from '#components/Link';
 import MonthlyCalendar from '#components/MonthlyCalendar';
 import Page from '#components/Page';
+import DateContext from '#contexts/date';
 import RouteContext from '#contexts/route';
 
 import styles from './styles.module.css';
@@ -26,9 +27,10 @@ export function Component() {
     const routes = useContext(RouteContext);
     const navigate = useNavigate();
 
+    const { year, month, fullDate } = useContext(DateContext);
+
     const handleDateClick = useCallback((dateStr: string) => {
-        const todayStr = encodeDate(new Date());
-        const newDate = dateStr === todayStr ? undefined : dateStr;
+        const newDate = dateStr === fullDate ? undefined : dateStr;
 
         const { resolvedPath } = resolvePath('dailyJournal', routes, { date: newDate });
         if (isNotDefined(resolvedPath)) {
@@ -36,9 +38,7 @@ export function Component() {
         }
 
         navigate(resolvedPath);
-    }, [navigate, routes]);
-
-    const today = new Date();
+    }, [navigate, routes, fullDate]);
 
     return (
         <Page
@@ -49,8 +49,8 @@ export function Component() {
             <MonthlyCalendar
                 selectedDate={undefined}
                 className={styles.calendar}
-                initialYear={today.getFullYear()}
-                initialMonth={today.getMonth()}
+                initialYear={year}
+                initialMonth={month}
                 onDateClick={handleDateClick}
             />
             <div className={styles.quickLinks}>

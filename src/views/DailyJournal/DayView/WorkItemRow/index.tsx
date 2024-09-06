@@ -32,6 +32,7 @@ import DurationInput from '#components/DurationInput';
 import MonthlyCalendar from '#components/MonthlyCalendar';
 import SelectInput from '#components/SelectInput';
 import TextArea from '#components/TextArea';
+import DateContext from '#contexts/date';
 import EnumsContext from '#contexts/enums';
 import SizeContext from '#contexts/size';
 import { EnumsQuery } from '#generated/types/graphql';
@@ -338,10 +339,7 @@ function WorkItemRow(props: Props) {
         </div>
     );
 
-    const today = new Date();
-    const selectedDate = isDefined(workItem.date)
-        ? new Date(workItem.date)
-        : today;
+    const { year, month } = useContext(DateContext);
 
     return (
         <>
@@ -388,8 +386,8 @@ function WorkItemRow(props: Props) {
             >
                 <MonthlyCalendar
                     selectedDate={workItem.date}
-                    initialYear={selectedDate.getFullYear()}
-                    initialMonth={selectedDate.getMonth()}
+                    initialYear={workItem.date ? new Date(workItem.date).getFullYear() : year}
+                    initialMonth={workItem.date ? new Date(workItem.date).getMonth() : month}
                     onDateClick={handleMoveOrCopyEntry}
                 />
             </Dialog>

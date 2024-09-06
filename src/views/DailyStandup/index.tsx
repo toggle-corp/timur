@@ -36,6 +36,7 @@ import {
 import Button from '#components/Button';
 import Page from '#components/Page';
 import Portal from '#components/Portal';
+import DateContext from '#contexts/date';
 import NavbarContext from '#contexts/navbar';
 import {
     AllProjectsAndEventsQuery,
@@ -56,9 +57,9 @@ const dateFormatter = new Intl.DateTimeFormat(
     [],
     {
         year: 'numeric',
-        month: 'long',
+        month: 'short',
         day: 'numeric',
-        weekday: 'long',
+        weekday: 'short',
     },
 );
 
@@ -100,25 +101,24 @@ const ALL_PROJECTS_AND_EVENTS_QUERY = gql`
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
     const { date: dateFromParams } = useParams<{ date: string | undefined}>();
+    const { fullDate } = useContext(DateContext);
 
     const { midActionsRef } = useContext(NavbarContext);
     const contentRef = useRef<HTMLDivElement>(null);
 
     const selectedDate = useMemo(() => {
-        const today = new Date();
-
         if (isNotDefined(dateFromParams)) {
-            return encodeDate(today);
+            return fullDate;
         }
 
         const date = new Date(dateFromParams);
 
         if (Number.isNaN(date.getTime())) {
-            return encodeDate(today);
+            return fullDate;
         }
 
         return encodeDate(date);
-    }, [dateFromParams]);
+    }, [dateFromParams, fullDate]);
 
     const [allProjectsResponse] = useQuery<
         AllProjectsAndEventsQuery,
@@ -300,11 +300,11 @@ export function Component() {
                 date: otherEvent.startDate,
                 remainingDays: getDifferenceInDays(
                     otherEvent.startDate,
-                    encodeDate(new Date()),
+                    fullDate,
                 ),
             })) ?? []),
         ].sort((a, b) => compareDate(a.date, b.date));
-    }, [allProjectsResponse]);
+    }, [allProjectsResponse, fullDate]);
 
     return (
         <Page

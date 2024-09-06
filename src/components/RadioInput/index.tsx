@@ -140,8 +140,6 @@ function RadioInput<
         descriptionSelector,
     ]);
 
-    // const isRequired = withAsterisk ?? required;
-
     return (
         <div
             className={_cs(

@@ -1,5 +1,6 @@
 import {
     useCallback,
+    useContext,
     useEffect,
     useMemo,
     useState,
@@ -14,6 +15,7 @@ import {
 } from '@togglecorp/fujs';
 
 import Button from '#components/Button';
+import DateContext from '#contexts/date';
 
 import styles from './styles.module.css';
 
@@ -62,7 +64,7 @@ function MonthlyCalendar(props: Props) {
     const [year, setYear] = useState(initialYear);
     const [month, setMonth] = useState(initialMonth);
 
-    const today = new Date();
+    const { fullDate } = useContext(DateContext);
 
     const resetView = useCallback(
         (newYear: number, newMonth: number) => {
@@ -105,6 +107,7 @@ function MonthlyCalendar(props: Props) {
         [month, year],
     );
 
+    // FIXME: We should be able be use a for loop here
     const daysInMonth = useMemo(() => {
         // NOTE: getDate() starts at 1
         // where as getDay() starts at 0
@@ -169,7 +172,7 @@ function MonthlyCalendar(props: Props) {
                 {daysInMonth.map((day) => {
                     const date = encodeDate(new Date(year, month, day.date));
                     let variant;
-                    if (encodeDate(today) === date) {
+                    if (fullDate === date) {
                         variant = 'secondary' as const;
                     } else if (selectedDate === date) {
                         variant = 'quaternary' as const;

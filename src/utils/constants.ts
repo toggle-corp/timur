@@ -45,6 +45,7 @@ export const colorscheme: [string, string][] = [
     ['#7d5327', '#ecdecc'],
 ];
 
+// FIXME: We should instead generate these options
 export const numericOptions: NumericOption[] = [
     { key: 1, label: '1' },
     { key: 2, label: '2' },

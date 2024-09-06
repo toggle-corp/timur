@@ -1,12 +1,13 @@
 import {
     useCallback,
+    useContext,
     useState,
 } from 'react';
-import { isDefined } from '@togglecorp/fujs';
 
 import Button, { Props as ButtonProps } from '#components//Button';
 import Dialog from '#components/Dialog';
 import MonthlyCalendar from '#components/MonthlyCalendar';
+import DateContext from '#contexts/date';
 
 import styles from './styles.module.css';
 
@@ -23,6 +24,7 @@ function CalendarInput<const N>(props: Props<N>) {
     } = props;
 
     const [confirmationShown, setConfirmationShown] = useState<boolean>(false);
+    const { year, month } = useContext(DateContext);
 
     const handleModalOpen = useCallback(
         () => {
@@ -46,9 +48,6 @@ function CalendarInput<const N>(props: Props<N>) {
         [onChange],
     );
 
-    const today = new Date();
-    const selectedDate = isDefined(value) ? new Date(value) : today;
-
     return (
         <>
             <Button
@@ -67,8 +66,8 @@ function CalendarInput<const N>(props: Props<N>) {
             >
                 <MonthlyCalendar
                     selectedDate={value}
-                    initialYear={selectedDate.getFullYear()}
-                    initialMonth={selectedDate.getMonth()}
+                    initialYear={value ? new Date(value).getFullYear() : year}
+                    initialMonth={value ? new Date(value).getMonth() : month}
                     onDateClick={handleDateClick}
                 />
             </Dialog>

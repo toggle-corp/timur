@@ -174,6 +174,8 @@ function AvailabilityDialog(props: Props) {
         },
         [date, dialogState, handleModalClose, updateAvailability],
     );
+
+    // FIXME: Use memo
     const formattedDate = dateFormatter.format(new Date(date));
 
     // FIXME: Use memo

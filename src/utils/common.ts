@@ -36,6 +36,7 @@ function squash<T extends object>(items: T[]): T | undefined {
     if (items.length <= 1) {
         return items[0];
     }
+    // NOTE: We should use items.slice(1) instead
     return items.reduce(
         (acc, val) => ({
             ...acc,

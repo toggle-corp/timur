@@ -9,7 +9,6 @@ import styles from './styles.module.css';
 
 interface Props {
     className?: string;
-    // pointerClassName?: string;
     elementRef?: React.RefObject<HTMLDivElement>;
     parentRef: React.RefObject<HTMLElement | undefined>;
     children?: React.ReactNode;
@@ -22,7 +21,6 @@ function Popup(props: Props) {
         elementRef,
         children,
         className,
-        // pointerClassName,
         preferredWidth,
     } = props;
 
@@ -38,7 +36,6 @@ function Popup(props: Props) {
 
     const {
         content,
-        // pointer,
         width,
         orientation,
     } = placements;
@@ -61,25 +58,6 @@ function Popup(props: Props) {
             >
                 {children}
             </div>
-            {/*
-            <div
-                className={_cs(
-                    styles.pointer,
-                    orientation.vertical === 'bottom' && styles.topOrientation,
-                    pointerClassName,
-                )}
-                style={{ ...pointer }}
-            >
-                <svg
-                    className={styles.icon}
-                    viewBox="0 0 200 100"
-                >
-                    <path
-                        d="M0 100 L100 0 L200 100Z"
-                    />
-                </svg>
-            </div>
-            */}
         </Portal>
     );
 }

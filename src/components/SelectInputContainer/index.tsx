@@ -160,16 +160,6 @@ function SelectInputContainer<
         ],
     );
 
-    /*
-    const handleToggleDropdown: NonNullable<ButtonProps<undefined>['onClick']> = useCallback(
-        (_, e) => {
-            e.stopPropagation();
-            onDropdownShownChange(!dropdownShown);
-        },
-        [dropdownShown, onDropdownShownChange],
-    );
-    */
-
     const handleShowDropdown = useCallback(
         () => {
             // FIXME: this is not atomic. Call only once
@@ -317,20 +307,6 @@ function SelectInputContainer<
                                 <IoCloseSharp className={styles.icon} />
                             </Button>
                         )}
-                        {/* !readOnly && (
-                            <Button
-                                onClick={handleToggleDropdown}
-                                variant="transparent"
-                                name={undefined}
-                                title={dropdownShownActual
-                                    ? 'Close dropdown'
-                                    : 'Open dropdown'}
-                            >
-                                {dropdownShownActual
-                                    ? <IoCaretUpSharp className={styles.icon} />
-                                    : <IoCaretDownSharp className={styles.icon} />}
-                            </Button>
-                        ) */}
                     </>
                 )}
                 input={(

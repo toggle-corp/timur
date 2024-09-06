@@ -57,9 +57,7 @@ function Dialog(props: Props) {
     );
 
     const contextValue = useMemo(
-        () => ({
-            dialogRef,
-        }),
+        () => ({ dialogRef }),
         [],
     );
 
