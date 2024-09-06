@@ -10,7 +10,7 @@ import styles from './styles.module.css';
 // eslint-disable-next-line no-console
 console.info('PWA information:', pwaInfo);
 
-function ReloadPrompt() {
+function PwaPrompt() {
     const {
         offlineReady: [offlineReady, setOfflineReady],
         needRefresh: [needRefresh, setNeedRefresh],
@@ -38,6 +38,7 @@ function ReloadPrompt() {
             console.info('SW registration error', error);
         },
     });
+
     const reload = useCallback(
         () => {
             updateServiceWorker(true);
@@ -96,4 +97,4 @@ function ReloadPrompt() {
     );
 }
 
-export default ReloadPrompt;
+export default PwaPrompt;

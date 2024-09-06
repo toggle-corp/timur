@@ -336,8 +336,9 @@ export function Component() {
                         onClick={handlePresentClick}
                         variant="quaternary"
                         title="Enter full screen"
+                        icons={<IoExpandOutline />}
                     >
-                        <IoExpandOutline />
+                        Present
                     </Button>
                 </div>
             </Portal>

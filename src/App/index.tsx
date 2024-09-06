@@ -111,14 +111,23 @@ function App() {
     const [userAuth, setUserAuth] = useState<UserAuth>();
     const [size, setSize] = useState<SizeContextProps>(getWindowSize);
     const [ready, setReady] = useState(false);
+
+    // Local Storage
+
     const [storageState, setStorageState] = useState<LocalStorageContextProps['storageState']>({
         'timur-config': {
             defaultValue: defaultConfigValue,
         },
     });
 
-    const debouncedSize = useThrottledValue(size);
+    const storageContextValue = useMemo<LocalStorageContextProps>(() => ({
+        storageState,
+        setStorageState,
+    }), [storageState]);
 
+    // Device Size
+
+    const throttledSize = useThrottledValue(size);
     useEffect(() => {
         function handleResize() {
             setSize(getWindowSize());
@@ -131,6 +140,8 @@ function App() {
         };
     }, []);
 
+    // Authentication
+
     const [meResult] = useQuery<MeQuery, MeQueryVariables>(
         { query: ME_QUERY },
     );
@@ -142,10 +153,6 @@ function App() {
         setUserAuth(meResult.data?.public.me ?? undefined);
         setReady(true);
     }, [meResult.data, meResult.fetching]);
-
-    const [enumsResult] = useQuery<EnumsQuery, EnumsQueryVariables>(
-        { query: ENUMS_QUERY },
-    );
 
     const removeUserAuth = useCallback(
         () => {
@@ -161,6 +168,12 @@ function App() {
             removeUserAuth,
         }),
         [userAuth, removeUserAuth],
+    );
+
+    // Enums
+
+    const [enumsResult] = useQuery<EnumsQuery, EnumsQueryVariables>(
+        { query: ENUMS_QUERY },
     );
 
     const enumsContextValue = useMemo<EnumsContextProps>(
@@ -182,10 +195,7 @@ function App() {
         [enumsResult],
     );
 
-    const storageContextValue = useMemo<LocalStorageContextProps>(() => ({
-        storageState,
-        setStorageState,
-    }), [storageState]);
+    // Page layouts
 
     const navbarStartActionRef = useRef<HTMLDivElement>(null);
     const navbarMidActionRef = useRef<HTMLDivElement>(null);
@@ -197,6 +207,8 @@ function App() {
         endActionsRef: navbarEndActionRef,
     }), []);
 
+    // Route
+
     const fallbackElement = (
         <div className={styles.fallbackElement}>
             <img
@@ -207,13 +219,15 @@ function App() {
         </div>
     );
 
+    // NOTE: We should block page for authentication before we mount routes
+    // TODO: Handle error with authentication
     if (!ready) {
         return fallbackElement;
     }
 
     return (
         <NavbarContext.Provider value={navbarContextValue}>
-            <SizeContext.Provider value={debouncedSize}>
+            <SizeContext.Provider value={throttledSize}>
                 <LocalStorageContext.Provider value={storageContextValue}>
                     <RouteContext.Provider value={wrappedRoutes}>
                         <UserContext.Provider value={userContextValue}>

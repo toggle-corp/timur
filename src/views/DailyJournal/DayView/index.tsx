@@ -266,7 +266,7 @@ function DayView(props: Props) {
                                     onClone={onWorkItemClone}
                                     onChange={onWorkItemChange}
                                     onDelete={onWorkItemDelete}
-                                    contract={taskDetails?.contract}
+                                    contractId={taskDetails.contract.id}
                                 />
                             </div>
                         );

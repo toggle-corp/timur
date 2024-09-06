@@ -39,7 +39,6 @@ import { useFocusClient } from '#hooks/useFocus';
 import useLocalStorage from '#hooks/useLocalStorage';
 import { colorscheme } from '#utils/constants';
 import {
-    Contract,
     EntriesAsList,
     Task,
     WorkItem,
@@ -86,7 +85,7 @@ function defaultColorSelector<T>(_: T, i: number): [string, string] {
 export interface Props {
     className?: string;
     workItem: WorkItem;
-    contract: Contract;
+    contractId: string;
 
     onClone: (clientId: string, override?: Partial<WorkItem>) => void;
     onChange: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
@@ -97,7 +96,7 @@ function WorkItemRow(props: Props) {
     const {
         className,
         workItem,
-        contract,
+        contractId,
         onClone,
         onDelete,
         onChange,
@@ -105,6 +104,7 @@ function WorkItemRow(props: Props) {
 
     const { enums } = useContext(EnumsContext);
     const { width: windowWidth } = useContext(SizeContext);
+
     const inputRef = useFocusClient<HTMLTextAreaElement>(workItem.clientId);
     const [config] = useLocalStorage('timur-config');
 
@@ -116,8 +116,8 @@ function WorkItemRow(props: Props) {
     );
 
     const filteredTaskList = useMemo(
-        () => enums?.private?.allActiveTasks?.filter((task) => task.contract.id === contract.id),
-        [contract.id, enums],
+        () => enums?.private?.allActiveTasks?.filter((task) => task.contract.id === contractId),
+        [contractId, enums],
     );
 
     const handleStatusCheck = useCallback(() => {

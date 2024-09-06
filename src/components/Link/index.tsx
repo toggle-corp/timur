@@ -56,7 +56,7 @@ export function resolvePath(
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
-export function useLink(props: {
+function useLink(props: {
     external: true,
     href: string | undefined | null,
     to?: never,
