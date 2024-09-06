@@ -1,6 +1,7 @@
 import {
     FcHome,
     FcLandscape,
+    FcOrganization,
 } from 'react-icons/fc';
 import { _cs } from '@togglecorp/fujs';
 
@@ -33,27 +34,43 @@ function AvailabilityIndicator(props: Props) {
         return <>{fallback}</>;
     }
 
-    const wfhContent = !!wfhType && <FcHome title="Work from home" />;
-    const leaveContent = !!leaveType && <FcLandscape title="Leave" />;
+    const wfhContent = <FcHome title="Work from home" />;
+    const leaveContent = <FcLandscape title="Leave" />;
+    const officeContent = <FcOrganization title="Work" />;
 
-    let content = (
-        <>
-            {leaveContent}
-            {wfhContent}
-        </>
-    );
-    if (leaveType === 'SECOND_HALF') {
-        content = (
-            <>
-                {wfhContent}
-                {leaveContent}
-            </>
-        );
+    let firstContent;
+    let secondContent;
+
+    if (wfhType === 'FULL') {
+        firstContent = wfhContent;
+        secondContent = null;
+    } else if (leaveType === 'FULL') {
+        firstContent = leaveContent;
+        secondContent = null;
+    } else if (wfhType === 'FIRST_HALF' && leaveType === 'SECOND_HALF') {
+        firstContent = wfhContent;
+        secondContent = leaveContent;
+    } else if (leaveType === 'FIRST_HALF' && wfhType === 'SECOND_HALF') {
+        firstContent = leaveContent;
+        secondContent = wfhContent;
+    } else if (wfhType === 'FIRST_HALF') {
+        firstContent = wfhContent;
+        secondContent = officeContent;
+    } else if (wfhType === 'SECOND_HALF') {
+        firstContent = officeContent;
+        secondContent = wfhContent;
+    } else if (leaveType === 'FIRST_HALF') {
+        firstContent = leaveContent;
+        secondContent = officeContent;
+    } else if (leaveType === 'SECOND_HALF') {
+        firstContent = officeContent;
+        secondContent = leaveContent;
     }
 
     return (
         <div className={_cs(styles.indicator, className)}>
-            {content}
+            {firstContent}
+            {secondContent}
         </div>
     );
 }
