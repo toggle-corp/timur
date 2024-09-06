@@ -9,14 +9,14 @@ import {
 } from 'react';
 import { FcHighPriority } from 'react-icons/fc';
 import {
-    IoAdd,
-    IoCalendarOutline,
-    IoChevronBackSharp,
-    IoChevronForwardSharp,
-    IoNewspaperOutline,
-    IoStorefrontOutline,
-    IoTerminalOutline,
-} from 'react-icons/io5';
+    RiAddLine,
+    RiArrowLeftSLine,
+    RiArrowRightSLine,
+    RiCalendar2Line,
+    RiHomeOfficeLine,
+    RiStickyNoteAddLine,
+    RiTerminalBoxLine,
+} from 'react-icons/ri';
 import {
     useNavigate,
     useParams,
@@ -639,7 +639,7 @@ export function Component() {
                                 variant="quaternary"
                                 title="Previous day"
                             >
-                                <IoChevronBackSharp />
+                                <RiArrowLeftSLine />
                             </Link>
                             <Link
                                 to="dailyJournal"
@@ -647,7 +647,7 @@ export function Component() {
                                 variant="quaternary"
                                 title="Next day"
                             >
-                                <IoChevronForwardSharp />
+                                <RiArrowRightSLine />
                             </Link>
                         </>
                     )}
@@ -658,7 +658,7 @@ export function Component() {
                         value={selectedDate}
                         onChange={setSelectedDate}
                     >
-                        <IoCalendarOutline />
+                        <RiCalendar2Line />
                     </CalendarInput>
                     {entriesWithoutTask > 0 && (
                         <div className={styles.warningBadge}>
@@ -686,7 +686,7 @@ export function Component() {
                         <AvailabilityIndicator
                             wfhType={wfhType}
                             leaveType={leaveType}
-                            fallback={<IoStorefrontOutline />}
+                            fallback={<RiHomeOfficeLine />}
                         />
                     </Button>
                     {screen === 'desktop' && (
@@ -696,7 +696,7 @@ export function Component() {
                             title="Update Note"
                             variant="quaternary"
                         >
-                            <IoNewspaperOutline />
+                            <RiStickyNoteAddLine />
                         </Button>
                     )}
                     {screen === 'desktop' && (
@@ -706,7 +706,7 @@ export function Component() {
                             variant="quaternary"
                             onClick={handleShortcutsButtonClick}
                         >
-                            <IoTerminalOutline />
+                            <RiTerminalBoxLine />
                         </Button>
                     )}
                 </div>
@@ -728,7 +728,7 @@ export function Component() {
                 <Button
                     name={undefined}
                     onClick={handleAddEntryClick}
-                    icons={<IoAdd />}
+                    icons={<RiAddLine />}
                     title="Add entry"
                 >
                     Add entry

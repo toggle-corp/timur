@@ -5,16 +5,8 @@
     padding: var(--spacing-xs) var(--spacing-sm);
     gap: var(--spacing-xs);
 
-    &.with-icons {
-        grid-template-columns: 5.5rem 2fr 5fr 12rem 5rem 4rem;
-    }
-
     &.checkbox-for-status {
         grid-template-columns: 1rem 2fr 5fr 10rem 4rem 4rem;
-
-        &.with-icons {
-            grid-template-columns: 1rem 2fr 5fr 10rem 5rem 4rem;
-        }
     }
 
     .actions {
@@ -49,16 +41,8 @@
         grid-template-columns: auto;
         gap: var(--spacing-sm);
 
-        &.with-icons {
-            grid-template-columns: auto;
-        }
-
         &.checkbox-for-status {
             grid-template-columns: 1rem 1fr;
-
-            &.with-icons {
-                grid-template-columns: 1rem 1fr;
-            }
         }
 
         .compact-options {

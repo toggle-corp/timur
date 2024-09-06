@@ -6,9 +6,9 @@ import {
     useState,
 } from 'react';
 import {
-    IoChevronBackSharp,
-    IoChevronForwardSharp,
-} from 'react-icons/io5';
+    RiArrowLeftSLine,
+    RiArrowRightSLine,
+} from 'react-icons/ri';
 import {
     _cs,
     encodeDate,
@@ -139,7 +139,7 @@ function MonthlyCalendar(props: Props) {
                     title="See previous month in calendar"
                     spacing="xs"
                 >
-                    <IoChevronBackSharp />
+                    <RiArrowLeftSLine />
                 </Button>
                 <Button
                     name={undefined}
@@ -148,7 +148,7 @@ function MonthlyCalendar(props: Props) {
                     title="See next month in calendar"
                     spacing="xs"
                 >
-                    <IoChevronForwardSharp />
+                    <RiArrowRightSLine />
                 </Button>
                 <div>
                     {year}

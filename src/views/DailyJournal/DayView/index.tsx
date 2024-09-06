@@ -5,7 +5,6 @@ import {
     useContext,
     useMemo,
 } from 'react';
-import { FcClock } from 'react-icons/fc';
 import {
     _cs,
     bound,
@@ -168,14 +167,8 @@ function DayView(props: Props) {
                 </h2>
                 {isDefined(totalHours) && (
                     <div
-                        className={_cs(
-                            styles.duration,
-                            storedConfig.showInputIcons && styles.withIcon,
-                        )}
+                        className={styles.duration}
                     >
-                        {storedConfig.showInputIcons && (
-                            <FcClock />
-                        )}
                         <div>
                             {getDurationString(totalHours)}
                         </div>

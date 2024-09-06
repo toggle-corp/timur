@@ -5,10 +5,10 @@ import {
     useRef,
 } from 'react';
 import {
-    IoChevronBack,
-    IoList,
-    IoMenu,
-} from 'react-icons/io5';
+    RiArrowLeftSLine,
+    RiListUnordered,
+    RiMenuLine,
+} from 'react-icons/ri';
 import {
     _cs,
     isDefined,
@@ -135,7 +135,7 @@ function Page(props: Props) {
                         variant="transparent"
                         title="Toggle left pane"
                     >
-                        <IoMenu className={styles.sidebarIcon} />
+                        <RiMenuLine className={styles.sidebarIcon} />
                     </Button>
                 </Portal>
             )}
@@ -150,7 +150,7 @@ function Page(props: Props) {
                             variant="transparent"
                             title="Close left pane"
                         >
-                            <IoChevronBack />
+                            <RiArrowLeftSLine />
                         </Button>
                     )}
                 </aside>
@@ -168,7 +168,7 @@ function Page(props: Props) {
                         variant="transparent"
                         title="Toggle right pane"
                     >
-                        <IoList className={styles.sidebarIcon} />
+                        <RiListUnordered className={styles.sidebarIcon} />
                     </Button>
                 </Portal>
             )}

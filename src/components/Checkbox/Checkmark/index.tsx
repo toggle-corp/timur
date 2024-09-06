@@ -1,8 +1,8 @@
 import {
-    IoCheckbox,
-    IoCreate,
-    IoSquareOutline,
-} from 'react-icons/io5';
+    RiCheckboxBlankLine,
+    RiCheckboxFill,
+    RiCheckboxIndeterminateFill,
+} from 'react-icons/ri';
 
 export interface CheckmarkProps {
     className?: string;
@@ -20,13 +20,13 @@ function Checkmark(props: CheckmarkProps) {
     return (
         <>
             {indeterminate && (
-                <IoCreate className={className} />
+                <RiCheckboxIndeterminateFill className={className} />
             )}
             {value && !indeterminate && (
-                <IoCheckbox className={className} />
+                <RiCheckboxFill className={className} />
             )}
             {!value && !indeterminate && (
-                <IoSquareOutline className={className} />
+                <RiCheckboxBlankLine className={className} />
             )}
         </>
     );

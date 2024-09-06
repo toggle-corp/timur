@@ -4,11 +4,11 @@ import {
     useState,
 } from 'react';
 import {
-    IoCaretDown,
-    IoCaretUp,
-    IoHome,
-    IoReload,
-} from 'react-icons/io5';
+    RiArrowDownSLine,
+    RiArrowUpSLine,
+    RiHome4Line,
+    RiRefreshLine,
+} from 'react-icons/ri';
 import { useRouteError } from 'react-router-dom';
 
 import Button from '#components/Button';
@@ -52,14 +52,17 @@ function PageError() {
                     {!fullErrorVisible && (
                         <div className={styles.stack}>
                             {errorResponse?.error?.message
-                                ?? errorResponse?.message
-                                ?? 'Something unexpected happended!'}
+                                || errorResponse?.message
+                                || 'Something unexpected happended!'}
                         </div>
                     )}
                     {fullErrorVisible && (
                         <div className={styles.stack}>
                             {errorResponse?.error?.stack
-                                ?? errorResponse?.stack ?? 'Stack trace not available!'}
+                                || errorResponse?.stack
+                                || errorResponse?.error?.message
+                                || errorResponse?.message
+                                || 'Stack trace not available!'}
                         </div>
                     )}
                 </div>
@@ -73,7 +76,7 @@ function PageError() {
                         variant="transparent"
                         onClick={setFullErrorVisible}
                         title="Toggle error detail"
-                        actions={fullErrorVisible ? <IoCaretUp /> : <IoCaretDown />}
+                        actions={fullErrorVisible ? <RiArrowUpSLine /> : <RiArrowDownSLine />}
                     >
                         {fullErrorVisible ? 'Hide details' : 'Show details'}
                     </Button>
@@ -82,7 +85,7 @@ function PageError() {
                         <Link
                             href="/"
                             external
-                            icons={<IoHome />}
+                            icons={<RiHome4Line />}
                             variant="quaternary"
                         >
                             Go to homepage
@@ -91,7 +94,7 @@ function PageError() {
                             name={undefined}
                             title="Reload page"
                             onClick={handleReloadButtonClick}
-                            icons={<IoReload />}
+                            icons={<RiRefreshLine />}
                         >
                             Reload
                         </Button>

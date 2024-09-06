@@ -7,10 +7,10 @@ import {
     useState,
 } from 'react';
 import {
-    IoChevronBack,
-    IoChevronForward,
-    IoExpandOutline,
-} from 'react-icons/io5';
+    RiArrowLeftSLine,
+    RiArrowRightSLine,
+    RiFullscreenLine,
+} from 'react-icons/ri';
 import { useParams } from 'react-router-dom';
 import {
     _cs,
@@ -244,7 +244,7 @@ export function Component() {
                         disabled={prevButtonDisabled}
                         title="Previous standup slide"
                     >
-                        <IoChevronBack />
+                        <RiArrowLeftSLine />
                     </Button>
                     <Button
                         name={nextButtonName}
@@ -253,14 +253,14 @@ export function Component() {
                         disabled={nextButtonDisabled}
                         title="Next standup slide"
                     >
-                        <IoChevronForward />
+                        <RiArrowRightSLine />
                     </Button>
                     <Button
                         name={undefined}
                         onClick={handlePresentClick}
                         variant="quaternary"
                         title="Enter full screen"
-                        icons={<IoExpandOutline />}
+                        icons={<RiFullscreenLine />}
                     >
                         Present
                     </Button>

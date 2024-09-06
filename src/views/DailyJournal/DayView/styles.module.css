@@ -31,20 +31,11 @@
             font-weight: var(--font-weight-bold);
             gap: var(--spacing-2xs);
 
-            &.with-icon {
-                width: calc(9rem + 2 * var(--spacing-xs));
-            }
-
             @media screen and (max-width: 900px) {
                 flex-grow: 1;
                 justify-content: flex-end;
                 padding: unset;
                 width: unset;
-
-                &.with-icon {
-                    padding: unset;
-                    width: unset;
-                }
             }
         }
     }

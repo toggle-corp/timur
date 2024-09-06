@@ -5,7 +5,7 @@ import {
     useMemo,
     useRef,
 } from 'react';
-import { IoCloseSharp } from 'react-icons/io5';
+import { RiCloseLine } from 'react-icons/ri';
 import { _cs } from '@togglecorp/fujs';
 
 import Button from '#components/Button';
@@ -107,7 +107,7 @@ function Dialog(props: Props) {
                                 title="Close dialog"
                                 variant="transparent"
                             >
-                                <IoCloseSharp />
+                                <RiCloseLine />
                             </Button>
                         </header>
                         <div className={_cs(styles.content, contentClassName)}>

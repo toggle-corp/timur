@@ -5,19 +5,12 @@ import {
     useState,
 } from 'react';
 import {
-    FcClock,
-    FcDocument,
-    FcPackage,
-    FcPieChart,
-    FcRuler,
-} from 'react-icons/fc';
-import {
-    IoCopyOutline,
-    IoEllipsisVertical,
-    IoPencilOutline,
-    IoSwapHorizontal,
-    IoTrashOutline,
-} from 'react-icons/io5';
+    RiDeleteBin2Line,
+    RiEditBoxLine,
+    RiFileCopyLine,
+    RiMoreLine,
+    RiSwap2Line,
+} from 'react-icons/ri';
 import {
     _cs,
     isDefined,
@@ -86,11 +79,11 @@ function defaultColorSelector<T>(_: T, i: number): [string, string] {
 interface Props {
     className?: string;
     workItem: WorkItem;
-    contractId: string;
+    contractId: string | undefined;
 
-    onClone: (clientId: string, override?: Partial<WorkItem>) => void;
-    onChange: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
-    onDelete: (clientId: string) => void;
+    onClone?: (clientId: string, override?: Partial<WorkItem>) => void;
+    onChange?: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
+    onDelete?: (clientId: string) => void;
 }
 
 function WorkItemRow(props: Props) {
@@ -103,6 +96,8 @@ function WorkItemRow(props: Props) {
         onChange,
     } = props;
 
+    console.log(workItem, contractId);
+
     const { enums } = useContext(EnumsContext);
     const { screen } = useContext(SizeContext);
 
@@ -111,7 +106,9 @@ function WorkItemRow(props: Props) {
 
     const setFieldValue = useCallback(
         (...entries: EntriesAsList<WorkItem>) => {
-            onChange(workItem.clientId, ...entries);
+            if (onChange) {
+                onChange(workItem.clientId, ...entries);
+            }
         },
         [workItem.clientId, onChange],
     );
@@ -161,7 +158,7 @@ function WorkItemRow(props: Props) {
         (newValue: string) => {
             if (dialogState === 'move') {
                 setFieldValue(newValue, 'date');
-            } else if (dialogState === 'copy') {
+            } else if (dialogState === 'copy' && onClone) {
                 onClone(workItem.clientId, { date: newValue });
             }
             setDialogState(undefined);
@@ -171,7 +168,9 @@ function WorkItemRow(props: Props) {
 
     const handleClone = useCallback(
         () => {
-            onClone(workItem.clientId);
+            if (onClone) {
+                onClone(workItem.clientId);
+            }
         },
         [onClone, workItem.clientId],
     );
@@ -199,7 +198,6 @@ function WorkItemRow(props: Props) {
             onChange={setFieldValue}
             value={workItem.status}
             nonClearable
-            icons={config.showInputIcons && <FcPieChart />}
         />
     );
 
@@ -214,12 +212,6 @@ function WorkItemRow(props: Props) {
             onChange={setFieldValue}
             value={workItem.task}
             nonClearable
-            icons={(
-                config.showInputIcons
-                // NOTE: hide/unhide icon wrt "checkbox for status" flag
-                && (screen === 'mobile' || !config.checkboxForStatus)
-                && <FcPackage />
-            )}
         />
     );
 
@@ -231,12 +223,6 @@ function WorkItemRow(props: Props) {
             title="Description"
             value={workItem.description}
             onChange={setFieldValue}
-            icons={(
-                config.showInputIcons
-                // NOTE: hide/unhide icon wrt "checkbox for status" flag
-                && (screen === 'desktop' || !config.checkboxForStatus)
-                && <FcDocument />
-            )}
             placeholder="Description"
             compact={config.compactTextArea}
         />
@@ -253,7 +239,6 @@ function WorkItemRow(props: Props) {
             colorSelector={defaultColorSelector}
             onChange={setFieldValue}
             value={workItem.type}
-            icons={config.showInputIcons && <FcRuler />}
         />
     );
 
@@ -264,7 +249,6 @@ function WorkItemRow(props: Props) {
             title="Hours"
             value={workItem.duration}
             onChange={setFieldValue}
-            icons={config.showInputIcons && <FcClock />}
             placeholder="hh:mm"
         />
     );
@@ -278,10 +262,10 @@ function WorkItemRow(props: Props) {
                 onClick={handleClone}
                 spacing="xs"
             >
-                <IoCopyOutline />
+                <RiFileCopyLine />
             </Button>
             <DropdownMenu
-                label={<IoEllipsisVertical />}
+                label={<RiMoreLine />}
                 withoutDropdownIcon
                 variant="transparent"
                 persistent
@@ -292,7 +276,7 @@ function WorkItemRow(props: Props) {
                     name={workItem.clientId}
                     title="Edit this entry"
                     onClick={undefined}
-                    icons={<IoPencilOutline />}
+                    icons={<RiEditBoxLine />}
                     disabled
                 >
                     Edit entry
@@ -302,7 +286,7 @@ function WorkItemRow(props: Props) {
                     name={workItem.clientId}
                     title="Move this entry to another day"
                     onClick={handleCopyDialogOpen}
-                    icons={<IoCopyOutline />}
+                    icons={<RiFileCopyLine />}
                 >
                     Copy to another day
                 </DropdownMenuItem>
@@ -311,7 +295,7 @@ function WorkItemRow(props: Props) {
                     name={workItem.clientId}
                     title="Move this entry to another day"
                     onClick={handleMoveDialogOpen}
-                    icons={<IoSwapHorizontal />}
+                    icons={<RiSwap2Line />}
                 >
                     Move to another day
                 </DropdownMenuItem>
@@ -331,7 +315,7 @@ function WorkItemRow(props: Props) {
                             </p>
                         </div>
                     )}
-                    icons={<IoTrashOutline />}
+                    icons={<RiDeleteBin2Line />}
                 >
                     Delete entry
                 </DropdownMenuItem>
@@ -348,7 +332,6 @@ function WorkItemRow(props: Props) {
                 className={_cs(
                     styles.workItemRow,
                     config.checkboxForStatus && styles.checkboxForStatus,
-                    config.showInputIcons && styles.withIcons,
                     className,
                 )}
             >

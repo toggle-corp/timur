@@ -3,9 +3,9 @@ import {
     useMemo,
 } from 'react';
 import {
-    IoChevronForward,
-    IoExit,
-} from 'react-icons/io5';
+    RiArrowRightWideLine,
+    RiExternalLinkLine,
+} from 'react-icons/ri';
 import {
     generatePath,
     Link as InternalLink,
@@ -199,10 +199,10 @@ function Link(props: Props) {
             <>
                 {actions}
                 {withLinkIcon && external && (
-                    <IoExit />
+                    <RiExternalLinkLine />
                 )}
                 {withLinkIcon && !external && (
-                    <IoChevronForward className={styles.forwardIcon} />
+                    <RiArrowRightWideLine className={styles.forwardIcon} />
                 )}
             </>
         ) : null,

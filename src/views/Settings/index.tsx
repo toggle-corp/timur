@@ -10,6 +10,8 @@ import useSetFieldValue from '#hooks/useSetFieldValue';
 import { colorscheme } from '#utils/constants';
 import { EditingMode } from '#utils/types';
 
+import WorkItemRow from '../DailyJournal/DayView/WorkItemRow';
+
 import styles from './styles.module.css';
 
 type EditingOption = { key: EditingMode, label: string };
@@ -68,18 +70,12 @@ export function Component() {
         >
             <div className={styles.section}>
                 <h4>
-                    Journal
+                    Entry
                 </h4>
                 <Checkbox
                     name="compactTextArea"
-                    label="Collapse text area on blur"
+                    label="Only expand text area on focus"
                     value={storedConfig.compactTextArea}
-                    onChange={setConfigFieldValue}
-                />
-                <Checkbox
-                    name="showInputIcons"
-                    label="Show input icons"
-                    value={storedConfig.showInputIcons}
                     onChange={setConfigFieldValue}
                 />
                 <Checkbox
@@ -89,6 +85,26 @@ export function Component() {
                     value={storedConfig.checkboxForStatus}
                     onChange={setConfigFieldValue}
                 />
+                <WorkItemRow
+                    className={styles.workItem}
+                    workItem={{
+                        clientId: 'xyz',
+                        date: '2024-09-06',
+                        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vel enim sit amet augue iaculis pharetra non ac nulla. In justo enim, egestas sed mi cursus, efficitur interdum felis.',
+                        duration: 90,
+                        id: undefined,
+                        startTime: undefined,
+                        status: 'DOING',
+                        task: '1',
+                        type: 'DEVELOPMENT',
+                    }}
+                    contractId="1"
+                />
+            </div>
+            <div className={styles.section}>
+                <h4>
+                    Create Entry
+                </h4>
                 <SelectInput
                     name="defaultTaskStatus"
                     variant="general"
@@ -115,11 +131,11 @@ export function Component() {
             </div>
             <div className={styles.section}>
                 <h4>
-                    Note
+                    Create Notes
                 </h4>
                 <SelectInput
                     name="editingMode"
-                    label="Note Editing Mode"
+                    label="Editing Mode"
                     variant="general"
                     options={editingOptions}
                     keySelector={editingOptionKeySelector}

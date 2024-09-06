@@ -6,7 +6,7 @@ import {
     useRef,
     useState,
 } from 'react';
-import { IoSearch } from 'react-icons/io5';
+import { RiSearchLine } from 'react-icons/ri';
 import { listToGroupList } from '@togglecorp/fujs';
 
 import Dialog from '#components/Dialog';
@@ -104,7 +104,7 @@ function AddWorkItemDialog(props: Props) {
                 variant="general"
                 onChange={setSearchText}
                 icons={(
-                    <IoSearch />
+                    <RiSearchLine />
                 )}
             />
             <div

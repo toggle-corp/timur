@@ -4,9 +4,9 @@ import React, {
     useRef,
 } from 'react';
 import {
-    IoCheckmarkDoneSharp,
-    IoCloseSharp,
-} from 'react-icons/io5';
+    RiCheckDoubleLine,
+    RiCloseLine,
+} from 'react-icons/ri';
 import {
     _cs,
     isTruthyString,
@@ -292,7 +292,7 @@ function SelectInputContainer<
                                 name={undefined}
                                 title="Select all options"
                             >
-                                <IoCheckmarkDoneSharp className={styles.icon} />
+                                <RiCheckDoubleLine className={styles.icon} />
                             </Button>
                         )}
                         {!readOnly && !nonClearable && hasValue && (
@@ -304,7 +304,7 @@ function SelectInputContainer<
                                 name={undefined}
                                 title="Clear all options"
                             >
-                                <IoCloseSharp className={styles.icon} />
+                                <RiCloseLine className={styles.icon} />
                             </Button>
                         )}
                     </>

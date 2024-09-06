@@ -3,7 +3,7 @@ import {
     useContext,
     useMemo,
 } from 'react';
-import { MdDragIndicator } from 'react-icons/md';
+import { RiDraggable } from 'react-icons/ri';
 import {
     closestCenter,
     DndContext,
@@ -88,7 +88,7 @@ function Item(props: ItemProps) {
                 {...draggableListeners}
                 className={styles.dragHandle}
             >
-                <MdDragIndicator />
+                <RiDraggable />
             </div>
             <div className={styles.label}>
                 {dailyJournalAttributeDetails[attribute.key].label}
