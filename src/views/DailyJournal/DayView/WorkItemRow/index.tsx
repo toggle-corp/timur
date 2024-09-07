@@ -96,8 +96,6 @@ function WorkItemRow(props: Props) {
         onChange,
     } = props;
 
-    console.log(workItem, contractId);
-
     const { enums } = useContext(EnumsContext);
     const { screen } = useContext(SizeContext);
 

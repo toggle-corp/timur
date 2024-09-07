@@ -25,7 +25,7 @@ import {
     sortByAttributes,
 } from '#utils/common';
 import {
-    DailyJournalAttributeOrder,
+    DailyJournalAttribute,
     EntriesAsList,
     WorkItem,
 } from '#utils/types';
@@ -71,9 +71,9 @@ function DayView(props: Props) {
 
     const [storedConfig] = useLocalStorage('timur-config');
 
-    const getWorkItemAttribute = useCallback((
+    const getWorkItemLabelFromAttr = useCallback((
         item: WorkItem,
-        attr: DailyJournalAttributeOrder,
+        attr: DailyJournalAttribute,
     ) => {
         if (attr.key === 'status') {
             return item.status;
@@ -102,6 +102,7 @@ function DayView(props: Props) {
 
     const formattedDate = dateFormatter.format(new Date(selectedDate));
     const formattedRelativeDate = useFormattedRelativeDate(selectedDate);
+
     const totalHours = useMemo(
         () => {
             if (isDefined(workItems)) {
@@ -115,10 +116,12 @@ function DayView(props: Props) {
 
     const {
         dailyJournalAttributeOrder,
-        dailyJournalGrouping,
+        dailyJournalGrouping: {
+            groupLevel,
+            joinLevel,
+        },
+        indent,
     } = storedConfig;
-
-    const { groupLevel, joinLevel } = dailyJournalGrouping;
 
     const groupedItems = useMemo(() => {
         if (isNotDefined(taskById) || isNotDefined(workItems)) {
@@ -130,8 +133,8 @@ function DayView(props: Props) {
             dailyJournalAttributeOrder,
             (a, b, attr) => (
                 compareString(
-                    getWorkItemAttribute(a, attr),
-                    getWorkItemAttribute(b, attr),
+                    getWorkItemLabelFromAttr(a, attr),
+                    getWorkItemLabelFromAttr(b, attr),
                     attr.sortDirection,
                 )
             ),
@@ -141,16 +144,20 @@ function DayView(props: Props) {
             sortedWorkItems,
             dailyJournalAttributeOrder.slice(0, groupLevel),
             (a, b, attr) => {
-                const aValue = getWorkItemAttribute(a, attr);
-                const bValue = getWorkItemAttribute(b, attr);
+                const aValue = getWorkItemLabelFromAttr(a, attr);
+                const bValue = getWorkItemLabelFromAttr(b, attr);
 
                 return aValue === bValue;
+            },
+            (item, attrs) => {
+                const values = attrs.map((attr) => getWorkItemLabelFromAttr(item, attr)).join(';');
+                return values;
             },
         );
     }, [
         taskById,
         workItems,
-        getWorkItemAttribute,
+        getWorkItemLabelFromAttr,
         dailyJournalAttributeOrder,
         groupLevel,
     ]);
@@ -185,75 +192,87 @@ function DayView(props: Props) {
                 <div className={styles.newGroup}>
                     {groupedItems.map((groupedItem) => {
                         if (groupedItem.type === 'heading') {
-                            const levelDiff = groupLevel - joinLevel;
+                            // Main Heading
+                            // NOTE: Need to add 1 as groupLevel and level starts from 1 and 0 resp.
+                            if (groupedItem.level + 1 < (groupLevel - joinLevel + 1)) {
+                                const headingText = getWorkItemLabelFromAttr(
+                                    groupedItem.value,
+                                    groupedItem.attribute,
+                                );
 
-                            const headingText = getWorkItemAttribute(
-                                groupedItem.value,
-                                groupedItem.attribute,
-                            );
-
-                            if (groupedItem.level < levelDiff) {
                                 const Heading = `h${bound(groupedItem.level + 2, 2, 4)}` as unknown as ElementType;
 
                                 return (
                                     <Heading
-                                        key={groupedItem.key}
+                                        key={`heading-${groupedItem.attribute.key}-of-${groupedItem.groupKey}`}
                                         className={styles.nestedHeading}
                                     >
-                                        <Indent level={groupedItem.level} />
+                                        {indent && <Indent level={groupedItem.level} />}
                                         {headingText}
                                     </Heading>
                                 );
                             }
 
-                            if (groupedItem.level < (groupLevel - 1)) {
-                                return null;
+                            // Sub Headings
+                            // NOTE: We only need to show one subheading after the main headings
+                            // NOTE: Need to add 1 as groupLevel and level starts from 1 and 0 resp.
+                            if (groupedItem.level + 1 === groupLevel) {
+                                return (
+                                    <h4
+                                        className={styles.joinedHeading}
+                                        key={`sub-heading-group-of-${groupedItem.groupKey}`}
+                                    >
+                                        {indent && (
+                                            <Indent
+                                                level={groupedItem.level - joinLevel + 1}
+                                            />
+                                        )}
+                                        {dailyJournalAttributeOrder.map((attribute, i) => {
+                                            if (i >= groupLevel) {
+                                                return null;
+                                            }
+
+                                            const currentLabel = getWorkItemLabelFromAttr(
+                                                groupedItem.value,
+                                                attribute,
+                                            );
+
+                                            if (i < (groupLevel - joinLevel)) {
+                                                return null;
+                                            }
+
+                                            return (
+                                                <Fragment key={`subheading-${attribute.key}-of-${groupedItem.groupKey}`}>
+                                                    {i > (groupLevel - joinLevel) && (
+                                                        <div className={styles.separator} />
+                                                    )}
+                                                    <div>{currentLabel}</div>
+                                                </Fragment>
+                                            );
+                                        })}
+                                    </h4>
+                                );
                             }
 
-                            return (
-                                <h4
-                                    className={styles.joinedHeading}
-                                    key={groupedItem.key}
-                                >
-                                    <Indent level={groupedItem.level - joinLevel + 1} />
-                                    {dailyJournalAttributeOrder.map((attribute, i) => {
-                                        if (i >= groupLevel) {
-                                            return null;
-                                        }
-
-                                        const currentLabel = getWorkItemAttribute(
-                                            groupedItem.value,
-                                            attribute,
-                                        );
-
-                                        if (i < (groupLevel - joinLevel)) {
-                                            return null;
-                                        }
-
-                                        return (
-                                            <Fragment key={attribute.key}>
-                                                {i > (groupLevel - joinLevel) && (
-                                                    <div className={styles.separator} />
-                                                )}
-                                                <div>{currentLabel}</div>
-                                            </Fragment>
-                                        );
-                                    })}
-                                </h4>
-                            );
+                            return null;
                         }
 
                         const taskDetails = taskById?.[groupedItem.value.task];
-
                         if (!taskDetails) {
                             return null;
                         }
 
                         return (
-                            <div className={styles.workItemContainer}>
-                                <Indent level={groupedItem.level - joinLevel} />
+                            <div
+                                className={styles.workItemContainer}
+                                key={groupedItem.value.clientId}
+                            >
+                                {indent && (
+                                    <Indent
+                                        level={groupedItem.level - joinLevel + 1}
+                                    />
+                                )}
                                 <WorkItemRow
-                                    key={groupedItem.value.clientId}
                                     className={styles.workItem}
                                     workItem={groupedItem.value}
                                     onClone={onWorkItemClone}

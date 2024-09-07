@@ -23,7 +23,7 @@ export type WorkItemStatus = TimeEntryStatusEnum;
 export type WorkItem = Omit<TimeEntryBulkCreateInput, 'clientId'> & { clientId: string };
 
 export type DailyJournalAttributeKeys = 'project' | 'contract' | 'task' | 'status';
-export interface DailyJournalAttributeOrder {
+export interface DailyJournalAttribute {
     key: DailyJournalAttributeKeys;
     sortDirection: number;
 }
@@ -36,13 +36,18 @@ export interface DailyJournalGrouping {
 export type ConfigStorage = {
     defaultTaskType: WorkItemType | undefined,
     defaultTaskStatus: WorkItemStatus,
+
     editingMode: EditingMode,
+
     checkboxForStatus: boolean,
+    compactTextArea: boolean,
+    indent: boolean,
+
+    dailyJournalAttributeOrder: DailyJournalAttribute[];
+    dailyJournalGrouping: DailyJournalGrouping;
+
     startSidebarShown: boolean,
     endSidebarShown: boolean,
-    compactTextArea: boolean,
-    dailyJournalAttributeOrder: DailyJournalAttributeOrder[];
-    dailyJournalGrouping: DailyJournalGrouping;
 }
 
 export interface GeneralEvent {

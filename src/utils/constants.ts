@@ -7,6 +7,7 @@ export const defaultConfigValue: ConfigStorage = {
     defaultTaskType: undefined,
     defaultTaskStatus: 'DONE',
     editingMode: 'normal',
+    indent: true,
     compactTextArea: false,
     checkboxForStatus: false,
     startSidebarShown: window.innerWidth >= 900,

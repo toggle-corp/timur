@@ -85,6 +85,12 @@ export function Component() {
                     value={storedConfig.checkboxForStatus}
                     onChange={setConfigFieldValue}
                 />
+                <Checkbox
+                    name="indent"
+                    label="Indent headings"
+                    value={storedConfig.indent}
+                    onChange={setConfigFieldValue}
+                />
                 <WorkItemRow
                     className={styles.workItem}
                     workItem={{

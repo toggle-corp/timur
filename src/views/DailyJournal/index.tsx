@@ -103,6 +103,24 @@ const MY_TIME_ENTRIES_QUERY = gql`
     }
 `;
 
+/*
+query MyQuery {
+  private {
+    allTimeEntries(filters: {statuses: TODO, users: "9"}) {
+      clientId
+      id
+      description
+      date
+      startTime
+      duration
+      status
+      taskId
+      type
+    }
+  }
+}
+*/
+
 const BULK_TIME_ENTRY_MUTATION = gql`
     mutation BulkTimeEntry($timeEntries: [TimeEntryBulkCreateInput!], $deleteIds: [ID!]) {
         private {

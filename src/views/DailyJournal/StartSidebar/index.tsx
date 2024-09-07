@@ -37,8 +37,8 @@ import {
     numericOptions,
 } from '#utils/constants';
 import {
+    DailyJournalAttribute,
     DailyJournalAttributeKeys,
-    DailyJournalAttributeOrder,
     DailyJournalGrouping,
 } from '#utils/types';
 
@@ -53,7 +53,7 @@ const dailyJournalAttributeDetails: Record<DailyJournalAttributeKeys, { label: s
 
 interface ItemProps {
     className?: string;
-    attribute: DailyJournalAttributeOrder;
+    attribute: DailyJournalAttribute;
     setNodeRef?: (node: HTMLElement | null) => void;
     draggableAttributes?: DraggableAttributes;
     draggableListeners?: SyntheticListenerMap | undefined;
@@ -99,7 +99,7 @@ function Item(props: ItemProps) {
 
 interface SortableItemProps {
     className?: string;
-    attribute: DailyJournalAttributeOrder;
+    attribute: DailyJournalAttribute;
 }
 
 function SortableItem(props: SortableItemProps) {
@@ -247,7 +247,10 @@ function StartSidebar(props: Props) {
                             strategy={verticalListSortingStrategy}
                         >
                             {storedConfig.dailyJournalAttributeOrder.map((attribute) => (
-                                <SortableItem attribute={attribute} />
+                                <SortableItem
+                                    key={attribute.key}
+                                    attribute={attribute}
+                                />
                             ))}
                         </SortableContext>
                     </DndContext>

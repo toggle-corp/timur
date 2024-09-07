@@ -223,11 +223,13 @@ export function sortByAttributes<LIST_ITEM, ATTRIBUTE>(
     attributes: ATTRIBUTE[],
     sortFn: (a: LIST_ITEM, b: LIST_ITEM, attr: ATTRIBUTE) => number,
 ): LIST_ITEM[] {
+    if (attributes.length <= 0) {
+        return list;
+    }
+
     const newList = [...list];
     newList.sort(
         (a, b) => {
-            let sortResult = 0;
-
             for (let i = 0; i < attributes.length; i += 1) {
                 const currentSortResult = sortFn(
                     a,
@@ -236,12 +238,10 @@ export function sortByAttributes<LIST_ITEM, ATTRIBUTE>(
                 );
 
                 if (currentSortResult !== 0) {
-                    sortResult = currentSortResult;
-                    break;
+                    return currentSortResult;
                 }
             }
-
-            return sortResult;
+            return 0;
         },
     );
 
@@ -249,7 +249,7 @@ export function sortByAttributes<LIST_ITEM, ATTRIBUTE>(
 }
 
 type GroupedItem<LIST_ITEM, ATTRIBUTE> = {
-    key: string;
+    groupKey: string;
     type: 'heading';
     value: LIST_ITEM;
     attribute: ATTRIBUTE;
@@ -265,6 +265,7 @@ export function groupListByAttributes<LIST_ITEM, ATTRIBUTE>(
     list: LIST_ITEM[],
     attributes: ATTRIBUTE[],
     compareItemAttributes: (a: LIST_ITEM, b: LIST_ITEM, attribute: ATTRIBUTE) => boolean,
+    getGroupKey: (item: LIST_ITEM, attributes: ATTRIBUTE[]) => string,
 ): GroupedItem<LIST_ITEM, ATTRIBUTE>[] {
     if (isNotDefined(list) || list.length === 0) {
         return [];
@@ -272,12 +273,13 @@ export function groupListByAttributes<LIST_ITEM, ATTRIBUTE>(
 
     const groupedItems = list.flatMap((listItem, listIndex) => {
         if (listIndex === 0) {
+            const groupKey = getGroupKey(listItem, attributes);
             const headings = attributes.map((attribute, i) => ({
                 type: 'heading' as const,
                 value: listItem,
                 attribute,
                 level: i,
-                key: `heading-${listIndex}-${i}`,
+                groupKey,
             }));
 
             return [
@@ -311,6 +313,7 @@ export function groupListByAttributes<LIST_ITEM, ATTRIBUTE>(
             ];
         }
 
+        const groupKey = getGroupKey(listItem, attributes);
         const headings = attributes.map((attribute, i) => {
             if (i < attributeMismatchIndex) {
                 return undefined;
@@ -321,7 +324,7 @@ export function groupListByAttributes<LIST_ITEM, ATTRIBUTE>(
                 value: listItem,
                 attribute,
                 level: i,
-                key: `heading-${listIndex}-${i}`,
+                groupKey,
             };
         }).filter(isDefined);
 

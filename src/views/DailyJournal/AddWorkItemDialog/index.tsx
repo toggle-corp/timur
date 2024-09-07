@@ -94,7 +94,7 @@ function AddWorkItemDialog(props: Props) {
             focusElementRef={titleInputRef}
         >
             <div>
-                Please select a task to add the workitems
+                Please select a task to add new entry
             </div>
             <TextInput
                 inputElementRef={titleInputRef}
