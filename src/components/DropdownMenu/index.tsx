@@ -6,9 +6,9 @@ import {
     useState,
 } from 'react';
 import {
-    IoCaretDown,
-    IoCaretUp,
-} from 'react-icons/io5';
+    RiArrowDropDownLine,
+    RiArrowDropUpLine,
+} from 'react-icons/ri';
 import { _cs } from '@togglecorp/fujs';
 
 import Button, { Props as ButtonProps } from '#components/Button';
@@ -126,8 +126,8 @@ function DropdownMenu(props: Props) {
                     <>
                         {actions}
                         {!withoutDropdownIcon && (showDropdown
-                            ? <IoCaretUp className={styles.dropdownIcon} />
-                            : <IoCaretDown className={styles.dropdownIcon} />
+                            ? <RiArrowDropUpLine className={styles.dropdownIcon} />
+                            : <RiArrowDropDownLine className={styles.dropdownIcon} />
                         )}
                     </>
                 ) : undefined}

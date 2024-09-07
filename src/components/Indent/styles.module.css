@@ -1,0 +1,12 @@
+.indent {
+    display: flex;
+    height: 100%;
+    gap: var(--spacing-sm);
+    min-height: 1.5rem;
+
+    .item {
+        border-right: var(--width-separator-sm) solid var(--color-separator-dark);
+        width: var(--spacing-2xs);
+        height: 100%;
+    }
+}

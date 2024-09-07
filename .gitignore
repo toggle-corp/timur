@@ -10,5 +10,5 @@ pnpm-debug.log*
 # Custom
 build/
 generated/
+coverage/
 stats.html
-

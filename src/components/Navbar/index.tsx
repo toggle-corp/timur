@@ -3,10 +3,10 @@ import {
     useContext,
 } from 'react';
 import {
-    IoExitOutline,
-    IoSettingsOutline,
-    IoShieldCheckmarkOutline,
-} from 'react-icons/io5';
+    RiAdminLine,
+    RiLogoutBoxLine,
+    RiSettings4Line,
+} from 'react-icons/ri';
 import {
     _cs,
     isDefined,
@@ -128,7 +128,7 @@ function Navbar(props: Props) {
                                 type="link"
                                 external
                                 href={import.meta.env.APP_ADMIN_URL}
-                                icons={<IoShieldCheckmarkOutline />}
+                                icons={<RiAdminLine />}
                             >
                                 Admin Panel
                             </DropdownMenuItem>
@@ -136,7 +136,7 @@ function Navbar(props: Props) {
                         <DropdownMenuItem
                             type="link"
                             to="settings"
-                            icons={<IoSettingsOutline />}
+                            icons={<RiSettings4Line />}
                         >
                             Settings
                         </DropdownMenuItem>
@@ -145,7 +145,7 @@ function Navbar(props: Props) {
                             name={undefined}
                             onClick={handleLogoutClick}
                             disabled={fetching}
-                            icons={<IoExitOutline />}
+                            icons={<RiLogoutBoxLine />}
                             title="Log out"
                         >
                             Log out

@@ -28,21 +28,6 @@
         }
     }
 
-    .warning {
-        display: flex;
-        flex-wrap: wrap;
-        gap: var(--spacing-sm);
-
-        .warning-badge {
-            display: flex;
-            flex-shrink: 0;
-            border: 1px solid var(--color-separator);
-            border-radius: var(--border-radius-lg);
-            padding: var(--spacing-xs) var(--spacing-sm);
-            gap: var(--spacing-xs);
-        }
-    }
-
     .bottom-actions {
         display: flex;
         gap: var(--spacing-sm);
@@ -59,6 +44,15 @@
     display: flex;
     width: 100%;
     gap: var(--spacing-xs);
+
+    .warning-badge {
+        display: flex;
+        flex-shrink: 0;
+        border: 1px solid var(--color-separator);
+        border-radius: var(--border-radius-lg);
+        padding: var(--spacing-2xs) var(--spacing-sm);
+        gap: var(--spacing-xs);
+    }
 
     .spacer {
         flex-grow: 1;

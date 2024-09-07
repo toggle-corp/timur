@@ -1,5 +1,4 @@
 import {
-    Fragment,
     useCallback,
     useContext,
     useEffect,
@@ -8,23 +7,14 @@ import {
     useState,
 } from 'react';
 import {
-    FcLandscape,
-    FcLeave,
-    FcNews,
-    FcNightLandscape,
-    FcSportsMode,
-} from 'react-icons/fc';
-import {
-    IoChevronBack,
-    IoChevronForward,
-    IoExpandOutline,
-} from 'react-icons/io5';
+    RiArrowLeftSLine,
+    RiArrowRightSLine,
+    RiFullscreenLine,
+} from 'react-icons/ri';
 import { useParams } from 'react-router-dom';
 import {
     _cs,
-    compareDate,
     encodeDate,
-    getDifferenceInDays,
     isDefined,
     isNotDefined,
 } from '@togglecorp/fujs';
@@ -36,94 +26,65 @@ import {
 import Button from '#components/Button';
 import Page from '#components/Page';
 import Portal from '#components/Portal';
+import DateContext from '#contexts/date';
 import NavbarContext from '#contexts/navbar';
 import {
-    AllProjectsAndEventsQuery,
-    AllProjectsAndEventsQueryVariables,
+    AllProjectsQuery,
+    AllProjectsQueryVariables,
 } from '#generated/types/graphql';
 import useKeybind from '#hooks/useKeybind';
 import useUrlQueryState from '#hooks/useUrlQueryState';
-import { type GeneralEvent } from '#utils/types';
 
+import DeadlineSection from './DeadlineSection';
 import EndSection from './EndSection';
-import GeneralEventOutput from './GeneralEvent';
-import ProjectStandup from './ProjectStandup';
-import Slide from './Slide';
+import ProjectSection from './ProjectSection';
+import StartSection from './StartSection';
 
 import styles from './styles.module.css';
 
-const dateFormatter = new Intl.DateTimeFormat(
-    [],
-    {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        weekday: 'long',
-    },
-);
-
-const ALL_PROJECTS_AND_EVENTS_QUERY = gql`
-    query AllProjectsAndEvents {
+const ALL_PROJECTS = gql`
+    query AllProjects {
         private {
             id
             allProjects {
                 id
                 name
-                deadlines {
-                    id
-                    name
-                    remainingDays
-                    endDate
-                    totalDays
-                    usedDays
-                    projectId
-                }
-                description
                 logoHd {
                     url
                 }
-            }
-            relativeEvents {
-                id
-                name
-                startDate
-                typeDisplay
-                dates
-                endDate
-                type
             }
         }
     }
 `;
 
+/** @knipignore */
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
     const { date: dateFromParams } = useParams<{ date: string | undefined}>();
+    const { fullDate } = useContext(DateContext);
 
     const { midActionsRef } = useContext(NavbarContext);
     const contentRef = useRef<HTMLDivElement>(null);
 
     const selectedDate = useMemo(() => {
-        const today = new Date();
-
         if (isNotDefined(dateFromParams)) {
-            return encodeDate(today);
+            return fullDate;
         }
 
         const date = new Date(dateFromParams);
 
         if (Number.isNaN(date.getTime())) {
-            return encodeDate(today);
+            return fullDate;
         }
 
         return encodeDate(date);
-    }, [dateFromParams]);
+    }, [dateFromParams, fullDate]);
 
     const [allProjectsResponse] = useQuery<
-        AllProjectsAndEventsQuery,
-        AllProjectsAndEventsQueryVariables
+        AllProjectsQuery,
+        AllProjectsQueryVariables
     >({
-        query: ALL_PROJECTS_AND_EVENTS_QUERY,
+        query: ALL_PROJECTS,
     });
 
     type UrlQueryKey = 'project' | 'page';
@@ -136,17 +97,20 @@ export function Component() {
         (value) => value,
     );
 
-    const formattedDate = dateFormatter.format(new Date(selectedDate));
-
     const projectsMap = useMemo(() => {
         const allProjectsData = allProjectsResponse?.data?.private.allProjects;
 
         if (isNotDefined(allProjectsData)) {
             return undefined;
         }
+
         const initialMap: Record<string, Record<'next' | 'prev', string | undefined>> = {
             start: {
                 prev: undefined,
+                next: 'deadlines',
+            },
+            deadlines: {
+                prev: 'start',
                 next: allProjectsData[0].id,
             },
             end: {
@@ -159,7 +123,7 @@ export function Component() {
             (acc, val, index) => {
                 const currentMap = {
                     next: index === (allProjectsData.length - 1) ? 'end' : allProjectsData[index + 1].id,
-                    prev: index === 0 ? 'start' : allProjectsData[index - 1].id,
+                    prev: index === 0 ? 'deadlines' : allProjectsData[index - 1].id,
                 };
 
                 acc[val.id] = currentMap;
@@ -179,6 +143,14 @@ export function Component() {
             return;
         }
 
+        if (pageId === 'deadlines') {
+            setUrlQuery({
+                project: undefined,
+                page: 'deadlines',
+            });
+            return;
+        }
+
         if (pageId === 'end') {
             setUrlQuery({
                 project: undefined,
@@ -193,18 +165,12 @@ export function Component() {
         });
     }, [setUrlQuery]);
 
-    const mapId = urlQuery.page ?? urlQuery.project;
-    const prevButtonName = isDefined(mapId)
-        ? projectsMap?.[mapId]?.prev
-        : undefined;
-    const prevButtonDisabled = isNotDefined(mapId) || isNotDefined(projectsMap?.[mapId]?.prev);
+    const mapId = urlQuery.page ?? urlQuery.project ?? 'start';
+    const prevButtonName = projectsMap?.[mapId].prev;
+    const prevButtonDisabled = isNotDefined(prevButtonName);
 
-    const nextButtonName = isDefined(mapId)
-        ? projectsMap?.[mapId].next
-        : projectsMap?.start.next;
-    const nextButtonDisabled = isNotDefined(mapId)
-        ? false
-        : isNotDefined(projectsMap?.[mapId].next);
+    const nextButtonName = projectsMap?.[mapId].next;
+    const nextButtonDisabled = isNotDefined(nextButtonName);
 
     const handleNextButtion = useCallback(
         () => {
@@ -263,48 +229,6 @@ export function Component() {
         contentRef.current?.requestFullscreen();
     }, []);
 
-    const events = useMemo<GeneralEvent[]>(() => {
-        const allDeadlines = allProjectsResponse.data?.private.allProjects.flatMap(
-            (project) => project.deadlines.map((deadline) => ({
-                ...deadline,
-                name: `${project.name}: ${deadline.name}`,
-            })),
-        );
-
-        const otherEvents = allProjectsResponse.data?.private.relativeEvents;
-
-        const iconsMap: Record<GeneralEvent['type'], React.ReactNode> = {
-            DEADLINE: <FcLeave />,
-            HOLIDAY: <FcLandscape />,
-            RETREAT: <FcNightLandscape />,
-            MISC: <FcNews />,
-        };
-
-        return [
-            ...(allDeadlines?.map((deadline) => ({
-                key: `DEADLINE-${deadline.id}`,
-                type: 'DEADLINE' as const,
-                typeDisplay: 'Deadline',
-                icon: iconsMap.DEADLINE,
-                name: deadline.name,
-                date: deadline.endDate,
-                remainingDays: deadline.remainingDays,
-            })) ?? []),
-            ...(otherEvents?.map((otherEvent) => ({
-                key: `${otherEvent.type}-${otherEvent.id}`,
-                type: otherEvent.type,
-                icon: iconsMap[otherEvent.type],
-                typeDisplay: otherEvent.typeDisplay,
-                name: otherEvent.name,
-                date: otherEvent.startDate,
-                remainingDays: getDifferenceInDays(
-                    otherEvent.startDate,
-                    encodeDate(new Date()),
-                ),
-            })) ?? []),
-        ].sort((a, b) => compareDate(a.date, b.date));
-    }, [allProjectsResponse]);
-
     return (
         <Page
             className={styles.dailyStandup}
@@ -320,7 +244,7 @@ export function Component() {
                         disabled={prevButtonDisabled}
                         title="Previous standup slide"
                     >
-                        <IoChevronBack />
+                        <RiArrowLeftSLine />
                     </Button>
                     <Button
                         name={nextButtonName}
@@ -329,15 +253,16 @@ export function Component() {
                         disabled={nextButtonDisabled}
                         title="Next standup slide"
                     >
-                        <IoChevronForward />
+                        <RiArrowRightSLine />
                     </Button>
                     <Button
                         name={undefined}
                         onClick={handlePresentClick}
                         variant="quaternary"
                         title="Enter full screen"
+                        icons={<RiFullscreenLine />}
                     >
-                        <IoExpandOutline />
+                        Present
                     </Button>
                 </div>
             </Portal>
@@ -345,40 +270,23 @@ export function Component() {
                 ref={contentRef}
                 className={_cs(styles.content, isFullScreen && styles.presentationMode)}
             >
-                {isNotDefined(mapId) && (
-                    <Slide
-                        variant="split"
-                        primaryPreText="Welcome to"
-                        primaryHeading="Daily Standup"
-                        primaryDescription={formattedDate}
-                        secondaryHeading="Upcoming Events"
-                        secondaryContent={events.map(
-                            (generalEvent, i) => (
-                                <Fragment key={generalEvent.key}>
-                                    <GeneralEventOutput
-                                        generalEvent={generalEvent}
-                                    />
-                                    {generalEvent.remainingDays < 0
-                                        && events[i + 1]?.remainingDays >= 0
-                                        && (
-                                            <div className={styles.separator}>
-                                                <div className={styles.line} />
-                                                <FcSportsMode className={styles.icon} />
-                                                <div className={styles.line} />
-                                            </div>
-                                        )}
-                                </Fragment>
-                            ),
-                        )}
-                    />
-                )}
-                {isNotDefined(urlQuery.page) && isDefined(urlQuery.project) && (
-                    <ProjectStandup
+                {mapId === 'start' && (
+                    <StartSection
                         date={selectedDate}
-                        projectId={urlQuery.project}
                     />
                 )}
-                {urlQuery.page === 'end' && (
+                {mapId === 'deadlines' && (
+                    <DeadlineSection
+                        date={selectedDate}
+                    />
+                )}
+                {mapId !== 'start' && mapId !== 'end' && mapId !== 'deadlines' && (
+                    <ProjectSection
+                        date={selectedDate}
+                        projectId={mapId}
+                    />
+                )}
+                {mapId === 'end' && (
                     <EndSection
                         date={selectedDate}
                     />

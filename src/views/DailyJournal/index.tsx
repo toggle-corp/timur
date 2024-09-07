@@ -9,14 +9,14 @@ import {
 } from 'react';
 import { FcHighPriority } from 'react-icons/fc';
 import {
-    IoAdd,
-    IoCalendarOutline,
-    IoChevronBackSharp,
-    IoChevronForwardSharp,
-    IoNewspaperOutline,
-    IoStorefrontOutline,
-    IoTerminalOutline,
-} from 'react-icons/io5';
+    RiAddLine,
+    RiArrowLeftSLine,
+    RiArrowRightSLine,
+    RiCalendar2Line,
+    RiHomeOfficeLine,
+    RiStickyNoteAddLine,
+    RiTerminalBoxLine,
+} from 'react-icons/ri';
 import {
     useNavigate,
     useParams,
@@ -27,6 +27,7 @@ import {
     encodeDate,
     isDefined,
     isNotDefined,
+    isTruthyString,
 } from '@togglecorp/fujs';
 import {
     gql,
@@ -40,6 +41,7 @@ import CalendarInput from '#components/CalendarInput';
 import Link, { resolvePath } from '#components/Link';
 import Page from '#components/Page';
 import Portal from '#components/Portal';
+import DateContext from '#contexts/date';
 import FocusContext from '#contexts/focus';
 import NavbarContext from '#contexts/navbar';
 import RouteContext from '#contexts/route';
@@ -58,13 +60,9 @@ import {
     addDays,
     getNewId,
 } from '#utils/common';
-import {
-    defaultConfigValue,
-    KEY_CONFIG_STORAGE,
-} from '#utils/constants';
+import { defaultConfigValue } from '#utils/constants';
 import { removeNull } from '#utils/nullHelper';
 import {
-    ConfigStorage,
     EntriesAsList,
     WorkItem,
 } from '#utils/types';
@@ -105,6 +103,24 @@ const MY_TIME_ENTRIES_QUERY = gql`
     }
 `;
 
+/*
+query MyQuery {
+  private {
+    allTimeEntries(filters: {statuses: TODO, users: "9"}) {
+      clientId
+      id
+      description
+      date
+      startTime
+      duration
+      status
+      taskId
+      type
+    }
+  }
+}
+*/
+
 const BULK_TIME_ENTRY_MUTATION = gql`
     mutation BulkTimeEntry($timeEntries: [TimeEntryBulkCreateInput!], $deleteIds: [ID!]) {
         private {
@@ -135,6 +151,7 @@ const BULK_TIME_ENTRY_MUTATION = gql`
 
 // TODO: Do not use JSON.stringify for comparison
 // TODO: use filtered localState instead of workItems
+/** @knipignore */
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
     const [workItems, setWorkItems] = useState<WorkItem[]>([]);
@@ -148,6 +165,7 @@ export function Component() {
     } = useFocusManager();
 
     const { date: dateFromParams } = useParams<{ date: string | undefined}>();
+    const { fullDate } = useContext(DateContext);
 
     // NOTE: We are opening the dialog from this parent component
     const dialogOpenTriggerRef = useRef<(() => void) | undefined>();
@@ -159,20 +177,18 @@ export function Component() {
             >(null);
 
     const selectedDate = useMemo(() => {
-        const today = new Date();
-
         if (isNotDefined(dateFromParams)) {
-            return encodeDate(today);
+            return fullDate;
         }
 
         const date = new Date(dateFromParams);
 
         if (Number.isNaN(date.getTime())) {
-            return encodeDate(today);
+            return fullDate;
         }
 
         return encodeDate(date);
-    }, [dateFromParams]);
+    }, [dateFromParams, fullDate]);
 
     useEffect(
         () => {
@@ -188,8 +204,7 @@ export function Component() {
     );
 
     const setSelectedDate = useCallback((newDateStr: string | undefined) => {
-        const today = encodeDate(new Date());
-        const newDate = newDateStr === today ? undefined : newDateStr;
+        const newDate = newDateStr === fullDate ? undefined : newDateStr;
 
         const { resolvedPath } = resolvePath('dailyJournal', routes, { date: newDate });
         if (isNotDefined(resolvedPath)) {
@@ -197,34 +212,29 @@ export function Component() {
         }
 
         navigate(resolvedPath);
-    }, [routes, navigate]);
+    }, [routes, navigate, fullDate]);
 
     const getNextDay = useCallback(() => {
         const nextDay = addDays(selectedDate, 1);
 
-        const today = encodeDate(new Date());
-        if (today === nextDay) {
+        if (fullDate === nextDay) {
             return undefined;
         }
 
         return nextDay;
-    }, [selectedDate]);
+    }, [selectedDate, fullDate]);
 
     const getPrevDay = useCallback(() => {
         const prevDay = addDays(selectedDate, -1);
 
-        const today = encodeDate(new Date());
-        if (today === prevDay) {
+        if (fullDate === prevDay) {
             return undefined;
         }
 
         return prevDay;
-    }, [selectedDate]);
+    }, [selectedDate, fullDate]);
 
-    const [storedConfig] = useLocalStorage<ConfigStorage>(
-        KEY_CONFIG_STORAGE,
-        defaultConfigValue,
-    );
+    const [storedConfig] = useLocalStorage('timur-config');
 
     const editMode = storedConfig.editingMode ?? defaultConfigValue.editingMode;
 
@@ -536,7 +546,7 @@ export function Component() {
             } else if (event.ctrlKey && event.shiftKey && event.key === 'ArrowDown') {
                 event.preventDefault();
                 event.stopPropagation();
-                setSelectedDate(encodeDate(new Date()));
+                setSelectedDate(fullDate);
             } else if (event.ctrlKey && event.shiftKey && event.key === '?') {
                 event.preventDefault();
                 event.stopPropagation();
@@ -544,6 +554,7 @@ export function Component() {
             }
         },
         [
+            fullDate,
             selectedDate,
             setSelectedDate,
             handleAddEntryClick,
@@ -570,7 +581,7 @@ export function Component() {
     );
 
     const { midActionsRef } = useContext(NavbarContext);
-    const { width: windowWidth } = useContext(SizeContext);
+    const { screen } = useContext(SizeContext);
 
     const handleSwipeLeft = useCallback(
         () => {
@@ -609,7 +620,6 @@ export function Component() {
                 <StartSidebar
                     calendarComponentRef={calendarRef}
                     selectedDate={selectedDate}
-                    workItems={filteredWorkItems}
                     setSelectedDate={setSelectedDate}
                 />
             )}
@@ -639,7 +649,7 @@ export function Component() {
             </div>
             <Portal container={midActionsRef}>
                 <div className={styles.dateNavigation}>
-                    {windowWidth >= 900 && (
+                    {screen === 'desktop' && (
                         <>
                             <Link
                                 to="dailyJournal"
@@ -647,7 +657,7 @@ export function Component() {
                                 variant="quaternary"
                                 title="Previous day"
                             >
-                                <IoChevronBackSharp />
+                                <RiArrowLeftSLine />
                             </Link>
                             <Link
                                 to="dailyJournal"
@@ -655,7 +665,7 @@ export function Component() {
                                 variant="quaternary"
                                 title="Next day"
                             >
-                                <IoChevronForwardSharp />
+                                <RiArrowRightSLine />
                             </Link>
                         </>
                     )}
@@ -666,8 +676,24 @@ export function Component() {
                         value={selectedDate}
                         onChange={setSelectedDate}
                     >
-                        <IoCalendarOutline />
+                        <RiCalendar2Line />
                     </CalendarInput>
+                    {entriesWithoutTask > 0 && (
+                        <div className={styles.warningBadge}>
+                            <FcHighPriority />
+                            <span>
+                                {`${entriesWithoutTask} uncategorized`}
+                            </span>
+                        </div>
+                    )}
+                    {entriesWithoutHours > 0 && (
+                        <div className={styles.warningBadge}>
+                            <FcHighPriority />
+                            <span>
+                                {`${entriesWithoutHours} untracked`}
+                            </span>
+                        </div>
+                    )}
                     <div className={styles.spacer} />
                     <Button
                         name={undefined}
@@ -678,27 +704,27 @@ export function Component() {
                         <AvailabilityIndicator
                             wfhType={wfhType}
                             leaveType={leaveType}
-                            fallback={<IoStorefrontOutline />}
+                            fallback={<RiHomeOfficeLine />}
                         />
                     </Button>
-                    {windowWidth >= 900 && (
+                    {screen === 'desktop' && (
                         <Button
                             name={undefined}
                             onClick={handleNoteUpdateClick}
                             title="Update Note"
                             variant="quaternary"
                         >
-                            <IoNewspaperOutline />
+                            <RiStickyNoteAddLine />
                         </Button>
                     )}
-                    {windowWidth >= 900 && (
+                    {screen === 'desktop' && (
                         <Button
                             title="Show shortcuts"
                             name={undefined}
                             variant="quaternary"
                             onClick={handleShortcutsButtonClick}
                         >
-                            <IoTerminalOutline />
+                            <RiTerminalBoxLine />
                         </Button>
                     )}
                 </div>
@@ -716,35 +742,23 @@ export function Component() {
                     selectedDate={selectedDate}
                 />
             </FocusContext.Provider>
-            {entriesWithoutTask + entriesWithoutHours > 0 && (
-                <div className={styles.warning}>
-                    {entriesWithoutTask > 0 && (
-                        <div className={styles.warningBadge}>
-                            <FcHighPriority />
-                            <span>
-                                {`${entriesWithoutTask} uncategorized entries`}
-                            </span>
-                        </div>
-                    )}
-                    {entriesWithoutHours > 0 && (
-                        <div className={styles.warningBadge}>
-                            <FcHighPriority />
-                            <span>
-                                {`${entriesWithoutHours} untracked entries`}
-                            </span>
-                        </div>
-                    )}
-                </div>
-            )}
             <div className={styles.bottomActions}>
                 <Button
                     name={undefined}
                     onClick={handleAddEntryClick}
-                    icons={<IoAdd />}
+                    icons={<RiAddLine />}
                     title="Add entry"
                 >
                     Add entry
                 </Button>
+                {!isTruthyString(dateFromParams) && (
+                    <Link
+                        to="dailyJournal"
+                        variant="quaternary"
+                    >
+                        Go to today
+                    </Link>
+                )}
             </div>
             <ShortcutsDialog
                 dialogOpenTriggerRef={shortcutsDialogOpenTriggerRef}

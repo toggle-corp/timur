@@ -11,6 +11,8 @@
         .header {
             display: flex;
             padding: var(--spacing-md);
+            padding-bottom: 0;
+            gap: var(--spacing-md);
 
             .heading {
                 flex-grow: 1;

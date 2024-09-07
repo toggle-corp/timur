@@ -1,15 +1,4 @@
-import { FlatCompat } from '@eslint/eslintrc';
-import js from '@eslint/js';
-import process from 'process';
-
-const dirname = process.cwd();
-
-const compat = new FlatCompat({
-    baseDirectory: dirname,
-    resolvePluginsRelativeTo: dirname,
-});
-
-const appConfigs = compat.config({
+const config = {
     env: {
         node: true,
         browser: true,
@@ -118,17 +107,6 @@ const appConfigs = compat.config({
             }
         }
     ]
-}).map((conf) => ({
-    ...conf,
-    files: ['src/**/*.tsx', 'src/**/*.jsx', 'src/**/*.ts', 'src/**/*.js', 'generated/**/*.ts'],
-}));
-
-const otherConfig = {
-    files: ['*.js', '*.ts', '*.cjs'],
-    ...js.configs.recommended,
 };
 
-export default [
-    ...appConfigs,
-    otherConfig,
-];
+module.exports = config;

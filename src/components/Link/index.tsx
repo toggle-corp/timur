@@ -3,9 +3,9 @@ import {
     useMemo,
 } from 'react';
 import {
-    IoChevronForward,
-    IoExit,
-} from 'react-icons/io5';
+    RiArrowRightWideLine,
+    RiExternalLinkLine,
+} from 'react-icons/ri';
 import {
     generatePath,
     Link as InternalLink,
@@ -30,7 +30,7 @@ import { type WrappedRoutes } from '../../App/routes';
 
 import styles from './styles.module.css';
 
-export interface UrlParams {
+interface UrlParams {
     [key: string]: string | number | null | undefined;
 }
 
@@ -56,7 +56,7 @@ export function resolvePath(
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
-export function useLink(props: {
+function useLink(props: {
     external: true,
     href: string | undefined | null,
     to?: never,
@@ -199,10 +199,10 @@ function Link(props: Props) {
             <>
                 {actions}
                 {withLinkIcon && external && (
-                    <IoExit />
+                    <RiExternalLinkLine />
                 )}
                 {withLinkIcon && !external && (
-                    <IoChevronForward className={styles.forwardIcon} />
+                    <RiArrowRightWideLine className={styles.forwardIcon} />
                 )}
             </>
         ) : null,

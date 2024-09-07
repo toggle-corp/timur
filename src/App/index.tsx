@@ -10,12 +10,16 @@ import {
     RouterProvider,
 } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
-import { listToMap } from '@togglecorp/fujs';
+import {
+    encodeDate,
+    listToMap,
+} from '@togglecorp/fujs';
 import {
     gql,
     useQuery,
 } from 'urql';
 
+import DateContext from '#contexts/date';
 import EnumsContext, { EnumsContextProps } from '#contexts/enums';
 import LocalStorageContext, { LocalStorageContextProps } from '#contexts/localStorage';
 import NavbarContext, { NavbarContextProps } from '#contexts/navbar';
@@ -33,7 +37,7 @@ import {
 } from '#generated/types/graphql';
 import useThrottledValue from '#hooks/useThrottledValue';
 import { getWindowSize } from '#utils/common';
-import { setToStorage } from '#utils/localStorage';
+import { defaultConfigValue } from '#utils/constants';
 
 import wrappedRoutes, { unwrappedRoutes } from './routes';
 
@@ -108,19 +112,62 @@ const sentryCreateBrowserRouter = Sentry.wrapCreateBrowserRouter(
 const router = sentryCreateBrowserRouter(unwrappedRoutes);
 
 function App() {
-    const [userAuth, setUserAuth] = useState<UserAuth>();
+    // Date
+
+    const [date, setDate] = useState(() => {
+        const today = new Date();
+        return {
+            fullDate: encodeDate(today),
+            year: today.getFullYear(),
+            month: today.getMonth(),
+            day: today.getDate(),
+        };
+    });
+
+    useEffect(
+        () => {
+            const timeout = window.setInterval(
+                () => {
+                    setDate((oldValue) => {
+                        const today = new Date();
+                        const newDateString = encodeDate(today);
+                        if (oldValue.fullDate === newDateString) {
+                            return oldValue;
+                        }
+                        return {
+                            fullDate: newDateString,
+                            year: today.getFullYear(),
+                            month: today.getMonth(),
+                            day: today.getDate(),
+                        };
+                    });
+                },
+                2000,
+            );
+            return () => {
+                window.clearInterval(timeout);
+            };
+        },
+        [],
+    );
+
+    // Local Storage
+
+    const [storageState, setStorageState] = useState<LocalStorageContextProps['storageState']>({
+        'timur-config': {
+            defaultValue: defaultConfigValue,
+        },
+    });
+
+    const storageContextValue = useMemo<LocalStorageContextProps>(() => ({
+        storageState,
+        setStorageState,
+    }), [storageState]);
+
+    // Device Size
+
     const [size, setSize] = useState<SizeContextProps>(getWindowSize);
-    const [ready, setReady] = useState(false);
-    const [storageState, setStorageState] = useState<LocalStorageContextProps['storageState']>({});
-
-    useEffect(() => {
-        Object.keys(storageState).forEach((key) => {
-            setToStorage(key, storageState[key].value);
-        });
-    }, [storageState]);
-
-    const debouncedSize = useThrottledValue(size);
-
+    const throttledSize = useThrottledValue(size);
     useEffect(() => {
         function handleResize() {
             setSize(getWindowSize());
@@ -133,6 +180,11 @@ function App() {
         };
     }, []);
 
+    // Authentication
+
+    const [userAuth, setUserAuth] = useState<UserAuth>();
+    const [ready, setReady] = useState(false);
+
     const [meResult] = useQuery<MeQuery, MeQueryVariables>(
         { query: ME_QUERY },
     );
@@ -144,10 +196,6 @@ function App() {
         setUserAuth(meResult.data?.public.me ?? undefined);
         setReady(true);
     }, [meResult.data, meResult.fetching]);
-
-    const [enumsResult] = useQuery<EnumsQuery, EnumsQueryVariables>(
-        { query: ENUMS_QUERY },
-    );
 
     const removeUserAuth = useCallback(
         () => {
@@ -163,6 +211,12 @@ function App() {
             removeUserAuth,
         }),
         [userAuth, removeUserAuth],
+    );
+
+    // Enums
+
+    const [enumsResult] = useQuery<EnumsQuery, EnumsQueryVariables>(
+        { query: ENUMS_QUERY },
     );
 
     const enumsContextValue = useMemo<EnumsContextProps>(
@@ -184,10 +238,7 @@ function App() {
         [enumsResult],
     );
 
-    const storageContextValue = useMemo<LocalStorageContextProps>(() => ({
-        storageState,
-        setStorageState,
-    }), [storageState]);
+    // Page layouts
 
     const navbarStartActionRef = useRef<HTMLDivElement>(null);
     const navbarMidActionRef = useRef<HTMLDivElement>(null);
@@ -199,6 +250,8 @@ function App() {
         endActionsRef: navbarEndActionRef,
     }), []);
 
+    // Route
+
     const fallbackElement = (
         <div className={styles.fallbackElement}>
             <img
@@ -209,26 +262,30 @@ function App() {
         </div>
     );
 
+    // NOTE: We should block page for authentication before we mount routes
+    // TODO: Handle error with authentication
     if (!ready) {
         return fallbackElement;
     }
 
     return (
         <NavbarContext.Provider value={navbarContextValue}>
-            <SizeContext.Provider value={debouncedSize}>
-                <LocalStorageContext.Provider value={storageContextValue}>
-                    <RouteContext.Provider value={wrappedRoutes}>
-                        <UserContext.Provider value={userContextValue}>
-                            <EnumsContext.Provider value={enumsContextValue}>
-                                <RouterProvider
-                                    router={router}
-                                    fallbackElement={fallbackElement}
-                                />
-                            </EnumsContext.Provider>
-                        </UserContext.Provider>
-                    </RouteContext.Provider>
-                </LocalStorageContext.Provider>
-            </SizeContext.Provider>
+            <DateContext.Provider value={date}>
+                <SizeContext.Provider value={throttledSize}>
+                    <LocalStorageContext.Provider value={storageContextValue}>
+                        <RouteContext.Provider value={wrappedRoutes}>
+                            <UserContext.Provider value={userContextValue}>
+                                <EnumsContext.Provider value={enumsContextValue}>
+                                    <RouterProvider
+                                        router={router}
+                                        fallbackElement={fallbackElement}
+                                    />
+                                </EnumsContext.Provider>
+                            </UserContext.Provider>
+                        </RouteContext.Provider>
+                    </LocalStorageContext.Provider>
+                </SizeContext.Provider>
+            </DateContext.Provider>
         </NavbarContext.Provider>
     );
 }

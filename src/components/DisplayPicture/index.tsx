@@ -21,6 +21,7 @@ function DisplayPicture(props: Props) {
         className,
     } = props;
 
+    // FIXME: Use pastel colors?
     const color = useMemo(() => stringToColor(displayName), [displayName]);
 
     return (

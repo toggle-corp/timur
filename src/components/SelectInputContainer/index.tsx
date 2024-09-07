@@ -4,9 +4,9 @@ import React, {
     useRef,
 } from 'react';
 import {
-    IoCheckmarkDoneSharp,
-    IoCloseSharp,
-} from 'react-icons/io5';
+    RiCheckDoubleLine,
+    RiCloseLine,
+} from 'react-icons/ri';
 import {
     _cs,
     isTruthyString,
@@ -160,16 +160,6 @@ function SelectInputContainer<
         ],
     );
 
-    /*
-    const handleToggleDropdown: NonNullable<ButtonProps<undefined>['onClick']> = useCallback(
-        (_, e) => {
-            e.stopPropagation();
-            onDropdownShownChange(!dropdownShown);
-        },
-        [dropdownShown, onDropdownShownChange],
-    );
-    */
-
     const handleShowDropdown = useCallback(
         () => {
             // FIXME: this is not atomic. Call only once
@@ -302,7 +292,7 @@ function SelectInputContainer<
                                 name={undefined}
                                 title="Select all options"
                             >
-                                <IoCheckmarkDoneSharp className={styles.icon} />
+                                <RiCheckDoubleLine className={styles.icon} />
                             </Button>
                         )}
                         {!readOnly && !nonClearable && hasValue && (
@@ -314,23 +304,9 @@ function SelectInputContainer<
                                 name={undefined}
                                 title="Clear all options"
                             >
-                                <IoCloseSharp className={styles.icon} />
+                                <RiCloseLine className={styles.icon} />
                             </Button>
                         )}
-                        {/* !readOnly && (
-                            <Button
-                                onClick={handleToggleDropdown}
-                                variant="transparent"
-                                name={undefined}
-                                title={dropdownShownActual
-                                    ? 'Close dropdown'
-                                    : 'Open dropdown'}
-                            >
-                                {dropdownShownActual
-                                    ? <IoCaretUpSharp className={styles.icon} />
-                                    : <IoCaretDownSharp className={styles.icon} />}
-                            </Button>
-                        ) */}
                     </>
                 )}
                 input={(

@@ -3,9 +3,6 @@
     align-items: center;
     flex-direction: column;
     justify-content: center;
-    /*
-    background-color: var(--go-ui-color-background);
-    */
     width: 100vw;
     height: 100vh;
     gap: 1rem;
@@ -13,8 +10,5 @@
     .app-logo {
         margin-top: -4rem;
         height: 6rem;
-        /*
-        animation: slide-up var(--go-ui-duration-animation-slow) ease-in-out forwards;
-        */
     }
 }

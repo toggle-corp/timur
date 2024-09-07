@@ -10,6 +10,55 @@
         gap: var(--spacing-sm);
     }
 
+    .attributes {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm);
+
+        .attribute-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--width-separator-md);
+
+            &.dragging-over {
+                outline: var(--width-separator-md) solid var(--color-separator);
+            }
+
+            .attribute {
+                display: flex;
+                align-items: center;
+                background-color: var(--color-foreground);
+                padding: var(--spacing-xs) var(--spacing-sm);
+                gap: var(--spacing-xs);
+
+                &.dragging {
+                    opacity: 0.8;
+                    z-index: 1;
+                    box-shadow: var(--box-shadow-md);
+                }
+
+                .drag-handle {
+                    cursor: grab;
+                }
+
+                &:hover {
+                    background-color: var(--color-tertiary);
+                }
+
+                .label {
+                    flex-grow: 1;
+                }
+            }
+        }
+    }
+
+    .grouping {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+
     .quick-settings {
         display: flex;
         flex-direction: column;

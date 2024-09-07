@@ -5,19 +5,12 @@ import {
     useState,
 } from 'react';
 import {
-    FcClock,
-    FcDocument,
-    FcPackage,
-    FcPieChart,
-    FcRuler,
-} from 'react-icons/fc';
-import {
-    IoCopyOutline,
-    IoEllipsisVertical,
-    IoPencilOutline,
-    IoSwapHorizontal,
-    IoTrashOutline,
-} from 'react-icons/io5';
+    RiDeleteBin2Line,
+    RiEditBoxLine,
+    RiFileCopyLine,
+    RiMoreLine,
+    RiSwap2Line,
+} from 'react-icons/ri';
 import {
     _cs,
     isDefined,
@@ -32,19 +25,14 @@ import DurationInput from '#components/DurationInput';
 import MonthlyCalendar from '#components/MonthlyCalendar';
 import SelectInput from '#components/SelectInput';
 import TextArea from '#components/TextArea';
+import DateContext from '#contexts/date';
 import EnumsContext from '#contexts/enums';
 import SizeContext from '#contexts/size';
 import { EnumsQuery } from '#generated/types/graphql';
 import { useFocusClient } from '#hooks/useFocus';
 import useLocalStorage from '#hooks/useLocalStorage';
+import { colorscheme } from '#utils/constants';
 import {
-    colorscheme,
-    defaultConfigValue,
-    KEY_CONFIG_STORAGE,
-} from '#utils/constants';
-import {
-    ConfigStorage,
-    Contract,
     EntriesAsList,
     Task,
     WorkItem,
@@ -88,44 +76,44 @@ function defaultColorSelector<T>(_: T, i: number): [string, string] {
     return colorscheme[i % colorscheme.length];
 }
 
-export interface Props {
+interface Props {
     className?: string;
     workItem: WorkItem;
-    contract: Contract;
+    contractId: string | undefined;
 
-    onClone: (clientId: string, override?: Partial<WorkItem>) => void;
-    onChange: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
-    onDelete: (clientId: string) => void;
+    onClone?: (clientId: string, override?: Partial<WorkItem>) => void;
+    onChange?: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
+    onDelete?: (clientId: string) => void;
 }
 
 function WorkItemRow(props: Props) {
     const {
         className,
         workItem,
-        contract,
+        contractId,
         onClone,
         onDelete,
         onChange,
     } = props;
 
     const { enums } = useContext(EnumsContext);
-    const { width: windowWidth } = useContext(SizeContext);
+    const { screen } = useContext(SizeContext);
+
     const inputRef = useFocusClient<HTMLTextAreaElement>(workItem.clientId);
-    const [config] = useLocalStorage<ConfigStorage>(
-        KEY_CONFIG_STORAGE,
-        defaultConfigValue,
-    );
+    const [config] = useLocalStorage('timur-config');
 
     const setFieldValue = useCallback(
         (...entries: EntriesAsList<WorkItem>) => {
-            onChange(workItem.clientId, ...entries);
+            if (onChange) {
+                onChange(workItem.clientId, ...entries);
+            }
         },
         [workItem.clientId, onChange],
     );
 
     const filteredTaskList = useMemo(
-        () => enums?.private?.allActiveTasks?.filter((task) => task.contract.id === contract.id),
-        [contract.id, enums],
+        () => enums?.private?.allActiveTasks?.filter((task) => task.contract.id === contractId),
+        [contractId, enums],
     );
 
     const handleStatusCheck = useCallback(() => {
@@ -168,7 +156,7 @@ function WorkItemRow(props: Props) {
         (newValue: string) => {
             if (dialogState === 'move') {
                 setFieldValue(newValue, 'date');
-            } else if (dialogState === 'copy') {
+            } else if (dialogState === 'copy' && onClone) {
                 onClone(workItem.clientId, { date: newValue });
             }
             setDialogState(undefined);
@@ -178,7 +166,9 @@ function WorkItemRow(props: Props) {
 
     const handleClone = useCallback(
         () => {
-            onClone(workItem.clientId);
+            if (onClone) {
+                onClone(workItem.clientId);
+            }
         },
         [onClone, workItem.clientId],
     );
@@ -206,7 +196,6 @@ function WorkItemRow(props: Props) {
             onChange={setFieldValue}
             value={workItem.status}
             nonClearable
-            icons={config.showInputIcons && <FcPieChart />}
         />
     );
 
@@ -221,12 +210,6 @@ function WorkItemRow(props: Props) {
             onChange={setFieldValue}
             value={workItem.task}
             nonClearable
-            icons={(
-                config.showInputIcons
-                // NOTE: hide/unhide icon wrt "checkbox for status" flag
-                && (windowWidth < 900 || !config.checkboxForStatus)
-                && <FcPackage />
-            )}
         />
     );
 
@@ -238,12 +221,6 @@ function WorkItemRow(props: Props) {
             title="Description"
             value={workItem.description}
             onChange={setFieldValue}
-            icons={(
-                config.showInputIcons
-                // NOTE: hide/unhide icon wrt "checkbox for status" flag
-                && (windowWidth >= 900 || !config.checkboxForStatus)
-                && <FcDocument />
-            )}
             placeholder="Description"
             compact={config.compactTextArea}
         />
@@ -260,7 +237,6 @@ function WorkItemRow(props: Props) {
             colorSelector={defaultColorSelector}
             onChange={setFieldValue}
             value={workItem.type}
-            icons={config.showInputIcons && <FcRuler />}
         />
     );
 
@@ -271,7 +247,6 @@ function WorkItemRow(props: Props) {
             title="Hours"
             value={workItem.duration}
             onChange={setFieldValue}
-            icons={config.showInputIcons && <FcClock />}
             placeholder="hh:mm"
         />
     );
@@ -285,10 +260,10 @@ function WorkItemRow(props: Props) {
                 onClick={handleClone}
                 spacing="xs"
             >
-                <IoCopyOutline />
+                <RiFileCopyLine />
             </Button>
             <DropdownMenu
-                label={<IoEllipsisVertical />}
+                label={<RiMoreLine />}
                 withoutDropdownIcon
                 variant="transparent"
                 persistent
@@ -299,7 +274,7 @@ function WorkItemRow(props: Props) {
                     name={workItem.clientId}
                     title="Edit this entry"
                     onClick={undefined}
-                    icons={<IoPencilOutline />}
+                    icons={<RiEditBoxLine />}
                     disabled
                 >
                     Edit entry
@@ -309,7 +284,7 @@ function WorkItemRow(props: Props) {
                     name={workItem.clientId}
                     title="Move this entry to another day"
                     onClick={handleCopyDialogOpen}
-                    icons={<IoCopyOutline />}
+                    icons={<RiFileCopyLine />}
                 >
                     Copy to another day
                 </DropdownMenuItem>
@@ -318,7 +293,7 @@ function WorkItemRow(props: Props) {
                     name={workItem.clientId}
                     title="Move this entry to another day"
                     onClick={handleMoveDialogOpen}
-                    icons={<IoSwapHorizontal />}
+                    icons={<RiSwap2Line />}
                 >
                     Move to another day
                 </DropdownMenuItem>
@@ -338,7 +313,7 @@ function WorkItemRow(props: Props) {
                             </p>
                         </div>
                     )}
-                    icons={<IoTrashOutline />}
+                    icons={<RiDeleteBin2Line />}
                 >
                     Delete entry
                 </DropdownMenuItem>
@@ -346,10 +321,7 @@ function WorkItemRow(props: Props) {
         </div>
     );
 
-    const today = new Date();
-    const selectedDate = isDefined(workItem.date)
-        ? new Date(workItem.date)
-        : today;
+    const { year, month } = useContext(DateContext);
 
     return (
         <>
@@ -358,11 +330,10 @@ function WorkItemRow(props: Props) {
                 className={_cs(
                     styles.workItemRow,
                     config.checkboxForStatus && styles.checkboxForStatus,
-                    config.showInputIcons && styles.withIcons,
                     className,
                 )}
             >
-                {windowWidth >= 900 ? (
+                {screen === 'desktop' ? (
                     <>
                         {statusInput}
                         {taskInput}
@@ -396,8 +367,8 @@ function WorkItemRow(props: Props) {
             >
                 <MonthlyCalendar
                     selectedDate={workItem.date}
-                    initialYear={selectedDate.getFullYear()}
-                    initialMonth={selectedDate.getMonth()}
+                    initialYear={workItem.date ? new Date(workItem.date).getFullYear() : year}
+                    initialMonth={workItem.date ? new Date(workItem.date).getMonth() : month}
                     onDateClick={handleMoveOrCopyEntry}
                 />
             </Dialog>

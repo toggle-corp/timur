@@ -24,11 +24,15 @@ export function isCallable<T, X extends Func>(value: T | X): value is X {
 export interface Size {
     width: number;
     height: number;
+    screen: 'desktop' | 'mobile';
 }
 export function getWindowSize(): Size {
     return {
         width: window.innerWidth,
         height: window.innerHeight,
+        screen: window.innerWidth >= 900
+            ? 'desktop'
+            : 'mobile',
     };
 }
 
@@ -36,6 +40,7 @@ function squash<T extends object>(items: T[]): T | undefined {
     if (items.length <= 1) {
         return items[0];
     }
+    // NOTE: We should use items.slice(1) instead
     return items.reduce(
         (acc, val) => ({
             ...acc,
@@ -107,7 +112,7 @@ export function getDurationNumber(value: string | undefined) {
     }
     // decimal
     if (value.match(/^\d{0,2}\.\d{1,2}$/)) {
-        return Number(value);
+        return Math.round(Number(value) * 60);
     }
     // hh:mm
     // hh:m
@@ -211,4 +216,159 @@ export function fuzzySearch<ItemType = string>(
         (results, term) => matchSorter(results, term, options),
         rows,
     );
+}
+
+export function sortByAttributes<LIST_ITEM, ATTRIBUTE>(
+    list: LIST_ITEM[],
+    attributes: ATTRIBUTE[],
+    sortFn: (a: LIST_ITEM, b: LIST_ITEM, attr: ATTRIBUTE) => number,
+): LIST_ITEM[] {
+    if (attributes.length <= 0) {
+        return list;
+    }
+
+    const newList = [...list];
+    newList.sort(
+        (a, b) => {
+            for (let i = 0; i < attributes.length; i += 1) {
+                const currentSortResult = sortFn(
+                    a,
+                    b,
+                    attributes[i],
+                );
+
+                if (currentSortResult !== 0) {
+                    return currentSortResult;
+                }
+            }
+            return 0;
+        },
+    );
+
+    return newList;
+}
+
+type GroupedItem<LIST_ITEM, ATTRIBUTE> = {
+    groupKey: string;
+    type: 'heading';
+    value: LIST_ITEM;
+    attribute: ATTRIBUTE;
+    level: number;
+} | {
+    type: 'list-item';
+    value: LIST_ITEM;
+    level: number;
+};
+
+// NOTE: the list must be sorted before grouping
+export function groupListByAttributes<LIST_ITEM, ATTRIBUTE>(
+    list: LIST_ITEM[],
+    attributes: ATTRIBUTE[],
+    compareItemAttributes: (a: LIST_ITEM, b: LIST_ITEM, attribute: ATTRIBUTE) => boolean,
+    getGroupKey: (item: LIST_ITEM, attributes: ATTRIBUTE[]) => string,
+): GroupedItem<LIST_ITEM, ATTRIBUTE>[] {
+    if (isNotDefined(list) || list.length === 0) {
+        return [];
+    }
+
+    const groupedItems = list.flatMap((listItem, listIndex) => {
+        if (listIndex === 0) {
+            const groupKey = getGroupKey(listItem, attributes);
+            const headings = attributes.map((attribute, i) => ({
+                type: 'heading' as const,
+                value: listItem,
+                attribute,
+                level: i,
+                groupKey,
+            }));
+
+            return [
+                ...headings,
+                {
+                    type: 'list-item' as const,
+                    value: listItem,
+                    level: attributes.length,
+                },
+            ];
+        }
+
+        const prevListItem = list[listIndex - 1];
+        const attributeMismatchIndex = attributes.findIndex((attribute) => {
+            const hasSameCurrentAttribute = compareItemAttributes(
+                listItem,
+                prevListItem,
+                attribute,
+            );
+
+            return !hasSameCurrentAttribute;
+        });
+
+        if (attributeMismatchIndex === -1) {
+            return [
+                {
+                    type: 'list-item' as const,
+                    value: listItem,
+                    level: attributes.length,
+                },
+            ];
+        }
+
+        const groupKey = getGroupKey(listItem, attributes);
+        const headings = attributes.map((attribute, i) => {
+            if (i < attributeMismatchIndex) {
+                return undefined;
+            }
+
+            return {
+                type: 'heading' as const,
+                value: listItem,
+                attribute,
+                level: i,
+                groupKey,
+            };
+        }).filter(isDefined);
+
+        return [
+            ...headings,
+            {
+                type: 'list-item' as const,
+                value: listItem,
+                level: attributes.length,
+            },
+        ];
+    });
+
+    return groupedItems;
+}
+
+export type PutNull<T extends object> = {
+    [key in keyof T]: T[key] extends undefined ? null : T[key];
+}
+export function putNull<T extends object>(value: T) {
+    type PartialWithNull<Q> = {
+      [P in keyof Q]: Q[P] | null;
+    };
+    const copy: PartialWithNull<T> = { ...value };
+    Object.keys(copy).forEach((key) => {
+        const safeKey = key as keyof T;
+        if (copy[safeKey] === undefined) {
+            copy[safeKey] = null;
+        }
+    });
+
+    return copy as PutNull<T>;
+}
+type PutUndefined<T extends object> = {
+    [key in keyof T]: T[key] extends null ? undefined : T[key];
+}
+export function putUndefined<T extends object>(value: T) {
+    const copy: Partial<T> = { ...value };
+    Object.keys(copy).forEach((key) => {
+        const safeKey = key as keyof T;
+        if (copy[safeKey] === null) {
+            copy[safeKey] = undefined;
+        }
+    });
+
+    return copy as PutUndefined<T>;
 }

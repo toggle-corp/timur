@@ -84,11 +84,8 @@ const settings = customWrapRoute({
     parent: rootLayout,
     path: 'settings',
     component: {
-        render: () => import('#components/TemplateView'),
-        props: {
-            title: 'Settings',
-            description: 'No settings to configure',
-        },
+        render: () => import('#views/Settings'),
+        props: {},
     },
     wrapperComponent: Auth,
     context: {

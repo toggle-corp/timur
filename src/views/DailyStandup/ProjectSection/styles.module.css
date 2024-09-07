@@ -1,0 +1,23 @@
+.project-section {
+    .project-icon {
+        width: 10rem;
+        height: 10rem;
+        object-fit: contain;
+        object-position: center center;
+    }
+
+    .user {
+        display: flex;
+        font-size: var(--font-size-lg);
+        gap: var(--spacing-xs);
+
+        .display-picture {
+            font-size: var(--font-size-xl);
+        }
+
+        .name {
+            display: inline-flex;
+            gap: var(--spacing-xs);
+        }
+    }
+}

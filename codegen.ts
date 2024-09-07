@@ -9,7 +9,7 @@ const config: CodegenConfig = {
     ignoreNoDocuments: true, // for better experience with the watcher
     generates: {
         './generated/types/': {
-            preset: 'client'
+            preset: 'client',
         }
     },
     config: {

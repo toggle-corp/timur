@@ -5,10 +5,10 @@ import {
     useRef,
 } from 'react';
 import {
-    IoChevronBack,
-    IoList,
-    IoMenu,
-} from 'react-icons/io5';
+    RiArrowLeftSLine,
+    RiListUnordered,
+    RiMenuLine,
+} from 'react-icons/ri';
 import {
     _cs,
     isDefined,
@@ -23,11 +23,6 @@ import SizeContext from '#contexts/size';
 import useDebouncedValue from '#hooks/useDebouncedValue';
 import useLocalStorage from '#hooks/useLocalStorage';
 import useSetFieldValue from '#hooks/useSetFieldValue';
-import {
-    defaultConfigValue,
-    KEY_CONFIG_STORAGE,
-} from '#utils/constants';
-import { ConfigStorage } from '#utils/types';
 
 import styles from './styles.module.css';
 
@@ -60,19 +55,16 @@ function Page(props: Props) {
         onSwipeRight,
     } = props;
 
-    const { width } = useContext(SizeContext);
+    const { screen } = useContext(SizeContext);
 
-    const [storedState, setStoredState] = useLocalStorage<ConfigStorage>(
-        KEY_CONFIG_STORAGE,
-        defaultConfigValue,
-    );
+    const [storedConfig, setStoredConfig] = useLocalStorage('timur-config');
 
     const {
         startSidebarShown,
         endSidebarShown,
-    } = storedState;
+    } = storedConfig;
 
-    const setFieldValue = useSetFieldValue(setStoredState);
+    const setFieldValue = useSetFieldValue(setStoredConfig);
 
     const setSidebarShown = useCallback(
         (newValue: boolean) => setFieldValue(newValue, 'startSidebarShown'),
@@ -125,11 +117,11 @@ function Page(props: Props) {
                 !startSidebarShown && styles.startSidebarCollapsed,
                 debouncedStartSidebarCollapsed && styles.debouncedStartSidebarCollapsed,
                 debouncedEndSidebarCollapsed && styles.debouncedEndSidebarCollapsed,
-                (!endSidebarShown || width <= 900) && styles.endSidebarCollapsed,
+                (!endSidebarShown || screen === 'mobile') && styles.endSidebarCollapsed,
                 startSidebarShown && !!startAsideContent && styles.startSidebarVisible,
                 endSidebarShown
                     && !!endAsideContent
-                    && width > 900
+                    && screen === 'desktop'
                     && styles.endSidebarVisible,
                 className,
             )}
@@ -143,7 +135,7 @@ function Page(props: Props) {
                         variant="transparent"
                         title="Toggle left pane"
                     >
-                        <IoMenu className={styles.sidebarIcon} />
+                        <RiMenuLine className={styles.sidebarIcon} />
                     </Button>
                 </Portal>
             )}
@@ -158,7 +150,7 @@ function Page(props: Props) {
                             variant="transparent"
                             title="Close left pane"
                         >
-                            <IoChevronBack />
+                            <RiArrowLeftSLine />
                         </Button>
                     )}
                 </aside>
@@ -168,7 +160,7 @@ function Page(props: Props) {
                     {children}
                 </div>
             </main>
-            {endAsideContent && width > 900 && (
+            {endAsideContent && screen === 'desktop' && (
                 <Portal container={endActionsRef}>
                     <Button
                         name={!endSidebarShown}
@@ -176,11 +168,11 @@ function Page(props: Props) {
                         variant="transparent"
                         title="Toggle right pane"
                     >
-                        <IoList className={styles.sidebarIcon} />
+                        <RiListUnordered className={styles.sidebarIcon} />
                     </Button>
                 </Portal>
             )}
-            {endAsideContent && width > 900 && (
+            {endAsideContent && screen === 'desktop' && (
                 <aside className={_cs(styles.endAside, endAsideContainerClassName)}>
                     {endAsideContent}
                 </aside>

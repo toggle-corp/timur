@@ -1,19 +1,28 @@
 import { createContext } from 'react';
 
-export type StoredValue<VALUE = unknown> = {
-    timestamp: number;
-    value: VALUE;
+import { PutNull } from '#utils/common';
+import { defaultConfigValue } from '#utils/constants';
+import { ConfigStorage } from '#utils/types';
+
+type StoredValue<VALUE extends object> = {
+    value?: PutNull<VALUE>;
+    defaultValue: VALUE;
 };
-type StorageState<VALUE = unknown> = Record<string, StoredValue<VALUE>>;
+export type StorageState = {
+    'timur-config': StoredValue<ConfigStorage>,
+};
 
 export interface LocalStorageContextProps {
     storageState: StorageState;
     setStorageState: React.Dispatch<React.SetStateAction<StorageState>>;
 }
 
-// FIXME: replace this with simpler alternative
 const LocalStorageContext = createContext<LocalStorageContextProps>({
-    storageState: {},
+    storageState: {
+        'timur-config': {
+            defaultValue: defaultConfigValue,
+        },
+    },
     setStorageState: () => {
         // eslint-disable-next-line no-console
         console.error('LocalStorageContext::setStorage() called without a provider');

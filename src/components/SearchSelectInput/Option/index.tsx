@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { IoCheckmark } from 'react-icons/io5';
+import { RiCheckLine } from 'react-icons/ri';
 import { _cs } from '@togglecorp/fujs';
 
 import styles from './styles.module.css';
@@ -23,7 +23,7 @@ function Option(props: Props) {
 
     return (
         <div className={_cs(styles.option, className)}>
-            <IoCheckmark className={_cs(styles.icon, iconClassName)} />
+            <RiCheckLine className={_cs(styles.icon, iconClassName)} />
             <div className={_cs(styles.label, labelClassName)}>
                 <div className={styles.overflowContainer}>
                     { label }

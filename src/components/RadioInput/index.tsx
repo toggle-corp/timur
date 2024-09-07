@@ -10,7 +10,7 @@ import Radio, { Props as RadioProps } from './Radio';
 
 import styles from './styles.module.css';
 
-export interface BaseProps<N, O, V, RRP extends RadioProps<V, N>> {
+interface BaseProps<N, O, V, RRP extends RadioProps<V, N>> {
     className?: string;
     options: O[] | undefined;
     name: N;
@@ -42,7 +42,7 @@ type ClearableProps<V, N> = {
     onChange: (value: V | undefined, name: N) => void;
 }
 
-export type Props<N, O, V, RRP extends RadioProps<V, N>, OMISSION extends string> = (
+type Props<N, O, V, RRP extends RadioProps<V, N>, OMISSION extends string> = (
     Omit<BaseProps<N, O, V, RRP>, OMISSION>
     & (
         Omit<ClearableProps<V, N>, OMISSION>
@@ -139,8 +139,6 @@ function RadioInput<
         readOnly,
         descriptionSelector,
     ]);
-
-    // const isRequired = withAsterisk ?? required;
 
     return (
         <div

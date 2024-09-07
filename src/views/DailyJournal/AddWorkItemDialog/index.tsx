@@ -6,7 +6,7 @@ import {
     useRef,
     useState,
 } from 'react';
-import { IoSearch } from 'react-icons/io5';
+import { RiSearchLine } from 'react-icons/ri';
 import { listToGroupList } from '@togglecorp/fujs';
 
 import Dialog from '#components/Dialog';
@@ -94,7 +94,7 @@ function AddWorkItemDialog(props: Props) {
             focusElementRef={titleInputRef}
         >
             <div>
-                Please select a task to add the workitems
+                Please select a task to add new entry
             </div>
             <TextInput
                 inputElementRef={titleInputRef}
@@ -104,7 +104,7 @@ function AddWorkItemDialog(props: Props) {
                 variant="general"
                 onChange={setSearchText}
                 icons={(
-                    <IoSearch />
+                    <RiSearchLine />
                 )}
             />
             <div
