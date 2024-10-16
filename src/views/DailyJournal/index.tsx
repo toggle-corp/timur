@@ -27,7 +27,6 @@ import {
     encodeDate,
     isDefined,
     isNotDefined,
-    isTruthyString,
 } from '@togglecorp/fujs';
 import {
     gql,
@@ -751,7 +750,7 @@ export function Component() {
                 >
                     Add entry
                 </Button>
-                {!isTruthyString(dateFromParams) && (
+                {selectedDate !== fullDate && (
                     <Link
                         to="dailyJournal"
                         variant="quaternary"

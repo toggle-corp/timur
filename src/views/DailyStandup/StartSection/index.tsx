@@ -8,6 +8,7 @@ import {
 } from 'urql';
 
 import AvailabilityIndicator from '#components/AvailabilityIndicator';
+import Clock from '#components/Clock';
 import DisplayPicture from '#components/DisplayPicture';
 import {
     type JournalLeaveTypeEnum,
@@ -38,16 +39,6 @@ function getUnavailability(
     return sum;
 }
 
-const dateFormatter = new Intl.DateTimeFormat(
-    [],
-    {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        weekday: 'short',
-    },
-);
-
 const USERS_AVAILABILITY = gql`
     query UsersAvailability {
         private {
@@ -64,17 +55,7 @@ const USERS_AVAILABILITY = gql`
     }
 `;
 
-interface Props {
-    date: string;
-}
-
-function StartSection(props: Props) {
-    const {
-        date,
-    } = props;
-
-    const formattedDate = dateFormatter.format(new Date(date));
-
+function StartSection() {
     const [usersAvailability] = useQuery<
         UsersAvailabilityQuery,
         UsersAvailabilityQueryVariables
@@ -83,16 +64,18 @@ function StartSection(props: Props) {
     });
 
     // FIXME: need to check how to sort these information
-    const sortedUsers = [...(usersAvailability.data?.private.users.items ?? [])].sort(
-        (foo, bar) => compareNumber(
-            getUnavailability(foo.leaveToday, foo.workFromHomeToday),
-            getUnavailability(bar.leaveToday, bar.workFromHomeToday),
-            -1,
-        ) || compareString(
-            foo.displayName,
-            bar.displayName,
-        ),
-    );
+    const sortedUsers = usersAvailability.data?.private.users.items
+        .filter((item) => item.leaveToday || item.workFromHomeToday)
+        .sort(
+            (foo, bar) => compareNumber(
+                getUnavailability(foo.leaveToday, foo.workFromHomeToday),
+                getUnavailability(bar.leaveToday, bar.workFromHomeToday),
+                -1,
+            ) || compareString(
+                foo.displayName,
+                bar.displayName,
+            ),
+        );
 
     return (
         <Slide
@@ -100,8 +83,8 @@ function StartSection(props: Props) {
             className={styles.startSection}
             primaryPreText="Welcome to"
             primaryHeading="Daily Standup"
-            primaryDescription={formattedDate}
-            secondaryHeading="Attendees"
+            primaryDescription={<Clock />}
+            secondaryHeading="Availability"
             secondaryContent={sortedUsers?.map((user) => (
                 <div
                     key={user.id}

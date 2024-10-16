@@ -271,14 +271,10 @@ export function Component() {
                 className={_cs(styles.content, isFullScreen && styles.presentationMode)}
             >
                 {mapId === 'start' && (
-                    <StartSection
-                        date={selectedDate}
-                    />
+                    <StartSection />
                 )}
                 {mapId === 'deadlines' && (
-                    <DeadlineSection
-                        date={selectedDate}
-                    />
+                    <DeadlineSection />
                 )}
                 {mapId !== 'start' && mapId !== 'end' && mapId !== 'deadlines' && (
                     <ProjectSection
