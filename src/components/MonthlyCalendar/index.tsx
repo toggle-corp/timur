@@ -19,6 +19,14 @@ import DateContext from '#contexts/date';
 
 import styles from './styles.module.css';
 
+const dateFormatter = new Intl.DateTimeFormat(
+    [],
+    {
+        year: 'numeric',
+        month: 'short',
+    },
+);
+
 const weekDaysName = [
     'Su',
     'Mo',
@@ -129,6 +137,8 @@ function MonthlyCalendar(props: Props) {
         return days;
     }, [year, month]);
 
+    const formattedDate = dateFormatter.format(new Date(year, month, 1));
+
     return (
         <div className={_cs(styles.calendarContainer, className)}>
             <div className={styles.header}>
@@ -150,10 +160,9 @@ function MonthlyCalendar(props: Props) {
                 >
                     <RiArrowRightSLine />
                 </Button>
+                <div className={styles.spacer} />
                 <div>
-                    {year}
-                    /
-                    {String(month + 1).padStart(2, '0')}
+                    {formattedDate}
                 </div>
             </div>
             <div className={styles.monthlyCalendar}>

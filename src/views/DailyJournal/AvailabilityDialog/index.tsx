@@ -188,7 +188,8 @@ function AvailabilityDialog(props: Props) {
                 return key === 'FIRST_HALF';
             }
             if (dialogState.wfhType === 'FULL') {
-                return false;
+                // NOTE: So that we can see all options
+                return true;
             }
             return true;
         },
@@ -204,7 +205,8 @@ function AvailabilityDialog(props: Props) {
                 return key === 'FIRST_HALF';
             }
             if (dialogState.leaveType === 'FULL') {
-                return false;
+                // NOTE: So that we can see all options
+                return true;
             }
             return true;
         },
@@ -221,32 +223,28 @@ function AvailabilityDialog(props: Props) {
             contentClassName={styles.modalContent}
             className={styles.availabilityDialog}
         >
-            {dialogState.wfhType !== 'FULL' && (
-                <RadioInput
-                    name="leaveType"
-                    label="Leave"
-                    options={availableLeaveTypeOptions}
-                    keySelector={leaveTypeKeySelector}
-                    labelSelector={leaveTypeLabelSelector}
-                    onChange={setFieldValue}
-                    value={dialogState.leaveType}
-                    disabled={disabled}
-                    clearable
-                />
-            )}
-            {dialogState.leaveType !== 'FULL' && (
-                <RadioInput
-                    name="wfhType"
-                    label="Work from home"
-                    options={availableWfhTypeOptions}
-                    keySelector={wfhTypeKeySelector}
-                    labelSelector={wfhTypeLabelSelector}
-                    onChange={setFieldValue}
-                    value={dialogState.wfhType}
-                    disabled={disabled}
-                    clearable
-                />
-            )}
+            <RadioInput
+                name="leaveType"
+                label="Leave"
+                options={availableLeaveTypeOptions}
+                keySelector={leaveTypeKeySelector}
+                labelSelector={leaveTypeLabelSelector}
+                onChange={setFieldValue}
+                value={dialogState.leaveType}
+                disabled={disabled || dialogState.wfhType === 'FULL'}
+                clearable
+            />
+            <RadioInput
+                name="wfhType"
+                label="Work from home"
+                options={availableWfhTypeOptions}
+                keySelector={wfhTypeKeySelector}
+                labelSelector={wfhTypeLabelSelector}
+                onChange={setFieldValue}
+                value={dialogState.wfhType}
+                disabled={disabled || dialogState.leaveType === 'FULL'}
+                clearable
+            />
             <div className={styles.actions}>
                 <Button
                     title="Cancel update availability"

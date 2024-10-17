@@ -100,6 +100,23 @@ function DayView(props: Props) {
         return undefined;
     }, [taskById]);
 
+    const getWorkItemIconFromAttr = useCallback((
+        item: WorkItem,
+        attr: DailyJournalAttribute,
+    ) => {
+        if (isNotDefined(taskById)) {
+            return undefined;
+        }
+
+        const taskDetails = taskById[item.task];
+
+        if (attr.key === 'project') {
+            return taskDetails.contract.project.logo;
+        }
+
+        return undefined;
+    }, [taskById]);
+
     const formattedDate = dateFormatter.format(new Date(selectedDate));
     const formattedRelativeDate = useFormattedRelativeDate(selectedDate);
 
@@ -199,6 +216,10 @@ function DayView(props: Props) {
                                     groupedItem.value,
                                     groupedItem.attribute,
                                 );
+                                const currentIcon = getWorkItemIconFromAttr(
+                                    groupedItem.value,
+                                    groupedItem.attribute,
+                                );
 
                                 const Heading = `h${bound(groupedItem.level + 2, 2, 4)}` as unknown as ElementType;
 
@@ -208,6 +229,13 @@ function DayView(props: Props) {
                                         className={styles.nestedHeading}
                                     >
                                         {indent && <Indent level={groupedItem.level} />}
+                                        {currentIcon && (
+                                            <img
+                                                className={styles.icon}
+                                                src={currentIcon.url}
+                                                alt={headingText}
+                                            />
+                                        )}
                                         {headingText}
                                     </Heading>
                                 );
@@ -236,6 +264,10 @@ function DayView(props: Props) {
                                                 groupedItem.value,
                                                 attribute,
                                             );
+                                            const currentIcon = getWorkItemIconFromAttr(
+                                                groupedItem.value,
+                                                attribute,
+                                            );
 
                                             if (i < (groupLevel - joinLevel)) {
                                                 return null;
@@ -245,6 +277,13 @@ function DayView(props: Props) {
                                                 <Fragment key={`subheading-${attribute.key}-of-${groupedItem.groupKey}`}>
                                                     {i > (groupLevel - joinLevel) && (
                                                         <div className={styles.separator} />
+                                                    )}
+                                                    {currentIcon && (
+                                                        <img
+                                                            className={styles.icon}
+                                                            src={currentIcon.url}
+                                                            alt={currentLabel}
+                                                        />
                                                     )}
                                                     <div>{currentLabel}</div>
                                                 </Fragment>

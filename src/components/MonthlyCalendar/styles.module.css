@@ -8,6 +8,10 @@
         gap: var(--spacing-sm);
         align-items: baseline;
         font-size: var(--font-size-sm);
+
+        .spacer {
+            flex-grow: 1;
+        }
     }
 
     .monthly-calendar {

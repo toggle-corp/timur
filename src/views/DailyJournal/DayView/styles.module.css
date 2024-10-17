@@ -60,6 +60,10 @@
 
             &h2 {
                 margin-top: var(--spacing-md);
+
+                .icon {
+                    height: 1em;
+                }
             }
         }
 
@@ -75,6 +79,10 @@
                 background-color: var(--color-separator);
                 width: 0.5rem;
                 height: 0.5rem;
+            }
+
+            .icon {
+                height: 1em;
             }
         }
 

@@ -15,6 +15,7 @@ import {
     useQuery,
 } from 'urql';
 
+import Clock from '#components/Clock';
 import {
     type DeadlinesAndEventsQuery,
     type DeadlinesAndEventsQueryVariables,
@@ -25,16 +26,6 @@ import Slide from '../Slide';
 import GeneralEventOutput from './GeneralEvent';
 
 import styles from './styles.module.css';
-
-const dateFormatter = new Intl.DateTimeFormat(
-    [],
-    {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        weekday: 'short',
-    },
-);
 
 const DEADLINES_AND_EVENTS = gql`
     query DeadlinesAndEvents {
@@ -60,15 +51,7 @@ const DEADLINES_AND_EVENTS = gql`
     }
 `;
 
-interface Props {
-    date: string;
-}
-
-function DeadlineSection(props: Props) {
-    const {
-        date,
-    } = props;
-
+function DeadlineSection() {
     const [deadlinesAndEvents] = useQuery<
         DeadlinesAndEventsQuery,
         DeadlinesAndEventsQueryVariables
@@ -78,8 +61,6 @@ function DeadlineSection(props: Props) {
 
     const projects = deadlinesAndEvents.data?.private.allProjects;
     const events = deadlinesAndEvents.data?.private.relativeEvents;
-
-    const formattedDate = dateFormatter.format(new Date(date));
 
     const upcomingEvents = useMemo<GeneralEvent[]>(() => {
         const deadlines = projects?.flatMap(
@@ -121,7 +102,7 @@ function DeadlineSection(props: Props) {
             variant="split"
             primaryPreText="Welcome to"
             primaryHeading="Daily Standup"
-            primaryDescription={formattedDate}
+            primaryDescription={<Clock />}
             secondaryHeading="Upcoming Events"
             secondaryContent={upcomingEvents.map(
                 (generalEvent, index) => (
