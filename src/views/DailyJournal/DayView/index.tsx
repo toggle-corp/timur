@@ -221,7 +221,8 @@ function DayView(props: Props) {
                                     groupedItem.attribute,
                                 );
 
-                                const Heading = `h${bound(groupedItem.level + 2, 2, 4)}` as unknown as ElementType;
+                                const headingLevel = bound(groupedItem.level + 2, 2, 4);
+                                const Heading = `h${headingLevel}` as unknown as ElementType;
 
                                 return (
                                     <Heading
@@ -301,6 +302,11 @@ function DayView(props: Props) {
                             return null;
                         }
 
+                        const itemErrored = groupedItem.value.status !== 'TODO' && (
+                            isNotDefined(groupedItem.value.type)
+                            || isNotDefined(groupedItem.value.duration)
+                        );
+
                         return (
                             <div
                                 className={styles.workItemContainer}
@@ -312,7 +318,7 @@ function DayView(props: Props) {
                                     />
                                 )}
                                 <WorkItemRow
-                                    className={styles.workItem}
+                                    className={_cs(styles.workItem, itemErrored && styles.errored)}
                                     workItem={groupedItem.value}
                                     onClone={onWorkItemClone}
                                     onChange={onWorkItemChange}

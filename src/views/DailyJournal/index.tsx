@@ -599,12 +599,13 @@ export function Component() {
     // FIXME: memoize this
     const filteredWorkItems = workItems.filter((item) => item.date === selectedDate);
 
-    const entriesWithoutTask = filteredWorkItems
-        .filter((item) => isNotDefined(item.type) && item.status !== 'TODO')
-        .length;
-    const entriesWithoutHours = filteredWorkItems
-        .filter((item) => isNotDefined(item.duration) && item.status !== 'TODO')
-        .length;
+    const entriesWithError = filteredWorkItems
+        .filter((item) => (
+            item.status !== 'TODO' && (
+                isNotDefined(item.type)
+                || isNotDefined(item.duration)
+            )
+        )).length;
 
     const leaveType = myTimeEntriesResult.data?.private.journal?.leaveType;
     const wfhType = myTimeEntriesResult.data?.private.journal?.wfhType;
@@ -677,19 +678,11 @@ export function Component() {
                     >
                         <RiCalendar2Line />
                     </CalendarInput>
-                    {entriesWithoutTask > 0 && (
+                    {entriesWithError > 0 && (
                         <div className={styles.warningBadge}>
                             <FcHighPriority />
                             <span>
-                                {`${entriesWithoutTask} uncategorized`}
-                            </span>
-                        </div>
-                    )}
-                    {entriesWithoutHours > 0 && (
-                        <div className={styles.warningBadge}>
-                            <FcHighPriority />
-                            <span>
-                                {`${entriesWithoutHours} untracked`}
+                                {`${entriesWithError} issues`}
                             </span>
                         </div>
                     )}
