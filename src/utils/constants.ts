@@ -10,6 +10,7 @@ export const defaultConfigValue: ConfigStorage = {
     indent: true,
     compactTextArea: false,
     checkboxForStatus: false,
+    enableCollapsibleGroups: false,
     startSidebarShown: window.innerWidth >= 900,
     endSidebarShown: false,
     dailyJournalGrouping: {
@@ -22,6 +23,7 @@ export const defaultConfigValue: ConfigStorage = {
         { key: 'task', sortDirection: 1 },
         { key: 'status', sortDirection: 1 },
     ],
+    collapsedGroups: [],
 };
 
 export const colorscheme: [string, string][] = [

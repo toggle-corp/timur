@@ -4,7 +4,6 @@ import {
     useCallback,
     useContext,
     useMemo,
-    useState,
 } from 'react';
 import {
     RiArrowDownSLine,
@@ -75,21 +74,42 @@ function DayView(props: Props) {
 
     const { taskById } = useContext(EnumsContext);
 
-    const [groupVisibility, setGroupVisibility] = useState<string[]>([]);
+    const [
+        storedConfig,
+        setStoredConfig,
+    ] = useLocalStorage('timur-config');
 
-    const toggleGroupVisibility = useCallback(
+    const handleToggleCollapseGroup = useCallback(
         (value: string) => {
-            setGroupVisibility((prevValues) => {
+            setStoredConfig((prevConfig) => {
+                // FIXME: We should not need to add fallback
+                const prevValues = prevConfig.collapsedGroups ?? [];
+
                 if (!prevValues.includes(value)) {
-                    return [...prevValues, value];
+                    return {
+                        ...prevConfig,
+                        collapsedGroups: [...prevValues, value],
+                    };
                 }
-                return prevValues.filter((prevValue) => prevValue !== value);
+                return {
+                    ...prevConfig,
+                    collapsedGroups: prevValues.filter((prevValue) => prevValue !== value),
+                };
             });
         },
-        [],
+        [setStoredConfig],
     );
 
-    const [storedConfig] = useLocalStorage('timur-config');
+    const {
+        dailyJournalAttributeOrder,
+        dailyJournalGrouping: {
+            groupLevel,
+            joinLevel,
+        },
+        indent,
+        enableCollapsibleGroups,
+        collapsedGroups,
+    } = storedConfig;
 
     const getWorkItemLabelFromAttr = useCallback((
         item: WorkItem,
@@ -150,15 +170,6 @@ function DayView(props: Props) {
         },
         [workItems],
     );
-
-    const {
-        dailyJournalAttributeOrder,
-        dailyJournalGrouping: {
-            groupLevel,
-            joinLevel,
-        },
-        indent,
-    } = storedConfig;
 
     const groupedItems = useMemo(() => {
         if (isNotDefined(taskById) || isNotDefined(workItems)) {
@@ -230,10 +241,11 @@ function DayView(props: Props) {
                 <div className={styles.newGroup}>
                     {groupedItems.map((groupedItem) => {
                         if (groupedItem.type === 'heading') {
-                            const hidden = groupVisibility.some((groupKey) => (
-                                groupedItem.groupKey !== groupKey
-                                && groupedItem.groupKey.startsWith(groupKey)
-                            ));
+                            const hidden = enableCollapsibleGroups
+                                && collapsedGroups.some((groupKey) => (
+                                    groupedItem.groupKey !== groupKey
+                                    && groupedItem.groupKey.startsWith(groupKey)
+                                ));
                             if (hidden) {
                                 return null;
                             }
@@ -268,16 +280,18 @@ function DayView(props: Props) {
                                             />
                                         )}
                                         {headingText}
-                                        <Button
-                                            name={groupedItem.groupKey}
-                                            onClick={toggleGroupVisibility}
-                                            title="Toggle group visibility"
-                                            variant="transparent"
-                                        >
-                                            {groupVisibility.includes(groupedItem.groupKey)
-                                                ? <RiArrowUpSLine />
-                                                : <RiArrowDownSLine />}
-                                        </Button>
+                                        {enableCollapsibleGroups && (
+                                            <Button
+                                                name={groupedItem.groupKey}
+                                                onClick={handleToggleCollapseGroup}
+                                                title="Toggle group visibility"
+                                                variant="transparent"
+                                            >
+                                                {collapsedGroups.includes(groupedItem.groupKey)
+                                                    ? <RiArrowUpSLine />
+                                                    : <RiArrowDownSLine />}
+                                            </Button>
+                                        )}
                                     </Heading>
                                 );
                             }
@@ -331,16 +345,18 @@ function DayView(props: Props) {
                                                 </Fragment>
                                             );
                                         })}
-                                        <Button
-                                            name={groupedItem.groupKey}
-                                            onClick={toggleGroupVisibility}
-                                            title="Toggle group visibility"
-                                            variant="transparent"
-                                        >
-                                            {groupVisibility.includes(groupedItem.groupKey)
-                                                ? <RiArrowUpSLine />
-                                                : <RiArrowDownSLine />}
-                                        </Button>
+                                        {enableCollapsibleGroups && (
+                                            <Button
+                                                name={groupedItem.groupKey}
+                                                onClick={handleToggleCollapseGroup}
+                                                title="Toggle group visibility"
+                                                variant="transparent"
+                                            >
+                                                {collapsedGroups.includes(groupedItem.groupKey)
+                                                    ? <RiArrowUpSLine />
+                                                    : <RiArrowDownSLine />}
+                                            </Button>
+                                        )}
                                     </h4>
                                 );
                             }
@@ -352,9 +368,10 @@ function DayView(props: Props) {
                         if (!taskDetails) {
                             return null;
                         }
-                        const hidden = groupVisibility.some(
-                            (groupKey) => groupedItem.itemKey.startsWith(groupKey),
-                        );
+                        const hidden = enableCollapsibleGroups
+                            && collapsedGroups.some(
+                                (groupKey) => groupedItem.itemKey.startsWith(groupKey),
+                            );
                         if (hidden) {
                             return null;
                         }
