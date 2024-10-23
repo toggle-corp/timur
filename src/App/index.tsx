@@ -159,10 +159,40 @@ function App() {
         },
     });
 
+    const handleStorageStateUpdate: typeof setStorageState = useCallback(
+        (val) => {
+            setStorageState((prevValue) => {
+                const newValue = typeof val === 'function'
+                    ? val(prevValue)
+                    : val;
+
+                if (
+                    prevValue['timur-config'].value?.dailyJournalGrouping !== newValue['timur-config'].value?.dailyJournalGrouping
+                    || prevValue['timur-config'].value?.dailyJournalAttributeOrder !== newValue['timur-config'].value?.dailyJournalAttributeOrder
+                ) {
+                    const overriddenValue: typeof newValue = {
+                        ...newValue,
+                        'timur-config': {
+                            ...newValue['timur-config'],
+                            value: {
+                                ...(newValue['timur-config'].value ?? defaultConfigValue),
+                                collapsedGroups: [],
+                            },
+                        },
+                    };
+                    return overriddenValue;
+                }
+
+                return newValue;
+            });
+        },
+        [],
+    );
+
     const storageContextValue = useMemo<LocalStorageContextProps>(() => ({
         storageState,
-        setStorageState,
-    }), [storageState]);
+        setStorageState: handleStorageStateUpdate,
+    }), [storageState, handleStorageStateUpdate]);
 
     // Device Size
 

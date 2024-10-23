@@ -91,6 +91,12 @@ export function Component() {
                     value={storedConfig.indent}
                     onChange={setConfigFieldValue}
                 />
+                <Checkbox
+                    name="enableCollapsibleGroups"
+                    label="Enable collapsible groups 🧪"
+                    value={storedConfig.enableCollapsibleGroups}
+                    onChange={setConfigFieldValue}
+                />
                 <WorkItemRow
                     className={styles.workItem}
                     workItem={{

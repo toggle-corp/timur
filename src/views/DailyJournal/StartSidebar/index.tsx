@@ -25,6 +25,7 @@ import {
     isNotDefined,
 } from '@togglecorp/fujs';
 
+import Link from '#components/Link';
 import MonthlyCalendar from '#components/MonthlyCalendar';
 import RadioInput from '#components/RadioInput';
 import DateContext from '#contexts/date';
@@ -282,6 +283,12 @@ function StartSidebar(props: Props) {
                     labelSelector={numericOptionLabelSelector}
                 />
             </div>
+            <Link
+                to="settings"
+                variant="quaternary"
+            >
+                Other Settings
+            </Link>
         </div>
     );
 }

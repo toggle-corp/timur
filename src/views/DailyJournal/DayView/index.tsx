@@ -6,6 +6,10 @@ import {
     useMemo,
 } from 'react';
 import {
+    RiArrowDownSLine,
+    RiArrowUpSLine,
+} from 'react-icons/ri';
+import {
     _cs,
     bound,
     compareString,
@@ -14,6 +18,7 @@ import {
     sum,
 } from '@togglecorp/fujs';
 
+import Button from '#components/Button';
 import DefaultMessage from '#components/DefaultMessage';
 import Indent from '#components/Indent';
 import EnumsContext from '#contexts/enums';
@@ -69,7 +74,42 @@ function DayView(props: Props) {
 
     const { taskById } = useContext(EnumsContext);
 
-    const [storedConfig] = useLocalStorage('timur-config');
+    const [
+        storedConfig,
+        setStoredConfig,
+    ] = useLocalStorage('timur-config');
+
+    const handleToggleCollapseGroup = useCallback(
+        (value: string) => {
+            setStoredConfig((prevConfig) => {
+                // FIXME: We should not need to add fallback
+                const prevValues = prevConfig.collapsedGroups ?? [];
+
+                if (!prevValues.includes(value)) {
+                    return {
+                        ...prevConfig,
+                        collapsedGroups: [...prevValues, value],
+                    };
+                }
+                return {
+                    ...prevConfig,
+                    collapsedGroups: prevValues.filter((prevValue) => prevValue !== value),
+                };
+            });
+        },
+        [setStoredConfig],
+    );
+
+    const {
+        dailyJournalAttributeOrder,
+        dailyJournalGrouping: {
+            groupLevel,
+            joinLevel,
+        },
+        indent,
+        enableCollapsibleGroups,
+        collapsedGroups,
+    } = storedConfig;
 
     const getWorkItemLabelFromAttr = useCallback((
         item: WorkItem,
@@ -131,15 +171,6 @@ function DayView(props: Props) {
         [workItems],
     );
 
-    const {
-        dailyJournalAttributeOrder,
-        dailyJournalGrouping: {
-            groupLevel,
-            joinLevel,
-        },
-        indent,
-    } = storedConfig;
-
     const groupedItems = useMemo(() => {
         if (isNotDefined(taskById) || isNotDefined(workItems)) {
             return [];
@@ -157,7 +188,7 @@ function DayView(props: Props) {
             ),
         );
 
-        return groupListByAttributes(
+        const result = groupListByAttributes(
             sortedWorkItems,
             dailyJournalAttributeOrder.slice(0, groupLevel),
             (a, b, attr) => {
@@ -171,6 +202,7 @@ function DayView(props: Props) {
                 return values;
             },
         );
+        return result;
     }, [
         taskById,
         workItems,
@@ -209,6 +241,15 @@ function DayView(props: Props) {
                 <div className={styles.newGroup}>
                     {groupedItems.map((groupedItem) => {
                         if (groupedItem.type === 'heading') {
+                            const hidden = enableCollapsibleGroups
+                                && collapsedGroups.some((groupKey) => (
+                                    groupedItem.groupKey !== groupKey
+                                    && groupedItem.groupKey.startsWith(groupKey)
+                                ));
+                            if (hidden) {
+                                return null;
+                            }
+
                             // Main Heading
                             // NOTE: Need to add 1 as groupLevel and level starts from 1 and 0 resp.
                             if (groupedItem.level + 1 < (groupLevel - joinLevel + 1)) {
@@ -221,11 +262,13 @@ function DayView(props: Props) {
                                     groupedItem.attribute,
                                 );
 
-                                const Heading = `h${bound(groupedItem.level + 2, 2, 4)}` as unknown as ElementType;
+                                const headingLevel = bound(groupedItem.level + 2, 2, 4);
+                                const Heading = `h${headingLevel}` as unknown as ElementType;
 
+                                const key = `heading-${groupedItem.groupKey}`;
                                 return (
                                     <Heading
-                                        key={`heading-${groupedItem.attribute.key}-of-${groupedItem.groupKey}`}
+                                        key={key}
                                         className={styles.nestedHeading}
                                     >
                                         {indent && <Indent level={groupedItem.level} />}
@@ -237,6 +280,18 @@ function DayView(props: Props) {
                                             />
                                         )}
                                         {headingText}
+                                        {enableCollapsibleGroups && (
+                                            <Button
+                                                name={groupedItem.groupKey}
+                                                onClick={handleToggleCollapseGroup}
+                                                title="Toggle group visibility"
+                                                variant="transparent"
+                                            >
+                                                {collapsedGroups.includes(groupedItem.groupKey)
+                                                    ? <RiArrowUpSLine />
+                                                    : <RiArrowDownSLine />}
+                                            </Button>
+                                        )}
                                     </Heading>
                                 );
                             }
@@ -245,10 +300,11 @@ function DayView(props: Props) {
                             // NOTE: We only need to show one subheading after the main headings
                             // NOTE: Need to add 1 as groupLevel and level starts from 1 and 0 resp.
                             if (groupedItem.level + 1 === groupLevel) {
+                                const key = `sub-heading-${groupedItem.groupKey}`;
                                 return (
                                     <h4
                                         className={styles.joinedHeading}
-                                        key={`sub-heading-group-of-${groupedItem.groupKey}`}
+                                        key={key}
                                     >
                                         {indent && (
                                             <Indent
@@ -274,7 +330,7 @@ function DayView(props: Props) {
                                             }
 
                                             return (
-                                                <Fragment key={`subheading-${attribute.key}-of-${groupedItem.groupKey}`}>
+                                                <Fragment key={`sub-heading-${attribute.key}-of-${groupedItem.groupKey}`}>
                                                     {i > (groupLevel - joinLevel) && (
                                                         <div className={styles.separator} />
                                                     )}
@@ -289,6 +345,18 @@ function DayView(props: Props) {
                                                 </Fragment>
                                             );
                                         })}
+                                        {enableCollapsibleGroups && (
+                                            <Button
+                                                name={groupedItem.groupKey}
+                                                onClick={handleToggleCollapseGroup}
+                                                title="Toggle group visibility"
+                                                variant="transparent"
+                                            >
+                                                {collapsedGroups.includes(groupedItem.groupKey)
+                                                    ? <RiArrowUpSLine />
+                                                    : <RiArrowDownSLine />}
+                                            </Button>
+                                        )}
                                     </h4>
                                 );
                             }
@@ -300,6 +368,18 @@ function DayView(props: Props) {
                         if (!taskDetails) {
                             return null;
                         }
+                        const hidden = enableCollapsibleGroups
+                            && collapsedGroups.some(
+                                (groupKey) => groupedItem.itemKey.startsWith(groupKey),
+                            );
+                        if (hidden) {
+                            return null;
+                        }
+
+                        const itemErrored = groupedItem.value.status !== 'TODO' && (
+                            isNotDefined(groupedItem.value.type)
+                            || isNotDefined(groupedItem.value.duration)
+                        );
 
                         return (
                             <div
@@ -312,7 +392,7 @@ function DayView(props: Props) {
                                     />
                                 )}
                                 <WorkItemRow
-                                    className={styles.workItem}
+                                    className={_cs(styles.workItem, itemErrored && styles.errored)}
                                     workItem={groupedItem.value}
                                     onClone={onWorkItemClone}
                                     onChange={onWorkItemChange}

@@ -42,10 +42,12 @@ export type ConfigStorage = {
     checkboxForStatus: boolean,
     compactTextArea: boolean,
     indent: boolean,
+    enableCollapsibleGroups: boolean,
 
     dailyJournalAttributeOrder: DailyJournalAttribute[];
     dailyJournalGrouping: DailyJournalGrouping;
 
+    collapsedGroups: string[],
     startSidebarShown: boolean,
     endSidebarShown: boolean,
 }

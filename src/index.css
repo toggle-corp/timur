@@ -23,15 +23,15 @@
 
     --base-font-size: 1rem;
 
-    --font-size-2xs: calc(var(--base-font-size) * 0.625);
-    --font-size-xs: calc(var(--base-font-size) * 0.75);
-    --font-size-sm: calc(var(--base-font-size) * 0.875);
-    --font-size-md: var(--base-font-size);
-    --font-size-lg: calc(var(--base-font-size) * 1.25);
-    --font-size-xl: calc(var(--base-font-size) * 1.44);
-    --font-size-2xl: calc(var(--base-font-size) * 1.8);
-    --font-size-3xl: calc(var(--base-font-size) * 2.5);
-    --font-size-4xl: calc(var(--base-font-size) * 3.6);
+    --font-size-2xs: calc(var(--base-font-size) * 0.625);   /* -1 */
+    --font-size-xs: calc(var(--base-font-size) * 0.75);     /* -0.5 */
+    --font-size-sm: calc(var(--base-font-size) * 0.875);    /* -0.25 */
+    --font-size-md: var(--base-font-size);                  /* 0 */
+    --font-size-lg: calc(var(--base-font-size) * 1.25);     /* 0.5 */
+    --font-size-xl: calc(var(--base-font-size) * 1.44);     /* 1 */
+    --font-size-2xl: calc(var(--base-font-size) * 1.8);     /* 1.5 */
+    --font-size-3xl: calc(var(--base-font-size) * 2.5);     /* 2 */
+    --font-size-4xl: calc(var(--base-font-size) * 3.6);     /* 2.5 */
 
     @media screen and (max-width: 40rem) {
         --base-font-size: 0.875rem;
@@ -165,23 +165,23 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-3xl);
 }
 
 h2 {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-2xl);
 }
 
 h3 {
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-xl);
 }
 
 h4 {
-    font-size: var(--font-size-md);
+    font-size: var(--font-size-lg);
 }
 
 h5 {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-md);
 }
 
 p {

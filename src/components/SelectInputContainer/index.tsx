@@ -316,6 +316,7 @@ function SelectInputContainer<
                         style={(searchText || !valueDisplay) ? undefined : {
                             backgroundColor: valueBgColor ?? colorscheme[0][1],
                             color: valueFgColor ?? colorscheme[0][0],
+                            border: 'var(--width-separator-sm) solid var(--color-foreground)',
                         }}
                         id={inputId}
                         name={name}
