@@ -11,6 +11,7 @@ export const defaultConfigValue: ConfigStorage = {
     compactTextArea: false,
     checkboxForStatus: false,
     enableCollapsibleGroups: false,
+    enableStrikethrough: false,
     startSidebarShown: window.innerWidth >= 900,
     endSidebarShown: false,
     dailyJournalGrouping: {

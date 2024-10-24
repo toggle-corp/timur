@@ -216,6 +216,9 @@ function WorkItemRow(props: Props) {
     const descriptionInput = (
         <TextArea
             className={styles.description}
+            inputClassName={_cs(
+                config.enableStrikethrough && workItem.status === 'DONE' && styles.strike,
+            )}
             inputElementRef={inputRef}
             name="description"
             title="Description"
