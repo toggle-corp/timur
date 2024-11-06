@@ -77,7 +77,6 @@ function RawTextArea<N>(props: Props<N>) {
             className={_cs(
                 styles.growWrap,
                 compact && styles.compact,
-                className,
             )}
         >
             <textarea
@@ -87,6 +86,7 @@ function RawTextArea<N>(props: Props<N>) {
                 className={_cs(
                     styles.rawInput,
                     !value && styles.empty,
+                    className,
                 )}
                 // FIXME: do we even need to pass name?
                 name={isDefined(name) ? String(name) : undefined}

@@ -43,6 +43,7 @@ export type ConfigStorage = {
     compactTextArea: boolean,
     indent: boolean,
     enableCollapsibleGroups: boolean,
+    enableStrikethrough: boolean,
 
     dailyJournalAttributeOrder: DailyJournalAttribute[];
     dailyJournalGrouping: DailyJournalGrouping;

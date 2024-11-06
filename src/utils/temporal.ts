@@ -53,6 +53,7 @@ function getTemporalDiff(min: DateLike, max: DateLike) {
     };
 }
 
+// FIXME: We need to revisit this logic
 export function toRelativeDate(dateLike: DateLike): RelativeDate | undefined {
     const today = new Date();
     const date = new Date(dateLike);
@@ -111,9 +112,9 @@ export function toRelativeDate(dateLike: DateLike): RelativeDate | undefined {
     }
 
     return {
-        direction: 'present',
+        direction,
         resolution: 'day',
-        value: 0,
+        value: temporalDiff.day,
     };
 }
 

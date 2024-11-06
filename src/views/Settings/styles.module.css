@@ -10,8 +10,16 @@
             flex-direction: column;
             gap: var(--spacing-sm);
 
-            .work-item {
-                background-color: var(--color-foreground);
+            .container {
+                display: flex;
+                flex-direction: column;
+                background-color: var(--color-quaternary);
+                padding: var(--spacing-xs);
+                gap: var(--spacing-xs);
+
+                .work-item {
+                    background-color: var(--color-foreground);
+                }
             }
         }
     }

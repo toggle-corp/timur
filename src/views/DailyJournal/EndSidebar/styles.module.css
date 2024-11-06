@@ -41,6 +41,7 @@
             .task-list {
                 display: flex;
                 flex-direction: column;
+                padding-left: var(--spacing-md);
 
                 .task {
                     display: flex;
@@ -57,6 +58,7 @@
                         white-space: nowrap;
                     }
 
+                    /*
                     .contract-name {
                         max-width: 6rem;
                         overflow: hidden;
@@ -65,21 +67,13 @@
                         color: var(--color-text-light);
                         font-size: var(--font-size-xs);
                     }
+                    */
 
                     .usage-count {
-                        display: flex;
-                        position: absolute;
-                        align-items: center;
-                        justify-content: center;
-                        transform: translateX(-100%) translateY(-50%);
-                        border-radius: 1rem;
-                        background-color: var(--color-secondary);
-                        padding: var(--spacing-3xs) var(--spacing-2xs);
-                        min-width: 1em;
-                        height: 1.5em;
-                        line-height: 1;
-                        color: var(--color-text-on-dark);
-                        font-size: var(--font-size-2xs);
+                        flex-shrink: 0;
+                        border-radius: var(--border-radius-lg);
+                        background-color: var(--color-quaternary);
+                        padding: 0 var(--spacing-sm);
                     }
 
                     &:hover {

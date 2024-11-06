@@ -1,12 +1,11 @@
 import {
+    useCallback,
     useContext,
-    useEffect,
     useMemo,
     useState,
 } from 'react';
 import {
     _cs,
-    isDefined,
     listToGroupList,
     mapToList,
 } from '@togglecorp/fujs';
@@ -35,14 +34,15 @@ function EndSidebar(props: Props) {
 
     const [activeProject, setActiveProject] = useState<string>();
     const [searchText] = useState<string | undefined>();
-
     const { enums } = useContext(EnumsContext);
-    useEffect(() => {
-        const projectId = enums?.private.allActiveTasks?.[0].contract.project.id;
-        if (isDefined(projectId)) {
-            setActiveProject(projectId);
-        }
-    }, [enums?.private.allActiveTasks]);
+
+    const handleProjectToggle = useCallback(
+        (value: string) => {
+            setActiveProject((prevValue) => (prevValue === value ? undefined : value));
+        },
+        [],
+    );
+
     const filteredTaskList = useMemo(
         () => fuzzySearch(
             enums?.private.allActiveTasks ?? [],
@@ -103,8 +103,8 @@ function EndSidebar(props: Props) {
                                 activeProject === project.id && styles.active,
                             )}
                             name={project.id}
-                            onClick={setActiveProject}
-                            title="Expand project tasks"
+                            onClick={handleProjectToggle}
+                            title="Expand/Collapse project tasks"
                         >
                             <DisplayPicture
                                 imageUrl={project.logo?.url}
@@ -123,7 +123,7 @@ function EndSidebar(props: Props) {
                                 className={styles.taskList}
                             >
                                 {projectWorkItems.map((task) => {
-                                    const { contract } = task;
+                                    // const { contract } = task;
                                     const count = taskCountMapping?.[task.id] ?? 0;
 
                                     return (
@@ -138,9 +138,11 @@ function EndSidebar(props: Props) {
                                             <span className={styles.taskName}>
                                                 {task.name}
                                             </span>
+                                            {/*
                                             <span className={styles.contractName}>
                                                 {contract.name}
                                             </span>
+                                            */}
                                             {count > 0 && (
                                                 <span className={styles.usageCount}>
                                                     {count}

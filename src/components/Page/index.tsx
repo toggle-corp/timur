@@ -6,6 +6,7 @@ import {
 } from 'react';
 import {
     RiArrowLeftSLine,
+    RiArrowRightSLine,
     RiListUnordered,
     RiMenuLine,
 } from 'react-icons/ri';
@@ -66,7 +67,7 @@ function Page(props: Props) {
 
     const setFieldValue = useSetFieldValue(setStoredConfig);
 
-    const setSidebarShown = useCallback(
+    const handleStartSidebarToggle = useCallback(
         (newValue: boolean) => setFieldValue(newValue, 'startSidebarShown'),
         [setFieldValue],
     );
@@ -130,7 +131,7 @@ function Page(props: Props) {
                 <Portal container={startActionsRef}>
                     <Button
                         name={!startSidebarShown}
-                        onClick={setSidebarShown}
+                        onClick={handleStartSidebarToggle}
                         className={styles.toggleCollapsedButton}
                         variant="transparent"
                         title="Toggle left pane"
@@ -145,10 +146,11 @@ function Page(props: Props) {
                     {startSidebarShown && (
                         <Button
                             name={false}
-                            onClick={setSidebarShown}
+                            onClick={handleStartSidebarToggle}
                             className={styles.closeLeftPaneButton}
-                            variant="transparent"
+                            variant="quaternary"
                             title="Close left pane"
+                            spacing="sm"
                         >
                             <RiArrowLeftSLine />
                         </Button>
@@ -175,6 +177,18 @@ function Page(props: Props) {
             {endAsideContent && screen === 'desktop' && (
                 <aside className={_cs(styles.endAside, endAsideContainerClassName)}>
                     {endAsideContent}
+                    {endSidebarShown && (
+                        <Button
+                            name={false}
+                            onClick={handleEndSidebarToggle}
+                            className={styles.closeRightPaneButton}
+                            variant="quaternary"
+                            title="Close right pane"
+                            spacing="sm"
+                        >
+                            <RiArrowRightSLine />
+                        </Button>
+                    )}
                 </aside>
             )}
         </div>

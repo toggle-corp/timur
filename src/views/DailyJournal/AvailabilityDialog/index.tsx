@@ -78,9 +78,7 @@ const UPDATE_JOURNAL = gql`
                     id
                     date
                     leaveType
-                    leaveTypeDisplay
                     wfhType
-                    wfhTypeDisplay
                 }
             }
         }

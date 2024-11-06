@@ -92,26 +92,49 @@ export function Component() {
                     onChange={setConfigFieldValue}
                 />
                 <Checkbox
+                    name="enableStrikethrough"
+                    label="Strikethrough completed entries 🧪"
+                    value={storedConfig.enableStrikethrough}
+                    onChange={setConfigFieldValue}
+                />
+                <Checkbox
                     name="enableCollapsibleGroups"
                     label="Enable collapsible groups 🧪"
                     value={storedConfig.enableCollapsibleGroups}
                     onChange={setConfigFieldValue}
                 />
-                <WorkItemRow
-                    className={styles.workItem}
-                    workItem={{
-                        clientId: 'xyz',
-                        date: '2024-09-06',
-                        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vel enim sit amet augue iaculis pharetra non ac nulla. In justo enim, egestas sed mi cursus, efficitur interdum felis.',
-                        duration: 90,
-                        id: undefined,
-                        startTime: undefined,
-                        status: 'DOING',
-                        task: '1',
-                        type: 'DEVELOPMENT',
-                    }}
-                    contractId="1"
-                />
+                <div className={styles.container}>
+                    <WorkItemRow
+                        className={styles.workItem}
+                        workItem={{
+                            clientId: 'xyz',
+                            date: '2024-09-06',
+                            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vel enim sit amet augue iaculis pharetra non ac nulla. In justo enim, egestas sed mi cursus, efficitur interdum felis.',
+                            duration: 90,
+                            id: undefined,
+                            startTime: undefined,
+                            status: 'DOING',
+                            task: '1',
+                            type: 'DEVELOPMENT',
+                        }}
+                        contractId="1"
+                    />
+                    <WorkItemRow
+                        className={styles.workItem}
+                        workItem={{
+                            clientId: 'abc',
+                            date: '2024-09-10',
+                            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vel enim sit amet augue iaculis pharetra non ac nulla. In justo enim, egestas sed mi cursus, efficitur interdum felis.',
+                            duration: 10,
+                            id: undefined,
+                            startTime: undefined,
+                            status: 'DONE',
+                            task: '1',
+                            type: 'DESIGN',
+                        }}
+                        contractId="1"
+                    />
+                </div>
             </div>
             <div className={styles.section}>
                 <h4>

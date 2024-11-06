@@ -1,5 +1,6 @@
 .select-input-container {
     .input {
+        border: var(--width-separator-sm) solid var(--color-foreground);
         border-radius: var(--border-radius-md);
         padding: 0 var(--spacing-sm);
     }
