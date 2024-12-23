@@ -38,6 +38,8 @@ import {
 import useThrottledValue from '#hooks/useThrottledValue';
 import { getWindowSize } from '#utils/common';
 import { defaultConfigValue } from '#utils/constants';
+import { getFromStorage } from '#utils/localStorage';
+import { ConfigStorage } from '#utils/types';
 
 import wrappedRoutes, { unwrappedRoutes } from './routes';
 
@@ -153,10 +155,14 @@ function App() {
 
     // Local Storage
 
-    const [storageState, setStorageState] = useState<LocalStorageContextProps['storageState']>({
-        'timur-config': {
-            defaultValue: defaultConfigValue,
-        },
+    const [storageState, setStorageState] = useState<LocalStorageContextProps['storageState']>(() => {
+        const configValue = getFromStorage<ConfigStorage>('timur-config');
+        return ({
+            'timur-config': {
+                value: configValue,
+                defaultValue: defaultConfigValue,
+            },
+        });
     });
 
     const handleStorageStateUpdate: typeof setStorageState = useCallback(

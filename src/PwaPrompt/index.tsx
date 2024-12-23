@@ -35,7 +35,7 @@ function PwaPrompt() {
         },
         onRegisterError: (error) => {
             // eslint-disable-next-line no-console
-            console.info('SW registration error', error);
+            console.error('SW registration error', error);
         },
     });
 
