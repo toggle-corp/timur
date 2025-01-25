@@ -271,15 +271,22 @@ export function unwrapRoute<K extends object>(
     );
 
     wrappedRoutes.forEach((route) => {
-        if (route.parent) {
-            const parentId = route.parent.id;
+        if (!route.parent) {
+            return;
+        }
+        const parentId = route.parent.id;
 
-            const parentRoute = mapping[parentId];
-            if (parentRoute.children) {
-                parentRoute.children.push(route);
-            } else {
-                parentRoute.children = [route];
-            }
+        const parentRoute = mapping[parentId];
+        if (!parentRoute) {
+            // eslint-disable-next-line no-console
+            console.error('Parent route is not defined');
+            return;
+        }
+
+        if (parentRoute.children) {
+            parentRoute.children.push(route);
+        } else {
+            parentRoute.children = [route];
         }
     });
 

@@ -41,7 +41,7 @@ function workItemStatusKeySelector(item: WorkItemStatusOption) {
 function workItemStatusLabelSelector(item: WorkItemStatusOption) {
     return item.label;
 }
-function workItemStatusColorSelector(item: WorkItemStatusOption): [string, string] {
+function workItemStatusColorSelector(item: WorkItemStatusOption): readonly [string, string] {
     if (item.key === 'DOING') {
         return colorscheme[1];
     }
@@ -51,8 +51,10 @@ function workItemStatusColorSelector(item: WorkItemStatusOption): [string, strin
     return colorscheme[7];
 }
 
-function defaultColorSelector<T>(_: T, i: number): [string, string] {
-    return colorscheme[i % colorscheme.length];
+function defaultColorSelector<T>(_: T, i: number): readonly [string, string] {
+    // NOTE: This is safe as we the index is bounded
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return colorscheme[i % colorscheme.length]!;
 }
 
 /** @knipignore */
@@ -106,6 +108,7 @@ export function Component() {
                 <div className={styles.container}>
                     <WorkItemRow
                         className={styles.workItem}
+                        tasks={undefined}
                         workItem={{
                             clientId: 'xyz',
                             date: '2024-09-06',
@@ -121,6 +124,7 @@ export function Component() {
                     />
                     <WorkItemRow
                         className={styles.workItem}
+                        tasks={undefined}
                         workItem={{
                             clientId: 'abc',
                             date: '2024-09-10',

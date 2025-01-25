@@ -72,13 +72,14 @@ function useSpacingTokens(props: Props) {
                     : spacingVariantToTokenStartIndex[variant];
                 const offset = spacingTypeToOffsetMap[spacing];
 
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 spacingValue = spacingTokens[
                     bound(
                         startIndex + offset,
                         0,
                         spacingTokens.length - 1,
                     )
-                ];
+                ]!;
             }
 
             if (isNotDefined(spacing)) {

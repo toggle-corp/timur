@@ -40,7 +40,7 @@ export type Props<
         searchOptions?: OPTION[] | undefined | null;
         keySelector: (option: OPTION) => OPTION_KEY;
         labelSelector: (option: OPTION) => string;
-        colorSelector?: (option: OPTION, index: number) => [string, string];
+        colorSelector?: (option: OPTION, index: number) => readonly [string, string];
         descriptionSelector?: (option: OPTION) => string;
         hideOptionFilter?: (option: OPTION) => boolean;
         name: NAME;

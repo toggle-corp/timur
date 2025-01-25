@@ -100,7 +100,7 @@ export function Component() {
     const projectsMap = useMemo(() => {
         const allProjectsData = allProjectsResponse?.data?.private.allProjects;
 
-        if (isNotDefined(allProjectsData)) {
+        if (isNotDefined(allProjectsData) || allProjectsData.length <= 0) {
             return undefined;
         }
 
@@ -111,10 +111,14 @@ export function Component() {
             },
             deadlines: {
                 prev: 'start',
-                next: allProjectsData[0].id,
+                // NOTE: This is safe because allProjectsData.length has been checked
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                next: allProjectsData[0]!.id,
             },
             end: {
-                prev: allProjectsData[allProjectsData.length - 1].id,
+                // NOTE: This is safe because allProjectsData.length has been checked
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                prev: allProjectsData[allProjectsData.length - 1]!.id,
                 next: undefined,
             },
         };
@@ -122,8 +126,12 @@ export function Component() {
         return allProjectsData.reduce(
             (acc, val, index) => {
                 const currentMap = {
-                    next: index === (allProjectsData.length - 1) ? 'end' : allProjectsData[index + 1].id,
-                    prev: index === 0 ? 'deadlines' : allProjectsData[index - 1].id,
+                    // NOTE: This is safe because boundary for allProjectsData has been checked
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    next: index === (allProjectsData.length - 1) ? 'end' : allProjectsData[index + 1]!.id,
+                    // NOTE: This is safe because boundary for allProjectsData has been checked
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    prev: index === 0 ? 'deadlines' : allProjectsData[index - 1]!.id,
                 };
 
                 acc[val.id] = currentMap;
@@ -166,10 +174,10 @@ export function Component() {
     }, [setUrlQuery]);
 
     const mapId = urlQuery.page ?? urlQuery.project ?? 'start';
-    const prevButtonName = projectsMap?.[mapId].prev;
+    const prevButtonName = projectsMap?.[mapId]?.prev;
     const prevButtonDisabled = isNotDefined(prevButtonName);
 
-    const nextButtonName = projectsMap?.[mapId].next;
+    const nextButtonName = projectsMap?.[mapId]?.next;
     const nextButtonDisabled = isNotDefined(nextButtonName);
 
     const handleNextButtion = useCallback(

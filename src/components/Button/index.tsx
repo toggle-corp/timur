@@ -15,7 +15,7 @@ import styles from './styles.module.css';
 
 type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent' | 'dropdown-item';
 
-const buttonVariantToClassNameMap: Record<ButtonVariant, string> = {
+const buttonVariantToClassNameMap: Record<ButtonVariant, string | undefined> = {
     primary: styles.primary,
     secondary: styles.secondary,
     tertiary: styles.tertiary,
@@ -24,7 +24,7 @@ const buttonVariantToClassNameMap: Record<ButtonVariant, string> = {
     'dropdown-item': styles.dropdownItem,
 };
 
-const spacingTypeToClassNameMap: Record<SpacingType, string> = {
+const spacingTypeToClassNameMap: Record<SpacingType, string | undefined> = {
     none: styles.noSpacing,
     '2xs': styles.condensedSpacing,
     xs: styles.compactSpacing,

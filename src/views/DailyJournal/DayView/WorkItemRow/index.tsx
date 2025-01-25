@@ -14,6 +14,7 @@ import {
 import {
     _cs,
     isDefined,
+    unique,
 } from '@togglecorp/fujs';
 
 import Button from '#components/Button';
@@ -62,7 +63,7 @@ function workItemStatusKeySelector(item: WorkItemStatusOption) {
 function workItemStatusLabelSelector(item: WorkItemStatusOption) {
     return item.label;
 }
-function workItemStatusColorSelector(item: WorkItemStatusOption): [string, string] {
+function workItemStatusColorSelector(item: WorkItemStatusOption): readonly [string, string] {
     if (item.key === 'DOING') {
         return colorscheme[1];
     }
@@ -72,13 +73,16 @@ function workItemStatusColorSelector(item: WorkItemStatusOption): [string, strin
     return colorscheme[7];
 }
 
-function defaultColorSelector<T>(_: T, i: number): [string, string] {
-    return colorscheme[i % colorscheme.length];
+function defaultColorSelector<T>(_: T, i: number): readonly [string, string] {
+    // NOTE: This is safe as we the index is bounded
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return colorscheme[i % colorscheme.length]!;
 }
 
 interface Props {
     className?: string;
     workItem: WorkItem;
+    tasks: Task[] | undefined;
     contractId: string | undefined;
 
     onClone?: (clientId: string, override?: Partial<WorkItem>) => void;
@@ -90,6 +94,7 @@ function WorkItemRow(props: Props) {
     const {
         className,
         workItem,
+        tasks,
         contractId,
         onClone,
         onDelete,
@@ -112,8 +117,18 @@ function WorkItemRow(props: Props) {
     );
 
     const filteredTaskList = useMemo(
-        () => enums?.private?.allActiveTasks?.filter((task) => task.contract.id === contractId),
-        [contractId, enums],
+        () => (
+            unique(
+                [
+                    ...enums?.private?.allActiveTasks ?? [],
+                    ...tasks ?? [],
+                ],
+                (item) => item.id,
+            ).filter(
+                (task) => task.contract.id === contractId,
+            )
+        ),
+        [contractId, enums, tasks],
     );
 
     const handleStatusCheck = useCallback(() => {
