@@ -19,6 +19,7 @@ import {
     useQuery,
 } from 'urql';
 
+import CommandContext, { CommandContextProps } from '#contexts/command';
 import DateContext from '#contexts/date';
 import EnumsContext, { EnumsContextProps } from '#contexts/enums';
 import LocalStorageContext, { LocalStorageContextProps } from '#contexts/localStorage';
@@ -36,10 +37,14 @@ import {
     MeQueryVariables,
 } from '#generated/types/graphql';
 import useThrottledValue from '#hooks/useThrottledValue';
+import { Command } from '#utils/command';
 import { getWindowSize } from '#utils/common';
 import { defaultConfigValue } from '#utils/constants';
 import { getFromStorage } from '#utils/localStorage';
-import { ConfigStorage } from '#utils/types';
+import {
+    ConfigStorage,
+    WorkItem,
+} from '#utils/types';
 
 import wrappedRoutes, { unwrappedRoutes } from './routes';
 
@@ -115,7 +120,7 @@ const sentryCreateBrowserRouter = Sentry.wrapCreateBrowserRouter(
 const router = sentryCreateBrowserRouter(unwrappedRoutes);
 
 function App() {
-    // Date
+    // DATE
 
     const [date, setDate] = useState(() => {
         const today = new Date();
@@ -154,7 +159,7 @@ function App() {
         [],
     );
 
-    // Local Storage
+    // LOCAL STORAGE
 
     const [storageState, setStorageState] = useState<LocalStorageContextProps['storageState']>(() => {
         const configValue = getFromStorage<ConfigStorage>('timur-config');
@@ -201,7 +206,7 @@ function App() {
         setStorageState: handleStorageStateUpdate,
     }), [storageState, handleStorageStateUpdate]);
 
-    // Device Size
+    // DEVICE SIZE
 
     const [size, setSize] = useState<SizeContextProps>(getWindowSize);
     const throttledSize = useThrottledValue(size);
@@ -217,7 +222,7 @@ function App() {
         };
     }, []);
 
-    // Authentication
+    // AUTHENTICATION
 
     const [userAuth, setUserAuth] = useState<UserAuth>();
     const [ready, setReady] = useState(false);
@@ -250,7 +255,7 @@ function App() {
         [userAuth, removeUserAuth],
     );
 
-    // Enums
+    // ENUMS
 
     const [enumsResult] = useQuery<EnumsQuery, EnumsQueryVariables>(
         {
@@ -278,7 +283,26 @@ function App() {
         [enumsResult],
     );
 
-    // Page layouts
+    // WORK ITEMS
+
+    const commands = useRef<Command<WorkItem, string>[]>([]);
+    const zeitgeist = useRef<number>(0);
+    const watch = useCallback(
+        (command: Command<WorkItem, string>) => {
+            // TODO: Create a command queue
+            // eslint-disable-next-line no-console
+            console.info('Command', command);
+        },
+        [],
+    );
+
+    const commandState = useMemo((): CommandContextProps => ({
+        commands,
+        zeitgeist,
+        watch,
+    }), [watch]);
+
+    // PAGE LAYOUTS
 
     const navbarStartActionRef = useRef<HTMLDivElement>(null);
     const navbarMidActionRef = useRef<HTMLDivElement>(null);
@@ -290,7 +314,7 @@ function App() {
         endActionsRef: navbarEndActionRef,
     }), []);
 
-    // Route
+    // ROUTE
 
     const fallbackElement = (
         <div className={styles.fallbackElement}>
@@ -316,10 +340,12 @@ function App() {
                         <RouteContext.Provider value={wrappedRoutes}>
                             <UserContext.Provider value={userContextValue}>
                                 <EnumsContext.Provider value={enumsContextValue}>
-                                    <RouterProvider
-                                        router={router}
-                                        fallbackElement={fallbackElement}
-                                    />
+                                    <CommandContext.Provider value={commandState}>
+                                        <RouterProvider
+                                            router={router}
+                                            fallbackElement={fallbackElement}
+                                        />
+                                    </CommandContext.Provider>
                                 </EnumsContext.Provider>
                             </UserContext.Provider>
                         </RouteContext.Provider>
