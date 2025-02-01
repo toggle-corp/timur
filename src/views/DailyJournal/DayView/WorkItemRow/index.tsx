@@ -316,21 +316,10 @@ function WorkItemRow(props: Props) {
                     Move to another day
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                    type="confirm-button"
+                    type="button"
                     name={workItem.clientId}
                     title="Delete this entry"
                     onClick={onDelete}
-                    confirmHeading="Delete entry"
-                    confirmDescription={(
-                        <div>
-                            <p>
-                                Do you want to delete this entry?
-                            </p>
-                            <p>
-                                This action cannot be reverted.
-                            </p>
-                        </div>
-                    )}
                     icons={<RiDeleteBin2Line />}
                 >
                     Delete entry
