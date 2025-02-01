@@ -83,6 +83,7 @@ function ProjectSection(props: Props) {
     });
 
     const stats = standupResponse.data?.private.dailyStandup.projectStat;
+
     // FIXME: use memo
     const sortedUsers = [...(stats?.users ?? [])].sort((foo, bar) => (
         compareNumber(
