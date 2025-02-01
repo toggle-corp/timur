@@ -123,56 +123,6 @@ const MY_TIME_ENTRIES_QUERY = gql`
     }
 `;
 
-/*
-query MyQuery {
-  private {
-    allTimeEntries(filters: {statuses: TODO, users: "9"}) {
-      clientId
-      id
-      description
-      date
-      startTime
-      duration
-      status
-      taskId
-      type
-    }
-  }
-}
-*/
-
-/*
-const BULK_TIME_ENTRY_MUTATION = gql`
-    mutation BulkTimeEntry($timeEntries: [TimeEntryBulkCreateInput!], $deleteIds: [ID!]) {
-        private {
-            bulkTimeEntry(
-                items: $timeEntries,
-                deleteIds: $deleteIds
-            ) {
-                deleted {
-                    id
-                    clientId
-                }
-                errors
-                results {
-                    id
-                    clientId
-                    date
-                    description
-                    duration
-                    startTime
-                    status
-                    taskId
-                    type
-                }
-            }
-        }
-    }
-`;
-*/
-
-// TODO: Do not use JSON.stringify for comparison
-// TODO: use filtered localState instead of workItems
 /** @knipignore */
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
@@ -205,7 +155,15 @@ export function Component() {
         [],
     );
 
-    const { zeitgeist, commands, watch } = useContext(CommandContext);
+    const {
+        zeitgeist,
+        commands,
+        setZeitgeist,
+        setCommands,
+        watch,
+        undoable,
+        redoable,
+    } = useContext(CommandContext);
 
     const {
         entries: workItems,
@@ -215,11 +173,13 @@ export function Component() {
         undo,
     } = useCommand({
         defaultEntries: [],
-        filter,
         commands,
+        filter,
         keySelector,
         watch,
         zeitgeist,
+        setZeitgeist,
+        setCommands,
     });
 
     const [tasks, setTasks] = useState<Task[]>([]);
@@ -254,71 +214,6 @@ export function Component() {
         },
         [selectedDate],
     );
-
-    /*
-    const [
-        bulkMutationState,
-        triggerBulkMutation,
-    ] = useMutation<BulkTimeEntryMutation, BulkTimeEntryMutationVariables>(
-        BULK_TIME_ENTRY_MUTATION,
-    );
-
-    const handleBulkAction = useCallback(
-        async (addedItems: WorkItem[], updatedItems: WorkItem[], removedItems: string[]) => {
-            const res = await triggerBulkMutation({
-                timeEntries: [
-                    ...addedItems,
-                    ...updatedItems.map((item) => ({
-                        // NOTE: We need to send null to the server so that we
-                        // can clear the values
-                        clientId: item.clientId ?? null,
-                        date: item.date ?? null,
-                        description: item.description ?? null,
-                        duration: item.duration ?? null,
-                        id: item.id ?? null,
-                        status: item.status ?? null,
-                        task: item.task ?? null,
-                        type: item.type ?? null,
-                    })),
-                ],
-                deleteIds: removedItems,
-            });
-            if (res.error) {
-                return { ok: false } as const;
-            }
-
-            const workItemsFromServer = removeNull(
-                res.data?.private.bulkTimeEntry.results?.map(
-                    (timeEntry) => {
-                        const { taskId, ...otherTimeEntryProps } = timeEntry;
-                        return {
-                            ...otherTimeEntryProps,
-                            task: taskId,
-                        };
-                    },
-                ) ?? [],
-            );
-
-            return {
-                ok: true as const,
-                savedValues: workItemsFromServer ?? [],
-                deletedValues: res.data?.private.bulkTimeEntry.deleted?.map(
-                    (item) => item.clientId,
-                ) ?? [],
-            } as const;
-        },
-        [triggerBulkMutation],
-    );
-
-    const {
-        addOrUpdateStateData,
-        removeFromStateData,
-        addOrUpdateServerData,
-        isObsolete,
-    } = useBackgroundSync<WorkItem>(
-        handleBulkAction,
-    );
-    */
 
     const [
         myTimeEntriesResult,
@@ -365,16 +260,12 @@ export function Component() {
 
             setTasks(tasksFromServer);
             setWorkItems(workItemsFromServer);
-            // addOrUpdateServerData(workItemsFromServer);
-            // addOrUpdateStateData(workItemsFromServer);
         },
         [
             myTimeEntriesResult.fetching,
             myTimeEntriesResult.data,
             myTimeEntriesResult.error,
             setWorkItems,
-            // addOrUpdateServerData,
-            // addOrUpdateStateData,
         ],
     );
 
@@ -671,6 +562,7 @@ export function Component() {
             <div
                 className={_cs(
                     styles.lastSavedStatus,
+                    // TODO: Move this to App
                     // (isObsolete || bulkMutationState.fetching) && styles.active,
                 )}
             >
@@ -714,22 +606,6 @@ export function Component() {
                     >
                         <RiCalendar2Line />
                     </CalendarInput>
-                    <Button
-                        name={undefined}
-                        title="Undo"
-                        onClick={undo}
-                        variant="quaternary"
-                    >
-                        Undo
-                    </Button>
-                    <Button
-                        name={undefined}
-                        title="Redo"
-                        onClick={redo}
-                        variant="quaternary"
-                    >
-                        Redo
-                    </Button>
                     {entriesWithError > 0 && (
                         <div className={styles.warningBadge}>
                             <FcHighPriority />
@@ -803,6 +679,25 @@ export function Component() {
                     >
                         Go to today
                     </Link>
+                )}
+                <Button
+                    name={undefined}
+                    title="Undo"
+                    onClick={undo}
+                    variant="quaternary"
+                    disabled={!undoable}
+                >
+                    Undo
+                </Button>
+                {redoable && (
+                    <Button
+                        name={undefined}
+                        title="Redo"
+                        onClick={redo}
+                        variant="quaternary"
+                    >
+                        Redo
+                    </Button>
                 )}
             </div>
             <ShortcutsDialog

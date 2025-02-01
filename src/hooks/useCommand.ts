@@ -55,6 +55,8 @@ function useCommand<T, K>(props: {
     filter: (entry: T) => boolean,
     commands: React.MutableRefObject<Command<T, K>[]>,
     zeitgeist: React.MutableRefObject<number>,
+    setCommands: (value: Command<T, K>[]) => void,
+    setZeitgeist: (value: number) => void,
     watch: (command: Command<T, K>) => void,
 }) {
     const {
@@ -64,6 +66,8 @@ function useCommand<T, K>(props: {
         commands,
         zeitgeist,
         watch,
+        setZeitgeist,
+        setCommands,
     } = props;
 
     const [entries, setEntries] = useState<T[]>(() => {
@@ -109,10 +113,10 @@ function useCommand<T, K>(props: {
                 },
                 1,
             );
-            zeitgeist.current = newState.zeitgeist;
+            setZeitgeist(newState.zeitgeist);
             setEntries(newState.entries);
         },
-        [commands, entries, keySelector, watch, zeitgeist],
+        [commands, entries, keySelector, watch, zeitgeist, setZeitgeist],
     );
 
     const handleUndo = useCallback(
@@ -129,15 +133,14 @@ function useCommand<T, K>(props: {
                 },
                 1,
             );
-            zeitgeist.current = newState.zeitgeist;
             setEntries(newState.entries);
+            setZeitgeist(newState.zeitgeist);
         },
-        [commands, entries, keySelector, watch, zeitgeist],
+        [commands, entries, keySelector, watch, zeitgeist, setZeitgeist],
     );
 
     const handleUpdate = useCallback(
         (command: Command<T, K>) => {
-            // TODO: Debounce this if id and type is the same and also check temporal
             const newState = act(
                 {
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -150,11 +153,11 @@ function useCommand<T, K>(props: {
                 },
                 command,
             );
-            zeitgeist.current = newState.zeitgeist;
-            commands.current = newState.commands;
             setEntries(newState.entries);
+            setZeitgeist(newState.zeitgeist);
+            setCommands(newState.commands);
         },
-        [commands, entries, keySelector, watch, zeitgeist],
+        [commands, entries, keySelector, setCommands, setZeitgeist, watch, zeitgeist],
     );
 
     return {

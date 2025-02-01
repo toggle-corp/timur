@@ -83,7 +83,7 @@ export function Component() {
                 <Checkbox
                     name="checkboxForStatus"
                     label="Use checkbox for status"
-                    tooltip="Use checkbox instead of select input for the status. i.e. to toggle TODO, Doing and Done"
+                    tooltip="Use checkbox instead of select input for the status. i.e. to toggle TODO, DOING and DONE"
                     value={storedConfig.checkboxForStatus}
                     onChange={setConfigFieldValue}
                 />

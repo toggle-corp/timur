@@ -53,7 +53,6 @@ function getTemporalDiff(min: DateLike, max: DateLike) {
     };
 }
 
-// FIXME: We need to revisit this logic
 export function toRelativeDate(dateLike: DateLike): RelativeDate | undefined {
     const today = new Date();
     const date = new Date(dateLike);
@@ -95,6 +94,8 @@ export function toRelativeDate(dateLike: DateLike): RelativeDate | undefined {
         };
     }
 
+    // FIXME: We need to revisit these logic. There are gaps where we get no. of days
+    // Eg. on day 22
     if (temporalDiff.day > 21 && temporalDiff.month > 0 && temporalDiff.month < 10) {
         return {
             direction,

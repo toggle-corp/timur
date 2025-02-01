@@ -76,7 +76,6 @@ function DayView(props: Props) {
         tasks,
     } = props;
 
-    // FIXME: We should still get archived tasks here
     const { taskById: oldTaskById } = useContext(EnumsContext);
 
     // FIXME: memoize this

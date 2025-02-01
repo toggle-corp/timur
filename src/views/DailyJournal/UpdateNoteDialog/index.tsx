@@ -181,8 +181,6 @@ function AddNoteDialog(props: Props) {
         Vim.defineEx('q', undefined, exitHandler);
         Vim.defineEx('x', undefined, saveAndQuitHandler);
 
-        // TODO: We need to only defineEx for this particular codemirror
-        // instance
         return () => {
             Vim.defineEx('w', undefined, undefined);
             Vim.defineEx('q', undefined, undefined);
