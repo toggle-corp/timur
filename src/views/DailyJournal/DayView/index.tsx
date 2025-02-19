@@ -222,9 +222,7 @@ function DayView(props: Props) {
                     </span>
                 </h2>
                 {isDefined(totalHours) && (
-                    <div
-                        className={styles.duration}
-                    >
+                    <div className={styles.duration}>
                         <div>
                             {getDurationString(totalHours)}
                         </div>
@@ -329,8 +327,10 @@ function DayView(props: Props) {
                                                 return null;
                                             }
 
+                                            const subHeadingKey = `sub-heading-${attribute.key}-of-${groupedItem.groupKey}`;
+
                                             return (
-                                                <Fragment key={`sub-heading-${attribute.key}-of-${groupedItem.groupKey}`}>
+                                                <Fragment key={subHeadingKey}>
                                                     {i > (groupLevel - joinLevel) && (
                                                         <div className={styles.separator} />
                                                     )}
@@ -384,7 +384,8 @@ function DayView(props: Props) {
                         return (
                             <div
                                 className={styles.workItemContainer}
-                                key={groupedItem.value.clientId}
+                                // FIXME: investigate why client ID is getting duplicated
+                                key={`${groupedItem.value.clientId} - ${groupedItem.value.id ?? 'local'}`}
                             >
                                 {indent && (
                                     <Indent
