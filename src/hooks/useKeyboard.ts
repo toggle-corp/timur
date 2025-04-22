@@ -41,7 +41,7 @@ function getNewKey<T, Q extends OptionKey>(
 
     const newIndex = modulo(oldIndex + increment, options.length);
 
-    return keySelector(options[newIndex], newIndex);
+    return keySelector(options[newIndex] as T, newIndex);
 }
 
 function useKeyboard<T, Q extends OptionKey>(

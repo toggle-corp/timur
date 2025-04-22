@@ -27,6 +27,7 @@ import {
     encodeDate,
     isDefined,
     isNotDefined,
+    unique,
 } from '@togglecorp/fujs';
 import {
     gql,
@@ -63,6 +64,7 @@ import { defaultConfigValue } from '#utils/constants';
 import { removeNull } from '#utils/nullHelper';
 import {
     EntriesAsList,
+    Task,
     WorkItem,
 } from '#utils/types';
 
@@ -91,6 +93,26 @@ const MY_TIME_ENTRIES_QUERY = gql`
                 status
                 taskId
                 type
+                # We can use this infromation to get task that are already archived
+                task {
+                    id
+                    name
+                    contract {
+                        id
+                        name
+                        project {
+                            id
+                            name
+                            logo {
+                                url
+                            }
+                            projectClient {
+                                id
+                                name
+                            }
+                        }
+                    }
+                }
             }
             journal(date: $date) {
                 id
@@ -154,6 +176,7 @@ const BULK_TIME_ENTRY_MUTATION = gql`
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
     const [workItems, setWorkItems] = useState<WorkItem[]>([]);
+    const [tasks, setTasks] = useState<Task[]>([]);
     const routes = useContext(RouteContext);
     const navigate = useNavigate();
 
@@ -336,6 +359,14 @@ export function Component() {
                 ).sort((foo, bar) => compareStringAsNumber(foo.id, bar.id)) ?? [],
             );
 
+            const tasksFromServer = unique(
+                myTimeEntriesResult.data?.private.myTimeEntries?.flatMap(
+                    (timeEntry) => timeEntry.task,
+                ) ?? [],
+                (item) => item.id,
+            );
+
+            setTasks(tasksFromServer);
             setWorkItems(workItemsFromServer);
             addOrUpdateServerData(workItemsFromServer);
             addOrUpdateStateData(workItemsFromServer);
@@ -394,7 +425,9 @@ export function Component() {
                 }
 
                 const targetItem = {
-                    ...oldWorkItems[sourceItemIndex],
+                    // FIXME: This is safe as sourceItemIndex === -1 is already checked
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    ...oldWorkItems[sourceItemIndex]!,
                     ...override,
                     clientId: newId,
                 };
@@ -430,7 +463,9 @@ export function Component() {
                     return oldWorkItems;
                 }
 
-                const removedItem = oldWorkItems[sourceItemIndex];
+                // FIXME: This is safe as sourceItemIndex === -1 is already checked
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                const removedItem = oldWorkItems[sourceItemIndex]!;
                 removeFromStateData(removedItem.clientId);
 
                 const newWorkItems = [...oldWorkItems];
@@ -456,7 +491,9 @@ export function Component() {
                     return oldWorkItems;
                 }
 
-                const obsoleteWorkItem = oldWorkItems[sourceItemIndex];
+                // FIXME: This is safe as sourceItemIndex === -1 is already checked
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                const obsoleteWorkItem = oldWorkItems[sourceItemIndex]!;
 
                 const newWorkItem = {
                     ...obsoleteWorkItem,
@@ -728,6 +765,7 @@ export function Component() {
                     loading={myTimeEntriesResult.fetching}
                     errored={!!myTimeEntriesResult.error}
                     workItems={filteredWorkItems}
+                    tasks={tasks}
                     onWorkItemClone={handleWorkItemClone}
                     onWorkItemChange={handleWorkItemChange}
                     onWorkItemDelete={handleWorkItemDelete}

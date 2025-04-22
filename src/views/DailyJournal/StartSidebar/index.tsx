@@ -217,7 +217,9 @@ function StartSidebar(props: Props) {
         }
 
         const [removedItem] = newAttributes.splice(sourceIndex, 1);
-        newAttributes.splice(destinationIndex, 0, removedItem);
+        // NOTE: We can assert removedItem is not undefined as sourceIndex is already checked for -1
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        newAttributes.splice(destinationIndex, 0, removedItem!);
 
         setConfigFieldValue(newAttributes, 'dailyJournalAttributeOrder');
     }, [setConfigFieldValue, storedConfig.dailyJournalAttributeOrder]);

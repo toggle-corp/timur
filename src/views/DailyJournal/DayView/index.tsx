@@ -15,6 +15,7 @@ import {
     compareString,
     isDefined,
     isNotDefined,
+    listToMap,
     sum,
 } from '@togglecorp/fujs';
 
@@ -32,6 +33,7 @@ import {
 import {
     DailyJournalAttribute,
     EntriesAsList,
+    Task,
     WorkItem,
 } from '#utils/types';
 
@@ -52,6 +54,7 @@ const dateFormatter = new Intl.DateTimeFormat(
 interface Props {
     className?: string;
     workItems: WorkItem[] | undefined;
+    tasks: Task[] | undefined;
     loading: boolean;
     errored: boolean;
     onWorkItemClone: (clientId: string, override?: Partial<WorkItem>) => void;
@@ -70,9 +73,25 @@ function DayView(props: Props) {
         loading,
         errored,
         selectedDate,
+        tasks,
     } = props;
 
-    const { taskById } = useContext(EnumsContext);
+    // FIXME: We should still get archived tasks here
+    const { taskById: oldTaskById } = useContext(EnumsContext);
+
+    // FIXME: memoize this
+    const newTaskById = listToMap(
+        tasks,
+        (item) => item.id,
+    );
+
+    const taskById = useMemo(
+        () => ({
+            ...oldTaskById,
+            ...newTaskById,
+        }),
+        [oldTaskById, newTaskById],
+    );
 
     const [
         storedConfig,
@@ -126,15 +145,15 @@ function DayView(props: Props) {
         const taskDetails = taskById[item.task];
 
         if (attr.key === 'task') {
-            return taskDetails.name;
+            return taskDetails?.name ?? 'Unknown Task';
         }
 
         if (attr.key === 'contract') {
-            return taskDetails.contract.name;
+            return taskDetails?.contract.name ?? 'Unknown Contract';
         }
 
         if (attr.key === 'project') {
-            return taskDetails.contract.project.name;
+            return taskDetails?.contract.project.name ?? 'Unknown Project';
         }
 
         return undefined;
@@ -149,6 +168,10 @@ function DayView(props: Props) {
         }
 
         const taskDetails = taskById[item.task];
+
+        if (!taskDetails) {
+            return undefined;
+        }
 
         if (attr.key === 'project') {
             return taskDetails.contract.project.logo;
@@ -364,10 +387,6 @@ function DayView(props: Props) {
                             return null;
                         }
 
-                        const taskDetails = taskById?.[groupedItem.value.task];
-                        if (!taskDetails) {
-                            return null;
-                        }
                         const hidden = enableCollapsibleGroups
                             && collapsedGroups.some(
                                 (groupKey) => groupedItem.itemKey.startsWith(groupKey),
@@ -380,6 +399,8 @@ function DayView(props: Props) {
                             isNotDefined(groupedItem.value.type)
                             || isNotDefined(groupedItem.value.duration)
                         );
+
+                        const taskDetails = taskById?.[groupedItem.value.task];
 
                         return (
                             <div
@@ -394,10 +415,11 @@ function DayView(props: Props) {
                                 <WorkItemRow
                                     className={_cs(styles.workItem, itemErrored && styles.errored)}
                                     workItem={groupedItem.value}
+                                    tasks={tasks}
                                     onClone={onWorkItemClone}
                                     onChange={onWorkItemChange}
                                     onDelete={onWorkItemDelete}
-                                    contractId={taskDetails.contract.id}
+                                    contractId={taskDetails?.contract.id}
                                 />
                             </div>
                         );

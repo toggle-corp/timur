@@ -122,6 +122,9 @@ export function getDurationNumber(value: string | undefined) {
     // :m
     if (value.match(/^\d{0,2}:\d{1,2}$/)) {
         const [hourStr, minuteStr] = value.split(':');
+        if (isNotDefined(hourStr) || isNotDefined(minuteStr)) {
+            return null;
+        }
         return validateHhmm(hourStr, minuteStr) ?? null;
     }
     // hhmm
@@ -160,6 +163,7 @@ export function getChangedItems<T>(
     keySelector: (item: T) => string,
 ) {
     const initialKeysMap = listToMap(initialItems ?? [], keySelector);
+
     const finalKeysMap = listToMap(finalItems ?? [], keySelector);
 
     const addedKeys = Object.keys(finalKeysMap).filter(
@@ -170,12 +174,14 @@ export function getChangedItems<T>(
     );
     const updatedKeys = Object.keys(initialKeysMap).filter(
         (key) => {
-            if (isNotDefined(finalKeysMap[key])) {
+            // This should be safe as we are using keys from Object.keys(initialKeysMap)
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const initialObj = initialKeysMap[key]!;
+            const finalObj = finalKeysMap[key];
+
+            if (isNotDefined(finalObj)) {
                 return false;
             }
-
-            const initialObj = initialKeysMap[key];
-            const finalObj = finalKeysMap[key];
 
             const initialJson = JSON.stringify(
                 initialObj,
@@ -191,9 +197,16 @@ export function getChangedItems<T>(
     );
 
     return {
-        addedItems: addedKeys.map((key) => finalKeysMap[key]),
-        removedItems: removedKeys.map((key) => initialKeysMap[key]),
-        updatedItems: updatedKeys.map((key) => finalKeysMap[key]),
+        // NOTE: This should be safe as addedKeys is subset of Object.keys(finalKeysMap)
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        addedItems: addedKeys.map((key) => finalKeysMap[key]!),
+        // NOTE: This should be safe as removedKeys is subset of Object.keys(initialKeysMap)
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        removedItems: removedKeys.map((key) => initialKeysMap[key]!),
+        // NOTE: This should be safe as updatedKeys is subset of
+        // Object.keys(initialKeysMap) intersection Object.keys(finalKeysMap)
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        updatedItems: updatedKeys.map((key) => finalKeysMap[key]!),
     };
 }
 
@@ -234,7 +247,9 @@ export function sortByAttributes<LIST_ITEM, ATTRIBUTE>(
                 const currentSortResult = sortFn(
                     a,
                     b,
-                    attributes[i],
+                    // NOTE: This should be safe as we are iterating over atttributes
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    attributes[i]!,
                 );
 
                 if (currentSortResult !== 0) {
@@ -296,7 +311,9 @@ export function groupListByAttributes<LIST_ITEM, ATTRIBUTE>(
             ];
         }
 
-        const prevListItem = list[listIndex - 1];
+        // NOTE: This will always be in-bounds because we have already checked for listIndex === 0
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const prevListItem = list[listIndex - 1]!;
         const attributeMismatchIndex = attributes.findIndex((attribute) => {
             const hasSameCurrentAttribute = compareItemAttributes(
                 listItem,

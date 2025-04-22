@@ -66,7 +66,8 @@ function EndSidebar(props: Props) {
             (task) => task.contract.project.id,
             undefined,
             (list) => ({
-                project: list[0].contract.project,
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                project: list[0]!.contract.project,
                 workItems: list,
             }),
         ),

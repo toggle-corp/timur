@@ -33,7 +33,10 @@
         ],
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-        "noFallthroughCasesInSwitch": true
+        "noFallthroughCasesInSwitch": true,
+
+        "noUncheckedIndexedAccess": true
+        /* "noPropertyAccessFromIndexSignature": true */
     },
     "include": [
         "src",

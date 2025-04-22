@@ -27,7 +27,7 @@ export const defaultConfigValue: ConfigStorage = {
     collapsedGroups: [],
 };
 
-export const colorscheme: [string, string][] = [
+export const colorscheme = [
     // gray 0
     ['#454447', '#eaeaea'],
     // idigo 1
@@ -46,7 +46,7 @@ export const colorscheme: [string, string][] = [
     ['#a86e00', '#fde3aa'],
     // horchata 8
     ['#7d5327', '#ecdecc'],
-];
+] as const satisfies readonly (readonly [string, string])[];
 
 // FIXME: We should instead generate these options
 export const numericOptions: NumericOption[] = [

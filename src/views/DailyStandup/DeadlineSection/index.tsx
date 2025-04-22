@@ -111,7 +111,10 @@ function DeadlineSection() {
                             generalEvent={generalEvent}
                         />
                         {generalEvent.remainingDays < 0
-                            && upcomingEvents[index + 1]?.remainingDays >= 0
+                            && upcomingEvents[index + 1]
+                            // NOTE: This is safe as upcomingEvents[index + 1] is already checked
+                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                            && upcomingEvents[index + 1]!.remainingDays >= 0
                             && (
                                 <div className={styles.separator}>
                                     <div className={styles.line} />
