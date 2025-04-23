@@ -7,15 +7,15 @@ on:
       - 'develop'
 
 env:
-  APP_TITLE: ${{ vars.APP_TITLE }}
-  APP_ENVIRONMENT: ${{ vars.APP_ENVIRONMENT }}
-  APP_GRAPHQL_CODEGEN_ENDPOINT: ${{ vars.APP_GRAPHQL_CODEGEN_ENDPOINT }}
-  APP_GRAPHQL_ENDPOINT: ${{ vars.APP_GRAPHQL_ENDPOINT }}
-  APP_AUTH_URL: ${{ vars.APP_AUTH_URL }}
-  APP_ADMIN_URL: ${{ vars.APP_ADMIN_URL }}
-  APP_UMAMI_SRC: ${{ vars.APP_UMAMI_SRC }}
-  APP_UMAMI_ID: ${{ vars.APP_UMAMI_ID }}
-  APP_SENTRY_DSN: ${{ vars.APP_SENTRY_DSN }}
+  APP_TITLE: Timur
+  APP_ENVIRONMENT: testing
+  APP_GRAPHQL_CODEGEN_ENDPOINT: ./backend/schema.graphql
+  APP_GRAPHQL_ENDPOINT: https://timur-fake-endpoint.com
+  APP_AUTH_URL: https://timur-fake-endpoint.com
+  APP_ADMIN_URL: https://timur-fake-endpoint.com
+  APP_UMAMI_SRC: https://umami-fake-endpoint.com/script.js
+  APP_UMAMI_ID: fake-umami-id
+  APP_SENTRY_DSN: htts://dsn-fake@sentry.com/9999
   GITHUB_WORKFLOW: true
 
 jobs:
