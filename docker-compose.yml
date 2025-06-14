@@ -8,6 +8,11 @@ services:
       context: ../
       target: dev
     command: sh -c 'pnpm install && pnpm start'
+    environment:
+      APP_TITLE: '${APP_TITLE:-Timur}'
+      APP_ENVIRONMENT: '${APP_ENVIRONMENT:-development}'
+      APP_GRAPHQL_DOMAIN: ${APP_GRAPHQL_DOMAIN:-http://localhost:8100}
+      APP_GRAPHQL_CODEGEN_ENDPOINT: ${APP_GRAPHQL_CODEGEN_ENDPOINT:-./backend/schema.graphql}
     volumes:
       - ../:/code
     ports:

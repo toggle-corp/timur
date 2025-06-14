@@ -1,5 +1,4 @@
 import { ValidateEnv as validateEnv } from '@julr/vite-plugin-validate-env';
-import basicSsl from '@vitejs/plugin-basic-ssl';
 import reactSwc from '@vitejs/plugin-react-swc';
 import { execSync } from 'child_process';
 import { visualizer } from 'rollup-plugin-visualizer';
@@ -56,7 +55,6 @@ export default defineConfig(({ mode }) => {
             'import.meta.env.APP_VERSION': JSON.stringify(env.npm_package_version),
         },
         plugins: [
-            !isProd ? basicSsl() : undefined,
             isProd ? checker({
                 // typescript: true,
                 eslint: {
@@ -109,8 +107,8 @@ export default defineConfig(({ mode }) => {
         envPrefix: 'APP_',
         server: {
             port: 3000,
-            host: 'local.timur.dev.togglecorp.com',
             strictPort: true,
+            host: '0.0.0.0',
         },
         build: {
             outDir: './build',
