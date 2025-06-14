@@ -57,6 +57,7 @@ function DeadlineSection() {
         DeadlinesAndEventsQueryVariables
     >({
         query: DEADLINES_AND_EVENTS,
+        requestPolicy: 'cache-and-network',
     });
 
     const projects = deadlinesAndEvents.data?.private.allProjects;

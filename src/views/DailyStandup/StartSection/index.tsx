@@ -61,6 +61,7 @@ function StartSection() {
         UsersAvailabilityQueryVariables
     >({
         query: USERS_AVAILABILITY,
+        requestPolicy: 'cache-and-network',
     });
 
     // FIXME: need to check how to sort these information

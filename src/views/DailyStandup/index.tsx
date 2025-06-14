@@ -85,6 +85,7 @@ export function Component() {
         AllProjectsQueryVariables
     >({
         query: ALL_PROJECTS,
+        requestPolicy: 'cache-and-network',
     });
 
     type UrlQueryKey = 'project' | 'page';
