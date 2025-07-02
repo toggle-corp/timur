@@ -102,7 +102,7 @@ function Navbar(props: Props) {
                 {isNotDefined(userAuth) && (
                     <Link
                         external
-                        href={`${import.meta.env.APP_AUTH_URL}?redirect_to=${window.location.href}`}
+                        href={`${import.meta.env.APP_GRAPHQL_DOMAIN}/dev/sign_in/?redirect_to=${window.location.href}`}
                     >
                         Login
                     </Link>
@@ -127,7 +127,7 @@ function Navbar(props: Props) {
                             <DropdownMenuItem
                                 type="link"
                                 external
-                                href={import.meta.env.APP_ADMIN_URL}
+                                href={`${import.meta.env.APP_GRAPHQL_DOMAIN}/admin`}
                                 icons={<RiAdminLine />}
                             >
                                 Admin Panel

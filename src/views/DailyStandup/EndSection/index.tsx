@@ -42,6 +42,7 @@ function EndSection(props: Props) {
     const [quoteResponse] = useQuery<DailyQuoteQuery, DailyQuoteQueryVariables>({
         query: DAILY_QUOTE_QUERY,
         variables: { date },
+        requestPolicy: 'cache-and-network',
     });
 
     const dailyQuote = quoteResponse.data?.private.dailyStandup.quote;

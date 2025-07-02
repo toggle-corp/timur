@@ -16,9 +16,7 @@ export default defineConfig({
         return value as ('production' | 'staging' | 'testing' | `alpha-${number}` | 'development' | 'APP_ENVIRONMENT_PLACEHOLDER');
     },
     APP_GRAPHQL_CODEGEN_ENDPOINT: Schema.string(),
-    APP_GRAPHQL_ENDPOINT: Schema.string(),
-    APP_AUTH_URL: Schema.string(),
-    APP_ADMIN_URL: Schema.string(),
+    APP_GRAPHQL_DOMAIN: Schema.string(),
     APP_UMAMI_SRC: Schema.string.optional(),
     APP_UMAMI_ID: Schema.string.optional(),
     APP_SENTRY_DSN: Schema.string.optional(),

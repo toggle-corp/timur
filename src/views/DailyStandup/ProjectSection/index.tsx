@@ -79,6 +79,7 @@ function ProjectSection(props: Props) {
     const [standupResponse] = useQuery<DailyStandupQuery, DailyStandupQueryVariables>({
         query: DAILY_STANDUP_QUERY,
         variables: { date, projectId },
+        requestPolicy: 'cache-and-network',
     });
 
     const stats = standupResponse.data?.private.dailyStandup.projectStat;

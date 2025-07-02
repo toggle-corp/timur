@@ -2,7 +2,8 @@
     "$schema": "https://unpkg.com/knip@5/schema.json",
     "ignoreDependencies": [
         "virtual:pwa-info",
-        "virtual:pwa-register"
+        "virtual:pwa-register",
+        "sharp"
     ],
     "entry": [
         "src/**/*.test.ts",

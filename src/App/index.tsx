@@ -252,7 +252,10 @@ function App() {
     // Enums
 
     const [enumsResult] = useQuery<EnumsQuery, EnumsQueryVariables>(
-        { query: ENUMS_QUERY },
+        {
+            query: ENUMS_QUERY,
+            requestPolicy: 'cache-and-network',
+        },
     );
 
     const enumsContextValue = useMemo<EnumsContextProps>(

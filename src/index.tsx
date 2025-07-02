@@ -26,7 +26,7 @@ const webappRootId = 'webapp-root';
 const webappRootElement = document.getElementById(webappRootId);
 
 const gqlClient = new UrqlClient({
-    url: import.meta.env.APP_GRAPHQL_ENDPOINT,
+    url: `${import.meta.env.APP_GRAPHQL_DOMAIN}/graphql/`,
     exchanges: [cacheExchange({
         keys: {
             PrivateQuery: () => null,
