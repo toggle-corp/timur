@@ -19,7 +19,6 @@ env:
 jobs:
   unused:
     name: Find unused things
-    environment: 'test'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -42,7 +41,6 @@ jobs:
         run: pnpm generate:type && pnpm lint:unused
   lint-js:
     name: Lint JS
-    environment: 'test'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -65,7 +63,6 @@ jobs:
         run: pnpm generate:type && pnpm lint:js
   css-lint:
     name: Lint CSS
-    environment: 'test'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -86,7 +83,6 @@ jobs:
         run: pnpm lint:css
   typecheck:
     name: Typecheck
-    environment: 'test'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -109,7 +105,6 @@ jobs:
         run: pnpm generate:type && pnpm typecheck
   build:
     name: Build
-    environment: 'test'
     needs: [lint-js, css-lint, typecheck]
     runs-on: ubuntu-latest
     steps:
