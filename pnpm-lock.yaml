@@ -71,8 +71,8 @@ devDependencies:
     specifier: ^3.2.0
     version: 3.2.0(graphql@16.9.0)
   '@julr/vite-plugin-validate-env':
-    specifier: ^2.2.0
-    version: 2.2.0(vite@5.0.10)
+    specifier: git+https://github.com/toggle-corp/vite-plugin-validate-env#v2.2.0-tc.1
+    version: github.com/toggle-corp/vite-plugin-validate-env/3225c8405bdadf1168f1fa6f8a6de76c6777b620(vite@5.0.10)
   '@types/node':
     specifier: ^20.11.6
     version: 20.11.6
@@ -3408,19 +3408,6 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
-    dev: true
-
-  /@julr/vite-plugin-validate-env@2.2.0(vite@5.0.10):
-    resolution: {integrity: sha512-R00QZcgMNsATxI9beeM1n7VwMcsSyxFnvElJ0S1ZmglmeGzNyOzaVlfxyGgRb0NmIPYGwPSoJOnFI5BYR7Quug==}
-    engines: {node: '>=22'}
-    peerDependencies:
-      vite: ^2.9.0 || ^3.0.0-0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
-    dependencies:
-      '@poppinss/cliui': 6.4.4
-      '@poppinss/validator-lite': 2.1.1
-      '@standard-schema/spec': 1.0.0
-      unconfig: 7.3.2
-      vite: 5.0.10(@types/node@20.11.6)
     dev: true
 
   /@kamilkisiela/fast-url-parser@1.1.4:
@@ -11491,4 +11478,22 @@ packages:
       - canvas
       - supports-color
       - utf-8-validate
+    dev: true
+
+  github.com/toggle-corp/vite-plugin-validate-env/3225c8405bdadf1168f1fa6f8a6de76c6777b620(vite@5.0.10):
+    resolution: {tarball: https://codeload.github.com/toggle-corp/vite-plugin-validate-env/tar.gz/3225c8405bdadf1168f1fa6f8a6de76c6777b620}
+    id: github.com/toggle-corp/vite-plugin-validate-env/3225c8405bdadf1168f1fa6f8a6de76c6777b620
+    name: '@julr/vite-plugin-validate-env'
+    version: 2.2.0
+    engines: {node: '>=22'}
+    prepare: true
+    requiresBuild: true
+    peerDependencies:
+      vite: ^2.9.0 || ^3.0.0-0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
+    dependencies:
+      '@poppinss/cliui': 6.4.4
+      '@poppinss/validator-lite': 2.1.1
+      '@standard-schema/spec': 1.0.0
+      unconfig: 7.3.2
+      vite: 5.0.10(@types/node@20.11.6)
     dev: true
