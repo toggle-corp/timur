@@ -71,8 +71,8 @@ devDependencies:
     specifier: ^3.2.0
     version: 3.2.0(graphql@16.9.0)
   '@julr/vite-plugin-validate-env':
-    specifier: ^1.0.1
-    version: 1.0.1(vite@5.0.10)(zod@3.23.8)
+    specifier: ^2.2.0
+    version: 2.2.0(vite@5.0.10)
   '@types/node':
     specifier: ^20.11.6
     version: 20.11.6
@@ -239,10 +239,6 @@ packages:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.5
       '@jridgewell/trace-mapping': 0.3.25
-    dev: true
-
-  /@antfu/utils@0.7.10:
-    resolution: {integrity: sha512-+562v9k4aI80m1+VuMHehNJWLOFjBnXn3tdOitzD0il5b7smkSBal4+a3oKiQTbrwMmN/TBUMDvbdoWDehgOww==}
     dev: true
 
   /@apideck/better-ajv-errors@0.3.6(ajv@8.17.1):
@@ -3397,21 +3393,17 @@ packages:
       '@jridgewell/sourcemap-codec': 1.5.0
     dev: true
 
-  /@julr/vite-plugin-validate-env@1.0.1(vite@5.0.10)(zod@3.23.8):
-    resolution: {integrity: sha512-ngqm/Tt0tL5hP/egIBi40hr8WO4h0ZdLjNjF3tDTZzdG2ov8R5DyoDkKk/CQqZqCsrvBSE5ATc6fu7NGPmhrow==}
-    engines: {node: '>=16'}
+  /@julr/vite-plugin-validate-env@2.2.0(vite@5.0.10):
+    resolution: {integrity: sha512-R00QZcgMNsATxI9beeM1n7VwMcsSyxFnvElJ0S1ZmglmeGzNyOzaVlfxyGgRb0NmIPYGwPSoJOnFI5BYR7Quug==}
+    engines: {node: '>=22'}
     peerDependencies:
-      vite: ^2.9.0 || ^3.0.0-0 || ^4.0.0 || ^5.0.0
-      zod: ^3.0.0
-    peerDependenciesMeta:
-      zod:
-        optional: true
+      vite: ^2.9.0 || ^3.0.0-0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
     dependencies:
-      '@poppinss/cliui': 6.4.1
-      '@poppinss/validator-lite': 1.0.3
-      unconfig: 0.3.13
+      '@poppinss/cliui': 6.4.4
+      '@poppinss/validator-lite': 2.1.1
+      '@standard-schema/spec': 1.0.0
+      unconfig: 7.3.2
       vite: 5.0.10(@types/node@20.11.6)
-      zod: 3.23.8
     dev: true
 
   /@kamilkisiela/fast-url-parser@1.1.4:
@@ -3523,33 +3515,29 @@ packages:
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
     dev: true
 
-  /@poppinss/cliui@6.4.1:
-    resolution: {integrity: sha512-tdV3QpAfrPFRLPOh98F8QxWBvwYF3ziWGGtpVqfZtFNTFkC7nQnVQlUW55UtQ7rkeMmFohxfDI+2JNWScGJ1jQ==}
-    engines: {node: '>=18.16.0'}
+  /@poppinss/cliui@6.4.4:
+    resolution: {integrity: sha512-yJfm+3yglxdeH85C+YebxZ1zsTB4pBh+QwCuxJcxV/pVbxagn63uYyxqnQif2sKWi+nkNZxuyemON3WrtGMBCQ==}
     dependencies:
-      '@poppinss/colors': 4.1.3
-      cli-boxes: 3.0.0
+      '@poppinss/colors': 4.1.5
+      cli-boxes: 4.0.1
       cli-table3: 0.6.5
       cli-truncate: 4.0.0
-      log-update: 6.0.0
+      log-update: 6.1.0
       pretty-hrtime: 1.0.3
       string-width: 7.2.0
-      supports-color: 9.4.0
+      supports-color: 10.0.0
       terminal-size: 4.0.0
       wordwrap: 1.0.0
     dev: true
 
-  /@poppinss/colors@4.1.3:
-    resolution: {integrity: sha512-A0FjJ6x14donWDN3bHAFFjJaPWTwM2PgWT834+bPKVK6Xukf25CscoRqCPYI939a8yuJFX9PYWWnVbUVI0E2Cg==}
-    engines: {node: '>=18.16.0'}
+  /@poppinss/colors@4.1.5:
+    resolution: {integrity: sha512-FvdDqtcRCtz6hThExcFOgW0cWX+xwSMWcRuQe5ZEb2m7cVQOAVZOIMt+/v9RxGiD9/OY16qJBXK4CVKWAPalBw==}
     dependencies:
       kleur: 4.1.5
     dev: true
 
-  /@poppinss/validator-lite@1.0.3:
-    resolution: {integrity: sha512-u4dmT7PDHwNtxY3q1jHVp/u+hMEEcBlkzd37QwwM4tVt/0mLlEDttSfPQ+TT7sqPG4VEtWKwVSlMInwPUYyJpA==}
-    dependencies:
-      validator: 13.12.0
+  /@poppinss/validator-lite@2.1.1:
+    resolution: {integrity: sha512-wD64/vpViB0qV40iR/nXYJJb0pOyXW4dvXGs2mR7lNiIUTZr1ceWlhxHu9XU8kQhTjaIDQphgMa9pPBa3scxPg==}
     dev: true
 
   /@quansync/fs@0.1.3:
@@ -3898,6 +3886,10 @@ packages:
       commander: 4.1.1
       ignore: 5.3.1
       p-map: 4.0.0
+    dev: true
+
+  /@standard-schema/spec@1.0.0:
+    resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==}
     dev: true
 
   /@surma/rollup-plugin-off-main-thread@2.2.3:
@@ -4680,9 +4672,11 @@ packages:
       type-fest: 0.21.3
     dev: true
 
-  /ansi-escapes@6.2.1:
-    resolution: {integrity: sha512-4nJ3yixlEthEJ9Rk4vPcdBRkZvQZlYyu8j4/Mqz5sgIkddmEnH2Yj2ZrnP9S3tQOvSNRUIgVNF/1yPpRAGNRig==}
-    engines: {node: '>=14.16'}
+  /ansi-escapes@7.0.0:
+    resolution: {integrity: sha512-GdYO7a61mR0fOlAsvC9/rIHf7L96sBc6dEWzeOu+KAea5bZyQRPIpojrVoI4AXGJS/ycu/fBTdLrUkA4ODrvjw==}
+    engines: {node: '>=18'}
+    dependencies:
+      environment: 1.1.0
     dev: true
 
   /ansi-regex@5.0.1:
@@ -5262,9 +5256,9 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /cli-boxes@3.0.0:
-    resolution: {integrity: sha512-/lzGpEWL/8PfI0BmBOPRwp0c/wFNX1RdUML3jK/RcSBA9T8mZDdQpqYBKtCFTOfQbwPqWEOpjqW+Fnayc0969g==}
-    engines: {node: '>=10'}
+  /cli-boxes@4.0.1:
+    resolution: {integrity: sha512-5IOn+jcCEHEraYolBPs/sT4BxYCe2nHg374OPiItB1O96KZFseS2gthU4twyYzeDcFew4DaUM/xwc5BQf08JJw==}
+    engines: {node: '>=18.20 <19 || >=20.10'}
     dev: true
 
   /cli-cursor@3.1.0:
@@ -5274,11 +5268,11 @@ packages:
       restore-cursor: 3.1.0
     dev: true
 
-  /cli-cursor@4.0.0:
-    resolution: {integrity: sha512-VGtlMu3x/4DOtIUwEkRezxUZ2lBacNJCHash0N0WeZDBS+7Ux1dm3XWAgWYxLJFMMdOeXMHXorshEFhbMSGelg==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
+  /cli-cursor@5.0.0:
+    resolution: {integrity: sha512-aCj4O5wKyszjMmDT4tZj93kxyydN/K5zPWSCe6/0AV/AA1pqe5ZBIw0a2ZfPQV7lL5/yb5HsUreJ6UFAF1tEQw==}
+    engines: {node: '>=18'}
     dependencies:
-      restore-cursor: 4.0.0
+      restore-cursor: 5.1.0
     dev: true
 
   /cli-spinners@2.9.2:
@@ -5906,6 +5900,11 @@ packages:
   /env-paths@2.2.1:
     resolution: {integrity: sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A==}
     engines: {node: '>=6'}
+    dev: true
+
+  /environment@1.1.0:
+    resolution: {integrity: sha512-xUtoPkMggbz0MPyPiIWr1Kp4aeWJjDZ6SMvURhimjdZgsRuDplF5/s9hcgGhyXMhs+6vpnuoiZ2kFiu3FMnS8Q==}
+    engines: {node: '>=18'}
     dev: true
 
   /error-ex@1.3.2:
@@ -7862,12 +7861,12 @@ packages:
       wrap-ansi: 6.2.0
     dev: true
 
-  /log-update@6.0.0:
-    resolution: {integrity: sha512-niTvB4gqvtof056rRIrTZvjNYE4rCUzO6X/X+kYjd7WFxXeJ0NwEFnRxX6ehkvv3jTwrXnNdtAak5XYZuIyPFw==}
+  /log-update@6.1.0:
+    resolution: {integrity: sha512-9ie8ItPR6tjY5uYJh8K/Zrv/RMZ5VOlOWvtZdEHYSTFKZfIBPQa9tOAEeAWhd+AnIneLJ22w5fjOYtoutpWq5w==}
     engines: {node: '>=18'}
     dependencies:
-      ansi-escapes: 6.2.1
-      cli-cursor: 4.0.0
+      ansi-escapes: 7.0.0
+      cli-cursor: 5.0.0
       slice-ansi: 7.1.0
       strip-ansi: 7.1.0
       wrap-ansi: 9.0.0
@@ -8004,6 +8003,11 @@ packages:
   /mimic-fn@4.0.0:
     resolution: {integrity: sha512-vqiC06CuhBTUdZH+RYl8sFrL096vA45Ok5ISO6sE/Mr1jRbGH4Csnhi8f3wKVl7x8mO4Au7Ir9D3Oyv1VYMFJw==}
     engines: {node: '>=12'}
+    dev: true
+
+  /mimic-function@5.0.1:
+    resolution: {integrity: sha512-VP79XUPxV2CigYP3jWwAUFSku2aKqBH7uTAapFWCBqutsbmDo96KY5o8uh6U+/YSIn5OxJnXp73beVkpqMIGhA==}
+    engines: {node: '>=18'}
     dev: true
 
   /minimatch@3.1.2:
@@ -8215,6 +8219,13 @@ packages:
     engines: {node: '>=12'}
     dependencies:
       mimic-fn: 4.0.0
+    dev: true
+
+  /onetime@7.0.0:
+    resolution: {integrity: sha512-VXJjc87FScF88uafS3JllDgvAm+c/Slfz06lorj2uAY34rlUu0Nt+v8wreiImcrgAjjIHp1rXpTDlLOGw29WwQ==}
+    engines: {node: '>=18'}
+    dependencies:
+      mimic-function: 5.0.1
     dev: true
 
   /open@7.4.2:
@@ -9283,12 +9294,12 @@ packages:
       signal-exit: 3.0.7
     dev: true
 
-  /restore-cursor@4.0.0:
-    resolution: {integrity: sha512-I9fPXU9geO9bHOt9pHHOhOkYerIMsmVaWB0rA2AI9ERh/+x/i7MV5HKBNrg+ljO5eoPVgCcnFuRjJ9uH6I/3eg==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
+  /restore-cursor@5.1.0:
+    resolution: {integrity: sha512-oMA2dcrw6u0YfxJQXm342bFKX/E4sG9rbTzO9ptUcR/e8A33cHuvStiYOwH7fszkZlZ1z/ta9AAoPk2F4qIOHA==}
+    engines: {node: '>=18'}
     dependencies:
-      onetime: 5.1.2
-      signal-exit: 3.0.7
+      onetime: 7.0.0
+      signal-exit: 4.1.0
     dev: true
 
   /reusify@1.0.4:
@@ -9968,6 +9979,11 @@ packages:
     resolution: {integrity: sha512-nMIjMrd5Z2nuB2RZCKJfFMjgS3fygbeyGk9PxPPaJR1RIcyN9yn4A63Isovzm3ZtQuEkLBVgMdPup8UeLH7aQw==}
     dev: true
 
+  /supports-color@10.0.0:
+    resolution: {integrity: sha512-HRVVSbCCMbj7/kdWF9Q+bbckjBHLtHMEoJWlkmYzzdwhYMkjkOwubLM6t7NbWKjgKamGDrWL1++KrjUO1t9oAQ==}
+    engines: {node: '>=18'}
+    dev: true
+
   /supports-color@5.5.0:
     resolution: {integrity: sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow==}
     engines: {node: '>=4'}
@@ -9980,11 +9996,6 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       has-flag: 4.0.0
-    dev: true
-
-  /supports-color@9.4.0:
-    resolution: {integrity: sha512-VL+lNrEoIXww1coLPOmiEmK/0sGigko5COxI09KzHc2VJXJsQ37UaQ+8quuxjDeA7+KnLGTWRyOXSLLR2Wb4jw==}
-    engines: {node: '>=12'}
     dev: true
 
   /supports-hyperlinks@3.0.0:
@@ -10342,14 +10353,6 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /unconfig@0.3.13:
-    resolution: {integrity: sha512-N9Ph5NC4+sqtcOjPfHrRcHekBCadCXWTBzp2VYYbySOHW0PfD9XLCeXshTXjkPYwLrBr9AtSeU0CZmkYECJhng==}
-    dependencies:
-      '@antfu/utils': 0.7.10
-      defu: 6.1.4
-      jiti: 1.21.6
-    dev: true
-
   /unconfig@7.3.2:
     resolution: {integrity: sha512-nqG5NNL2wFVGZ0NA/aCFw0oJ2pxSf1lwg4Z5ill8wd7K4KX/rQbHlwbh+bjctXL5Ly1xtzHenHGOK0b+lG6JVg==}
     dependencies:
@@ -10486,11 +10489,6 @@ packages:
       '@jridgewell/trace-mapping': 0.3.25
       '@types/istanbul-lib-coverage': 2.0.6
       convert-source-map: 2.0.0
-    dev: true
-
-  /validator@13.12.0:
-    resolution: {integrity: sha512-c1Q0mCiPlgdTVVVIJIrBuxNicYE+t/7oKeI9MWLj3fh/uq2Pxh/3eeWbVZ4OcGW1TUf53At0njHw5SMdA3tmMg==}
-    engines: {node: '>= 0.10'}
     dev: true
 
   /value-or-promise@1.0.12:
