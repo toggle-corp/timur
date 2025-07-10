@@ -13,6 +13,22 @@
         flex-grow: 1;
         border-bottom: var(--width-separator-sm) solid var(--color-separator);
     }
+
+    .primary-section{
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        gap: var(--spacing-sm);
+
+        .conductor {
+            justify-content: center;
+            font-size: var(--font-size-sm);
+
+            &.hidden {
+                visibility: hidden;
+            }
+        }
+    }
 }
 
 @keyframes run {

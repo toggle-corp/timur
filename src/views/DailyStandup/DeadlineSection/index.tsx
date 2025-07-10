@@ -9,20 +9,28 @@ import {
     FcNightLandscape,
     FcSportsMode,
 } from 'react-icons/fc';
-import { compareNumber } from '@togglecorp/fujs';
+import {
+    _cs,
+    compareNumber,
+    encodeDate,
+} from '@togglecorp/fujs';
 import {
     gql,
     useQuery,
 } from 'urql';
 
 import Clock from '#components/Clock';
+import TextOutput from '#components/TextOutput';
 import {
     type DeadlinesAndEventsQuery,
     type DeadlinesAndEventsQueryVariables,
+    type StandupConductorsQuery,
+    type StandupConductorsQueryVariables,
 } from '#generated/types/graphql';
 import { type GeneralEvent } from '#utils/types';
 
 import Slide from '../Slide';
+import { STANDUP_CONDUCTORS } from '../StartSection';
 import GeneralEventOutput from './GeneralEvent';
 
 import styles from './styles.module.css';
@@ -51,6 +59,8 @@ const DEADLINES_AND_EVENTS = gql`
     }
 `;
 
+const todayDate = encodeDate(new Date());
+
 function DeadlineSection() {
     const [deadlinesAndEvents] = useQuery<
         DeadlinesAndEventsQuery,
@@ -59,6 +69,14 @@ function DeadlineSection() {
         query: DEADLINES_AND_EVENTS,
         requestPolicy: 'cache-and-network',
     });
+
+    const [conductorsResponse] = useQuery<StandupConductorsQuery, StandupConductorsQueryVariables>({
+        query: STANDUP_CONDUCTORS,
+        variables: { date: todayDate },
+        requestPolicy: 'cache-and-network',
+    });
+
+    const standupConductors = conductorsResponse.data?.private.dailyStandup;
 
     const projects = deadlinesAndEvents.data?.private.allProjects;
     const events = deadlinesAndEvents.data?.private.relativeEvents;
@@ -103,7 +121,27 @@ function DeadlineSection() {
             variant="split"
             primaryPreText="Welcome to"
             primaryHeading="Daily Standup"
-            primaryDescription={<Clock />}
+            primaryDescription={(
+                <div className={styles.primarySection}>
+                    <Clock />
+                    <TextOutput
+                        className={_cs(
+                            styles.conductor,
+                            !standupConductors && styles.hidden,
+                        )}
+                        label="Standup Lead"
+                        value={standupConductors?.conductor?.displayName ?? 'Anon'}
+                    />
+                    <TextOutput
+                        className={_cs(
+                            styles.conductor,
+                            !standupConductors && styles.hidden,
+                        )}
+                        label="Acting Lead"
+                        value={standupConductors?.fallbackConductor?.displayName ?? 'Anon'}
+                    />
+                </div>
+            )}
             secondaryHeading="Upcoming Events"
             secondaryContent={upcomingEvents.map(
                 (generalEvent, index) => (

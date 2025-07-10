@@ -1,0 +1,38 @@
+.text-output {
+    --spacing: var(--spacing-md);
+    display: flex;
+    align-items: baseline;
+    font-size: var(--font-size-sm);
+    gap: var(--spacing);
+
+    &.blok {
+        align-items: initial;
+        flex-direction: column;
+    }
+
+    >.label {
+        color: var(--color-text);
+    }
+
+    >.value {
+        font-weight: var(--font-weight-bold);
+
+        /* Useful for nested text outputs */
+        .text-output {
+            font-weight: var(--font-weight-semibold);
+        }
+    }
+
+    >.description {
+        color: var(--color-text-light);
+        font-size: var(--font-size-sm);
+    }
+
+    &.with-label-colon {
+        >.label {
+            &:after {
+                content: ':';
+            }
+        }
+    }
+}

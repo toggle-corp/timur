@@ -1,6 +1,8 @@
 import {
+    _cs,
     compareNumber,
     compareString,
+    encodeDate,
 } from '@togglecorp/fujs';
 import {
     gql,
@@ -10,9 +12,12 @@ import {
 import AvailabilityIndicator from '#components/AvailabilityIndicator';
 import Clock from '#components/Clock';
 import DisplayPicture from '#components/DisplayPicture';
+import TextOutput from '#components/TextOutput';
 import {
     type JournalLeaveTypeEnum,
     type JournalWorkFromHomeTypeEnum,
+    type StandupConductorsQuery,
+    type StandupConductorsQueryVariables,
     type UsersAvailabilityQuery,
     type UsersAvailabilityQueryVariables,
 } from '#generated/types/graphql';
@@ -55,6 +60,26 @@ const USERS_AVAILABILITY = gql`
     }
 `;
 
+export const STANDUP_CONDUCTORS = gql`
+    query StandupConductors($date: Date!){
+        private {
+            dailyStandup(date: $date) {
+                conductor {
+                    id
+                    displayName
+                    displayPicture
+                }
+                fallbackConductor {
+                    id
+                    displayName
+                    displayPicture
+                }
+            }
+        }
+    }
+`;
+
+const todayDate = encodeDate(new Date());
 function StartSection() {
     const [usersAvailability] = useQuery<
         UsersAvailabilityQuery,
@@ -63,6 +88,14 @@ function StartSection() {
         query: USERS_AVAILABILITY,
         requestPolicy: 'cache-and-network',
     });
+
+    const [conductorsResponse] = useQuery<StandupConductorsQuery, StandupConductorsQueryVariables>({
+        query: STANDUP_CONDUCTORS,
+        variables: { date: todayDate },
+        requestPolicy: 'cache-and-network',
+    });
+
+    const standupConductors = conductorsResponse.data?.private.dailyStandup;
 
     // FIXME: need to check how to sort these information
     const sortedUsers = usersAvailability.data?.private.users.items
@@ -84,8 +117,28 @@ function StartSection() {
             className={styles.startSection}
             primaryPreText="Welcome to"
             primaryHeading="Daily Standup"
-            primaryDescription={<Clock />}
-            secondaryHeading="Availability"
+            primaryDescription={(
+                <div className={styles.primarySection}>
+                    <Clock />
+                    <TextOutput
+                        className={_cs(
+                            styles.conductor,
+                            !standupConductors && styles.hidden,
+                        )}
+                        label="Standup Lead"
+                        value={standupConductors?.conductor?.displayName ?? 'Anon'}
+                    />
+                    <TextOutput
+                        className={_cs(
+                            styles.conductor,
+                            !standupConductors && styles.hidden,
+                        )}
+                        label="Acting Lead"
+                        value={standupConductors?.fallbackConductor?.displayName ?? 'Anon'}
+                    />
+                </div>
+            )}
+            secondaryHeading="Unavailability"
             secondaryContent={sortedUsers?.map((user) => (
                 <div
                     key={user.id}

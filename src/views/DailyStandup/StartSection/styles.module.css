@@ -13,4 +13,19 @@
             gap: var(--spacing-xs);
         }
     }
+    .primary-section{
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        gap: var(--spacing-sm);
+
+        .conductor {
+            justify-content: center;
+            font-size: var(--font-size-sm);
+
+            &.hidden {
+                visibility: hidden;
+            }
+        }
+    }
 }
