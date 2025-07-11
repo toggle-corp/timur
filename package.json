@@ -67,7 +67,7 @@
         "eslint-plugin-simple-import-sort": "^10.0.0",
         "graphql": "^16.9.0",
         "happy-dom": "^15.7.3",
-        "knip": "^5.29.2",
+        "knip": "^5.61.3",
         "patch-package": "^7.0.0",
         "postcss": "^8.3.0",
         "postcss-nested": "^6.0.1",
