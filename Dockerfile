@@ -12,7 +12,7 @@ RUN apt-get update -y \
 WORKDIR /code
 
 # -------------------------- Nginx - Builder --------------------------------
-FROM dev AS nginx-build
+FROM dev AS web-app-serve-build
 
 COPY ./package.json ./pnpm-lock.yaml /code/
 
@@ -20,30 +20,37 @@ RUN pnpm install
 
 COPY . /code/
 
-# Dynamic configs. Can be changed with containers. (Placeholder values)
-ENV APP_TITLE=APP_TITLE_PLACEHOLDER
-ENV APP_ENVIRONMENT=APP_ENVIRONMENT_PLACEHOLDER
-ENV APP_GRAPHQL_DOMAIN=APP_GRAPHQL_DOMAIN_PLACEHOLDER
-ENV APP_UMAMI_SRC=APP_UMAMI_SRC_PLACEHOLDER
-ENV APP_UMAMI_ID=APP_UMAMI_ID_PLACEHOLDER
-ENV APP_SENTRY_DSN=APP_SENTRY_DSN_PLACEHOLDER
+# NOTE: Dynamic env variables
+# These env variables can be dynamically defined in web-app-serve container runtime.
+# These variables are not included in the build files but the values should still be valid.
+# See "schema" field in "./env.ts"
+ENV APP_TITLE=Timur
+ENV APP_ENVIRONMENT=production
+ENV APP_GRAPHQL_DOMAIN=https://api.example.com
+ENV APP_SENTRY_DSN=https://xyzl@sentry.example.com/123
 
-# Build variables (Requires backend pulled)
+# NOTE: These are set directly in `vite.config.ts`
+# We're using raw web-app-serve placeholder values here to treat them as dynamic values
+ENV APP_UMAMI_SRC=WEB_APP_SERVE_PLACEHOLDER__APP_UMAMI_SRC
+ENV APP_UMAMI_ID=WEB_APP_SERVE_PLACEHOLDER__APP_UMAMI_ID
+
+# NOTE: Static env variables:
+# These env variables are used during build
 ENV APP_GRAPHQL_CODEGEN_ENDPOINT=./backend/schema.graphql
 
-RUN pnpm generate:type && pnpm build
+# NOTE: WEB_APP_SERVE_ENABLED=true will skip defining the above dynamic env variables
+# See "overrideDefine" field in "./env.ts"
+RUN pnpm generate:type && WEB_APP_SERVE_ENABLED=true pnpm build
 
-# ---------------------------------------------------------------------------
-FROM nginx:1 AS nginx-serve
+# ---------------------------------------------------------------------
+# Final image using web-app-serve
+FROM ghcr.io/toggle-corp/web-app-serve:v0.1.2 AS web-app-serve
 
-LABEL maintainer="Togglecorp Dev"
+MAINTAINER navin
 LABEL org.opencontainers.image.source="https://github.com/toggle-corp/timur"
+LABEL org.opencontainers.image.authors="dev@togglecorp.com"
 
-COPY ./nginx-serve/apply-config.sh /docker-entrypoint.d/
-COPY ./nginx-serve/nginx.conf.template /etc/nginx/templates/default.conf.template
-COPY --from=nginx-build /code/build /code/build
-
-# NOTE: Used by apply-config.sh
+# Env for apply-config script
 ENV APPLY_CONFIG__SOURCE_DIRECTORY=/code/build/
-ENV APPLY_CONFIG__DESTINATION_DIRECTORY=/usr/share/nginx/html/
-ENV APPLY_CONFIG__OVERWRITE_DESTINATION=true
+
+COPY --from=web-app-serve-build /code/build "$APPLY_CONFIG__SOURCE_DIRECTORY"
