@@ -395,3 +395,21 @@ export function putUndefined<T extends object>(value: T) {
 
     return copy as PutUndefined<T>;
 }
+
+const dateTimeFormatter = new Intl.DateTimeFormat(
+    [],
+    {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        weekday: 'short',
+        hour: 'numeric',
+        minute: 'numeric',
+        // second: 'numeric',
+        hour12: true,
+    },
+);
+
+export function formatDateTime(date: Date) {
+    return dateTimeFormatter.format(date);
+}

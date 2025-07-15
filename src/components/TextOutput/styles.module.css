@@ -2,8 +2,8 @@
     --spacing: var(--spacing-md);
     display: flex;
     align-items: baseline;
-    font-size: var(--font-size-sm);
-    gap: var(--spacing);
+    font-size: var(--font-size-md);
+    gap: var(--spacing-sm);
 
     &.blok {
         align-items: initial;
@@ -25,7 +25,6 @@
 
     >.description {
         color: var(--color-text-light);
-        font-size: var(--font-size-sm);
     }
 
     &.with-label-colon {

@@ -4,7 +4,7 @@ import { UserMeType } from '#generated/types/graphql';
 
 export type UserAuth = Pick<
     UserMeType,
-    'displayName' | 'displayPicture' | 'email' | 'firstName' | 'id' | 'lastName' | 'isStaff'
+    'displayName' | 'displayPicture' | 'email' | 'firstName' | 'id' | 'lastName' | 'isStaff' | 'loginExpire'
 >;
 
 export interface UserContextProps {

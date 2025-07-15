@@ -20,6 +20,13 @@
         }
     }
 
+    .nagbar {
+        flex-shrink: 0;
+        background: var(--color-primary);
+        padding: var(--spacing-xs);
+        text-align: center;
+        color: var(--color-tertiary);
+    }
     .navbar {
         flex-shrink: 0;
     }

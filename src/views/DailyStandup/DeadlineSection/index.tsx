@@ -9,28 +9,22 @@ import {
     FcNightLandscape,
     FcSportsMode,
 } from 'react-icons/fc';
-import {
-    _cs,
-    compareNumber,
-    encodeDate,
-} from '@togglecorp/fujs';
+import { compareNumber } from '@togglecorp/fujs';
 import {
     gql,
     useQuery,
 } from 'urql';
 
-import Clock from '#components/Clock';
-import TextOutput from '#components/TextOutput';
+import StandupConductors from '#components/StandupConductors';
 import {
     type DeadlinesAndEventsQuery,
     type DeadlinesAndEventsQueryVariables,
-    type StandupConductorsQuery,
-    type StandupConductorsQueryVariables,
 } from '#generated/types/graphql';
+import useCurrentDate from '#hooks/useCurrentDate';
+import { formatDateTime } from '#utils/common';
 import { type GeneralEvent } from '#utils/types';
 
 import Slide from '../Slide';
-import { STANDUP_CONDUCTORS } from '../StartSection';
 import GeneralEventOutput from './GeneralEvent';
 
 import styles from './styles.module.css';
@@ -59,8 +53,6 @@ const DEADLINES_AND_EVENTS = gql`
     }
 `;
 
-const todayDate = encodeDate(new Date());
-
 function DeadlineSection() {
     const [deadlinesAndEvents] = useQuery<
         DeadlinesAndEventsQuery,
@@ -69,14 +61,6 @@ function DeadlineSection() {
         query: DEADLINES_AND_EVENTS,
         requestPolicy: 'cache-and-network',
     });
-
-    const [conductorsResponse] = useQuery<StandupConductorsQuery, StandupConductorsQueryVariables>({
-        query: STANDUP_CONDUCTORS,
-        variables: { date: todayDate },
-        requestPolicy: 'cache-and-network',
-    });
-
-    const standupConductors = conductorsResponse.data?.private.dailyStandup;
 
     const projects = deadlinesAndEvents.data?.private.allProjects;
     const events = deadlinesAndEvents.data?.private.relativeEvents;
@@ -115,6 +99,7 @@ function DeadlineSection() {
             })) ?? []),
         ].sort((a, b) => compareNumber(a.remainingDays, b.remainingDays));
     }, [events, projects]);
+    const todayDate = useCurrentDate();
 
     return (
         <Slide
@@ -123,23 +108,8 @@ function DeadlineSection() {
             primaryHeading="Daily Standup"
             primaryDescription={(
                 <div className={styles.primarySection}>
-                    <Clock />
-                    <TextOutput
-                        className={_cs(
-                            styles.conductor,
-                            !standupConductors && styles.hidden,
-                        )}
-                        label="Standup Lead"
-                        value={standupConductors?.conductor?.displayName ?? 'Anon'}
-                    />
-                    <TextOutput
-                        className={_cs(
-                            styles.conductor,
-                            !standupConductors && styles.hidden,
-                        )}
-                        label="Acting Lead"
-                        value={standupConductors?.fallbackConductor?.displayName ?? 'Anon'}
-                    />
+                    <div>{formatDateTime(todayDate)}</div>
+                    <StandupConductors />
                 </div>
             )}
             secondaryHeading="Upcoming Events"
