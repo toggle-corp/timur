@@ -8,14 +8,16 @@ import {
 } from 'urql';
 
 import AvailabilityIndicator from '#components/AvailabilityIndicator';
-import Clock from '#components/Clock';
 import DisplayPicture from '#components/DisplayPicture';
+import StandupConductors from '#components/StandupConductors';
 import {
     type JournalLeaveTypeEnum,
     type JournalWorkFromHomeTypeEnum,
     type UsersAvailabilityQuery,
     type UsersAvailabilityQueryVariables,
 } from '#generated/types/graphql';
+import useCurrentDate from '#hooks/useCurrentDate';
+import { formatDateTime } from '#utils/common';
 
 import Slide from '../Slide';
 
@@ -77,6 +79,7 @@ function StartSection() {
                 bar.displayName,
             ),
         );
+    const todayDate = useCurrentDate();
 
     return (
         <Slide
@@ -84,8 +87,13 @@ function StartSection() {
             className={styles.startSection}
             primaryPreText="Welcome to"
             primaryHeading="Daily Standup"
-            primaryDescription={<Clock />}
-            secondaryHeading="Availability"
+            primaryDescription={(
+                <div className={styles.primarySection}>
+                    <div>{formatDateTime(todayDate)}</div>
+                    <StandupConductors />
+                </div>
+            )}
+            secondaryHeading="Unavailability"
             secondaryContent={sortedUsers?.map((user) => (
                 <div
                     key={user.id}

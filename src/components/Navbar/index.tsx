@@ -102,7 +102,7 @@ function Navbar(props: Props) {
                 {isNotDefined(userAuth) && (
                     <Link
                         external
-                        href={`${import.meta.env.APP_GRAPHQL_DOMAIN}/dev/sign_in/?redirect_to=${window.location.href}`}
+                        href={`${import.meta.env.APP_GRAPHQL_DOMAIN}/?redirect_to=${window.location.href}`}
                     >
                         Login
                     </Link>

@@ -1,3 +1,10 @@
+.primary-section{
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-2xl);
+}
+
 .separator {
     display: flex;
     align-items: center;

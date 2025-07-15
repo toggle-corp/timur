@@ -15,11 +15,13 @@ import {
     useQuery,
 } from 'urql';
 
-import Clock from '#components/Clock';
+import StandupConductors from '#components/StandupConductors';
 import {
     type DeadlinesAndEventsQuery,
     type DeadlinesAndEventsQueryVariables,
 } from '#generated/types/graphql';
+import useCurrentDate from '#hooks/useCurrentDate';
+import { formatDateTime } from '#utils/common';
 import { type GeneralEvent } from '#utils/types';
 
 import Slide from '../Slide';
@@ -97,13 +99,19 @@ function DeadlineSection() {
             })) ?? []),
         ].sort((a, b) => compareNumber(a.remainingDays, b.remainingDays));
     }, [events, projects]);
+    const todayDate = useCurrentDate();
 
     return (
         <Slide
             variant="split"
             primaryPreText="Welcome to"
             primaryHeading="Daily Standup"
-            primaryDescription={<Clock />}
+            primaryDescription={(
+                <div className={styles.primarySection}>
+                    <div>{formatDateTime(todayDate)}</div>
+                    <StandupConductors />
+                </div>
+            )}
             secondaryHeading="Upcoming Events"
             secondaryContent={upcomingEvents.map(
                 (generalEvent, index) => (
