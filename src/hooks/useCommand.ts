@@ -1,5 +1,6 @@
 import {
     useCallback,
+    useRef,
     useState,
 } from 'react';
 
@@ -70,6 +71,7 @@ function useCommand<T, K>(props: {
         setCommands,
     } = props;
 
+    const entriesRef = useRef<T[]>([]);
     const [entries, setEntries] = useState<T[]>(() => {
         const newEntries = initializeEntries({
             entries: defaultEntries,
@@ -80,6 +82,7 @@ function useCommand<T, K>(props: {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             zeitgeist: zeitgeist.current!,
         });
+        entriesRef.current = newEntries;
         return newEntries;
     });
 
@@ -95,6 +98,7 @@ function useCommand<T, K>(props: {
                 zeitgeist: zeitgeist.current!,
             });
             setEntries(newEntries);
+            entriesRef.current = newEntries;
         },
         [commands, filter, keySelector, zeitgeist],
     );
@@ -108,15 +112,16 @@ function useCommand<T, K>(props: {
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     zeitgeist: zeitgeist.current!,
                     watch,
-                    entries,
+                    entries: entriesRef.current,
                     keySelector,
                 },
                 1,
             );
             setZeitgeist(newState.zeitgeist);
             setEntries(newState.entries);
+            entriesRef.current = newState.entries;
         },
-        [commands, entries, keySelector, watch, zeitgeist, setZeitgeist],
+        [commands, keySelector, watch, zeitgeist, setZeitgeist],
     );
 
     const handleUndo = useCallback(
@@ -128,15 +133,16 @@ function useCommand<T, K>(props: {
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     zeitgeist: zeitgeist.current!,
                     watch,
-                    entries,
+                    entries: entriesRef.current,
                     keySelector,
                 },
                 1,
             );
             setEntries(newState.entries);
+            entriesRef.current = newState.entries;
             setZeitgeist(newState.zeitgeist);
         },
-        [commands, entries, keySelector, watch, zeitgeist, setZeitgeist],
+        [commands, keySelector, watch, zeitgeist, setZeitgeist],
     );
 
     const handleUpdate = useCallback(
@@ -148,16 +154,17 @@ function useCommand<T, K>(props: {
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     zeitgeist: zeitgeist.current!,
                     watch,
-                    entries,
+                    entries: entriesRef.current,
                     keySelector,
                 },
                 command,
             );
             setEntries(newState.entries);
+            entriesRef.current = newState.entries;
             setZeitgeist(newState.zeitgeist);
             setCommands(newState.commands);
         },
-        [commands, entries, keySelector, setCommands, setZeitgeist, watch, zeitgeist],
+        [commands, keySelector, setCommands, setZeitgeist, watch, zeitgeist],
     );
 
     return {
