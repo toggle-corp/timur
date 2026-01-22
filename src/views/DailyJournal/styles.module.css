@@ -1,33 +1,6 @@
 .daily-journal {
     position: relative;
 
-    .last-saved-status {
-        display: flex;
-        position: fixed;
-        right: var(--spacing-md);
-        bottom: var(--spacing-md);
-        align-items: center;
-        transition: .5s opacity ease-in-out;
-        opacity: 0;
-        border-radius: 0.5rem;
-        background-color: var(--color-quaternary);
-        padding: var(--spacing-2xs) var(--spacing-sm);
-        color: var(--color-text-light);
-        gap: var(--spacing-xs);
-
-        .timur-icon {
-            height: 1rem;
-        }
-
-        &.active {
-            opacity: 1;
-
-            .timur-icon {
-                animation: shake-it-off 2.2s ease-in infinite;
-            }
-        }
-    }
-
     .bottom-actions {
         display: flex;
         gap: var(--spacing-sm);
@@ -56,32 +29,5 @@
 
     .spacer {
         flex-grow: 1;
-    }
-}
-
-@keyframes shake-it-off {
-    10% {
-        transform: rotate(0);
-    }
-    20% {
-        transform: rotate(-160deg);
-    }
-    30% {
-        transform: rotate(-160deg) translateY(2px);
-    }
-    35% {
-        transform: rotate(-160deg) translateY(-2px);
-    }
-    50% {
-        transform: rotate(-160deg) translateY(2px);
-    }
-    55% {
-        transform: rotate(-160deg) translateY(-2px);
-    }
-    70% {
-        transform: rotate(-160deg) translateY(0);
-    }
-    80% {
-        transform: rotate(0);
     }
 }

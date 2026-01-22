@@ -59,6 +59,7 @@ import {
     WorkItem,
 } from '#utils/types';
 
+import timurLogo from './icon.svg';
 import PwaPrompt from './PwaPrompt';
 import wrappedRoutes, { unwrappedRoutes } from './routes';
 
@@ -475,7 +476,6 @@ function CommandProvider(props: BaseProps) {
     const inFlightServerCommands = useRef<Command<WorkItem, string>[]>([]);
     const [inFlight, setInFlight] = useState(false);
 
-    // TODO: We need to debounce the values here
     const [
         ,
         triggerBulkMutation,
@@ -483,11 +483,9 @@ function CommandProvider(props: BaseProps) {
         BULK_TIME_ENTRY_MUTATION,
     );
 
-    const throttledLastUpdated = useThrottledValue(serverCommandsLastUpdated, 1000);
-
     useEffect(
         () => {
-            if (inFlight || !throttledLastUpdated) {
+            if (inFlight || !serverCommandsLastUpdated) {
                 return;
             }
 
@@ -528,9 +526,14 @@ function CommandProvider(props: BaseProps) {
                 inFlightServerCommands.current = [];
                 setInFlight(false);
             }
-            mutate();
+
+            // NOTE: This will act as a rate limit
+            setTimeout(
+                mutate,
+                1000,
+            );
         },
-        [inFlight, throttledLastUpdated, setServerCommands, triggerBulkMutation],
+        [inFlight, serverCommandsLastUpdated, setServerCommands, triggerCudTimeEntryMutation],
     );
 
     const setZeitgeist = useCallback(
@@ -621,6 +624,21 @@ function CommandProvider(props: BaseProps) {
     return (
         <CommandContext.Provider value={commandState}>
             {children}
+            <div
+                className={_cs(
+                    styles.lastSavedStatus,
+                    inFlight && styles.active,
+                )}
+            >
+                <img
+                    className={styles.timurIcon}
+                    alt="Timur Icon"
+                    src={timurLogo}
+                />
+                <div>
+                    Committing...
+                </div>
+            </div>
         </CommandContext.Provider>
     );
 }
