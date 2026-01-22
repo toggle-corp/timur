@@ -304,9 +304,11 @@ export function Component() {
                 console.error(`Could not find item ${workItemClientId} while cloning`);
                 return;
             }
+
             const newId = getNewId();
             const newItem: WorkItem = {
                 ...oldItem,
+                ...override,
                 clientId: newId,
             };
             delete newItem.id;
