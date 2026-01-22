@@ -394,11 +394,6 @@ function DayView(props: Props) {
                             return null;
                         }
 
-                        const itemErrored = groupedItem.value.status !== 'TODO' && (
-                            isNotDefined(groupedItem.value.type)
-                            || isNotDefined(groupedItem.value.duration)
-                        );
-
                         const taskDetails = taskById?.[groupedItem.value.task];
 
                         return (
@@ -412,9 +407,11 @@ function DayView(props: Props) {
                                     />
                                 )}
                                 <WorkItemRow
-                                    className={_cs(styles.workItem, itemErrored && styles.errored)}
+                                    className={styles.workItem}
                                     workItem={groupedItem.value}
                                     tasks={tasks}
+                                    typeErrored={groupedItem.value.status !== 'TODO' && isNotDefined(groupedItem.value.type)}
+                                    durationErrored={groupedItem.value.status !== 'TODO' && isNotDefined(groupedItem.value.duration)}
                                     onClone={onWorkItemClone}
                                     onChange={onWorkItemChange}
                                     onDelete={onWorkItemDelete}
