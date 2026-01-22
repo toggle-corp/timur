@@ -47,15 +47,15 @@ export function Component() {
                     )}
                 />
             )}
-            {userAuth && daysBeforeLogout < REMAINING_DAYS_THRESHOLD && (
-                <div className={styles.nagbar}>
-                    {`You'll be automatically logged out in ${Math.floor(daysBeforeLogout)} days. Please re-login to avoid unexpected logout.`}
-                </div>
-            )}
             <Navbar className={styles.navbar} />
             <div className={styles.pageContent}>
                 <Outlet />
             </div>
+            {userAuth && daysBeforeLogout < REMAINING_DAYS_THRESHOLD && (
+                <div className={styles.nagbar}>
+                    {`You'll be automatically logged out in ${Math.floor(daysBeforeLogout)} days unless you re-login.`}
+                </div>
+            )}
         </div>
     );
 }
