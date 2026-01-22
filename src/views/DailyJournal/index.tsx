@@ -22,7 +22,6 @@ import {
     useParams,
 } from 'react-router-dom';
 import {
-    _cs,
     compareStringAsNumber,
     encodeDate,
     isDefined,
@@ -67,7 +66,6 @@ import {
     WorkItem,
 } from '#utils/types';
 
-import timurLogo from '../../App/icon.svg';
 import AddWorkItemDialog from './AddWorkItemDialog';
 import AvailabilityDialog from './AvailabilityDialog';
 import DayView from './DayView';
@@ -559,22 +557,6 @@ export function Component() {
             onSwipeLeft={handleSwipeLeft}
             onSwipeRight={handleSwipeRight}
         >
-            <div
-                className={_cs(
-                    styles.lastSavedStatus,
-                    // TODO: Move this to App
-                    // (isObsolete || bulkMutationState.fetching) && styles.active,
-                )}
-            >
-                <img
-                    className={styles.timurIcon}
-                    alt="Timur Icon"
-                    src={timurLogo}
-                />
-                <div>
-                    Syncing...
-                </div>
-            </div>
             <Portal container={midActionsRef}>
                 <div className={styles.dateNavigation}>
                     {screen === 'desktop' && (
