@@ -522,10 +522,18 @@ function CommandProvider(props: BaseProps) {
                     const deletedItems = inFlightServerCommands.current.filter(isDeleteAction);
                     const res = await triggerCudTimeEntryMutation({
                         createItems: addedItems.map((item) => item.newValue),
-                        updateItems: editedItems.map((item) => ({
-                            ...item.newValue,
-                            clientId: item.key,
-                        })),
+                        updateItems: editedItems.map((item) => {
+                            const finalItem = {
+                                ...item.newValue,
+                                clientId: item.key,
+                            };
+                            // NOTE: We want to replace all undefined with null so that
+                            // we can indicate to server that the fields should be cleared
+                            Object.entries(finalItem).forEach(([field, value]) => {
+                                finalItem[field as keyof typeof finalItem] = value ?? null;
+                            });
+                            return finalItem;
+                        }),
                         deleteIds: deletedItems.map((item) => item.oldValue.id).filter(isDefined),
                     });
 
