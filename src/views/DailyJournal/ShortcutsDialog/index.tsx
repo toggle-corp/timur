@@ -47,13 +47,6 @@ function ShortcutsDialog(props: Props) {
             <div>
                 Hit
                 {' '}
-                <code>Ctrl+Enter</code>
-                {' '}
-                to add a new note.
-            </div>
-            <div>
-                Hit
-                {' '}
                 <code>Ctrl+Shift+Left</code>
                 {' '}
                 to go to previous day.

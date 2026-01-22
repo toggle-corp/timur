@@ -438,10 +438,6 @@ export function Component() {
                 event.preventDefault();
                 event.stopPropagation();
                 handleAddEntryClick();
-            } else if (event.ctrlKey && event.key === 'Enter') {
-                event.preventDefault();
-                event.stopPropagation();
-                handleNoteUpdateClick();
             } else if (event.ctrlKey && event.shiftKey && event.key === 'ArrowLeft') {
                 event.preventDefault();
                 event.stopPropagation();
@@ -466,7 +462,6 @@ export function Component() {
             setSelectedDate,
             handleAddEntryClick,
             handleShortcutsButtonClick,
-            handleNoteUpdateClick,
         ],
     );
 
