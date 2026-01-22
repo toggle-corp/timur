@@ -108,11 +108,6 @@
                 flex-grow: 1;
                 background-color: var(--color-foreground);
 
-                &.errored {
-                    /* FIXME: use design token */
-                    background-color: #ffeae1;
-                }
-
                 &:focus-within {
                     background-color: var(--color-foreground);
                 }
