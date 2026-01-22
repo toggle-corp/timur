@@ -58,6 +58,7 @@ interface Props {
     loading: boolean;
     errored: boolean;
     onWorkItemClone: (clientId: string, override?: Partial<WorkItem>) => void;
+    onWorkItemAssist: (clientId: string) => void;
     onWorkItemChange: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
     onWorkItemDelete: (clientId: string) => void;
     selectedDate: string;
@@ -68,6 +69,7 @@ function DayView(props: Props) {
         className,
         workItems,
         onWorkItemClone,
+        onWorkItemAssist,
         onWorkItemChange,
         onWorkItemDelete,
         loading,
@@ -413,6 +415,7 @@ function DayView(props: Props) {
                                     typeErrored={groupedItem.value.status !== 'TODO' && isNotDefined(groupedItem.value.type)}
                                     durationErrored={groupedItem.value.status !== 'TODO' && isNotDefined(groupedItem.value.duration)}
                                     onClone={onWorkItemClone}
+                                    onAssist={onWorkItemAssist}
                                     onChange={onWorkItemChange}
                                     onDelete={onWorkItemDelete}
                                     contractId={taskDetails?.contract.id}
