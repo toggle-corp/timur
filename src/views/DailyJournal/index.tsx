@@ -48,6 +48,7 @@ import SizeContext from '#contexts/size';
 import {
     MyTimeEntriesQuery,
     MyTimeEntriesQueryVariables,
+    TimeEntryTypeEnum,
 } from '#generated/types/graphql';
 import useCommand from '#hooks/useCommand';
 import { useFocusManager } from '#hooks/useFocus';
@@ -75,6 +76,29 @@ import StartSidebar from './StartSidebar';
 import UpdateNoteDialog from './UpdateNoteDialog';
 
 import styles from './styles.module.css';
+
+function inferTypeFromDescription(desc: string): TimeEntryTypeEnum | undefined {
+    const sanitizedDesc = desc.toLowerCase();
+    if (sanitizedDesc.includes('meeting') || sanitizedDesc.includes('standup') || sanitizedDesc.includes('all hands') || sanitizedDesc.includes('catchup')) {
+        return 'INTERNAL_MEETING';
+    }
+    if (sanitizedDesc.includes('discuss')) {
+        return 'INTERNAL_DISCUSSION';
+    }
+    if (sanitizedDesc.includes('deploy')) {
+        return 'DEV_OPS';
+    }
+    if (sanitizedDesc.includes('research') || sanitizedDesc.includes('study')) {
+        return 'RESEARCH';
+    }
+    if (sanitizedDesc.includes('documentation')) {
+        return 'DOCUMENTATION';
+    }
+    if (sanitizedDesc.includes('review pr') || sanitizedDesc.includes('refactor') || sanitizedDesc.includes('fix') || sanitizedDesc.includes('debug')) {
+        return 'DEVELOPMENT';
+    }
+    return undefined;
+}
 
 const MY_TIME_ENTRIES_QUERY = gql`
     query MyTimeEntries($date: Date!) {
@@ -329,6 +353,65 @@ export function Component() {
             focus(String(newId));
         },
         [workItems, setWorkItemChange, focus],
+    );
+
+    const handleWorkItemAssist = useCallback(
+        (workItemClientId: string) => {
+            const sourceItem = workItems.find((item) => item.clientId === workItemClientId);
+            if (!sourceItem) {
+                // eslint-disable-next-line no-console
+                console.error(`Could not find item ${workItemClientId} while splitting`);
+                return;
+            }
+
+            // NOTE: split on 2 new liness
+            const descriptions = (sourceItem.description ?? '')
+                .split(/\n\n+/)
+                .map((line) => line.trim()).filter((item) => item !== '');
+
+            if (descriptions.length <= 0) {
+                return;
+            }
+
+            const [firstDescription, ...otherDescriptions] = descriptions;
+
+            const now = new Date().getTime();
+
+            otherDescriptions.forEach((desc) => {
+                const type = inferTypeFromDescription(desc);
+                const targetItem = {
+                    ...sourceItem,
+                    description: desc,
+                    type,
+                    clientId: getNewId(),
+                };
+                delete targetItem.id;
+                delete targetItem.duration;
+
+                setWorkItemChange({
+                    type: 'add',
+                    key: targetItem.clientId,
+                    newValue: targetItem,
+                    timestamp: now,
+                });
+            });
+
+            setWorkItemChange({
+                type: 'edit',
+                key: sourceItem.clientId,
+                oldValue: {
+                    description: sourceItem.description,
+                    type: sourceItem.type,
+                },
+                newValue: {
+                    description: firstDescription,
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    type: inferTypeFromDescription(firstDescription!) ?? sourceItem.type,
+                },
+                timestamp: now,
+            });
+        },
+        [workItems, setWorkItemChange],
     );
 
     const handleWorkItemDelete = useCallback(
@@ -638,6 +721,7 @@ export function Component() {
                     workItems={filteredWorkItems}
                     tasks={tasks}
                     onWorkItemClone={handleWorkItemClone}
+                    onWorkItemAssist={handleWorkItemAssist}
                     onWorkItemChange={handleWorkItemChange}
                     onWorkItemDelete={handleWorkItemDelete}
                     selectedDate={selectedDate}

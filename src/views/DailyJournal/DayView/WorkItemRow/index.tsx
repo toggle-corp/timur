@@ -1,4 +1,5 @@
 import {
+    KeyboardEvent,
     useCallback,
     useContext,
     useMemo,
@@ -89,6 +90,7 @@ interface Props {
     durationErrored?: boolean;
 
     onClone?: (clientId: string, override?: Partial<WorkItem>) => void;
+    onAssist?: (clientId: string) => void;
     onChange?: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
     onDelete?: (clientId: string) => void;
 }
@@ -100,6 +102,7 @@ function WorkItemRow(props: Props) {
         tasks,
         contractId,
         onClone,
+        onAssist,
         onDelete,
         onChange,
         typeErrored,
@@ -193,6 +196,17 @@ function WorkItemRow(props: Props) {
         [onClone, workItem.clientId],
     );
 
+    const handleShortcuts = useCallback(
+        (event: KeyboardEvent<HTMLTextAreaElement>) => {
+            if (event.ctrlKey && event.key === 'Enter' && onAssist) {
+                event.preventDefault();
+                event.stopPropagation();
+                onAssist(workItem.clientId);
+            }
+        },
+        [onAssist, workItem.clientId],
+    );
+
     const statusInput = config.checkboxForStatus ? (
         <Checkbox
             checkmarkClassName={_cs(
@@ -244,6 +258,7 @@ function WorkItemRow(props: Props) {
             title="Description"
             value={workItem.description}
             onChange={setFieldValue}
+            onKeyDown={handleShortcuts}
             placeholder="Description"
             compact={config.compactTextArea}
         />
