@@ -13,7 +13,6 @@ import * as Sentry from '@sentry/react';
 import {
     _cs,
     encodeDate,
-    isDefined,
     listToMap,
 } from '@togglecorp/fujs';
 import { cacheExchange } from '@urql/exchange-graphcache';
@@ -38,8 +37,8 @@ import UserContext, {
     UserContextProps,
 } from '#contexts/user';
 import {
-    BulkTimeEntryMutation,
-    BulkTimeEntryMutationVariables,
+    CudTimeEntryMutation,
+    CudTimeEntryMutationVariables,
     EnumsQuery,
     EnumsQueryVariables,
     MeQuery,
@@ -150,11 +149,16 @@ const ENUMS_QUERY = gql`
     }
 `;
 
-const BULK_TIME_ENTRY_MUTATION = gql`
-    mutation BulkTimeEntry($timeEntries: [TimeEntryBulkCreateInput!], $deleteIds: [ID!]) {
+const CUD_TIME_ENTRY_MUTATION = gql`
+    mutation CudTimeEntry(
+        $createItems: [TimeEntryBulkCreateInput!],
+        $updateItems: [TimeEntryBulkUpdateInput!],
+        $deleteIds: [ID!],
+    ) {
         private {
-            bulkTimeEntry(
-                items: $timeEntries,
+            cudTimeEntry(
+                createItems: $createItems,
+                updateItems: $updateItems,
                 deleteIds: $deleteIds
             ) {
                 deleted {
@@ -162,7 +166,18 @@ const BULK_TIME_ENTRY_MUTATION = gql`
                     clientId
                 }
                 errors
-                results {
+                createItems {
+                    id
+                    clientId
+                    date
+                    description
+                    duration
+                    startTime
+                    status
+                    taskId
+                    type
+                }
+                updateItems {
                     id
                     clientId
                     date
@@ -479,9 +494,9 @@ function CommandProvider(props: BaseProps) {
 
     const [
         ,
-        triggerBulkMutation,
-    ] = useMutation<BulkTimeEntryMutation, BulkTimeEntryMutationVariables>(
-        BULK_TIME_ENTRY_MUTATION,
+        triggerCudTimeEntryMutation,
+    ] = useMutation<CudTimeEntryMutation, CudTimeEntryMutationVariables>(
+        CUD_TIME_ENTRY_MUTATION,
     );
 
     useEffect(
@@ -504,16 +519,21 @@ function CommandProvider(props: BaseProps) {
                     const addedItems = inFlightServerCommands.current.filter(isAddAction);
                     const editedItems = inFlightServerCommands.current.filter(isEditAction);
                     const deletedItems = inFlightServerCommands.current.filter(isDeleteAction);
-                    // TODO: Use clientId instead in the id for edit and delete
-                    const res = await triggerBulkMutation({
-                        timeEntries: [
-                            ...addedItems.map((item) => item.newValue),
-                            ...editedItems.map((item) => ({
+                    const res = await triggerCudTimeEntryMutation({
+                        createItems: addedItems.map((item) => item.newValue),
+                        updateItems: editedItems.map((item) => {
+                            const finalItem = {
                                 ...item.newValue,
                                 clientId: item.key,
-                            })),
-                        ],
-                        deleteIds: deletedItems.map((item) => item.oldValue.id).filter(isDefined),
+                            };
+                            // NOTE: We want to replace all undefined with null so that
+                            // we can indicate to server that the fields should be cleared
+                            Object.entries(finalItem).forEach(([field, value]) => {
+                                finalItem[field as keyof typeof finalItem] = value ?? null;
+                            });
+                            return finalItem;
+                        }),
+                        deleteIds: deletedItems.map((item) => item.oldValue.clientId),
                     });
 
                     // eslint-disable-next-line no-console
