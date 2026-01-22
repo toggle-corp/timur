@@ -38,6 +38,15 @@
         min-width: 8rem;
     }
 
+    .errored-input {
+        input {
+            text-decoration: underline;
+            text-decoration-color: red;
+            text-decoration-thickness: 2px;
+            text-decoration-style: solid;
+        }
+    }
+
     &:focus-within {
         background-color: var(--color-tertiary);
     }

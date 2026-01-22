@@ -85,6 +85,9 @@ interface Props {
     tasks: Task[] | undefined;
     contractId: string | undefined;
 
+    typeErrored?: boolean;
+    durationErrored?: boolean;
+
     onClone?: (clientId: string, override?: Partial<WorkItem>) => void;
     onChange?: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
     onDelete?: (clientId: string) => void;
@@ -99,6 +102,8 @@ function WorkItemRow(props: Props) {
         onClone,
         onDelete,
         onChange,
+        typeErrored,
+        durationErrored,
     } = props;
 
     const { enums } = useContext(EnumsContext);
@@ -246,7 +251,7 @@ function WorkItemRow(props: Props) {
 
     const typeInput = (
         <SelectInput
-            className={styles.type}
+            className={_cs(styles.type, typeErrored && styles.erroredInput)}
             name="type"
             placeholder="Type"
             options={enums?.enums.TimeEntryType}
@@ -260,7 +265,7 @@ function WorkItemRow(props: Props) {
 
     const durationInput = (
         <DurationInput
-            className={styles.hours}
+            className={_cs(styles.hours, durationErrored && styles.erroredInput)}
             name="duration"
             title="Hours"
             value={workItem.duration}
