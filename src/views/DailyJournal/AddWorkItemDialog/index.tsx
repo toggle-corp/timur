@@ -1,4 +1,5 @@
 import {
+    KeyboardEvent,
     useCallback,
     useContext,
     useEffect,
@@ -84,6 +85,22 @@ function AddWorkItemDialog(props: Props) {
         [searchText, enums],
     );
 
+    const handleAcceptFirstOption = useCallback(
+        (event: KeyboardEvent<HTMLInputElement>) => {
+            if (event.key !== 'Enter') {
+                return;
+            }
+            event.preventDefault();
+            event.stopPropagation();
+            const firstItem = filteredTaskList[0];
+            if (!firstItem) {
+                return;
+            }
+            handleWorkItemCreate(firstItem.id);
+        },
+        [filteredTaskList, handleWorkItemCreate],
+    );
+
     return (
         <Dialog
             open={showAddWorkItemDialog}
@@ -103,6 +120,7 @@ function AddWorkItemDialog(props: Props) {
                 value={searchText}
                 variant="general"
                 onChange={setSearchText}
+                onKeyDown={handleAcceptFirstOption}
                 icons={(
                     <RiSearchLine />
                 )}
