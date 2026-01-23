@@ -13,7 +13,6 @@ import * as Sentry from '@sentry/react';
 import {
     _cs,
     encodeDate,
-    isDefined,
     listToMap,
 } from '@togglecorp/fujs';
 import { cacheExchange } from '@urql/exchange-graphcache';
@@ -534,7 +533,7 @@ function CommandProvider(props: BaseProps) {
                             });
                             return finalItem;
                         }),
-                        deleteIds: deletedItems.map((item) => item.oldValue.id).filter(isDefined),
+                        deleteIds: deletedItems.map((item) => item.oldValue.clientId),
                     });
 
                     // eslint-disable-next-line no-console
