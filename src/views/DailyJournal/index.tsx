@@ -545,7 +545,6 @@ export function Component() {
             setSelectedDate,
             handleAddEntryClick,
             handleShortcutsButtonClick,
-            handleNoteUpdateClick,
         ],
     );
 
