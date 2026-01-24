@@ -7,7 +7,6 @@ import {
     useRef,
     useState,
 } from 'react';
-import { FcHighPriority } from 'react-icons/fc';
 import {
     RiAddLine,
     RiArrowLeftSLine,
@@ -604,14 +603,6 @@ export function Component() {
     // FIXME: memoize this
     const filteredWorkItems = workItems.filter((item) => item.date === selectedDate);
 
-    const entriesWithError = filteredWorkItems
-        .filter((item) => (
-            item.status !== 'TODO' && (
-                isNotDefined(item.type)
-                || isNotDefined(item.duration)
-            )
-        )).length;
-
     const leaveType = myTimeEntriesResult.data?.private.journal?.leaveType;
     const wfhType = myTimeEntriesResult.data?.private.journal?.wfhType;
 
@@ -668,13 +659,6 @@ export function Component() {
                     >
                         <RiCalendar2Line />
                     </CalendarInput>
-                    {entriesWithError > 0 && (
-                        <div className={styles.warningBadge}>
-                            <FcHighPriority />
-                            <span>
-                                {`${entriesWithError} issues`}
-                            </span>
-                        </div>
                     )}
                     <div className={styles.spacer} />
                     <Button
