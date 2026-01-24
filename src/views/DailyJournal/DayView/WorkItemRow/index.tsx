@@ -387,7 +387,7 @@ function WorkItemRow(props: Props) {
                 open={isDefined(dialogState)}
                 mode="center"
                 onClose={handleDialogClose}
-                heading="Select date"
+                heading={dialogState === 'move' ? 'Move to' : 'Copy to'}
                 contentClassName={styles.modalContent}
                 className={styles.calendarDialog}
                 size="auto"

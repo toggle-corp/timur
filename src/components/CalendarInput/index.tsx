@@ -59,7 +59,7 @@ function CalendarInput<const N>(props: Props<N>) {
                 open={confirmationShown}
                 mode="center"
                 onClose={handleModalClose}
-                heading="Select date"
+                heading="Jump to"
                 contentClassName={styles.modalContent}
                 className={styles.calendarDialog}
                 size="auto"
