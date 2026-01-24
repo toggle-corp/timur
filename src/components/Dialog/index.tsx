@@ -97,9 +97,9 @@ function Dialog(props: Props) {
                 {open && (
                     <>
                         <header className={styles.header}>
-                            <h2 className={styles.heading}>
+                            <h4 className={styles.heading}>
                                 {heading}
-                            </h2>
+                            </h4>
                             <Button
                                 className={styles.closeButton}
                                 name={undefined}
