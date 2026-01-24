@@ -9,10 +9,13 @@ import {
 } from 'react';
 import {
     RiAddLine,
+    RiArrowGoBackFill,
+    RiArrowGoForwardFill,
     RiArrowLeftSLine,
     RiArrowRightSLine,
     RiCalendar2Line,
     RiHomeOfficeLine,
+    RiSettingsLine,
     RiStickyNoteAddLine,
     RiTerminalBoxLine,
 } from 'react-icons/ri';
@@ -34,7 +37,6 @@ import {
 
 import AvailabilityIndicator from '#components/AvailabilityIndicator';
 import Button from '#components/Button';
-import CalendarInput from '#components/CalendarInput';
 import Link, { resolvePath } from '#components/Link';
 import Page from '#components/Page';
 import Portal from '#components/Portal';
@@ -650,15 +652,16 @@ export function Component() {
                             </Link>
                         </>
                     )}
-                    <CalendarInput
-                        title="Open calendar"
-                        name={undefined}
-                        variant="quaternary"
-                        value={selectedDate}
-                        onChange={setSelectedDate}
-                    >
-                        <RiCalendar2Line />
-                    </CalendarInput>
+                    {selectedDate !== fullDate && (
+                        <Link
+                            to="dailyJournal"
+                            variant="quaternary"
+                            icons={(
+                                <RiCalendar2Line />
+                            )}
+                        >
+                            Today
+                        </Link>
                     )}
                     <div className={styles.spacer} />
                     <Button
@@ -679,8 +682,11 @@ export function Component() {
                             onClick={handleNoteUpdateClick}
                             title="Update Note"
                             variant="quaternary"
+                            icons={(
+                                <RiStickyNoteAddLine />
+                            )}
                         >
-                            <RiStickyNoteAddLine />
+                            Note
                         </Button>
                     )}
                     {screen === 'desktop' && (
@@ -689,9 +695,24 @@ export function Component() {
                             name={undefined}
                             variant="quaternary"
                             onClick={handleShortcutsButtonClick}
+                            icons={(
+                                <RiTerminalBoxLine />
+                            )}
                         >
-                            <RiTerminalBoxLine />
+                            Shortcuts
                         </Button>
+                    )}
+                    {screen === 'desktop' && (
+                        <Link
+                            to="settings"
+                            title="Settings"
+                            variant="quaternary"
+                            icons={(
+                                <RiSettingsLine />
+                            )}
+                        >
+                            Settings
+                        </Link>
                     )}
                 </div>
             </Portal>
@@ -719,14 +740,6 @@ export function Component() {
                 >
                     Add entry
                 </Button>
-                {selectedDate !== fullDate && (
-                    <Link
-                        to="dailyJournal"
-                        variant="quaternary"
-                    >
-                        Go to today
-                    </Link>
-                )}
                 <Button
                     name={undefined}
                     title="Undo"
@@ -734,18 +747,17 @@ export function Component() {
                     variant="quaternary"
                     disabled={!undoable}
                 >
-                    Undo
+                    <RiArrowGoBackFill />
                 </Button>
-                {redoable && (
-                    <Button
-                        name={undefined}
-                        title="Redo"
-                        onClick={redo}
-                        variant="quaternary"
-                    >
-                        Redo
-                    </Button>
-                )}
+                <Button
+                    name={undefined}
+                    title="Redo"
+                    onClick={redo}
+                    variant="quaternary"
+                    disabled={!redoable}
+                >
+                    <RiArrowGoForwardFill />
+                </Button>
             </div>
             <ShortcutsDialog
                 dialogOpenTriggerRef={shortcutsDialogOpenTriggerRef}
