@@ -21,7 +21,7 @@
     .brand {
         display: flex;
         align-items: center;
-        font-size: var(--font-size-2xl);
+        font-size: var(--font-size-xl);
 
         .home-link {
             display: flex;
@@ -30,7 +30,7 @@
         }
 
         .app-logo {
-            height: 1.4rem;
+            height: 1.2rem;
         }
     }
 

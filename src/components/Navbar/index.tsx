@@ -5,7 +5,6 @@ import {
 import {
     RiAdminLine,
     RiLogoutBoxLine,
-    RiSettings4Line,
 } from 'react-icons/ri';
 import {
     _cs,
@@ -133,13 +132,6 @@ function Navbar(props: Props) {
                                 Admin Panel
                             </DropdownMenuItem>
                         )}
-                        <DropdownMenuItem
-                            type="link"
-                            to="settings"
-                            icons={<RiSettings4Line />}
-                        >
-                            Settings
-                        </DropdownMenuItem>
                         <DropdownMenuItem
                             type="button"
                             name={undefined}

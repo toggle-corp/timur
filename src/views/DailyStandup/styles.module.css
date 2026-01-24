@@ -9,10 +9,6 @@
         gap: var(--spacing-lg);
         overflow: auto;
 
-        &:not(.presentation-mode) {
-            border: var(--width-separator-sm) solid var(--color-separator);
-        }
-
         .content {
             display: flex;
             flex-direction: column;
