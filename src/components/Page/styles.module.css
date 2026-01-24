@@ -5,7 +5,7 @@
     gap: var(--spacing-md);
     isolation: isolate;
 
-    --width-start-sidebar: 16rem;
+    --width-start-sidebar: 20rem;
     --width-end-sidebar: 20rem;
 
     .main {

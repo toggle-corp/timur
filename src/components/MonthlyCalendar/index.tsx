@@ -173,6 +173,7 @@ function MonthlyCalendar(props: Props) {
                         style={{
                             gridColumnStart: i + 1,
                             gridRowStart: 1,
+                            opacity: i === 6 || i === 0 ? 0.5 : 1,
                         }}
                     >
                         {dayName}
@@ -199,6 +200,7 @@ function MonthlyCalendar(props: Props) {
                                 gridColumnStart: day.dayOfWeek + 1,
                                 // Note +2 is due to the week day name row
                                 gridRowStart: day.week + 2,
+                                opacity: day.dayOfWeek === 6 || day.dayOfWeek === 0 ? 0.5 : 1,
                             }}
                             variant={variant}
                         >
