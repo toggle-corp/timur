@@ -31,6 +31,7 @@ function ShortcutsDialog(props: Props) {
 
     return (
         <Dialog
+            size="auto"
             open={showDialog}
             onClose={handleModalClose}
             heading="Shortcuts"

@@ -4,7 +4,6 @@ import {
 } from 'react';
 import {
     FcCalendar,
-    FcSettings,
     FcVoicePresentation,
 } from 'react-icons/fc';
 import { useNavigate } from 'react-router-dom';
@@ -64,13 +63,6 @@ export function Component() {
                     icons={<FcVoicePresentation className={styles.icon} />}
                 >
                     Standup Deck
-                </Link>
-                <Link
-                    to="settings"
-                    linkElementClassName={styles.link}
-                    icons={<FcSettings className={styles.icon} />}
-                >
-                    Settings
                 </Link>
             </div>
         </Page>
