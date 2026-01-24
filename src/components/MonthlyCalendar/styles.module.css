@@ -1,13 +1,13 @@
 .calendar-container {
     display: flex;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-md);
     flex-direction: column;
 
     .header {
         display: flex;
-        gap: var(--spacing-sm);
+        gap: var(--spacing-md);
         align-items: baseline;
-        font-size: var(--font-size-sm);
+        font-size: var(--font-size-md);
 
         .spacer {
             flex-grow: 1;
@@ -17,17 +17,18 @@
     .monthly-calendar {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: var(--spacing-2xs);
+        gap: var(--spacing-xs);
 
         .day-name {
-            padding: var(--spacing-2xs);
+            padding: var(--spacing-xs);
             color: var(--color-text-light);
-            font-size: var(--font-size-sm);
+            font-size: var(--font-size-md);
         }
 
         .date {
-            padding: var(--spacing-3xs) var(--spacing-xs);
+            padding: var(--spacing-xs) var(--spacing-xs);
             font-size: var(--font-size-sm);
+            font-weight: unset;
         }
     }
 }
