@@ -36,6 +36,7 @@ function SelectInput<
         nonClearable,
         // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
         onChange,
+        sortFunction = rankedSearchOnList,
         ...otherProps
     } = props;
 
@@ -53,7 +54,7 @@ function SelectInput<
                 nonClearable={props.nonClearable}
                 name={name}
                 options={options}
-                sortFunction={rankedSearchOnList}
+                sortFunction={sortFunction}
                 searchOptions={options}
                 selectedOnTop={false}
             />
@@ -69,7 +70,7 @@ function SelectInput<
             nonClearable={props.nonClearable}
             name={name}
             options={options}
-            sortFunction={rankedSearchOnList}
+            sortFunction={sortFunction}
             searchOptions={options}
             selectedOnTop={false}
         />

@@ -396,8 +396,6 @@ function DayView(props: Props) {
                             return null;
                         }
 
-                        const taskDetails = taskById?.[groupedItem.value.task];
-
                         return (
                             <div
                                 className={styles.workItemContainer}
@@ -418,7 +416,6 @@ function DayView(props: Props) {
                                     onAssist={onWorkItemAssist}
                                     onChange={onWorkItemChange}
                                     onDelete={onWorkItemDelete}
-                                    contractId={taskDetails?.contract.id}
                                 />
                             </div>
                         );

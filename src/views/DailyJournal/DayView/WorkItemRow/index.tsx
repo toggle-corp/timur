@@ -7,7 +7,6 @@ import {
 } from 'react';
 import {
     RiDeleteBin2Line,
-    RiEditBoxLine,
     RiFileCopyLine,
     RiMoreLine,
     RiSwap2Line,
@@ -33,6 +32,7 @@ import SizeContext from '#contexts/size';
 import { EnumsQuery } from '#generated/types/graphql';
 import { useFocusClient } from '#hooks/useFocus';
 import useLocalStorage from '#hooks/useLocalStorage';
+import { fuzzySearch } from '#utils/common';
 import { colorscheme } from '#utils/constants';
 import {
     EntriesAsList,
@@ -51,6 +51,11 @@ function taskKeySelector(item: Task) {
 }
 function taskLabelSelector(item: Task) {
     return item.name;
+}
+function taskDescriptionSelector(item: Task) {
+    const { contract } = item;
+    const { project } = contract;
+    return `${project.name} › ${contract.name}`;
 }
 function workItemTypeKeySelector(item: WorkItemTypeOption) {
     return item.key;
@@ -84,7 +89,6 @@ interface Props {
     className?: string;
     workItem: WorkItem;
     tasks: Task[] | undefined;
-    contractId: string | undefined;
 
     typeErrored?: boolean;
     durationErrored?: boolean;
@@ -100,7 +104,6 @@ function WorkItemRow(props: Props) {
         className,
         workItem,
         tasks,
-        contractId,
         onClone,
         onAssist,
         onDelete,
@@ -124,7 +127,7 @@ function WorkItemRow(props: Props) {
         [workItem.clientId, onChange],
     );
 
-    const filteredTaskList = useMemo(
+    const taskList: Task[] = useMemo(
         () => (
             unique(
                 [
@@ -132,11 +135,31 @@ function WorkItemRow(props: Props) {
                     ...tasks ?? [],
                 ],
                 (item) => item.id,
-            ).filter(
-                (task) => task.contract.id === contractId,
             )
         ),
-        [contractId, enums, tasks],
+        [enums, tasks],
+    );
+
+    // FIXME: re-use this
+    const filterTaskList = useCallback(
+        (items: Task[], value: string | undefined | null): Task[] => {
+            if (!value) {
+                return items;
+            }
+            return fuzzySearch(
+                items,
+                value,
+                {
+                    keys: [
+                        (task) => task.name,
+                        (task) => task.contract.name,
+                        (task) => task.contract.project.name,
+                        (task) => task.contract.project.projectClient.name,
+                    ],
+                },
+            );
+        },
+        [],
     );
 
     const handleStatusCheck = useCallback(() => {
@@ -237,11 +260,12 @@ function WorkItemRow(props: Props) {
         <SelectInput
             className={styles.task}
             name="task"
-            options={filteredTaskList}
+            options={taskList}
             keySelector={taskKeySelector}
             labelSelector={taskLabelSelector}
-            // colorSelector={defaultColorSelector}
+            descriptionSelector={taskDescriptionSelector}
             onChange={setFieldValue}
+            sortFunction={filterTaskList}
             value={workItem.task}
             nonClearable
         />
@@ -307,16 +331,6 @@ function WorkItemRow(props: Props) {
                 persistent
                 title="Show additional entry options"
             >
-                <DropdownMenuItem
-                    type="button"
-                    name={workItem.clientId}
-                    title="Edit this entry"
-                    onClick={undefined}
-                    icons={<RiEditBoxLine />}
-                    disabled
-                >
-                    Edit entry
-                </DropdownMenuItem>
                 <DropdownMenuItem
                     type="button"
                     name={workItem.clientId}
