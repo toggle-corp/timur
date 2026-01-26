@@ -95,12 +95,12 @@ function DurationInput<const T>(props: Props<T>) {
     const handleBlur = useCallback(() => {
         const newValue = getDurationNumber(tempValue);
 
-        if (newValue !== null && onChange) {
+        if (onChange && newValue !== null && newValue !== valueFromProps) {
             onChange(newValue, name);
         }
 
         setCounter((oldVal) => (oldVal + 1));
-    }, [name, tempValue, onChange]);
+    }, [name, tempValue, valueFromProps, onChange]);
 
     const handleKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLInputElement>) => {
