@@ -303,7 +303,6 @@ export function Component() {
                             task: '1',
                             type: 'DEVELOPMENT',
                         }}
-                        contractId="1"
                     />
                     <WorkItemRow
                         className={styles.workItem}
@@ -319,7 +318,6 @@ export function Component() {
                             task: '1',
                             type: 'DESIGN',
                         }}
-                        contractId="1"
                     />
                 </div>
             </div>
