@@ -456,8 +456,9 @@ export function Component() {
                 && oldItem.duration !== tentativeNewItem.duration
                 && tentativeNewItem.status === 'TODO'
             ) {
-                tentativeNewItem.status = 'DOING';
+                changes.status = 'DOING';
             }
+
             setWorkItemChange({
                 type: 'edit',
                 key: workItemClientId,
