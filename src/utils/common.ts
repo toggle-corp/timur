@@ -1,6 +1,4 @@
 import {
-    caseInsensitiveSubmatch,
-    compareStringSearch,
     encodeDate,
     isDefined,
     isFalsyString,
@@ -35,24 +33,6 @@ export function getWindowSize(): Size {
 
 export function getNewId(): string {
     return ulid();
-}
-
-export function rankedSearchOnList<T>(
-    list: T[],
-    searchString: string | undefined,
-    labelSelector: (item: T) => string,
-) {
-    if (isFalsyString(searchString)) {
-        return list;
-    }
-
-    return list
-        .filter((option) => caseInsensitiveSubmatch(labelSelector(option), searchString))
-        .sort((a, b) => compareStringSearch(
-            labelSelector(a),
-            labelSelector(b),
-            searchString,
-        ));
 }
 
 export function getDurationString(totalMinutes: number) {
@@ -124,7 +104,7 @@ export function addDays(dateStr: string, numDays: number) {
 }
 
 export function fuzzySearch<ItemType = string>(
-    rows: ReadonlyArray<ItemType>,
+    rows: ItemType[],
     filterValue: string,
     options?: MatchSorterOptions<ItemType>,
 ) {
@@ -325,4 +305,24 @@ const dateTimeFormatter = new Intl.DateTimeFormat(
 
 export function formatDateTime(date: Date) {
     return dateTimeFormatter.format(date);
+}
+
+export function rankedSearchOnList<T>(
+    list: T[],
+    searchString: string | undefined,
+    labelSelector: (item: T) => string,
+) {
+    if (isFalsyString(searchString)) {
+        return list;
+    }
+
+    return fuzzySearch(
+        list,
+        searchString,
+        {
+            keys: [
+                labelSelector,
+            ],
+        },
+    );
 }
