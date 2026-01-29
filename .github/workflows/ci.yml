@@ -8,12 +8,12 @@ on:
 
 env:
   APP_TITLE: Timur
-  APP_ENVIRONMENT: testing
   APP_GRAPHQL_CODEGEN_ENDPOINT: ./backend/schema.graphql
   APP_GRAPHQL_DOMAIN: https://timur-fake-endpoint.com
   APP_UMAMI_SRC: https://umami-fake-endpoint.com/script.js
   APP_UMAMI_ID: fake-umami-id
   APP_SENTRY_DSN: htts://dsn-fake@sentry.com/9999
+  APP_ENVIRONMENT: testing
   GITHUB_WORKFLOW: true
 
 jobs:

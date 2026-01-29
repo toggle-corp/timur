@@ -34,8 +34,6 @@
     --font-size-4xl: calc(var(--base-font-size) * 3.6);     /* 2.5 */
 
     @media screen and (max-width: 40rem) {
-        --base-font-size: 0.875rem;
-
         --font-size-2xs: calc(var(--base-font-size) * 0.75);
         --font-size-xs: calc(var(--base-font-size) * 0.875);
         --font-size-sm: calc(var(--base-font-size) * 0.9375);
