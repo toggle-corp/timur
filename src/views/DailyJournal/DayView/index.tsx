@@ -4,6 +4,7 @@ import {
     useCallback,
     useContext,
     useMemo,
+    useState,
 } from 'react';
 import {
     RiArrowDownSLine,
@@ -78,6 +79,7 @@ function DayView(props: Props) {
 
     // FIXME: We should still get archived tasks here
     const { taskById: oldTaskById } = useContext(EnumsContext);
+    const [expandedItemId, setExpandedItemId] = useState<string | undefined>(undefined);
 
     // FIXME: memoize this
     const newTaskById = listToMap(
@@ -416,6 +418,8 @@ function DayView(props: Props) {
                                     className={_cs(styles.workItem, itemErrored && styles.errored)}
                                     workItem={groupedItem.value}
                                     tasks={tasks}
+                                    isExpanded={expandedItemId === groupedItem.value.clientId}
+                                    onToggleExpand={setExpandedItemId}
                                     onClone={onWorkItemClone}
                                     onChange={onWorkItemChange}
                                     onDelete={onWorkItemDelete}
