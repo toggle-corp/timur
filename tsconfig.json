@@ -2,6 +2,7 @@
     "compilerOptions": {
         "paths": {
             "#generated/*": ["./generated/*"],
+            "#resources/*": ["./src/resources/*"],
             "#components/*": ["./src/components/*"],
             "#config": ["./src/config"],
             "#contexts/*": ["./src/contexts/*"],
