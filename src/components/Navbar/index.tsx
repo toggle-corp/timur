@@ -26,8 +26,7 @@ import {
     LogoutMutation,
     LogoutMutationVariables,
 } from '#generated/types/graphql';
-
-import timurLogo from '../../App/icon.svg';
+import icon from '#resources/icon.svg';
 
 import styles from './styles.module.css';
 
@@ -86,7 +85,7 @@ function Navbar(props: Props) {
                         <img
                             className={styles.appLogo}
                             alt=""
-                            src={timurLogo}
+                            src={icon}
                         />
                     )}
                 >
@@ -120,7 +119,7 @@ function Navbar(props: Props) {
                         title="Show user actions"
                     >
                         <div className={styles.greetings}>
-                            {`Hello ${userAuth.displayName}!`}
+                            {`Welcome ${userAuth.displayName}!`}
                         </div>
                         {userAuth.isStaff && (
                             <DropdownMenuItem
