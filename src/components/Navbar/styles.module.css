@@ -47,7 +47,6 @@
 }
 
 .greetings {
-    border-bottom: var(--width-separator-sm) solid var(--color-separator);
     padding: var(--spacing-sm) var(--spacing-md);
     color: var(--color-text-light);
     font-size: var(--font-size-sm);
