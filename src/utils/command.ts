@@ -51,9 +51,12 @@ export function forward<E, K>(state: State<E, K>, to: number): State<E, K> {
 
     commands.slice(zeitgeist, newZeitgeist).forEach((command) => {
         if (command.type === 'add') {
-            // TODO: Need to check if adding a item with duplicate key
-            newEntries.push(command.newValue);
-            watch?.(command);
+            // NOTE: Need to check if adding a item with duplicate key
+            // When chaning page, we get the same entry from server and from the commands causing
+            if (!newEntries.find((entry) => keySelector(entry) === keySelector(command.newValue))) {
+                newEntries.push(command.newValue);
+                watch?.(command);
+            }
         } else if (command.type === 'delete') {
             const index = newEntries.findIndex((item) => keySelector(item) === command.key);
             if (index === -1) {
