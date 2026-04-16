@@ -4,6 +4,7 @@
     flex-grow: 1;
     gap: var(--spacing-lg);
     padding: var(--spacing-md);
+    overflow-y: auto;
 
     .bottom-actions {
         display: flex;

@@ -8,6 +8,7 @@ import {
     useLocation,
     useNavigationType,
 } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import * as Sentry from '@sentry/react';
 import { isNotDefined } from '@togglecorp/fujs';
 
@@ -73,7 +74,9 @@ if (isNotDefined(webappRootElement)) {
                 )}
                 showDialog
             >
-                <App />
+                <GoogleOAuthProvider clientId={import.meta.env.APP_GOOGLE_OAUTH_CLIENT_ID ?? ''}>
+                    <App />
+                </GoogleOAuthProvider>
             </Sentry.ErrorBoundary>
         </React.StrictMode>
     );

@@ -28,12 +28,14 @@ import {
     isNotDefined,
 } from '@togglecorp/fujs';
 
+import Button from '#components/Button';
 import Checkbox from '#components/Checkbox';
 import Link from '#components/Link';
 import Page from '#components/Page';
 import SelectInput from '#components/SelectInput';
 import EnumsContext from '#contexts/enums';
 import { EnumsQuery } from '#generated/types/graphql';
+import useGoogleCalendar from '#hooks/useGoogleCalendar';
 import useLocalStorage from '#hooks/useLocalStorage';
 import useSetFieldValue from '#hooks/useSetFieldValue';
 import {
@@ -254,6 +256,7 @@ const timurContract = {
     project: {
         id: 'project-timur',
         name: 'Timur',
+        shortName: 'Timur',
         logo: null,
         projectClient: { id: 'client-internal', name: 'Internal' },
     },
@@ -265,6 +268,7 @@ const chronoContract = {
     project: {
         id: 'project-chrono',
         name: 'Chrono',
+        shortName: 'Timur',
         logo: null,
         projectClient: { id: 'client-internal', name: 'Internal' },
     },
@@ -382,6 +386,28 @@ export function Component() {
     const { enums } = useContext(EnumsContext);
     const [storedConfig, setStoredConfig] = useLocalStorage('timur-config');
     const setConfigFieldValue = useSetFieldValue(setStoredConfig);
+
+    const {
+        isAvailable: isGoogleCalendarAvailable,
+        isConnected: isGoogleCalendarConnected,
+        expiresAt: googleCalendarExpiresAt,
+        connect: connectGoogleCalendar,
+        disconnect: disconnectGoogleCalendar,
+    } = useGoogleCalendar();
+
+    const googleCalendarStatusMessage = useMemo(() => {
+        if (!isGoogleCalendarConnected) {
+            return 'Connect to view events from Google Calendar.';
+        }
+        if (!googleCalendarExpiresAt) {
+            return 'Connected to Google Calendar.';
+        }
+        const expiresOn = new Date(googleCalendarExpiresAt).toLocaleString([], {
+            dateStyle: 'medium',
+            timeStyle: 'short',
+        });
+        return `Connected. Integration expires on ${expiresOn}.`;
+    }, [isGoogleCalendarConnected, googleCalendarExpiresAt]);
 
     const updateJournalGrouping = useCallback((value: number, name: 'groupLevel' | 'joinLevel') => {
         const oldValue = storedConfig.dailyJournalGrouping
@@ -623,6 +649,56 @@ export function Component() {
                             value={storedConfig.editingMode}
                             nonClearable
                         />
+                    </div>
+                    <div className={styles.section}>
+                        <h4>
+                            Show Events
+                        </h4>
+                        <Checkbox
+                            name="showEvents"
+                            label="System"
+                            value={storedConfig.showEvents}
+                            onChange={setConfigFieldValue}
+                        />
+                        <Checkbox
+                            name="googleCalendarEnabled"
+                            label="Google Calendar"
+                            value={storedConfig.googleCalendarEnabled}
+                            onChange={setConfigFieldValue}
+                        />
+                    </div>
+                    <div className={styles.section}>
+                        <h4>
+                            Google Calendar
+                        </h4>
+                        {!isGoogleCalendarAvailable && (
+                            <p>
+                                Google Calendar integration requires
+                                {' '}
+                                <code>APP_GOOGLE_OAUTH_CLIENT_ID</code>
+                                {' '}
+                                to be configured.
+                            </p>
+                        )}
+                        {isGoogleCalendarAvailable && (
+                            <>
+                                <p>
+                                    {googleCalendarStatusMessage}
+                                </p>
+                                <Button
+                                    name={undefined}
+                                    title={isGoogleCalendarConnected
+                                        ? 'Disconnect Google Calendar'
+                                        : 'Connect Google Calendar'}
+                                    onClick={isGoogleCalendarConnected
+                                        ? disconnectGoogleCalendar
+                                        : connectGoogleCalendar}
+                                    variant="tertiary"
+                                >
+                                    {isGoogleCalendarConnected ? 'Disconnect' : 'Connect'}
+                                </Button>
+                            </>
+                        )}
                     </div>
                 </div>
                 <div className={styles.previewColumn}>

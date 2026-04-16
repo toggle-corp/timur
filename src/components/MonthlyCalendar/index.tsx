@@ -13,11 +13,69 @@ import {
     _cs,
     encodeDate,
 } from '@togglecorp/fujs';
+import {
+    gql,
+    useQuery,
+} from 'urql';
 
+import AvailabilityIndicator from '#components/AvailabilityIndicator';
 import Button from '#components/Button';
 import DateContext from '#contexts/date';
+import {
+    type JournalLeaveTypeEnum,
+    type JournalWorkFromHomeTypeEnum,
+    type MonthlyCalendarDataQuery,
+    type MonthlyCalendarDataQueryVariables,
+} from '#generated/types/graphql';
+import { addDays } from '#utils/common';
 
 import styles from './styles.module.css';
+
+interface DateInfo {
+    totalMinutes?: number;
+    targetMinutes?: number;
+    isHoliday?: boolean;
+    leaveType?: JournalLeaveTypeEnum | null;
+    wfhType?: JournalWorkFromHomeTypeEnum | null;
+    hasEvent?: boolean;
+}
+
+const MONTHLY_CALENDAR_DATA = gql`
+    query MonthlyCalendarData($dateGte: Date!, $dateLte: Date!) {
+        private {
+            id
+            hoursPerDay(dateGte: $dateGte, dateLte: $dateLte) {
+                date
+                totalMinutes
+                targetMinutes
+                isHoliday
+                leaveType
+                wfhType
+            }
+            events(
+                filters: {
+                    startDate: { lte: $dateLte }
+                    endDate: { gte: $dateGte }
+                    types: [HOLIDAY, RETREAT, MISC]
+                }
+            ) {
+                items {
+                    id
+                    startDate
+                    endDate
+                    dates
+                }
+            }
+            allProjects {
+                id
+                deadlines {
+                    id
+                    endDate
+                }
+            }
+        }
+    }
+`;
 
 const dateFormatter = new Intl.DateTimeFormat(
     [],
@@ -51,12 +109,12 @@ interface Props {
     initialYear: number;
     initialMonth: number;
     onDateClick?: (date: string) => void;
+    onMonthChange?: (year: number, month: number) => void;
     componentRef?: React.MutableRefObject<{
         resetView: (year: number, month: number) => void;
     } | null>;
 }
 
-// TODO: Show holidays, leaves on calendar
 function MonthlyCalendar(props: Props) {
     const {
         initialYear,
@@ -64,6 +122,7 @@ function MonthlyCalendar(props: Props) {
         componentRef,
         className,
         onDateClick,
+        onMonthChange,
         weekDayNameClassName,
         dateClassName,
         selectedDate,
@@ -90,6 +149,10 @@ function MonthlyCalendar(props: Props) {
         }
     }, [componentRef, resetView]);
 
+    useEffect(() => {
+        onMonthChange?.(year, month);
+    }, [onMonthChange, year, month]);
+
     const handlePrevMonth = useCallback(
         () => {
             const newMonth = month - 1;
@@ -114,6 +177,69 @@ function MonthlyCalendar(props: Props) {
         },
         [month, year],
     );
+
+    const monthStart = useMemo(
+        () => encodeDate(new Date(year, month, 1)),
+        [year, month],
+    );
+
+    const monthEnd = useMemo(
+        () => encodeDate(new Date(year, month + 1, 0)),
+        [year, month],
+    );
+
+    const [calendarDataResult] = useQuery<
+        MonthlyCalendarDataQuery,
+        MonthlyCalendarDataQueryVariables
+    >({
+        query: MONTHLY_CALENDAR_DATA,
+        variables: { dateGte: monthStart, dateLte: monthEnd },
+        requestPolicy: 'cache-and-network',
+    });
+
+    const dateInfoMap = useMemo(() => {
+        const map = new Map<string, DateInfo>();
+
+        calendarDataResult.data?.private.hoursPerDay.forEach((entry) => {
+            const dateStr = String(entry.date);
+            map.set(dateStr, {
+                totalMinutes: entry.totalMinutes,
+                targetMinutes: entry.targetMinutes,
+                isHoliday: entry.isHoliday,
+                leaveType: entry.leaveType,
+                wfhType: entry.wfhType,
+                hasEvent: false,
+            });
+        });
+
+        calendarDataResult.data?.private.allProjects.forEach((project) => {
+            project.deadlines.forEach((deadline) => {
+                const dateStr = String(deadline.endDate);
+                const existing = map.get(dateStr) ?? {};
+                map.set(dateStr, { ...existing, hasEvent: true });
+            });
+        });
+
+        calendarDataResult.data?.private.events.items.forEach((event) => {
+            if (event.dates.length > 0) {
+                event.dates.forEach((d) => {
+                    const dateStr = String(d);
+                    const existing = map.get(dateStr) ?? {};
+                    map.set(dateStr, { ...existing, hasEvent: true });
+                });
+            } else {
+                let cursor = String(event.startDate);
+                const end = String(event.endDate);
+                while (cursor <= end) {
+                    const existing = map.get(cursor) ?? {};
+                    map.set(cursor, { ...existing, hasEvent: true });
+                    cursor = addDays(cursor, 1);
+                }
+            }
+        });
+
+        return map;
+    }, [calendarDataResult.data]);
 
     // FIXME: We should be able be use a for loop here
     const daysInMonth = useMemo(() => {
@@ -180,18 +306,34 @@ function MonthlyCalendar(props: Props) {
                 ))}
                 {daysInMonth.map((day) => {
                     const date = encodeDate(new Date(year, month, day.date));
-                    let variant;
-                    if (fullDate === date) {
-                        variant = 'secondary' as const;
-                    } else if (selectedDate === date) {
-                        variant = 'tertiary' as const;
-                    } else {
-                        variant = 'transparent' as const;
-                    }
+
+                    const info = dateInfoMap.get(date);
+                    const isPast = date <= fullDate;
+                    const targetMinutes = info?.targetMinutes ?? 0;
+                    const totalMinutes = info?.totalMinutes ?? 0;
+                    const fillPct = isPast && targetMinutes > 0
+                        ? Math.min(1, totalMinutes / targetMinutes)
+                        : 0;
+                    const hue = Math.round(fillPct * 120);
+                    const hoursBg = isPast && targetMinutes > 0
+                        ? `hsla(${hue}, 55%, 50%, 0.18)`
+                        : undefined;
+
+                    const effectiveLeaveType: JournalLeaveTypeEnum | null = info?.isHoliday
+                        ? 'FULL'
+                        : (info?.leaveType ?? null);
+                    const effectiveWfhType = info?.wfhType ?? null;
+                    const hasAvailability = effectiveLeaveType != null || effectiveWfhType != null;
+
                     return (
                         <Button
                             onClick={onDateClick}
-                            className={_cs(styles.date, dateClassName)}
+                            className={_cs(
+                                styles.date,
+                                fullDate === date && styles.today,
+                                selectedDate === date && styles.selected,
+                                dateClassName,
+                            )}
                             name={date}
                             title="Set date from calendar"
                             key={day.date}
@@ -199,10 +341,23 @@ function MonthlyCalendar(props: Props) {
                                 gridColumnStart: day.dayOfWeek + 1,
                                 // Note +2 is due to the week day name row
                                 gridRowStart: day.week + 2,
+                                backgroundColor: hoursBg,
                             }}
-                            variant={variant}
+                            variant="transparent"
                         >
-                            {day.date}
+                            <span className={styles.dateContent}>
+                                {day.date}
+                                {info?.hasEvent && (
+                                    <span className={styles.eventDot} />
+                                )}
+                                {hasAvailability && (
+                                    <AvailabilityIndicator
+                                        className={styles.availabilityIndicator}
+                                        leaveType={effectiveLeaveType}
+                                        wfhType={effectiveWfhType}
+                                    />
+                                )}
+                            </span>
                         </Button>
                     );
                 })}
