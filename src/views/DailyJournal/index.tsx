@@ -13,6 +13,7 @@ import {
     RiArrowGoForwardFill,
     RiArrowLeftSLine,
     RiArrowRightSLine,
+    RiCalendarCheckLine,
     RiHomeOfficeLine,
     RiStickyNoteAddLine,
 } from 'react-icons/ri';
@@ -218,6 +219,7 @@ export function Component() {
     const noteDialogOpenTriggerRef = useRef<(() => void) | undefined>(undefined);
     const shortcutsDialogOpenTriggerRef = useRef<(() => void) | undefined>(undefined);
     const availabilityDialogOpenTriggerRef = useRef<(() => void) | undefined>(undefined);
+    const pendingCalendarOverrideRef = useRef<Partial<WorkItem> | undefined>(undefined);
     const calendarRef = useRef<CalendarElement>(null);
 
     useEffect(
@@ -289,6 +291,9 @@ export function Component() {
 
     const handleWorkItemCreate = useCallback(
         (taskId: string) => {
+            const override = pendingCalendarOverrideRef.current;
+            pendingCalendarOverrideRef.current = undefined;
+
             const newId = getNewId();
             const newItem: WorkItem = {
                 clientId: newId,
@@ -296,6 +301,7 @@ export function Component() {
                 type: storedConfig.defaultTaskType,
                 status: storedConfig.defaultTaskStatus,
                 date: selectedDate,
+                ...override,
             };
 
             setWorkItemChange({
@@ -314,6 +320,16 @@ export function Component() {
             setWorkItemChange,
             focus,
         ],
+    );
+
+    const handleWorkItemCreateFromCalendar = useCallback(
+        (override: Partial<WorkItem>) => {
+            pendingCalendarOverrideRef.current = override;
+            if (dialogOpenTriggerRef.current) {
+                dialogOpenTriggerRef.current();
+            }
+        },
+        [],
     );
 
     const handleWorkItemClone = useCallback(
@@ -609,13 +625,13 @@ export function Component() {
             documentTitle="Timur - Daily Journal"
             className={styles.dailyJournal}
             contentClassName={styles.content}
-            startAsideContainerClassName={styles.startAside}
             startAsideContent={(
                 <StartSidebar
                     calendarComponentRef={calendarRef}
                     selectedDate={selectedDate}
                     setSelectedDate={setSelectedDate}
                     onShortcutsClick={handleShortcutsButtonClick}
+                    onWorkItemCreateFromCalendar={handleWorkItemCreateFromCalendar}
                 />
             )}
             endAsideContent={(
@@ -647,6 +663,15 @@ export function Component() {
                     >
                         <RiArrowRightSLine />
                     </Link>
+                    {selectedDate !== fullDate && (
+                        <Link
+                            to="dailyJournal"
+                            variant="tertiary"
+                            title="Jump to today"
+                        >
+                            <RiCalendarCheckLine />
+                        </Link>
+                    )}
                     {(undoable || redoable) && (
                         <div
                             className={_cs(styles.separator, styles.desktopOnly)}

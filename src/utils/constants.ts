@@ -26,6 +26,8 @@ export const defaultConfigValue: ConfigStorage = {
     ],
     collapsedGroups: [],
     quickActions: ['clone'],
+    showEvents: true,
+    googleCalendarEnabled: false,
 };
 
 export const colorscheme = [
