@@ -72,6 +72,9 @@ const config = {
         'react/jsx-indent-props': ['error', 4],
         'react/jsx-filename-extension': ['error', { extensions: ['.js', '.jsx', '.ts', '.tsx'] }],
 
+        // eslint-plugin-react 7.32 predates the Popover API attributes.
+        'react/no-unknown-property': ['error', { ignore: ['popover'] }],
+
         'import/extensions': ['off', 'never'],
 
         'react-hooks/rules-of-hooks': 'error',
