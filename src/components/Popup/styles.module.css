@@ -1,13 +1,25 @@
-.popup {
-    position: fixed;
+.popover {
+    --popup-width: 16rem;
+
+    position: absolute;
+    /* position-area: block-end span-inline-end; */
+    /* position-try-fallbacks: block-end span-inline-start; */
+    margin: var(--spacing-xs) 0;
+    border-width: 0px;
     border-radius: var(--spacing-xs);
-    box-shadow: var(--box-shadow-2xl);
+    box-shadow: var(--box-shadow-xl);
     background-color: var(--color-text-on-dark);
+
+    width: var(--popup-width, auto);
+    min-width: anchor-size(width);
     max-height: 40vh;
     overflow: auto;
 
-    &.top-orientation {
-        /* FIXME: add variable */
-        box-shadow: 0 -8pt 20pt -5pt rgb(0 0 0 / 0.5);
+    position-visibility: anchors-visible;
+    position-area: bottom center;
+    position-try-fallbacks: flip-block, flip-inline;
+
+    ::backdrop {
+        display: none;
     }
 }

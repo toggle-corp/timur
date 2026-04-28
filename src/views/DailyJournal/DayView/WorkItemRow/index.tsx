@@ -328,7 +328,6 @@ function WorkItemRow(props: Props) {
                 label={<RiMoreLine />}
                 withoutDropdownIcon
                 variant="transparent"
-                persistent
                 title="Show additional entry options"
             >
                 <DropdownMenuItem
