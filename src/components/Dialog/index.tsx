@@ -25,7 +25,7 @@ interface Props {
     size?: 'auto-height' | 'auto';
     escapeDisabled?: boolean;
 
-    focusElementRef?: RefObject<HTMLElement>;
+    focusElementRef?: RefObject<HTMLElement | null>;
 }
 
 function Dialog(props: Props) {
