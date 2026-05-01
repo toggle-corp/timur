@@ -15,7 +15,7 @@ export interface Props<NAME> extends Omit<React.HTMLProps<HTMLInputElement>, 're
         name: NAME,
         e?: React.FormEvent<HTMLInputElement> | undefined,
     ) => void;
-    elementRef?: React.RefObject<HTMLInputElement>;
+    elementRef?: React.RefObject<HTMLInputElement | null>;
 }
 
 function RawInput<const N>(props: Props<N>) {

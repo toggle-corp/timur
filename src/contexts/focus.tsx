@@ -1,7 +1,7 @@
 import { createContext } from 'react';
 
 interface FocusContextProps {
-    register: (key: string, inputRef: React.RefObject<HTMLElement>) => void;
+    register: (key: string, inputRef: React.RefObject<HTMLElement | null>) => void;
     unregister: (key: string) => void;
 }
 

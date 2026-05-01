@@ -1,6 +1,6 @@
 import { _cs } from '@togglecorp/fujs';
 
-import { GeneralEvent } from '#utils/types';
+import { GeneralEvent as GeneralEventType } from '#utils/types';
 
 import styles from './styles.module.css';
 
@@ -27,7 +27,7 @@ function getFormattedDaysRemaining(numDays: number) {
 }
 
 interface Props {
-    generalEvent: GeneralEvent;
+    generalEvent: GeneralEventType;
 }
 
 function GeneralEvent(props: Props) {

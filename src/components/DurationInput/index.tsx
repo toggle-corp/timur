@@ -16,7 +16,7 @@ import {
 type InheritedProps<T> = (Omit<InputContainerProps, 'input' | 'htmlFor'> & Omit<RawInputProps<T>, 'onChange' | 'value' | 'id'>);
 
 interface Props<T> extends InheritedProps<T> {
-  inputElementRef?: React.RefObject<HTMLInputElement>;
+  inputElementRef?: React.RefObject<HTMLInputElement | null>;
   inputClassName?: string;
   value: number | undefined | null;
   onChange?: (

@@ -219,10 +219,10 @@ export function Component() {
     interface CalendarElement {
         resetView:(year: number, month: number) => void;
     }
-    const dialogOpenTriggerRef = useRef<(() => void) | undefined>();
-    const noteDialogOpenTriggerRef = useRef<(() => void) | undefined>();
-    const shortcutsDialogOpenTriggerRef = useRef<(() => void) | undefined>();
-    const availabilityDialogOpenTriggerRef = useRef<(() => void) | undefined>();
+    const dialogOpenTriggerRef = useRef<(() => void) | undefined>(undefined);
+    const noteDialogOpenTriggerRef = useRef<(() => void) | undefined>(undefined);
+    const shortcutsDialogOpenTriggerRef = useRef<(() => void) | undefined>(undefined);
+    const availabilityDialogOpenTriggerRef = useRef<(() => void) | undefined>(undefined);
     const calendarRef = useRef<CalendarElement>(null);
 
     useEffect(
