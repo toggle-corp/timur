@@ -1,6 +1,6 @@
 # -------------------------- Dev ---------------------------------------
 
-FROM node:18-bullseye AS dev
+FROM node:24-bullseye AS dev
 
 RUN apt-get update -y \
     && apt-get install -y --no-install-recommends git \
