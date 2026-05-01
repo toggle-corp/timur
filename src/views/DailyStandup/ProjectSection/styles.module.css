@@ -18,6 +18,10 @@
         .name {
             display: inline-flex;
             gap: var(--spacing-xs);
+
+        }
+        .unavailable {
+            text-decoration: line-through;
         }
     }
 }
