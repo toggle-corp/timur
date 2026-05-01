@@ -120,7 +120,14 @@ function ProjectSection(props: Props) {
                         imageUrl={user.user.displayPicture}
                         displayName={user.user.displayName ?? 'Hari Bahadur'}
                     />
-                    <div className={styles.name}>
+                    <div
+                        className={
+                            _cs(
+                                styles.name,
+                                (user.leave === 'FIRST_HALF' || user.leave === 'FULL') && styles.unavailable,
+                            )
+                        }
+                    >
                         {user.user.displayName ?? 'Hari Bahadur'}
                         {' '}
                         <AvailabilityIndicator
