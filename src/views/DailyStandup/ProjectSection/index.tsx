@@ -101,6 +101,7 @@ function ProjectSection(props: Props) {
             className={_cs(styles.projectSection, className)}
             primaryPreText={isDefined(stats?.project.logoHd) && (
                 <img
+                    key={stats?.project.id}
                     className={styles.projectIcon}
                     alt=""
                     src={stats?.project.logoHd?.url}
