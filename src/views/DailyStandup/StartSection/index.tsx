@@ -103,10 +103,10 @@ function StartSection() {
                     <DisplayPicture
                         className={styles.displayPicture}
                         imageUrl={user.displayPicture}
-                        displayName={user.displayName ?? 'Anon'}
+                        displayName={user.displayName ?? 'Hari Bahadur'}
                     />
                     <div className={styles.name}>
-                        {user.displayName ?? 'Anon'}
+                        {user.displayName ?? 'Hari Bahadur'}
                         {' '}
                         <AvailabilityIndicator
                             wfhType={user.workFromHomeToday}

@@ -118,10 +118,10 @@ function ProjectSection(props: Props) {
                     <DisplayPicture
                         className={styles.displayPicture}
                         imageUrl={user.user.displayPicture}
-                        displayName={user.user.displayName ?? 'Anon'}
+                        displayName={user.user.displayName ?? 'Hari Bahadur'}
                     />
                     <div className={styles.name}>
-                        {user.user.displayName ?? 'Anon'}
+                        {user.user.displayName ?? 'Hari Bahadur'}
                         {' '}
                         <AvailabilityIndicator
                             wfhType={user.workFromHome}

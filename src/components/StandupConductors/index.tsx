@@ -59,11 +59,11 @@ function StandupConductors() {
                     <>
                         <DisplayPicture
                             imageUrl={standupConductors?.conductor?.displayPicture}
-                            displayName={standupConductors?.conductor?.displayName ?? 'Anonymous'}
+                            displayName={standupConductors?.conductor?.displayName ?? 'Hari Bahadur'}
                         />
                         <span>
                             {standupConductors?.conductor?.displayName
-                                ?? 'Anonymous'}
+                                ?? 'Hari Bahadur'}
                         </span>
                     </>
                 )}
@@ -82,11 +82,11 @@ function StandupConductors() {
                         <DisplayPicture
                             imageUrl={standupConductors
                                 ?.fallbackConductor?.displayPicture}
-                            displayName={standupConductors?.fallbackConductor?.displayName ?? 'Anonymous'}
+                            displayName={standupConductors?.fallbackConductor?.displayName ?? 'Hari Bahadur'}
                         />
                         <span>
                             {standupConductors?.fallbackConductor?.displayName
-                                ?? 'Anonymous'}
+                                ?? 'Hari Bahadur'}
                         </span>
                     </>
                 )}
