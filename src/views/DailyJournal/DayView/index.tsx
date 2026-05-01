@@ -238,13 +238,12 @@ function DayView(props: Props) {
     return (
         <section className={_cs(styles.dayView, className)}>
             <header className={styles.header}>
-                <h2 className={styles.heading}>
-                    {formattedDate}
-                    {' '}
+                <div className={styles.heading}>
+                    <h2>{formattedDate}</h2>
                     <span className={styles.relativeDate}>
-                        {`(${formattedRelativeDate})`}
+                        {`${formattedRelativeDate}`}
                     </span>
-                </h2>
+                </div>
                 {isDefined(totalHours) && (
                     <div
                         className={styles.duration}
@@ -260,6 +259,10 @@ function DayView(props: Props) {
                 empty={groupedItems.length === 0}
                 pending={loading}
                 errored={errored}
+                pendingMessage="Fetching entries..."
+                errorMessage="Could not fetch entries!"
+                filteredEmptyMessage="No entries found!"
+                emptyMessage="No entries found!"
             />
             {!errored && !loading && (
                 <div className={styles.newGroup}>

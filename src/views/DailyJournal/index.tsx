@@ -656,6 +656,7 @@ export function Component() {
                         <Link
                             to="dailyJournal"
                             variant="quaternary"
+                            title="Jump to today"
                             icons={(
                                 <RiCalendar2Line />
                             )}
