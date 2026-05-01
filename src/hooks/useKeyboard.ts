@@ -61,7 +61,7 @@ function useKeyboard<T, Q extends OptionKey>(
             // NOTE: De-structuring e here will create access error
             const { code } = e;
             const myKey = focusedKey?.key;
-            if (isOptionsShown && (code === 'Tab' || code === 'Escape')) {
+            if (isOptionsShown && code === 'Tab') {
                 // If tab or escape was pressed and dropdown is being shown,
                 // hide the dropdown.
                 e.stopPropagation();
