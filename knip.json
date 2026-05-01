@@ -5,8 +5,7 @@
         "sharp"
     ],
     "entry": [
-        "generated/**/*.ts",
-        "src/index.tsx!"
+        "generated/**/*.ts"
     ],
     "project": [
         "src/**/*.d.ts",
