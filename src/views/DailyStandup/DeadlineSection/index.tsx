@@ -3,6 +3,7 @@ import {
     useMemo,
 } from 'react';
 import {
+    FcHighPriority,
     FcLandscape,
     FcLeave,
     FcNews,
@@ -38,7 +39,8 @@ const DEADLINES_AND_EVENTS = gql`
                 name
                 deadlines {
                     id
-                    name
+                    displayName
+                    isExternal
                     remainingDays
                 }
             }
@@ -67,14 +69,10 @@ function DeadlineSection() {
 
     const upcomingEvents = useMemo<GeneralEvent[]>(() => {
         const deadlines = projects?.flatMap(
-            (project) => project.deadlines.map((deadline) => ({
-                ...deadline,
-                name: `${project.name}: ${deadline.name}`,
-            })),
+            (project) => project.deadlines,
         );
 
-        const iconsMap: Record<GeneralEvent['type'], React.ReactNode> = {
-            DEADLINE: <FcLeave />,
+        const iconsMap: Record<Exclude<GeneralEvent['type'], 'DEADLINE'>, React.ReactNode> = {
             HOLIDAY: <FcLandscape />,
             RETREAT: <FcNightLandscape />,
             MISC: <FcNews />,
@@ -85,8 +83,8 @@ function DeadlineSection() {
                 key: `DEADLINE-${deadline.id}`,
                 type: 'DEADLINE' as const,
                 typeDisplay: 'Deadline',
-                icon: iconsMap.DEADLINE,
-                name: deadline.name,
+                icon: deadline.isExternal ? <FcHighPriority /> : <FcLeave />,
+                name: deadline.displayName,
                 remainingDays: deadline.remainingDays,
             })) ?? []),
             ...(events?.map((otherEvent) => ({
