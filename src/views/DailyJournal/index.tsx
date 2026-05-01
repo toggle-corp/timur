@@ -146,7 +146,6 @@ const MY_TIME_ENTRIES_QUERY = gql`
     }
 `;
 
-/** @knipignore */
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
     const { date: dateFromParams } = useParams<{ date: string | undefined}>();

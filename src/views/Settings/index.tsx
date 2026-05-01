@@ -200,7 +200,6 @@ function defaultColorSelector<T>(_: T, i: number): readonly [string, string] {
     return colorscheme[i % colorscheme.length]!;
 }
 
-/** @knipignore */
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
     const { enums } = useContext(EnumsContext);
