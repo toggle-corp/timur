@@ -2,13 +2,11 @@
     --popup-width: 16rem;
 
     position: absolute;
-    /* position-area: block-end span-inline-end; */
-    /* position-try-fallbacks: block-end span-inline-start; */
-    margin: var(--spacing-xs) 0;
-    border-width: 0px;
+    margin: var(--spacing-sm);
+    border: var(--width-separator-sm) solid var(--color-separator-dark);
     border-radius: var(--spacing-xs);
     box-shadow: var(--box-shadow-xl);
-    background-color: var(--color-text-on-dark);
+    background-color: var(--color-foreground);
 
     width: var(--popup-width, auto);
     min-width: anchor-size(width);
@@ -16,8 +14,8 @@
     overflow: auto;
 
     position-visibility: anchors-visible;
-    position-area: bottom center;
-    position-try-fallbacks: flip-block, flip-inline;
+    position-area: bottom;
+    position-try-fallbacks: bottom, bottom left, bottom right, top, top left, top right;
 
     ::backdrop {
         display: none;
