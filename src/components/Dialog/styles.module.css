@@ -10,7 +10,7 @@
 
         .header {
             display: flex;
-            padding: var(--spacing-md);
+            padding: var(--spacing-lg);
             padding-bottom: 0;
             gap: var(--spacing-md);
 
@@ -26,6 +26,7 @@
 
         .content {
             flex-grow: 1;
+            padding: var(--spacing-lg);
             overflow: auto;
         }
 
