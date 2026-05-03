@@ -37,6 +37,7 @@ function ShortcutsDialog(props: Props) {
             heading="Shortcuts"
             contentClassName={styles.modalContent}
             className={styles.shortcutsDialog}
+            closeOnOutsideClick
         >
             <div>
                 Hit

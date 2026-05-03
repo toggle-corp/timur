@@ -220,6 +220,7 @@ function AvailabilityDialog(props: Props) {
             heading={`${formattedDate} availability`}
             contentClassName={styles.modalContent}
             className={styles.availabilityDialog}
+            closeOnOutsideClick
         >
             <RadioInput
                 name="leaveType"

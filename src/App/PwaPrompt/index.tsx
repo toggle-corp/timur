@@ -67,6 +67,7 @@ function PwaPrompt() {
             contentClassName={styles.modalContent}
             className={styles.promptDialog}
             size="auto"
+            closeOnOutsideClick
         >
             <div>
                 {offlineReady

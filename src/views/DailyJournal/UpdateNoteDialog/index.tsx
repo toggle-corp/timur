@@ -200,6 +200,7 @@ function AddNoteDialog(props: Props) {
             className={styles.updateNoteDialog}
             escapeDisabled={editingMode === 'vim'}
             size="auto-height"
+            closeOnOutsideClick
         >
             <CodeMirror
                 ref={refs}
