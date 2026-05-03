@@ -637,7 +637,7 @@ export function Component() {
                             <Link
                                 to="dailyJournal"
                                 urlParams={{ date: getPrevDay() }}
-                                variant="quaternary"
+                                variant="tertiary"
                                 title="Previous day"
                             >
                                 <RiArrowLeftSLine />
@@ -645,7 +645,7 @@ export function Component() {
                             <Link
                                 to="dailyJournal"
                                 urlParams={{ date: getNextDay() }}
-                                variant="quaternary"
+                                variant="tertiary"
                                 title="Next day"
                             >
                                 <RiArrowRightSLine />
@@ -655,7 +655,7 @@ export function Component() {
                     {selectedDate !== fullDate && (
                         <Link
                             to="dailyJournal"
-                            variant="quaternary"
+                            variant="tertiary"
                             title="Jump to today"
                             icons={(
                                 <RiCalendar2Line />
@@ -669,7 +669,7 @@ export function Component() {
                         name={undefined}
                         onClick={handleAvailabilityButtonClick}
                         title="Update availability"
-                        variant="quaternary"
+                        variant="tertiary"
                     >
                         <AvailabilityIndicator
                             wfhType={wfhType}
@@ -682,7 +682,7 @@ export function Component() {
                             name={undefined}
                             onClick={handleNoteUpdateClick}
                             title="Update Note"
-                            variant="quaternary"
+                            variant="tertiary"
                             icons={(
                                 <RiStickyNoteAddLine />
                             )}
@@ -694,7 +694,7 @@ export function Component() {
                         <Button
                             title="Show shortcuts"
                             name={undefined}
-                            variant="quaternary"
+                            variant="tertiary"
                             onClick={handleShortcutsButtonClick}
                             icons={(
                                 <RiTerminalBoxLine />
@@ -707,7 +707,7 @@ export function Component() {
                         <Link
                             to="settings"
                             title="Settings"
-                            variant="quaternary"
+                            variant="tertiary"
                             icons={(
                                 <RiSettingsLine />
                             )}
@@ -745,7 +745,7 @@ export function Component() {
                     name={undefined}
                     title="Undo"
                     onClick={undo}
-                    variant="quaternary"
+                    variant="tertiary"
                     disabled={!undoable}
                 >
                     <RiArrowGoBackFill />
@@ -754,7 +754,7 @@ export function Component() {
                     name={undefined}
                     title="Redo"
                     onClick={redo}
-                    variant="quaternary"
+                    variant="tertiary"
                     disabled={!redoable}
                 >
                     <RiArrowGoForwardFill />

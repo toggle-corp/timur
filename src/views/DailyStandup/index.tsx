@@ -248,7 +248,7 @@ export function Component() {
                     <Button
                         name={prevButtonName}
                         onClick={updatePage}
-                        variant="quaternary"
+                        variant="tertiary"
                         disabled={prevButtonDisabled}
                         title="Previous standup slide"
                     >
@@ -257,7 +257,7 @@ export function Component() {
                     <Button
                         name={nextButtonName}
                         onClick={updatePage}
-                        variant="quaternary"
+                        variant="tertiary"
                         disabled={nextButtonDisabled}
                         title="Next standup slide"
                     >
@@ -266,7 +266,7 @@ export function Component() {
                     <Button
                         name={undefined}
                         onClick={handlePresentClick}
-                        variant="quaternary"
+                        variant="tertiary"
                         title="Enter full screen"
                         icons={<RiFullscreenLine />}
                     >

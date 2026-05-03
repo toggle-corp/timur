@@ -33,12 +33,8 @@
                 .usage-count {
                     flex-shrink: 0;
                     border-radius: var(--border-radius-lg);
-                    background-color: var(--color-quaternary);
-                    padding: 0 var(--spacing-sm);
-                }
-
-                &:hover {
                     background-color: var(--color-tertiary);
+                    padding: 0 var(--spacing-sm);
                 }
             }
         }

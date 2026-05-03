@@ -63,7 +63,7 @@ function ConfirmButton<const N>(props: Props<N>) {
                         title={`Cancel ${title}`}
                         name={undefined}
                         onClick={handleCancelButtonClick}
-                        variant="quaternary"
+                        variant="tertiary"
                     >
                         Cancel
                     </Button>

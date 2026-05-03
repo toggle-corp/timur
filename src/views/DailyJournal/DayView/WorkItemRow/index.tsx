@@ -317,7 +317,7 @@ function WorkItemRow(props: Props) {
         <div className={styles.actions}>
             <Button
                 name={undefined}
-                variant="quaternary"
+                variant="tertiary"
                 title="Clone this entry"
                 onClick={handleClone}
                 spacing="xs"
