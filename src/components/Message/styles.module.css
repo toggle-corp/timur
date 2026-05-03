@@ -5,7 +5,6 @@
     gap: var(--spacing-sm);
     justify-content: center;
     opacity: var(--opacity-message);
-    background-color: var(--color-foreground);
     padding: var(--spacing-lg);
     min-height: var(--height-content--min);
     text-align: center;
@@ -36,11 +35,6 @@
         }
     }
 
-    &:not(.compact) {
-        .title {
-            font-weight: var(--font-weight-bold);
-        }
-    }
     &.compact {
         padding: var(--spacing-sm);
         min-height: var(--height-compact-content--min);
