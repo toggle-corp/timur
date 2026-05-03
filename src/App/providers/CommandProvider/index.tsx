@@ -5,7 +5,6 @@ import {
     useRef,
     useState,
 } from 'react';
-import { _cs } from '@togglecorp/fujs';
 import {
     gql,
     useMutation,
@@ -16,7 +15,6 @@ import {
     CudTimeEntryMutation,
     CudTimeEntryMutationVariables,
 } from '#generated/types/graphql';
-import icon from '#resources/icon.svg';
 import {
     AddCommand,
     Command,
@@ -24,8 +22,6 @@ import {
     EditCommand,
 } from '#utils/command';
 import { WorkItem } from '#utils/types';
-
-import styles from './styles.module.css';
 
 const CUD_TIME_ENTRY_MUTATION = gql`
     mutation CudTimeEntry(
@@ -274,26 +270,12 @@ function CommandProvider(props: BaseProps) {
         watch,
         undoable,
         redoable,
-    }), [watch, setZeitgeist, setCommands, undoable, redoable]);
+        inFlight,
+    }), [watch, setZeitgeist, setCommands, undoable, redoable, inFlight]);
 
     return (
         <CommandContext.Provider value={commandState}>
             {children}
-            <div
-                className={_cs(
-                    styles.lastSavedStatus,
-                    inFlight && styles.active,
-                )}
-            >
-                <img
-                    className={styles.timurIcon}
-                    alt="Timur Icon"
-                    src={icon}
-                />
-                <div>
-                    Committing...
-                </div>
-            </div>
         </CommandContext.Provider>
     );
 }

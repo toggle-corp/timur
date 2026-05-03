@@ -12,9 +12,11 @@ import {
 } from '@togglecorp/fujs';
 
 import Navbar from '#components/Navbar';
+import CommandContext from '#contexts/command';
 import UserContext from '#contexts/user';
 import useCurrentDate from '#hooks/useCurrentDate';
 import useDebouncedValue from '#hooks/useDebouncedValue';
+import icon from '#resources/icon.svg';
 
 import styles from './styles.module.css';
 
@@ -28,6 +30,7 @@ export function Component() {
     const {
         userAuth,
     } = useContext(UserContext);
+    const { inFlight } = useContext(CommandContext);
 
     const todayDate = useCurrentDate();
     const daysBeforeLogout = useMemo(() => (
@@ -50,6 +53,21 @@ export function Component() {
             <Navbar className={styles.navbar} />
             <div className={styles.pageContent}>
                 <Outlet />
+                <div
+                    className={_cs(
+                        styles.savingIndicator,
+                        inFlight && styles.active,
+                    )}
+                >
+                    <img
+                        className={styles.savingIcon}
+                        alt=""
+                        src={icon}
+                    />
+                    <div>
+                        Saving...
+                    </div>
+                </div>
             </div>
             {userAuth && daysBeforeLogout < REMAINING_DAYS_THRESHOLD && (
                 <div className={styles.nagbar}>
