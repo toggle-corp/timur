@@ -73,6 +73,10 @@
     .footer {
         flex-shrink: 0;
     }
+
+    .bottom-nav {
+        flex-shrink: 0;
+    }
 }
 
 @keyframes bounce-back-and-forth {
