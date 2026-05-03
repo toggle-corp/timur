@@ -79,7 +79,7 @@ function PwaPrompt() {
                     title="Close SW update prompt"
                     name={undefined}
                     onClick={close}
-                    variant="quaternary"
+                    variant="tertiary"
                 >
                     Close
                 </Button>

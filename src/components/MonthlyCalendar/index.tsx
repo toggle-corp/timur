@@ -144,7 +144,7 @@ function MonthlyCalendar(props: Props) {
             <div className={styles.header}>
                 <Button
                     name={undefined}
-                    variant="quaternary"
+                    variant="tertiary"
                     onClick={handlePrevMonth}
                     title="See previous month in calendar"
                     spacing="xs"
@@ -153,7 +153,7 @@ function MonthlyCalendar(props: Props) {
                 </Button>
                 <Button
                     name={undefined}
-                    variant="quaternary"
+                    variant="tertiary"
                     onClick={handleNextMonth}
                     title="See next month in calendar"
                     spacing="xs"
@@ -173,7 +173,6 @@ function MonthlyCalendar(props: Props) {
                         style={{
                             gridColumnStart: i + 1,
                             gridRowStart: 1,
-                            opacity: i === 6 || i === 0 ? 0.5 : 1,
                         }}
                     >
                         {dayName}
@@ -185,7 +184,7 @@ function MonthlyCalendar(props: Props) {
                     if (fullDate === date) {
                         variant = 'secondary' as const;
                     } else if (selectedDate === date) {
-                        variant = 'quaternary' as const;
+                        variant = 'tertiary' as const;
                     } else {
                         variant = 'transparent' as const;
                     }
@@ -200,7 +199,6 @@ function MonthlyCalendar(props: Props) {
                                 gridColumnStart: day.dayOfWeek + 1,
                                 // Note +2 is due to the week day name row
                                 gridRowStart: day.week + 2,
-                                opacity: day.dayOfWeek === 6 || day.dayOfWeek === 0 ? 0.5 : 1,
                             }}
                             variant={variant}
                         >

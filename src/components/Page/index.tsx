@@ -148,7 +148,7 @@ function Page(props: Props) {
                             name={false}
                             onClick={handleStartSidebarToggle}
                             className={styles.closeLeftPaneButton}
-                            variant="quaternary"
+                            variant="tertiary"
                             title="Close left pane"
                             spacing="sm"
                         >
@@ -182,7 +182,7 @@ function Page(props: Props) {
                             name={false}
                             onClick={handleEndSidebarToggle}
                             className={styles.closeRightPaneButton}
-                            variant="quaternary"
+                            variant="tertiary"
                             title="Close right pane"
                             spacing="sm"
                         >

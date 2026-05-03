@@ -38,7 +38,7 @@ function DropdownMenu(props: Props) {
         label,
         activeClassName,
         icons,
-        variant = 'quaternary',
+        variant = 'tertiary',
         actions,
         withoutDropdownIcon,
         title,

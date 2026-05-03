@@ -3,23 +3,85 @@
 }
 
 :root {
+    color-scheme: light dark;
+
     --font-family-sans-serif: "Fira Sans", sans-serif;
     --font-family-mono: "Oxygen Mono", monospace;
 
-    --color-primary: #c45332;
-    --color-secondary: #9cb56e;
-    --color-tertiary: #f2fde1; /* used as hover color */
-    --color-quaternary: #f2f2d0;
+    --color-primary: #b04525;
+    --color-primary-text: #9c3c1f;
 
-    --color-background: #fafaf0;
+    --color-secondary: #b8c878;
+    --color-secondary-text: #7d8a3d;
+
+    --color-tertiary: #eae2bf;
+
+    --color-background: #f4f1e3;
     --color-foreground: #ffffff;
 
     --color-text: rgba(0, 0, 0, .8);
-    --color-text-light: rgba(0, 0, 0, .6);
+    --color-text-light: rgba(0, 0, 0, .65);
     --color-text-on-dark: #ffffff;
 
     --color-separator: rgba(0, 0, 0, 0.1);
     --color-separator-dark: rgba(0, 0, 0, 0.2);
+
+    --color-focus: color-mix(in srgb, var(--color-secondary) 45%, var(--color-background));
+
+    --cs-0-fg: #454447;
+    --cs-0-bg: #eaeaea;
+    --cs-1-fg: #2840a9;
+    --cs-1-bg: #dce3fa;
+    --cs-2-fg: #0474a6;
+    --cs-2-bg: #c1f0fe;
+    --cs-3-fg: #007a5a;
+    --cs-3-bg: #c3f6e0;
+    --cs-4-fg: #c01343;
+    --cs-4-bg: #ffd6e4;
+    --cs-5-fg: #50740e;
+    --cs-5-bg: #e5f5b8;
+    --cs-6-fg: #83388a;
+    --cs-6-bg: #f4daff;
+    --cs-7-fg: #a86e00;
+    --cs-7-bg: #fde3aa;
+    --cs-8-fg: #7d5327;
+    --cs-8-bg: #ecdecc;
+
+    @media (prefers-color-scheme: dark) {
+        --color-primary: #db7657;
+        --color-primary-text: #e2866a;
+        --color-secondary: #7e8b3c;
+        --color-secondary-text: #b9c57c;
+        --color-tertiary: #3d3620;
+
+        --color-background: #1c1b17;
+        --color-foreground: #333129;
+
+        --color-text: rgba(255, 255, 255, .85);
+        --color-text-light: rgba(255, 255, 255, .55);
+
+        --color-separator: rgba(255, 255, 255, 0.1);
+        --color-separator-dark: rgba(255, 255, 255, 0.2);
+
+        --cs-0-fg: #dad6cf;
+        --cs-0-bg: #2e2c28;
+        --cs-1-fg: #b3c0f0;
+        --cs-1-bg: #1a2660;
+        --cs-2-fg: #87d6f0;
+        --cs-2-bg: #033a52;
+        --cs-3-fg: #80d8b3;
+        --cs-3-bg: #024a36;
+        --cs-4-fg: #f7a3bf;
+        --cs-4-bg: #5c0a26;
+        --cs-5-fg: #c8e08a;
+        --cs-5-bg: #2a4008;
+        --cs-6-fg: #d8b3df;
+        --cs-6-bg: #3f1e44;
+        --cs-7-fg: #f0c673;
+        --cs-7-bg: #4d3300;
+        --cs-8-fg: #d4b890;
+        --cs-8-bg: #3a2517;
+    }
 
     --base-font-size: 1rem;
 

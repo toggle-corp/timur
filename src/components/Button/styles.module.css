@@ -41,8 +41,7 @@
 
     &.primary,
     &.secondary,
-    &.tertiary,
-    &.quaternary {
+    &.tertiary {
         .children {
             text-align: center;
         }
@@ -112,22 +111,6 @@
 
     &.tertiary {
         --color-background: var(--color-tertiary);
-        --color-text: var(--color-text-light);
-
-        &.disabled {
-            filter: saturate(50%);
-        }
-
-        &:not(.disabled) {
-            &:hover {
-                filter: saturate(200%);
-            }
-        }
-    }
-
-    &.quaternary {
-        --color-background: var(--color-quaternary);
-        --color-text: var(--color-text-light);
 
         &.disabled {
             filter: saturate(50%);
@@ -161,7 +144,7 @@
         --padding: var(--spacing-sm) var(--spacing-md);
 
         &:hover {
-            background-color: var(--color-tertiary);
+            background-color: var(--color-focus);
         }
     }
 

@@ -46,7 +46,8 @@
         }
 
         &:focus-within {
-            outline: var(--width-separator-md) solid var(--color-secondary);
+            outline: var(--width-separator-md) solid var(--color-focus);
+            outline-offset: var(--spacing-2xs);
         }
 
         &:not(.read-only) {

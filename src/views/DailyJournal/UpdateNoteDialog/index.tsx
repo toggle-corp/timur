@@ -217,7 +217,7 @@ function AddNoteDialog(props: Props) {
                     title="Close note dialog"
                     name={undefined}
                     onClick={handleModalClose}
-                    variant="quaternary"
+                    variant="tertiary"
                 >
                     Close
                 </Button>
