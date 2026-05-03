@@ -52,6 +52,11 @@ export function Component() {
                 />
             )}
             <Navbar className={styles.navbar} />
+            {userAuth && daysBeforeLogout < REMAINING_DAYS_THRESHOLD && (
+                <div className={styles.nagbar}>
+                    {`You'll be automatically logged out in ${Math.floor(daysBeforeLogout)} days unless you re-login.`}
+                </div>
+            )}
             <div className={styles.pageContent}>
                 <Outlet />
                 <div
@@ -65,16 +70,11 @@ export function Component() {
                         alt=""
                         src={icon}
                     />
-                    <div>
+                    <span>
                         Saving...
-                    </div>
+                    </span>
                 </div>
             </div>
-            {userAuth && daysBeforeLogout < REMAINING_DAYS_THRESHOLD && (
-                <div className={styles.nagbar}>
-                    {`You'll be automatically logged out in ${Math.floor(daysBeforeLogout)} days unless you re-login.`}
-                </div>
-            )}
             <BottomNav className={styles.bottomNav} />
         </div>
     );
