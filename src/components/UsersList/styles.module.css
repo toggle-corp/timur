@@ -1,0 +1,18 @@
+.user {
+    display: flex;
+    font-size: var(--font-size-lg);
+    gap: var(--spacing-xs);
+
+    .display-picture {
+        font-size: var(--font-size-xl);
+    }
+
+    .name {
+        display: inline-flex;
+        gap: var(--spacing-xs);
+    }
+
+    .unavailable {
+        text-decoration: line-through;
+    }
+}

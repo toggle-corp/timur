@@ -21,7 +21,7 @@
             font-size: var(--font-size-xl);
 
             &:before {
-                content: '- '
+                content: '— '
             }
         }
     }

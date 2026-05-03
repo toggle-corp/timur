@@ -1,14 +1,13 @@
 import {
-    _cs,
     encodeDate,
+    isDefined,
 } from '@togglecorp/fujs';
 import {
     gql,
     useQuery,
 } from 'urql';
 
-import DisplayPicture from '#components/DisplayPicture';
-import TextOutput from '#components/TextOutput';
+import UsersList from '#components/UsersList';
 import {
     type StandupConductorsQuery,
     type StandupConductorsQueryVariables,
@@ -24,11 +23,15 @@ const STANDUP_CONDUCTORS = gql`
                     id
                     displayName
                     displayPicture
+                    leaveToday
+                    workFromHomeToday
                 }
                 fallbackConductor {
                     id
                     displayName
                     displayPicture
+                    leaveToday
+                    workFromHomeToday
                 }
             }
         }
@@ -46,54 +49,33 @@ function StandupConductors() {
 
     const standupConductors = conductorsResponse.data?.private.dailyStandup;
 
+    const conductors = [
+        standupConductors?.conductor,
+        standupConductors?.fallbackConductor,
+    ]
+        .filter(isDefined)
+        .map((conductor) => ({
+            id: conductor.id,
+            displayPicture: conductor.displayPicture,
+            displayName: conductor.displayName,
+            leave: conductor.leaveToday,
+            workFromHome: conductor.workFromHomeToday,
+        }));
+
+    if (conductors.length === 0) {
+        return null;
+    }
+
     return (
-        <div className={styles.conductors}>
-            <TextOutput
-                className={_cs(
-                    styles.conductorItem,
-                    !standupConductors && styles.hidden,
-                )}
-                label="Standup Lead"
-                valueContainerClassName={styles.conductorValue}
-                value={(
-                    <>
-                        <DisplayPicture
-                            imageUrl={standupConductors?.conductor?.displayPicture}
-                            displayName={standupConductors?.conductor?.displayName ?? 'Hari Bahadur'}
-                        />
-                        <span>
-                            {standupConductors?.conductor?.displayName
-                                ?? 'Hari Bahadur'}
-                        </span>
-                    </>
-                )}
-                block
-                hideLabelColon
+        <section className={styles.standupConductors}>
+            <h3 className={styles.heading}>
+                Conductors
+            </h3>
+            <UsersList
+                users={conductors}
+                strikeoutForStandup
             />
-            <TextOutput
-                className={_cs(
-                    styles.conductorItem,
-                    !standupConductors && styles.hidden,
-                )}
-                label="Acting Lead"
-                valueContainerClassName={styles.conductorValue}
-                value={(
-                    <>
-                        <DisplayPicture
-                            imageUrl={standupConductors
-                                ?.fallbackConductor?.displayPicture}
-                            displayName={standupConductors?.fallbackConductor?.displayName ?? 'Hari Bahadur'}
-                        />
-                        <span>
-                            {standupConductors?.fallbackConductor?.displayName
-                                ?? 'Hari Bahadur'}
-                        </span>
-                    </>
-                )}
-                block
-                hideLabelColon
-            />
-        </div>
+        </section>
     );
 }
 

@@ -53,7 +53,7 @@ export type ConfigStorage = {
     endSidebarShown: boolean,
 }
 
-export interface GeneralEvent {
+export interface GeneralEventType {
     key: string;
     type: EventTypeEnum | 'DEADLINE';
     typeDisplay: string;
