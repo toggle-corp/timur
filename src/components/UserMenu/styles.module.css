@@ -1,0 +1,4 @@
+.greetings {
+    padding: var(--spacing-sm) var(--spacing-md);
+    color: var(--color-text-light);
+}

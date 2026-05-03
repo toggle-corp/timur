@@ -11,6 +11,7 @@ import {
     compareDate,
 } from '@togglecorp/fujs';
 
+import BottomNav from '#components/BottomNav';
 import Navbar from '#components/Navbar';
 import CommandContext from '#contexts/command';
 import UserContext from '#contexts/user';
@@ -74,6 +75,7 @@ export function Component() {
                     {`You'll be automatically logged out in ${Math.floor(daysBeforeLogout)} days unless you re-login.`}
                 </div>
             )}
+            <BottomNav className={styles.bottomNav} />
         </div>
     );
 }
