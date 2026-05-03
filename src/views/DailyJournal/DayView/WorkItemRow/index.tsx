@@ -404,6 +404,7 @@ function WorkItemRow(props: Props) {
                 contentClassName={styles.modalContent}
                 className={styles.calendarDialog}
                 size="auto"
+                closeOnOutsideClick
             >
                 <MonthlyCalendar
                     selectedDate={workItem.date}
