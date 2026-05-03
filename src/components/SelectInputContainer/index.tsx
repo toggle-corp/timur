@@ -141,6 +141,7 @@ function SelectInputContainer<
     const options = optionsFromProps ?? (emptyList as OPTION[]);
 
     const inputSectionRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const handleSearchInputChange = useCallback(
         (value: string | undefined) => {
@@ -193,6 +194,7 @@ function SelectInputContainer<
             onOptionClick(valueKey, value, name);
             if (!persistentOptionPopup) {
                 handleHideDropdown();
+                inputRef.current?.focus();
             }
         },
         [onOptionClick, handleHideDropdown, persistentOptionPopup, name],
@@ -291,6 +293,7 @@ function SelectInputContainer<
                 )}
                 input={(
                     <RawInput
+                        elementRef={inputRef}
                         className={styles.input}
                         // NOTE: We are not using isNotDefined as we can have empty string
                         style={(searchText || !valueDisplay) ? undefined : {
