@@ -1,6 +1,6 @@
 import { _cs } from '@togglecorp/fujs';
 
-import { GeneralEvent as GeneralEventType } from '#utils/types';
+import { GeneralEventType } from '#utils/types';
 
 import styles from './styles.module.css';
 
@@ -8,16 +8,6 @@ function getFormattedDaysRemaining(numDays: number) {
     if (numDays === 0) {
         return 'Today';
     }
-
-    /*
-    if (numDays === 1) {
-        return 'Tomorrow';
-    }
-
-    if (numDays === -1) {
-        return 'Yesterday';
-    }
-    */
 
     const dayLabel = Math.abs(numDays) === 1 ? 'day' : 'days';
 

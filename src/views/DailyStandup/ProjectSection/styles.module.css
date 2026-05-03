@@ -6,22 +6,46 @@
         object-position: center center;
     }
 
-    .user {
+    .primary-section{
         display: flex;
-        font-size: var(--font-size-lg);
-        gap: var(--spacing-xs);
+        flex-direction: column;
+        text-align: center;
+        gap: var(--spacing-2xl);
+    }
 
-        .display-picture {
+    .sub-sections {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        gap: var(--spacing-lg);
+    }
+
+    .current-time {
+        display: flex;
+        justify-content: space-between;
+        color: var(--color-text-light);
+        font-size: var(--font-size-md);
+        gap: var(--spacing-sm);
+    }
+
+    .sub-section {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm);
+
+        .sub-heading {
+            color: var(--color-secondary-text);
             font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-normal);
         }
 
-        .name {
-            display: inline-flex;
+        .contracts {
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            padding-left: var(--spacing-lg);
             gap: var(--spacing-xs);
-
-        }
-        .unavailable {
-            text-decoration: line-through;
         }
     }
+
 }

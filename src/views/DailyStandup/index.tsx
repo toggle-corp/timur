@@ -180,6 +180,24 @@ export function Component() {
     const nextButtonName = projectsMap?.[mapId]?.next;
     const nextButtonDisabled = isNotDefined(nextButtonName);
 
+    const slideOrder = useMemo(() => {
+        const allProjectsData = allProjectsResponse?.data?.private.allProjects;
+        if (isNotDefined(allProjectsData)) {
+            return undefined;
+        }
+        return [
+            'start',
+            'deadlines',
+            ...allProjectsData.map((project) => project.id),
+            'end',
+        ];
+    }, [allProjectsResponse?.data]);
+
+    const totalSlides = slideOrder?.length;
+    const currentSlide = slideOrder
+        ? slideOrder.indexOf(mapId) + 1 || undefined
+        : undefined;
+
     const handleNextButtion = useCallback(
         () => {
             if (nextButtonDisabled) {
@@ -242,11 +260,14 @@ export function Component() {
             className={styles.dailyStandup}
             documentTitle="Timur - Daily Standup"
             contentClassName={styles.pageContent}
+            onSwipeLeft={handleNextButtion}
+            onSwipeRight={handlePrevButton}
         >
             <Portal container={midActionsRef}>
                 <div className={styles.actions}>
                     <Button
                         name={prevButtonName}
+                        className={styles.navButton}
                         onClick={updatePage}
                         variant="tertiary"
                         disabled={prevButtonDisabled}
@@ -256,6 +277,7 @@ export function Component() {
                     </Button>
                     <Button
                         name={nextButtonName}
+                        className={styles.navButton}
                         onClick={updatePage}
                         variant="tertiary"
                         disabled={nextButtonDisabled}
@@ -263,10 +285,12 @@ export function Component() {
                     >
                         <RiArrowRightSLine />
                     </Button>
+                    <div className={styles.spacer} />
                     <Button
                         name={undefined}
+                        className={styles.presentButton}
                         onClick={handlePresentClick}
-                        variant="tertiary"
+                        variant="primary"
                         title="Enter full screen"
                         icons={<RiFullscreenLine />}
                     >
@@ -279,15 +303,23 @@ export function Component() {
                 className={_cs(styles.content, isFullScreen && styles.presentationMode)}
             >
                 {mapId === 'start' && (
-                    <StartSection />
+                    <StartSection
+                        currentSlide={currentSlide}
+                        totalSlides={totalSlides}
+                    />
                 )}
                 {mapId === 'deadlines' && (
-                    <DeadlineSection />
+                    <DeadlineSection
+                        currentSlide={currentSlide}
+                        totalSlides={totalSlides}
+                    />
                 )}
                 {mapId !== 'start' && mapId !== 'end' && mapId !== 'deadlines' && (
                     <ProjectSection
                         date={selectedDate}
                         projectId={mapId}
+                        currentSlide={currentSlide}
+                        totalSlides={totalSlides}
                     />
                 )}
                 {mapId === 'end' && (

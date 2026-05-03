@@ -22,5 +22,17 @@
 .actions {
     display: flex;
     justify-content: flex-end;
+    width: 100%;
     gap: var(--spacing-sm);
+
+    .spacer {
+        flex-grow: 1;
+    }
+
+    .present-button,
+    .nav-button {
+        @media screen and (max-width: 900px) {
+            display: none;
+        }
+    }
 }
