@@ -4,7 +4,6 @@ import {
     isDefined,
     isNotDefined,
 } from '@togglecorp/fujs';
-import stringToColor from 'string-to-color';
 
 import styles from './styles.module.css';
 
@@ -14,6 +13,16 @@ interface Props {
     className?: string;
 }
 
+function stringToPastelColor(str: string): string {
+    let hash = 0;
+    for (let i = 0; i < str.length; i += 1) {
+        // eslint-disable-next-line no-bitwise
+        hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
+    }
+    const hue = hash % 360;
+    return `hsl(${hue}, 60%, 45%)`;
+}
+
 function DisplayPicture(props: Props) {
     const {
         imageUrl,
@@ -21,8 +30,7 @@ function DisplayPicture(props: Props) {
         className,
     } = props;
 
-    // FIXME: Use pastel colors?
-    const color = useMemo(() => stringToColor(displayName), [displayName]);
+    const color = useMemo(() => stringToPastelColor(displayName), [displayName]);
 
     return (
         <div
