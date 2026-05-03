@@ -82,7 +82,7 @@ const dailyStandup = customWrapRoute({
 
 const settings = customWrapRoute({
     parent: rootLayout,
-    path: 'settings',
+    path: 'daily-journal/settings',
     component: {
         render: () => import('#views/Settings'),
         props: {},
