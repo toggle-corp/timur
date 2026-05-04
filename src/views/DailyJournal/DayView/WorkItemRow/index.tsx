@@ -7,9 +7,10 @@ import {
 } from 'react';
 import {
     RiDeleteBin2Line,
+    RiFileAddLine,
     RiFileCopyLine,
+    RiFileTransferLine,
     RiMoreLine,
-    RiSwap2Line,
 } from 'react-icons/ri';
 import {
     _cs,
@@ -38,6 +39,7 @@ import {
     EntriesAsList,
     Task,
     WorkItem,
+    WorkItemAction,
     WorkItemStatus,
 } from '#utils/types';
 
@@ -230,7 +232,9 @@ function WorkItemRow(props: Props) {
         [onAssist, workItem.clientId],
     );
 
-    const statusInput = config.checkboxForStatus ? (
+    const checkboxForStatus = config.checkboxForStatus || screen === 'mobile';
+
+    const statusInput = checkboxForStatus ? (
         <Checkbox
             checkmarkClassName={_cs(
                 styles.statusCheckbox,
@@ -313,51 +317,93 @@ function WorkItemRow(props: Props) {
         />
     );
 
+    const handleDeleteClick = useCallback(
+        () => {
+            onDelete?.(workItem.clientId);
+        },
+        [onDelete, workItem.clientId],
+    );
+
+    const availableActionDefs: {
+        key: WorkItemAction;
+        title: string;
+        label: string;
+        icon: React.ReactNode;
+        onClick: () => void;
+    }[] = [
+        {
+            key: 'clone',
+            title: 'Clone this entry',
+            label: 'Clone entry',
+            icon: <RiFileCopyLine />,
+            onClick: handleClone,
+        },
+        {
+            key: 'copy',
+            title: 'Copy this entry to another day',
+            label: 'Copy to another day',
+            icon: <RiFileAddLine />,
+            onClick: handleCopyDialogOpen,
+        },
+        {
+            key: 'move',
+            title: 'Move this entry to another day',
+            label: 'Move to another day',
+            icon: <RiFileTransferLine />,
+            onClick: handleMoveDialogOpen,
+        },
+        {
+            key: 'delete',
+            title: 'Delete this entry',
+            label: 'Delete entry',
+            icon: <RiDeleteBin2Line />,
+            onClick: handleDeleteClick,
+        },
+    ];
+
+    const outsideSet = new Set(config.quickActions);
+    const outsideActionDefs = availableActionDefs.filter(
+        (actionDef) => outsideSet.has(actionDef.key),
+    );
+    const insideActionDefs = availableActionDefs.filter(
+        (actionDef) => !outsideSet.has(actionDef.key),
+    );
+
     const actions = (
         <div className={styles.actions}>
-            <Button
-                name={undefined}
-                variant="tertiary"
-                title="Clone this entry"
-                onClick={handleClone}
-                spacing="xs"
-            >
-                <RiFileCopyLine />
-            </Button>
-            <DropdownMenu
-                label={<RiMoreLine />}
-                withoutDropdownIcon
-                variant="transparent"
-                title="Show additional entry options"
-            >
-                <DropdownMenuItem
-                    type="button"
-                    name={workItem.clientId}
-                    title="Move this entry to another day"
-                    onClick={handleCopyDialogOpen}
-                    icons={<RiFileCopyLine />}
+            {outsideActionDefs.map((actionDef) => (
+                <Button
+                    key={actionDef.key}
+                    name={undefined}
+                    variant="tertiary"
+                    title={actionDef.title}
+                    onClick={actionDef.onClick}
+                    spacing="xs"
                 >
-                    Copy to another day
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                    type="button"
-                    name={workItem.clientId}
-                    title="Move this entry to another day"
-                    onClick={handleMoveDialogOpen}
-                    icons={<RiSwap2Line />}
+                    {actionDef.icon}
+                </Button>
+            ))}
+            {insideActionDefs.length > 0 && (
+                <DropdownMenu
+                    label={<RiMoreLine />}
+                    withoutDropdownIcon
+                    variant="transparent"
+                    title="Show additional entry options"
                 >
-                    Move to another day
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                    type="button"
-                    name={workItem.clientId}
-                    title="Delete this entry"
-                    onClick={onDelete}
-                    icons={<RiDeleteBin2Line />}
-                >
-                    Delete entry
-                </DropdownMenuItem>
-            </DropdownMenu>
+                    {insideActionDefs.map((actionDef) => (
+                        <DropdownMenuItem
+                            key={actionDef.key}
+                            type="button"
+                            name={workItem.clientId}
+                            title={actionDef.title}
+                            onClick={actionDef.onClick}
+                            icons={actionDef.icon}
+                        >
+                            {actionDef.label}
+                        </DropdownMenuItem>
+                    ))}
+                </DropdownMenu>
+            )}
         </div>
     );
 
@@ -369,7 +415,7 @@ function WorkItemRow(props: Props) {
                 role="listitem"
                 className={_cs(
                     styles.workItemRow,
-                    config.checkboxForStatus && styles.checkboxForStatus,
+                    checkboxForStatus && styles.checkboxForStatus,
                     className,
                 )}
             >
@@ -384,14 +430,16 @@ function WorkItemRow(props: Props) {
                     </>
                 ) : (
                     <>
-                        {config.checkboxForStatus && statusInput}
+                        {checkboxForStatus && statusInput}
                         {descriptionInput}
                         <div className={styles.compactOptions}>
-                            {!config.checkboxForStatus && statusInput}
+                            {!checkboxForStatus && statusInput}
                             {taskInput}
                             {typeInput}
-                            {durationInput}
-                            {actions}
+                            <div className={styles.optionGroup}>
+                                {durationInput}
+                                {actions}
+                            </div>
                         </div>
                     </>
                 )}

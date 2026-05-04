@@ -25,6 +25,7 @@ export const defaultConfigValue: ConfigStorage = {
         { key: 'status', sortDirection: 1 },
     ],
     collapsedGroups: [],
+    quickActions: ['clone'],
 };
 
 export const colorscheme = [
@@ -48,18 +49,6 @@ export const colorscheme = [
     ['var(--cs-8-fg)', 'var(--cs-8-bg)'],
 ] as const satisfies readonly (readonly [string, string])[];
 
-// FIXME: We should instead generate these options
-export const numericOptions: NumericOption[] = [
-    { key: 1, label: '1' },
-    { key: 2, label: '2' },
-    { key: 3, label: '3' },
-    { key: 4, label: '4' },
-    { key: 5, label: '5' },
-    { key: 6, label: '6' },
-    { key: 7, label: '7' },
-    { key: 8, label: '8' },
-    { key: 9, label: '9' },
-];
 export function numericOptionKeySelector(option: NumericOption) {
     return option.key;
 }

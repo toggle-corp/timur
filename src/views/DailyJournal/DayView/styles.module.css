@@ -104,11 +104,6 @@
 
             .work-item {
                 flex-grow: 1;
-                background-color: var(--color-foreground);
-
-                &:focus-within {
-                    background-color: var(--color-foreground);
-                }
             }
         }
     }

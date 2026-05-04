@@ -13,17 +13,15 @@ import {
     RiArrowGoForwardFill,
     RiArrowLeftSLine,
     RiArrowRightSLine,
-    RiCalendar2Line,
     RiHomeOfficeLine,
-    RiSettingsLine,
     RiStickyNoteAddLine,
-    RiTerminalBoxLine,
 } from 'react-icons/ri';
 import {
     useNavigate,
     useParams,
 } from 'react-router-dom';
 import {
+    _cs,
     compareStringAsNumber,
     encodeDate,
     isDefined,
@@ -45,7 +43,6 @@ import DateContext from '#contexts/date';
 import FocusContext from '#contexts/focus';
 import NavbarContext from '#contexts/navbar';
 import RouteContext from '#contexts/route';
-import SizeContext from '#contexts/size';
 import {
     MyTimeEntriesQuery,
     MyTimeEntriesQueryVariables,
@@ -165,7 +162,6 @@ export function Component() {
     const navigate = useNavigate();
     const routes = useContext(RouteContext);
     const { midActionsRef } = useContext(NavbarContext);
-    const { screen } = useContext(SizeContext);
 
     // State
     const filter = useCallback(
@@ -619,6 +615,7 @@ export function Component() {
                     calendarComponentRef={calendarRef}
                     selectedDate={selectedDate}
                     setSelectedDate={setSelectedDate}
+                    onShortcutsClick={handleShortcutsButtonClick}
                 />
             )}
             endAsideContent={(
@@ -632,39 +629,63 @@ export function Component() {
         >
             <Portal container={midActionsRef}>
                 <div className={styles.dateNavigation}>
-                    {screen === 'desktop' && (
-                        <>
-                            <Link
-                                to="dailyJournal"
-                                urlParams={{ date: getPrevDay() }}
-                                variant="tertiary"
-                                title="Previous day"
-                            >
-                                <RiArrowLeftSLine />
-                            </Link>
-                            <Link
-                                to="dailyJournal"
-                                urlParams={{ date: getNextDay() }}
-                                variant="tertiary"
-                                title="Next day"
-                            >
-                                <RiArrowRightSLine />
-                            </Link>
-                        </>
+                    <Link
+                        to="dailyJournal"
+                        urlParams={{ date: getPrevDay() }}
+                        className={styles.desktopOnly}
+                        variant="tertiary"
+                        title="Previous day"
+                    >
+                        <RiArrowLeftSLine />
+                    </Link>
+                    <Link
+                        to="dailyJournal"
+                        urlParams={{ date: getNextDay() }}
+                        className={styles.desktopOnly}
+                        variant="tertiary"
+                        title="Next day"
+                    >
+                        <RiArrowRightSLine />
+                    </Link>
+                    {(undoable || redoable) && (
+                        <div
+                            className={_cs(styles.separator, styles.desktopOnly)}
+                            role="separator"
+                        />
                     )}
-                    {selectedDate !== fullDate && (
-                        <Link
-                            to="dailyJournal"
+                    {undoable && (
+                        <Button
+                            name={undefined}
+                            title="Undo"
+                            onClick={undo}
                             variant="tertiary"
-                            title="Jump to today"
-                            icons={(
-                                <RiCalendar2Line />
-                            )}
                         >
-                            Today
-                        </Link>
+                            <RiArrowGoBackFill />
+                        </Button>
+                    )}
+                    {redoable && (
+                        <Button
+                            name={undefined}
+                            title="Redo"
+                            onClick={redo}
+                            variant="tertiary"
+                        >
+                            <RiArrowGoForwardFill />
+                        </Button>
                     )}
                     <div className={styles.spacer} />
+                    <Button
+                        name={undefined}
+                        className={styles.desktopOnly}
+                        onClick={handleNoteUpdateClick}
+                        title="Update Note"
+                        variant="tertiary"
+                        icons={(
+                            <RiStickyNoteAddLine />
+                        )}
+                    >
+                        Note
+                    </Button>
                     <Button
                         name={undefined}
                         onClick={handleAvailabilityButtonClick}
@@ -677,44 +698,6 @@ export function Component() {
                             fallback={<RiHomeOfficeLine />}
                         />
                     </Button>
-                    {screen === 'desktop' && (
-                        <Button
-                            name={undefined}
-                            onClick={handleNoteUpdateClick}
-                            title="Update Note"
-                            variant="tertiary"
-                            icons={(
-                                <RiStickyNoteAddLine />
-                            )}
-                        >
-                            Note
-                        </Button>
-                    )}
-                    {screen === 'desktop' && (
-                        <Button
-                            title="Show shortcuts"
-                            name={undefined}
-                            variant="tertiary"
-                            onClick={handleShortcutsButtonClick}
-                            icons={(
-                                <RiTerminalBoxLine />
-                            )}
-                        >
-                            Shortcuts
-                        </Button>
-                    )}
-                    {screen === 'desktop' && (
-                        <Link
-                            to="settings"
-                            title="Settings"
-                            variant="tertiary"
-                            icons={(
-                                <RiSettingsLine />
-                            )}
-                        >
-                            Settings
-                        </Link>
-                    )}
                 </div>
             </Portal>
             <FocusContext.Provider
@@ -732,34 +715,19 @@ export function Component() {
                     selectedDate={selectedDate}
                 />
             </FocusContext.Provider>
-            <div className={styles.bottomActions}>
-                <Button
-                    name={undefined}
-                    onClick={handleAddEntryClick}
-                    icons={<RiAddLine />}
-                    title="Add entry"
-                >
-                    Add entry
-                </Button>
-                <Button
-                    name={undefined}
-                    title="Undo"
-                    onClick={undo}
-                    variant="tertiary"
-                    disabled={!undoable}
-                >
-                    <RiArrowGoBackFill />
-                </Button>
-                <Button
-                    name={undefined}
-                    title="Redo"
-                    onClick={redo}
-                    variant="tertiary"
-                    disabled={!redoable}
-                >
-                    <RiArrowGoForwardFill />
-                </Button>
-            </div>
+            <Button
+                name={undefined}
+                className={_cs(
+                    styles.fab,
+                    storedConfig.startSidebarShown && styles.startSidebarShown,
+                )}
+                onClick={handleAddEntryClick}
+                icons={<RiAddLine />}
+                title="Add entry"
+                variant="primary"
+            >
+                Add entry
+            </Button>
             <ShortcutsDialog
                 dialogOpenTriggerRef={shortcutsDialogOpenTriggerRef}
             />
