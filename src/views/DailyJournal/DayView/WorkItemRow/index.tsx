@@ -413,6 +413,7 @@ function WorkItemRow(props: Props) {
         <>
             <div
                 role="listitem"
+                tabIndex={-1}
                 className={_cs(
                     styles.workItemRow,
                     checkboxForStatus && styles.checkboxForStatus,
