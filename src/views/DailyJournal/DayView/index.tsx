@@ -255,13 +255,13 @@ function DayView(props: Props) {
                 )}
             </header>
             <DefaultMessage
+                key={selectedDate}
                 filtered={false}
                 empty={groupedItems.length === 0}
                 pending={loading}
                 errored={errored}
                 pendingMessage="Fetching entries..."
                 errorMessage="Could not fetch entries!"
-                filteredEmptyMessage="No entries found!"
                 emptyMessage="No entries found!"
             />
             {!errored && !loading && (

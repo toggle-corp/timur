@@ -3,21 +3,46 @@
         display: flex;
         flex-direction: column;
         gap: var(--spacing-lg);
-        max-width: 1024px;
+        max-width: 80rem;
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+            gap: var(--spacing-xl);
+            align-items: start;
+
+            @media screen and (max-width: 900px) {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .settings-column,
+        .preview-column {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+            min-width: 0;
+        }
+
+        .preview-column {
+            position: sticky;
+            top: var(--spacing-sm);
+
+            .preview-frame {
+                border: var(--width-separator-sm) solid var(--color-separator);
+                border-radius: var(--border-radius-lg);
+                padding: var(--spacing-lg);
+            }
+        }
 
         .section {
             display: flex;
             flex-direction: column;
             gap: var(--spacing-sm);
 
-            .container {
-                display: flex;
-                flex-direction: column;
-                gap: var(--width-separator-lg);
-
-                .work-item {
-                    background-color: var(--color-foreground);
-                }
+            .description {
+                color: var(--color-text-light);
+                font-size: var(--font-size-sm);
             }
         }
     }
@@ -35,6 +60,7 @@
         .attribute {
             display: flex;
             align-items: center;
+            border-radius: var(--border-radius-md);
             background-color: var(--color-foreground);
             padding: var(--spacing-xs) var(--spacing-sm);
             gap: var(--spacing-xs);

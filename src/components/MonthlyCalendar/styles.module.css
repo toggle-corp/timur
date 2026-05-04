@@ -29,6 +29,11 @@
             padding: var(--spacing-xs) var(--spacing-xs);
             font-size: var(--font-size-sm);
             font-weight: unset;
+
+            > div {
+                justify-content: center;
+                min-width: 2ch;
+            }
         }
     }
 }

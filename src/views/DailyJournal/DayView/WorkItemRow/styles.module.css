@@ -1,12 +1,15 @@
 .work-item-row {
     display: grid;
     align-items: flex-start;
-    grid-template-columns: 5rem 2fr 5fr 9rem 4rem 4rem;
-    padding: var(--spacing-xs) var(--spacing-sm);
+    outline: none;
+    border-radius: var(--spacing-2xs);
+    background-color: var(--color-foreground);
+    padding: var(--spacing-xs);
+    grid-template-columns: 5rem 2fr 5fr 9rem 4rem max-content;
     gap: var(--spacing-xs);
 
     &.checkbox-for-status {
-        grid-template-columns: 1rem 2fr 5fr 10rem 4rem 4rem;
+        grid-template-columns: 1rem 2fr 5fr 10rem 4rem max-content;
     }
 
     .description {
@@ -42,8 +45,8 @@
         input {
             text-decoration: underline;
             text-decoration-color: red;
-            text-decoration-thickness: 2px;
             text-decoration-style: solid;
+            text-decoration-thickness: 2px;
         }
     }
 
@@ -60,6 +63,16 @@
             flex-direction: column;
             gap: var(--spacing-xs);
             grid-column: 1 / -1;
+
+            .option-group {
+                display: flex;
+                gap: var(--spacing-xs);
+
+                > * {
+                    flex-grow: 1;
+                    min-width: 0;
+                }
+            }
         }
 
         &:not(:focus-within) {
