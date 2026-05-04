@@ -1,34 +1,75 @@
 .home {
     .main-content {
         display: flex;
-        align-items: center;
         flex-direction: column;
-        gap: var(--spacing-xl);
-        flex-wrap: wrap;
-        justify-content: center;
+        gap: var(--spacing-lg);
 
-        .calendar {
-            border: var(--width-separator-sm) solid var(--color-separator);
-            border-radius: var(--border-radius-lg);
-            background-color: var(--color-foreground);
-            padding: var(--spacing-md);
-            max-width: 30rem;
-        }
-
-        .quick-links {
+        .applications {
             display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: var(--spacing-xl);
+            flex-direction: column;
+            gap: var(--spacing-lg);
+            margin-inline: auto;
+            width: 100%;
+            max-width: 80rem;
 
-            .link {
-                flex-direction: column;
-                padding: var(--spacing-md);
-                font-size: var(--font-size-lg);
+            .search {
+                background-color: var(--color-foreground);
+                padding: var(--spacing-sm);
+            }
 
-                .icon {
-                    font-size: 4rem;
+            .grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+                /* stylelint-disable-next-line declaration-property-value-no-unknown */
+                grid-template-rows: masonry;
+                gap: var(--spacing-lg);
+                align-items: start;
+                masonry-auto-flow: next;
+
+                .group {
+                    display: flex;
+                    flex-direction: column;
+
+                    .group-title {
+                        color: var(--color-secondary-text);
+                        font-size: var(--font-size-xl);
+                        font-weight: var(--font-weight-normal);
+                    }
+                }
+
+                .app-list {
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--spacing-md);
+                    padding: var(--spacing-md) 0;
+
+                    .app-link-container {
+                        width: 100%;
+                    }
+
+                    .app-text {
+                        display: flex;
+                        flex-direction: column;
+                        gap: var(--spacing-xs);
+                    }
+
+                    .app-url {
+                        max-width: 100%;
+                        overflow: hidden;
+                        white-space: nowrap;
+                        color: var(--color-text-light);
+                        font-size: var(--font-size-sm);
+                        font-weight: var(--font-weight-normal);
+                    }
+
+                    .app-icon {
+                        border-radius: var(--border-radius-md);
+                        background-color: var(--color-tertiary);
+                        padding: var(--spacing-xs);
+                        width: 2rem;
+                        height: 2rem;
+                        object-fit: contain;
+                    }
                 }
             }
         }
