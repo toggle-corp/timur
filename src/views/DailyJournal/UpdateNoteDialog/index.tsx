@@ -182,9 +182,11 @@ function AddNoteDialog(props: Props) {
         Vim.defineEx('x', undefined, saveAndQuitHandler);
 
         return () => {
-            Vim.defineEx('w', undefined, undefined);
-            Vim.defineEx('q', undefined, undefined);
-            Vim.defineEx('x', undefined, undefined);
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            const noop = () => {};
+            Vim.defineEx('w', undefined, noop);
+            Vim.defineEx('q', undefined, noop);
+            Vim.defineEx('x', undefined, noop);
         };
     }, [showDialog, handleSave]);
 
