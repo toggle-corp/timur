@@ -5,7 +5,7 @@ import RawTextArea, { Props as RawTextAreaProps } from '../RawTextArea';
 
 type InheritedProps<N> = (Omit<InputContainerProps, 'input' | 'htmlFor'> & Omit<RawTextAreaProps<N>, 'type' | 'id'>);
 interface Props<T> extends InheritedProps<T> {
-    inputElementRef?: React.RefObject<HTMLTextAreaElement>;
+    inputElementRef?: React.RefObject<HTMLTextAreaElement | null>;
     inputClassName?: string;
 }
 

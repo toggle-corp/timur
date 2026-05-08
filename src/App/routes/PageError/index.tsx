@@ -86,7 +86,7 @@ function PageError() {
                             href="/"
                             external
                             icons={<RiHome4Line />}
-                            variant="quaternary"
+                            variant="tertiary"
                         >
                             Go to homepage
                         </Link>

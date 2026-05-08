@@ -1,31 +1,21 @@
-import {
-    Fragment,
-    useMemo,
-} from 'react';
-import {
-    FcLandscape,
-    FcLeave,
-    FcNews,
-    FcNightLandscape,
-    FcSportsMode,
-} from 'react-icons/fc';
-import { compareNumber } from '@togglecorp/fujs';
+import { useMemo } from 'react';
 import {
     gql,
     useQuery,
 } from 'urql';
 
+import DefaultMessage from '#components/DefaultMessage';
+import SlideCounter from '#components/SlideCounter';
 import StandupConductors from '#components/StandupConductors';
+import UpcomingEventsList from '#components/UpcomingEventsList';
 import {
     type DeadlinesAndEventsQuery,
     type DeadlinesAndEventsQueryVariables,
 } from '#generated/types/graphql';
 import useCurrentDate from '#hooks/useCurrentDate';
 import { formatDateTime } from '#utils/common';
-import { type GeneralEvent } from '#utils/types';
 
 import Slide from '../Slide';
-import GeneralEventOutput from './GeneralEvent';
 
 import styles from './styles.module.css';
 
@@ -39,6 +29,8 @@ const DEADLINES_AND_EVENTS = gql`
                 deadlines {
                     id
                     name
+                    displayName
+                    isExternal
                     remainingDays
                 }
             }
@@ -53,7 +45,14 @@ const DEADLINES_AND_EVENTS = gql`
     }
 `;
 
-function DeadlineSection() {
+interface Props {
+    currentSlide: number | undefined;
+    totalSlides: number | undefined;
+}
+
+function DeadlineSection(props: Props) {
+    const { currentSlide, totalSlides } = props;
+
     const [deadlinesAndEvents] = useQuery<
         DeadlinesAndEventsQuery,
         DeadlinesAndEventsQueryVariables
@@ -65,74 +64,58 @@ function DeadlineSection() {
     const projects = deadlinesAndEvents.data?.private.allProjects;
     const events = deadlinesAndEvents.data?.private.relativeEvents;
 
-    const upcomingEvents = useMemo<GeneralEvent[]>(() => {
-        const deadlines = projects?.flatMap(
-            (project) => project.deadlines.map((deadline) => ({
-                ...deadline,
-                name: `${project.name}: ${deadline.name}`,
-            })),
-        );
+    const deadlines = useMemo(
+        () => projects?.flatMap((project) => project.deadlines),
+        [projects],
+    );
 
-        const iconsMap: Record<GeneralEvent['type'], React.ReactNode> = {
-            DEADLINE: <FcLeave />,
-            HOLIDAY: <FcLandscape />,
-            RETREAT: <FcNightLandscape />,
-            MISC: <FcNews />,
-        };
+    const isEmpty = (deadlines?.length ?? 0) + (events?.length ?? 0) === 0;
 
-        return [
-            ...(deadlines?.map((deadline) => ({
-                key: `DEADLINE-${deadline.id}`,
-                type: 'DEADLINE' as const,
-                typeDisplay: 'Deadline',
-                icon: iconsMap.DEADLINE,
-                name: deadline.name,
-                remainingDays: deadline.remainingDays,
-            })) ?? []),
-            ...(events?.map((otherEvent) => ({
-                key: `${otherEvent.type}-${otherEvent.id}`,
-                type: otherEvent.type,
-                icon: iconsMap[otherEvent.type],
-                typeDisplay: otherEvent.typeDisplay,
-                name: otherEvent.name,
-                remainingDays: otherEvent.remainingDaysToStart,
-            })) ?? []),
-        ].sort((a, b) => compareNumber(a.remainingDays, b.remainingDays));
-    }, [events, projects]);
     const todayDate = useCurrentDate();
 
     return (
         <Slide
             variant="split"
-            primaryPreText="Welcome to"
+            primaryPreText="Welcome!"
             primaryHeading="Daily Standup"
             primaryDescription={(
-                <div className={styles.primarySection}>
-                    <div>{formatDateTime(todayDate)}</div>
-                    <StandupConductors />
-                </div>
+                <p>
+                    A quick sync about what you did yesterday, what&apos;s on for today,
+                    and anything blocking you.
+                </p>
             )}
-            secondaryHeading="Upcoming Events"
-            secondaryContent={upcomingEvents.map(
-                (generalEvent, index) => (
-                    <Fragment key={generalEvent.key}>
-                        <GeneralEventOutput
-                            generalEvent={generalEvent}
+            tertiaryContent={(
+                <>
+                    <div className={styles.subSections}>
+                        <StandupConductors />
+                    </div>
+                    <div className={styles.currentTime}>
+                        <span>{formatDateTime(todayDate)}</span>
+                        <SlideCounter
+                            current={currentSlide}
+                            total={totalSlides}
                         />
-                        {generalEvent.remainingDays < 0
-                            && upcomingEvents[index + 1]
-                            // NOTE: This is safe as upcomingEvents[index + 1] is already checked
-                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                            && upcomingEvents[index + 1]!.remainingDays >= 0
-                            && (
-                                <div className={styles.separator}>
-                                    <div className={styles.line} />
-                                    <FcSportsMode className={styles.icon} />
-                                    <div className={styles.line} />
-                                </div>
-                            )}
-                    </Fragment>
-                ),
+                    </div>
+                </>
+            )}
+            secondaryHeading="Deadlines & Events"
+            secondaryContent={(
+                <>
+                    <UpcomingEventsList
+                        prefixedDeadlineName
+                        deadlines={deadlines}
+                        events={events}
+                    />
+                    <DefaultMessage
+                        filtered={false}
+                        empty={isEmpty}
+                        pending={deadlinesAndEvents.fetching}
+                        errored={!!deadlinesAndEvents.error}
+                        pendingMessage="Looking ahead..."
+                        errorMessage="Something went sideways!"
+                        emptyMessage="Nothing on the horizon!"
+                    />
+                </>
             )}
         />
     );

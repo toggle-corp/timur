@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import {
-    FcAlarmClock,
-    FcDislike,
+    FcSynchronize,
+    FcViewDetails,
 } from 'react-icons/fc';
 import { _cs } from '@togglecorp/fujs';
 
@@ -121,9 +121,10 @@ function DefaultMessage(props: Props) {
             className={_cs(
                 styles.defaultMessage,
                 pending && overlayPending && styles.overlay,
+                pending && styles.animated,
                 className,
             )}
-            icon={pending ? <FcAlarmClock /> : <FcDislike />}
+            icon={!pending ? <FcViewDetails /> : <FcSynchronize />}
             compact={compact}
             title={messageTitle}
             description={messageDescription}

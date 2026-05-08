@@ -1,9 +1,9 @@
 import { createContext } from 'react';
 
 export interface NavbarContextProps {
-    startActionsRef: React.RefObject<HTMLDivElement> | undefined;
-    midActionsRef: React.RefObject<HTMLDivElement> | undefined;
-    endActionsRef: React.RefObject<HTMLDivElement> | undefined;
+    startActionsRef: React.RefObject<HTMLDivElement | null> | undefined;
+    midActionsRef: React.RefObject<HTMLDivElement | null> | undefined;
+    endActionsRef: React.RefObject<HTMLDivElement | null> | undefined;
 }
 
 const NavbarContext = createContext<NavbarContextProps>({

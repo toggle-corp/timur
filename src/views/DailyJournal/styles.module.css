@@ -1,24 +1,46 @@
 .daily-journal {
     position: relative;
 
-    .bottom-actions {
-        display: flex;
-        gap: var(--spacing-sm);
-    }
-
     .content {
         display: flex;
         flex-direction: column;
         gap: var(--spacing-lg);
+    }
+
+    .fab {
+        position: absolute;
+        right: var(--spacing-lg);
+        bottom: var(--spacing-lg);
+        z-index: 1;
+        box-shadow: var(--box-shadow-lg);
+
+        @media screen and (max-width: 900px) {
+            &.start-sidebar-shown {
+                display: none;
+            }
+        }
     }
 }
 
 .date-navigation {
     display: flex;
     width: 100%;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-sm);
 
     .spacer {
         flex-grow: 1;
+    }
+
+    .separator {
+        align-self: center;
+        background-color: var(--color-separator);
+        width: var(--width-separator-sm);
+        height: 1.5rem;
+    }
+
+    .desktop-only {
+        @media screen and (max-width: 900px) {
+            display: none;
+        }
     }
 }

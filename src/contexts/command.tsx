@@ -11,6 +11,7 @@ export interface CommandContextProps {
     watch: (command: Command<WorkItem, string>) => void,
     redoable: boolean,
     undoable: boolean,
+    inFlight: boolean,
 }
 
 const CommandContext = createContext<CommandContextProps>({
@@ -30,5 +31,6 @@ const CommandContext = createContext<CommandContextProps>({
     },
     undoable: false,
     redoable: false,
+    inFlight: false,
 });
 export default CommandContext;

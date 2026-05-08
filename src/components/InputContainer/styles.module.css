@@ -38,8 +38,10 @@
     }
 
     &:focus-within {
-        outline: var(--width-separator-md) solid var(--color-secondary);
-        /* outline-offset: var(--width-separator-md); */
+        outline: var(--width-separator-md) solid var(--color-focus);
+        &:not(.general) {
+            outline-offset: var(--spacing-2xs);
+        }
 
         .input-section {
             .icons-container {

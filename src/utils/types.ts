@@ -15,6 +15,8 @@ export type SpacingVariant = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export type EditingMode = 'normal' | 'vim';
 
+export type WorkItemAction = 'clone' | 'copy' | 'move' | 'delete';
+
 export type Task = EnumsQuery['private']['allActiveTasks'][number];
 
 type WorkItemType = TimeEntryTypeEnum;
@@ -48,12 +50,14 @@ export type ConfigStorage = {
     dailyJournalAttributeOrder: DailyJournalAttribute[];
     dailyJournalGrouping: DailyJournalGrouping;
 
+    quickActions: WorkItemAction[];
+
     collapsedGroups: string[],
     startSidebarShown: boolean,
     endSidebarShown: boolean,
 }
 
-export interface GeneralEvent {
+export interface GeneralEventType {
     key: string;
     type: EventTypeEnum | 'DEADLINE';
     typeDisplay: string;

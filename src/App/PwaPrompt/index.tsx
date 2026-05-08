@@ -67,6 +67,7 @@ function PwaPrompt() {
             contentClassName={styles.modalContent}
             className={styles.promptDialog}
             size="auto"
+            closeOnOutsideClick
         >
             <div>
                 {offlineReady
@@ -78,7 +79,7 @@ function PwaPrompt() {
                     title="Close SW update prompt"
                     name={undefined}
                     onClick={close}
-                    variant="quaternary"
+                    variant="tertiary"
                 >
                     Close
                 </Button>

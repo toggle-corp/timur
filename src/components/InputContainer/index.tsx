@@ -23,8 +23,8 @@ export interface Props {
     variant?: 'form' | 'general';
     withAsterisk?: boolean;
     className?: string;
-    containerRef?: React.RefObject<HTMLLabelElement>;
-    inputSectionRef?: React.RefObject<HTMLDivElement>;
+    containerRef?: React.RefObject<HTMLLabelElement | null>;
+    inputSectionRef?: React.RefObject<HTMLDivElement | null>;
     spacing?: SpacingType;
     htmlFor: string;
 }
