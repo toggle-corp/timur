@@ -3,7 +3,10 @@ import {
     useContext,
     useMemo,
 } from 'react';
-import { RiDraggable } from 'react-icons/ri';
+import {
+    RiArrowLeftLine,
+    RiDraggable,
+} from 'react-icons/ri';
 import {
     closestCenter,
     DndContext,
@@ -26,8 +29,8 @@ import {
 } from '@togglecorp/fujs';
 
 import Checkbox from '#components/Checkbox';
+import Link from '#components/Link';
 import Page from '#components/Page';
-import RadioInput from '#components/RadioInput';
 import SelectInput from '#components/SelectInput';
 import EnumsContext from '#contexts/enums';
 import { EnumsQuery } from '#generated/types/graphql';
@@ -38,18 +41,28 @@ import {
     defaultConfigValue,
     numericOptionKeySelector,
     numericOptionLabelSelector,
-    numericOptions,
 } from '#utils/constants';
 import {
     DailyJournalAttribute,
     DailyJournalAttributeKeys,
     DailyJournalGrouping,
     EditingMode,
+    NumericOption,
+    Task,
+    WorkItem,
+    WorkItemAction,
 } from '#utils/types';
 
-import WorkItemRow from '../DailyJournal/DayView/WorkItemRow';
+import DayView from '../DailyJournal/DayView';
 
 import styles from './styles.module.css';
+
+const workItemActionLabels: { key: WorkItemAction; label: string }[] = [
+    { key: 'clone', label: 'Clone entry' },
+    { key: 'copy', label: 'Copy to another day' },
+    { key: 'move', label: 'Move to another day' },
+    { key: 'delete', label: 'Delete entry' },
+];
 
 const dailyJournalAttributeDetails: Record<DailyJournalAttributeKeys, { label: string }> = {
     project: { label: 'Project' },
@@ -57,6 +70,39 @@ const dailyJournalAttributeDetails: Record<DailyJournalAttributeKeys, { label: s
     task: { label: 'Task' },
     status: { label: 'Status' },
 };
+
+function getAttributeLabel(attribute: DailyJournalAttribute) {
+    return dailyJournalAttributeDetails[attribute.key].label;
+}
+
+// FIXME: move this below
+function buildGroupLevelOptions(attributes: DailyJournalAttribute[]): NumericOption[] {
+    return attributes.map((_, index) => ({
+        key: index + 1,
+        label: attributes
+            .slice(0, index + 1)
+            .map(getAttributeLabel)
+            .join(', '),
+    }));
+}
+
+// FIXME: move this below
+function buildJoinLevelOptions(
+    attributes: DailyJournalAttribute[],
+    groupLevel: number,
+): NumericOption[] {
+    return Array.from({ length: groupLevel }, (_, index) => {
+        const joinLevel = index + 1;
+        const start = groupLevel - joinLevel;
+        return {
+            key: joinLevel,
+            label: attributes
+                .slice(start, groupLevel)
+                .map(getAttributeLabel)
+                .join(' › '),
+        };
+    });
+}
 
 interface ItemProps {
     className?: string;
@@ -200,7 +246,137 @@ function defaultColorSelector<T>(_: T, i: number): readonly [string, string] {
     return colorscheme[i % colorscheme.length]!;
 }
 
-/** @knipignore */
+const SAMPLE_DATE = '2024-09-06';
+
+const timurContract = {
+    id: 'contract-timur-2026',
+    name: '2026 Maintenance',
+    project: {
+        id: 'project-timur',
+        name: 'Timur',
+        logo: null,
+        projectClient: { id: 'client-internal', name: 'Internal' },
+    },
+} as const;
+
+const chronoContract = {
+    id: 'contract-chrono-sunset',
+    name: 'Sunset & Migration',
+    project: {
+        id: 'project-chrono',
+        name: 'Chrono',
+        logo: null,
+        projectClient: { id: 'client-internal', name: 'Internal' },
+    },
+} as const;
+
+const sampleTasks: Task[] = [
+    {
+        id: 'task-journal',
+        name: 'Redesign',
+        contract: timurContract,
+    },
+    {
+        id: 'task-reporting',
+        name: 'Dashboard',
+        contract: timurContract,
+    },
+    {
+        id: 'task-chrono-export',
+        name: 'Data Export',
+        contract: chronoContract,
+    },
+    {
+        id: 'task-chrono-bugs',
+        name: 'Bug fixes',
+        contract: chronoContract,
+    },
+];
+
+const sampleWorkItems: WorkItem[] = [
+    {
+        clientId: 'sample-1',
+        date: SAMPLE_DATE,
+        description: 'Refine work-item row layout',
+        duration: 75,
+        id: undefined,
+        startTime: undefined,
+        status: 'DONE',
+        task: 'task-journal',
+        type: 'DEVELOPMENT',
+    },
+    {
+        clientId: 'sample-2',
+        date: SAMPLE_DATE,
+        description: 'Iterate on grouping behaviour based on review feedback',
+        duration: 30,
+        id: undefined,
+        startTime: undefined,
+        status: 'DOING',
+        task: 'task-journal',
+        type: 'DEVELOPMENT',
+    },
+    {
+        clientId: 'sample-3',
+        date: SAMPLE_DATE,
+        description: 'Sketch reporting dashboard',
+        duration: 45,
+        id: undefined,
+        startTime: undefined,
+        status: 'TODO',
+        task: 'task-reporting',
+        type: 'DESIGN',
+    },
+    {
+        clientId: 'sample-4',
+        date: SAMPLE_DATE,
+        description: 'Wire up weekly aggregation query and verify totals against legacy Chrono dashboard',
+        duration: 90,
+        id: undefined,
+        startTime: undefined,
+        status: 'DONE',
+        task: 'task-reporting',
+        type: 'DEVELOPMENT',
+    },
+    {
+        clientId: 'sample-5',
+        date: SAMPLE_DATE,
+        description: 'CSV export for legacy entries',
+        duration: 60,
+        id: undefined,
+        startTime: undefined,
+        status: 'DOING',
+        task: 'task-chrono-export',
+        type: 'DEVELOPMENT',
+    },
+    {
+        clientId: 'sample-6',
+        date: SAMPLE_DATE,
+        description: 'Investigate timezone drift on imported entries after DST change',
+        duration: 40,
+        id: undefined,
+        startTime: undefined,
+        status: 'TODO',
+        task: 'task-chrono-bugs',
+        type: 'RESEARCH',
+    },
+    {
+        clientId: 'sample-7',
+        date: SAMPLE_DATE,
+        description: 'Daily standup',
+        duration: 15,
+        id: undefined,
+        startTime: undefined,
+        status: 'DONE',
+        task: 'task-journal',
+        type: 'INTERNAL_MEETING',
+    },
+];
+
+function noop() {
+    // intentionally empty: preview is read-only
+}
+
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
     const { enums } = useContext(EnumsContext);
@@ -226,9 +402,34 @@ export function Component() {
         } satisfies DailyJournalGrouping, 'dailyJournalGrouping');
     }, [storedConfig.dailyJournalGrouping, setConfigFieldValue]);
 
+    const groupLevelOptions = useMemo(
+        () => buildGroupLevelOptions(storedConfig.dailyJournalAttributeOrder),
+        [storedConfig.dailyJournalAttributeOrder],
+    );
+
+    const joinLevelOptions = useMemo(
+        () => buildJoinLevelOptions(
+            storedConfig.dailyJournalAttributeOrder,
+            storedConfig.dailyJournalGrouping.groupLevel,
+        ),
+        [
+            storedConfig.dailyJournalAttributeOrder,
+            storedConfig.dailyJournalGrouping.groupLevel,
+        ],
+    );
+
     const sensors = useSensors(
         useSensor(PointerSensor),
     );
+
+    const handleQuickActionsChange = useCallback((value: boolean, name: WorkItemAction) => {
+        const oldValues = storedConfig.quickActions
+            ?? defaultConfigValue.quickActions;
+        const next = value
+            ? [...oldValues.filter((key) => key !== name), name]
+            : oldValues.filter((key) => key !== name);
+        setConfigFieldValue(next, 'quickActions');
+    }, [storedConfig.quickActions, setConfigFieldValue]);
 
     const handleDndEnd = useCallback((dragEndEvent: DragEndEvent) => {
         const {
@@ -265,171 +466,185 @@ export function Component() {
             className={styles.settings}
             contentClassName={styles.mainContent}
         >
-            <div className={styles.section}>
-                <h4>
-                    Entry
-                </h4>
-                <Checkbox
-                    name="compactTextArea"
-                    label="Only expand text area on focus"
-                    value={storedConfig.compactTextArea}
-                    onChange={setConfigFieldValue}
-                />
-                <Checkbox
-                    name="checkboxForStatus"
-                    label="Use compact status indicator"
-                    tooltip="Use checkbox instead of select input for the status. i.e. to toggle TODO, DOING and DONE"
-                    value={storedConfig.checkboxForStatus}
-                    onChange={setConfigFieldValue}
-                />
-                <Checkbox
-                    name="enableStrikethrough"
-                    label="Strikethrough completed entries 🧪"
-                    value={storedConfig.enableStrikethrough}
-                    onChange={setConfigFieldValue}
-                />
-                <div className={styles.container}>
-                    <WorkItemRow
-                        className={styles.workItem}
-                        tasks={undefined}
-                        workItem={{
-                            clientId: 'xyz',
-                            date: '2024-09-06',
-                            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vel enim sit amet augue iaculis pharetra non ac nulla. In justo enim, egestas sed mi cursus, efficitur interdum felis.',
-                            duration: 90,
-                            id: undefined,
-                            startTime: undefined,
-                            status: 'DOING',
-                            task: '1',
-                            type: 'DEVELOPMENT',
-                        }}
-                    />
-                    <WorkItemRow
-                        className={styles.workItem}
-                        tasks={undefined}
-                        workItem={{
-                            clientId: 'abc',
-                            date: '2024-09-10',
-                            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vel enim sit amet augue iaculis pharetra non ac nulla. In justo enim, egestas sed mi cursus, efficitur interdum felis.',
-                            duration: 10,
-                            id: undefined,
-                            startTime: undefined,
-                            status: 'DONE',
-                            task: '1',
-                            type: 'DESIGN',
-                        }}
-                    />
+            <Link
+                to="dailyJournal"
+                variant="tertiary"
+                icons={<RiArrowLeftLine />}
+            >
+                Back to Journal
+            </Link>
+            <div className={styles.layout}>
+                <div className={styles.settingsColumn}>
+                    <div className={styles.section}>
+                        <h4>
+                            Entry
+                        </h4>
+                        <Checkbox
+                            name="compactTextArea"
+                            label="Only expand text area on focus"
+                            value={storedConfig.compactTextArea}
+                            onChange={setConfigFieldValue}
+                        />
+                        <Checkbox
+                            name="checkboxForStatus"
+                            label="Use compact status indicator"
+                            tooltip="Use checkbox instead of select input for the status. i.e. to toggle TODO, DOING and DONE"
+                            value={storedConfig.checkboxForStatus}
+                            onChange={setConfigFieldValue}
+                        />
+                        <Checkbox
+                            name="enableStrikethrough"
+                            label="Strikethrough completed entries"
+                            value={storedConfig.enableStrikethrough}
+                            onChange={setConfigFieldValue}
+                        />
+                        <div className={styles.description}>
+                            Choose which actions are visible outside the popup. 🧪
+                        </div>
+                        {workItemActionLabels.map(({ key, label }) => (
+                            <Checkbox
+                                key={key}
+                                name={key}
+                                label={label}
+                                value={storedConfig.quickActions?.includes(key)}
+                                onChange={handleQuickActionsChange}
+                            />
+                        ))}
+                    </div>
+                    <div className={styles.section}>
+                        <h4>
+                            Ordering and Grouping
+                        </h4>
+                        <Checkbox
+                            name="indent"
+                            label="Indent groups"
+                            value={storedConfig.indent}
+                            onChange={setConfigFieldValue}
+                        />
+                        <Checkbox
+                            name="enableCollapsibleGroups"
+                            label="Collapsible groups"
+                            value={storedConfig.enableCollapsibleGroups}
+                            onChange={setConfigFieldValue}
+                        />
+                        <div className={styles.description}>
+                            Drag and drop to order entries by these attributes.
+                        </div>
+                        <div className={styles.attributeList}>
+                            <DndContext
+                                sensors={sensors}
+                                collisionDetection={closestCenter}
+                                onDragEnd={handleDndEnd}
+                            >
+                                <SortableContext
+                                    items={storedConfig.dailyJournalAttributeOrder.map(
+                                        ({ key }) => ({ id: key }),
+                                    )}
+                                    strategy={verticalListSortingStrategy}
+                                >
+                                    {storedConfig.dailyJournalAttributeOrder.map((attribute) => (
+                                        <SortableItem
+                                            key={attribute.key}
+                                            attribute={attribute}
+                                        />
+                                    ))}
+                                </SortableContext>
+                            </DndContext>
+                        </div>
+                        <div className={styles.description}>
+                            Choose which attributes are used for grouping
+                        </div>
+                        <SelectInput
+                            name="groupLevel"
+                            value={storedConfig.dailyJournalGrouping.groupLevel}
+                            onChange={updateJournalGrouping}
+                            options={groupLevelOptions}
+                            keySelector={numericOptionKeySelector}
+                            labelSelector={numericOptionLabelSelector}
+                            nonClearable
+                        />
+                        <div className={styles.description}>
+                            Choose which groups are combined into a single heading
+                        </div>
+                        <SelectInput
+                            name="joinLevel"
+                            value={storedConfig.dailyJournalGrouping.joinLevel}
+                            onChange={updateJournalGrouping}
+                            options={joinLevelOptions}
+                            keySelector={numericOptionKeySelector}
+                            labelSelector={numericOptionLabelSelector}
+                            nonClearable
+                        />
+                    </div>
+                    <div className={styles.section}>
+                        <h4>
+                            Create Entry
+                        </h4>
+                        <div className={styles.description}>
+                            Choose default status when a new entry is created
+                        </div>
+                        <SelectInput
+                            name="defaultTaskStatus"
+                            options={enums?.enums.TimeEntryStatus}
+                            keySelector={workItemStatusKeySelector}
+                            labelSelector={workItemStatusLabelSelector}
+                            colorSelector={workItemStatusColorSelector}
+                            onChange={setConfigFieldValue}
+                            value={storedConfig.defaultTaskStatus}
+                            nonClearable
+                        />
+                        <div className={styles.description}>
+                            Choose default task when a new entry is created
+                        </div>
+                        <SelectInput
+                            name="defaultTaskType"
+                            options={enums?.enums.TimeEntryType}
+                            keySelector={workItemTypeKeySelector}
+                            labelSelector={workItemTypeLabelSelector}
+                            colorSelector={defaultColorSelector}
+                            onChange={setConfigFieldValue}
+                            value={storedConfig.defaultTaskType}
+                        />
+                    </div>
+                    <div className={styles.section}>
+                        <h4>
+                            Create Notes
+                        </h4>
+                        <div className={styles.description}>
+                            Choose the editing mode for the editor
+                        </div>
+                        <SelectInput
+                            name="editingMode"
+                            options={editingOptions}
+                            keySelector={editingOptionKeySelector}
+                            labelSelector={editingOptionLabelSelector}
+                            // colorSelector={defaultColorSelector}
+                            onChange={setConfigFieldValue}
+                            value={storedConfig.editingMode}
+                            nonClearable
+                        />
+                    </div>
                 </div>
-            </div>
-            <div className={styles.section}>
-                <h4>
-                    Entry ordering
-                </h4>
-                <div className={styles.attributeList}>
-                    <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragEnd={handleDndEnd}
-                    >
-                        <SortableContext
-                            items={storedConfig.dailyJournalAttributeOrder.map(
-                                ({ key }) => ({ id: key }),
-                            )}
-                            strategy={verticalListSortingStrategy}
-                        >
-                            {storedConfig.dailyJournalAttributeOrder.map((attribute) => (
-                                <SortableItem
-                                    key={attribute.key}
-                                    attribute={attribute}
-                                />
-                            ))}
-                        </SortableContext>
-                    </DndContext>
+                <div className={styles.previewColumn}>
+                    <div className={styles.section}>
+                        <h4>
+                            Preview
+                        </h4>
+                        <div className={styles.previewFrame}>
+                            <DayView
+                                workItems={sampleWorkItems}
+                                tasks={sampleTasks}
+                                loading={false}
+                                errored={false}
+                                selectedDate={SAMPLE_DATE}
+                                onWorkItemClone={noop}
+                                onWorkItemAssist={noop}
+                                onWorkItemChange={noop}
+                                onWorkItemDelete={noop}
+                            />
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div className={styles.section}>
-                <h4>
-                    Entry Grouping
-                </h4>
-                <Checkbox
-                    name="indent"
-                    label="Indent headings"
-                    value={storedConfig.indent}
-                    onChange={setConfigFieldValue}
-                />
-                <Checkbox
-                    name="enableCollapsibleGroups"
-                    label="Enable collapsible groups 🧪"
-                    value={storedConfig.enableCollapsibleGroups}
-                    onChange={setConfigFieldValue}
-                />
-                <RadioInput
-                    name="groupLevel"
-                    label="Grouping Level"
-                    value={storedConfig.dailyJournalGrouping.groupLevel}
-                    onChange={updateJournalGrouping}
-                    options={numericOptions.slice(
-                        0,
-                        storedConfig.dailyJournalAttributeOrder.length,
-                    )}
-                    keySelector={numericOptionKeySelector}
-                    labelSelector={numericOptionLabelSelector}
-                />
-                <RadioInput
-                    name="joinLevel"
-                    label="Title Join Level"
-                    value={storedConfig.dailyJournalGrouping.joinLevel}
-                    onChange={updateJournalGrouping}
-                    // eslint-disable-next-line max-len
-                    options={numericOptions.slice(0, storedConfig.dailyJournalGrouping.groupLevel)}
-                    keySelector={numericOptionKeySelector}
-                    labelSelector={numericOptionLabelSelector}
-                />
-            </div>
-            <div className={styles.section}>
-                <h4>
-                    Create Entry
-                </h4>
-                <SelectInput
-                    name="defaultTaskStatus"
-                    variant="general"
-                    label="Default Entry Status"
-                    options={enums?.enums.TimeEntryStatus}
-                    keySelector={workItemStatusKeySelector}
-                    labelSelector={workItemStatusLabelSelector}
-                    colorSelector={workItemStatusColorSelector}
-                    onChange={setConfigFieldValue}
-                    value={storedConfig.defaultTaskStatus}
-                    nonClearable
-                />
-                <SelectInput
-                    name="defaultTaskType"
-                    label="Default Entry Type"
-                    variant="general"
-                    options={enums?.enums.TimeEntryType}
-                    keySelector={workItemTypeKeySelector}
-                    labelSelector={workItemTypeLabelSelector}
-                    colorSelector={defaultColorSelector}
-                    onChange={setConfigFieldValue}
-                    value={storedConfig.defaultTaskType}
-                />
-            </div>
-            <div className={styles.section}>
-                <h4>
-                    Create Notes
-                </h4>
-                <SelectInput
-                    name="editingMode"
-                    label="Editing Mode"
-                    variant="general"
-                    options={editingOptions}
-                    keySelector={editingOptionKeySelector}
-                    labelSelector={editingOptionLabelSelector}
-                    // colorSelector={defaultColorSelector}
-                    onChange={setConfigFieldValue}
-                    value={storedConfig.editingMode}
-                    nonClearable
-                />
             </div>
         </Page>
     );

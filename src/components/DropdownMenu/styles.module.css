@@ -13,7 +13,10 @@
 }
 
 .dropdown-content {
-    display: flex;
-    flex-direction: column;
     padding: var(--spacing-sm) 0;
+
+    &:popover-open {
+        display: flex;
+        flex-direction: column;
+    }
 }

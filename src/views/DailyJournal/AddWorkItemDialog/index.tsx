@@ -109,6 +109,7 @@ function AddWorkItemDialog(props: Props) {
             contentClassName={styles.modalContent}
             className={styles.addWorkItemDialog}
             focusElementRef={titleInputRef}
+            closeOnOutsideClick
         >
             <div>
                 Please select a task to add new entry

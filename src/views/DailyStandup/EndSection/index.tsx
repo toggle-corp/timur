@@ -53,12 +53,12 @@ function EndSection(props: Props) {
             variant="general"
         >
             <section className={styles.quoteSection}>
-                <div className={styles.quote}>
+                <p className={styles.quote}>
                     {dailyQuote?.text}
-                </div>
-                <p className={styles.author}>
-                    {dailyQuote?.author}
                 </p>
+                <span className={styles.author}>
+                    {dailyQuote?.author}
+                </span>
             </section>
         </Slide>
     );

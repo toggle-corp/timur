@@ -24,7 +24,7 @@ function useFormattedRelativeDate(dateLike: DateLike) {
         ,
     );
 
-    const updateTimeoutRef = useRef<number>();
+    const updateTimeoutRef = useRef<number | undefined>(undefined);
 
     const update = useCallback(() => {
         if (isDefined(dateLike)) {

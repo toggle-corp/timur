@@ -11,15 +11,13 @@
 
         .heading {
             display: flex;
-            align-items: center;
+            align-items: baseline;
             flex-grow: 1;
             flex-wrap: wrap;
             gap: 0 var(--spacing-sm);
 
             .relative-date {
                 color: var(--color-text-light);
-                font-size: var(--font-size-md);
-                font-weight: var(--font-weight-normal);
             }
         }
 
@@ -106,11 +104,6 @@
 
             .work-item {
                 flex-grow: 1;
-                background-color: var(--color-foreground);
-
-                &:focus-within {
-                    background-color: var(--color-foreground);
-                }
             }
         }
     }

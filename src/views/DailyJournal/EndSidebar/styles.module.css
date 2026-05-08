@@ -21,7 +21,7 @@
                 gap: var(--spacing-xs);
 
                 &.active {
-                    color: var(--color-primary);
+                    color: var(--color-primary-text);
                 }
 
                 .project-name {
@@ -30,11 +30,6 @@
 
                 .client-name {
                     font-size: var(--font-size-xs);
-                }
-
-                &:hover {
-                    outline: var(--width-separator-md) solid var(--color-secondary);
-                    /* outline-offset: var(--spacing-xs); */
                 }
             }
 
@@ -72,12 +67,8 @@
                     .usage-count {
                         flex-shrink: 0;
                         border-radius: var(--border-radius-lg);
-                        background-color: var(--color-quaternary);
+                        background-color: var(--color-tertiary);
                         padding: 0 var(--spacing-sm);
-                    }
-
-                    &:hover {
-                        outline: var(--width-separator-sm) solid var(--color-secondary);
                     }
                 }
             }

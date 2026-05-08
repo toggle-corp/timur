@@ -55,6 +55,7 @@ function ConfirmButton<const N>(props: Props<N>) {
                 contentClassName={styles.modalContent}
                 className={styles.shortcutsDialog}
                 size="auto"
+                closeOnOutsideClick
             >
                 {confirmDescription}
                 <div className={styles.actions}>
@@ -62,7 +63,7 @@ function ConfirmButton<const N>(props: Props<N>) {
                         title={`Cancel ${title}`}
                         name={undefined}
                         onClick={handleCancelButtonClick}
-                        variant="quaternary"
+                        variant="tertiary"
                     >
                         Cancel
                     </Button>

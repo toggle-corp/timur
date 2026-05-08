@@ -13,13 +13,12 @@ import { SpacingType } from '#utils/types';
 
 import styles from './styles.module.css';
 
-type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent' | 'dropdown-item';
+type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'transparent' | 'dropdown-item';
 
 const buttonVariantToClassNameMap: Record<ButtonVariant, string | undefined> = {
     primary: styles.primary,
     secondary: styles.secondary,
     tertiary: styles.tertiary,
-    quaternary: styles.quaternary,
     transparent: styles.transparent,
     'dropdown-item': styles.dropdownItem,
 };

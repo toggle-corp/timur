@@ -220,6 +220,7 @@ function AvailabilityDialog(props: Props) {
             heading={`${formattedDate} availability`}
             contentClassName={styles.modalContent}
             className={styles.availabilityDialog}
+            closeOnOutsideClick
         >
             <RadioInput
                 name="leaveType"
@@ -248,7 +249,7 @@ function AvailabilityDialog(props: Props) {
                     title="Cancel update availability"
                     name={undefined}
                     onClick={handleModalClose}
-                    variant="quaternary"
+                    variant="tertiary"
                 >
                     Cancel
                 </Button>

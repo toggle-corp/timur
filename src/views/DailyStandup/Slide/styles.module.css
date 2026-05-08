@@ -12,47 +12,65 @@
 
         .heading {
             overflow-wrap: break-word;
-            color: var(--color-primary);
+            color: var(--color-primary-text);
             font-size: var(--font-size-3xl);
             font-weight: var(--font-weight-light);
         }
     }
 
     &.split-variant {
+        gap: var(--spacing-lg);
         overflow: auto;
 
-        @media screen and (max-width: 768px) {
+        @media screen and (max-width: 900px) {
             flex-direction: column;
         }
 
         .start-section {
             display: flex;
-            align-items: center;
             flex-basis: 40%;
             flex-direction: column;
             flex-grow: 0;
             flex-shrink: 0;
-            justify-content: center;
+            gap: var(--spacing-lg);
             padding: var(--spacing-lg);
-            gap: var(--spacing-sm);
-            text-align: center;
 
-            .primary-pre-text {
-                overflow-wrap: break-word;
-                font-size: var(--font-size-xl);
+            @media screen and (max-width: 900px) {
+                flex-basis: auto;
+                padding: unset;
             }
 
-            .primary-heading {
-                overflow-wrap: break-word;
-                color: var(--color-primary);
-                font-size: var(--font-size-3xl);
-                font-weight: var(--font-weight-light);
+            .primary-section {
+                display: flex;
+                flex-direction: column;
+                flex-grow: 0;
+                gap: var(--spacing-sm);
+
+                .primary-pre-text {
+                    overflow-wrap: break-word;
+                    font-size: var(--font-size-xl);
+                }
+
+                .primary-heading {
+                    overflow-wrap: break-word;
+                    color: var(--color-primary-text);
+                    font-size: var(--font-size-3xl);
+                    font-weight: var(--font-weight-light);
+                }
+
+                .primary-description {
+                    overflow-wrap: break-word;
+                    color: var(--color-text-light);
+                    font-size: var(--font-size-md);
+                }
             }
 
-            .primary-description {
-                overflow-wrap: break-word;
-                color: var(--color-text-light);
-                font-size: var(--font-size-xl);
+            .tertiary-section {
+                display: flex;
+                flex-direction: column;
+                flex-grow: 1;
+                overflow: auto;
+                gap: var(--spacing-lg);
             }
         }
 
@@ -64,25 +82,41 @@
             padding: var(--spacing-lg);
             gap: var(--spacing-md);
 
+            @media screen and (max-width: 900px) {
+                background-color: unset;
+                padding: unset;
+            }
+
             .secondary-heading {
-                color: var(--color-secondary);
+                color: var(--color-secondary-text);
                 font-size: var(--font-size-xl);
                 font-weight: var(--font-weight-normal);
             }
 
-            .separator {
-                margin: 0;
-                border-top: unset;
-                border-bottom: var(--width-separator-sm) solid var(--color-separator);
-            }
-
             .secondary-content {
                 display: flex;
+                position: relative;
                 flex-direction: column;
                 flex-grow: 1;
                 flex-wrap: wrap;
                 overflow: auto;
                 gap: var(--spacing-md);
+
+                &::before {
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    bottom: 0;
+                    left: 0;
+                    opacity: 0.2;
+                    /* stylelint-disable-next-line csstools/value-no-unknown-custom-properties */
+                    background-image: var(--project-slide-background);
+                    background-position: bottom right;
+                    background-repeat: no-repeat;
+                    background-size: 12rem;
+                    content: '';
+                    pointer-events: none;
+                }
             }
         }
     }

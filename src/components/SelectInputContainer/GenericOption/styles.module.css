@@ -6,6 +6,6 @@
     text-align: left;
 
     &:hover {
-        background-color: var(--color-tertiary);
+        background-color: var(--color-focus);
     }
 }

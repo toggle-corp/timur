@@ -2,7 +2,7 @@ import { createPortal } from 'react-dom';
 
 interface Props {
     portalKey?: string;
-    container?: React.RefObject<Element | DocumentFragment>;
+    container?: React.RefObject<Element | DocumentFragment | null>;
     children: React.ReactNode;
 }
 

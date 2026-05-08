@@ -1,13 +1,13 @@
 import { createContext } from 'react';
 
-export interface DropdownMenuContextProps {
-    setShowDropdown: React.Dispatch<React.SetStateAction<boolean>>;
+interface DropdownMenuContextProps {
+    closePopover: () => void;
 }
 
 const DropdownMenuContext = createContext<DropdownMenuContextProps>({
-    setShowDropdown: () => {
+    closePopover: () => {
         // eslint-disable-next-line no-console
-        console.warn('DropdownMenuContext::setShowDropdown called without a provider');
+        console.warn('DropdownMenuContext::closePopover called without a provider');
     },
 });
 

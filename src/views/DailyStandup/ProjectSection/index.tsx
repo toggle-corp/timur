@@ -9,13 +9,17 @@ import {
     useQuery,
 } from 'urql';
 
-import AvailabilityIndicator from '#components/AvailabilityIndicator';
-import DisplayPicture from '#components/DisplayPicture';
+import DefaultMessage from '#components/DefaultMessage';
+import SlideCounter from '#components/SlideCounter';
+import UpcomingEventsList from '#components/UpcomingEventsList';
+import UsersList from '#components/UsersList';
 import {
     DailyStandupQuery,
     DailyStandupQueryVariables,
     UserDepartmentTypeEnum,
 } from '#generated/types/graphql';
+import useCurrentDate from '#hooks/useCurrentDate';
+import { formatDateTime } from '#utils/common';
 
 import Slide from '../Slide';
 
@@ -36,6 +40,8 @@ interface Props {
     projectId: string;
     date: string;
     className?: string;
+    currentSlide: number | undefined;
+    totalSlides: number | undefined;
 }
 
 const DAILY_STANDUP_QUERY = gql`
@@ -48,8 +54,16 @@ const DAILY_STANDUP_QUERY = gql`
                     project {
                         id
                         name
+                        description
                         logoHd {
                             url
+                        }
+                        deadlines {
+                            id
+                            name
+                            displayName
+                            isExternal
+                            remainingDays
                         }
                     }
                     users {
@@ -65,6 +79,24 @@ const DAILY_STANDUP_QUERY = gql`
                     }
                 }
             }
+            relativeEvents {
+                id
+                name
+                remainingDaysToStart
+                typeDisplay
+                type
+            }
+            contracts(
+                filters: {
+                    projectId: { exact: $projectId },
+                    isArchived: { exact: false },
+                },
+            ) {
+                items {
+                    id
+                    name
+                }
+            }
         }
     }
 `;
@@ -74,6 +106,8 @@ function ProjectSection(props: Props) {
         projectId,
         date,
         className,
+        currentSlide,
+        totalSlides,
     } = props;
 
     const [standupResponse] = useQuery<DailyStandupQuery, DailyStandupQueryVariables>({
@@ -83,52 +117,102 @@ function ProjectSection(props: Props) {
     });
 
     const stats = standupResponse.data?.private.dailyStandup.projectStat;
+    const deadlines = stats?.project?.deadlines;
+    const events = standupResponse.data?.private.relativeEvents;
+    const activeContracts = standupResponse.data?.private.contracts.items;
+    const hasActiveContracts = (activeContracts?.length ?? 0) > 0;
+    const hasUpcomingEvents = (deadlines?.length ?? 0) + (events?.length ?? 0) > 0;
+
+    const todayDate = useCurrentDate();
 
     // FIXME: use memo
-    const sortedUsers = [...(stats?.users ?? [])].sort((foo, bar) => (
-        compareNumber(
-            foo.user.department ? mapping[foo.user.department] : undefined,
-            bar.user.department ? mapping[bar.user.department] : undefined,
-        ) || compareString(
-            foo.user.displayName,
-            bar.user.displayName,
-        )
-    ));
+    const sortedUsers = [...(stats?.users ?? [])]
+        .sort((foo, bar) => (
+            compareNumber(
+                foo.user.department ? mapping[foo.user.department] : undefined,
+                bar.user.department ? mapping[bar.user.department] : undefined,
+            ) || compareString(
+                foo.user.displayName,
+                bar.user.displayName,
+            )
+        ))
+        .map((stat) => ({
+            id: stat.id,
+            displayPicture: stat.user.displayPicture,
+            displayName: stat.user.displayName,
+            leave: stat.leave,
+            workFromHome: stat.workFromHome,
+        }));
 
     return (
         <Slide
             variant="split"
             className={_cs(styles.projectSection, className)}
-            primaryPreText={isDefined(stats?.project.logoHd) && (
-                <img
-                    className={styles.projectIcon}
-                    alt=""
-                    src={stats?.project.logoHd?.url}
-                />
-            )}
             primaryHeading={stats?.project.name}
-            secondaryHeading="Team members"
-            secondaryContent={sortedUsers?.map((user) => (
-                <div
-                    key={user.id}
-                    role="listitem"
-                    className={styles.user}
-                >
-                    <DisplayPicture
-                        className={styles.displayPicture}
-                        imageUrl={user.user.displayPicture}
-                        displayName={user.user.displayName ?? 'Anon'}
-                    />
-                    <div className={styles.name}>
-                        {user.user.displayName ?? 'Anon'}
-                        {' '}
-                        <AvailabilityIndicator
-                            wfhType={user.workFromHome}
-                            leaveType={user.leave}
+            primaryDescription={stats?.project.description && (
+                <p>
+                    {stats.project.description}
+                </p>
+            )}
+            tertiaryContent={(
+                <>
+                    <div className={styles.subSections}>
+                        {hasActiveContracts && (
+                            <div className={styles.subSection}>
+                                <h3 className={styles.subHeading}>
+                                    Active Contracts
+                                </h3>
+                                <ul className={styles.contracts}>
+                                    {activeContracts?.map((contract) => (
+                                        <li key={contract.id}>
+                                            {contract.name}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                        {hasUpcomingEvents && (
+                            <div className={styles.subSection}>
+                                <h3 className={styles.subHeading}>
+                                    Deadlines & Events
+                                </h3>
+                                <UpcomingEventsList
+                                    deadlines={deadlines}
+                                    events={events}
+                                />
+                            </div>
+                        )}
+                    </div>
+                    <div className={styles.currentTime}>
+                        <span>{formatDateTime(todayDate)}</span>
+                        <SlideCounter
+                            current={currentSlide}
+                            total={totalSlides}
                         />
                     </div>
-                </div>
-            ))}
+                </>
+            )}
+            secondaryHeading="Team members"
+            secondaryBackground={isDefined(stats?.project.logoHd)
+                ? `url(${stats.project.logoHd.url})`
+                : undefined}
+            secondaryContent={(
+                <>
+                    <UsersList
+                        strikeoutForStandup
+                        users={sortedUsers}
+                    />
+                    <DefaultMessage
+                        filtered={false}
+                        empty={sortedUsers.length === 0}
+                        pending={standupResponse.fetching}
+                        errored={!!standupResponse.error}
+                        pendingMessage="Rounding up the team..."
+                        errorMessage="Something went sideways!"
+                        emptyMessage="No activity here!"
+                    />
+                </>
+            )}
         />
     );
 }
