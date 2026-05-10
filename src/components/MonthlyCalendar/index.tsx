@@ -18,7 +18,6 @@ import {
     useQuery,
 } from 'urql';
 
-import AvailabilityIndicator from '#components/AvailabilityIndicator';
 import Button from '#components/Button';
 import DateContext from '#contexts/date';
 import {
@@ -27,6 +26,7 @@ import {
     type MonthlyCalendarDataQuery,
     type MonthlyCalendarDataQueryVariables,
 } from '#generated/types/graphql';
+import useDebouncedValue from '#hooks/useDebouncedValue';
 import { addDays } from '#utils/common';
 
 import styles from './styles.module.css';
@@ -38,8 +38,12 @@ interface DateInfo {
     leaveType?: JournalLeaveTypeEnum | null;
     wfhType?: JournalWorkFromHomeTypeEnum | null;
     hasEvent?: boolean;
+    eventNames: string[];
+    deadlineNames: string[];
 }
 
+// FIXME: events are paginated.
+// FIXME: allDeadlines should be filtered (also show expired ones).
 const MONTHLY_CALENDAR_DATA = gql`
     query MonthlyCalendarData($dateGte: Date!, $dateLte: Date!) {
         private {
@@ -61,21 +65,94 @@ const MONTHLY_CALENDAR_DATA = gql`
             ) {
                 items {
                     id
+                    name
                     startDate
                     endDate
                     dates
                 }
             }
-            allProjects {
+            allDeadlines {
                 id
-                deadlines {
-                    id
-                    endDate
-                }
+                displayName
+                endDate
             }
         }
     }
 `;
+
+function leaveTypeLabel(type: JournalLeaveTypeEnum | null | undefined) {
+    if (type === 'FULL') {
+        return 'Full leave';
+    }
+    if (type === 'FIRST_HALF') return 'First half leave';
+    if (type === 'SECOND_HALF') return 'Second half leave';
+    return undefined;
+}
+
+function wfhTypeLabel(type: JournalWorkFromHomeTypeEnum | null | undefined) {
+    if (type === 'FULL') return 'WFH';
+    if (type === 'FIRST_HALF') return 'First half WFH';
+    if (type === 'SECOND_HALF') return 'Second half WFH';
+    return undefined;
+}
+
+function getDatesInRange(startDate: string, endDate: string): string[] {
+    const list: string[] = [];
+    let cursor = startDate;
+    while (cursor <= endDate) {
+        list.push(cursor);
+        cursor = addDays(cursor, 1);
+    }
+    return list;
+}
+
+const MUTED_COLOR = 'hsla(0, 0%, 50%, 0.12)';
+
+function heatmapAt(pct: number): string {
+    return `color-mix(in oklch, color-mix(in oklch, var(--color-secondary) ${Math.round(pct * 100)}%, var(--color-primary)) 50%, var(--color-background))`;
+}
+
+function getHeatmapColor(info: DateInfo | undefined): string | undefined {
+    const leaveType = info?.leaveType;
+    const totalHours = (info?.totalMinutes ?? 0) / 60;
+
+    const fillPct = Math.min(1, totalHours / (
+        leaveType === 'FIRST_HALF' || leaveType === 'SECOND_HALF'
+            ? 7
+            : 3.5
+    ));
+    const heatmapColor = heatmapAt(fillPct);
+
+    if (leaveType === 'FIRST_HALF') {
+        return `radial-gradient(ellipse 70% 70% at 100% 50%, ${heatmapColor} 100%, ${MUTED_COLOR} 100%)`;
+    }
+    if (leaveType === 'SECOND_HALF') {
+        return `radial-gradient(ellipse 70% 70% at 0% 50%, ${heatmapColor} 100%, ${MUTED_COLOR} 100%)`;
+    }
+    return heatmapColor;
+}
+
+function getDateTooltip(dateStr: string, info: DateInfo | undefined): string {
+    const lines: string[] = [dateStr];
+    if (info?.isHoliday) {
+        lines.push('Holiday');
+    }
+    const leaveLabel = leaveTypeLabel(info?.leaveType);
+    if (leaveLabel) {
+        lines.push(leaveLabel);
+    }
+    const wfhLabel = wfhTypeLabel(info?.wfhType);
+    if (wfhLabel) {
+        lines.push(wfhLabel);
+    }
+    info?.deadlineNames.forEach((name) => {
+        lines.push(`Deadline: ${name}`);
+    });
+    info?.eventNames.forEach((name) => {
+        lines.push(`Event: ${name}`);
+    });
+    return lines.join('\n');
+}
 
 const dateFormatter = new Intl.DateTimeFormat(
     [],
@@ -95,12 +172,6 @@ const weekDaysName = [
     'Sa',
 ];
 
-interface Day {
-    date: number;
-    dayOfWeek: number;
-    week: number;
-}
-
 interface Props {
     className?: string;
     weekDayNameClassName?: string;
@@ -113,6 +184,7 @@ interface Props {
     componentRef?: React.MutableRefObject<{
         resetView: (year: number, month: number) => void;
     } | null>;
+    lastEditedAt?: number | null;
 }
 
 function MonthlyCalendar(props: Props) {
@@ -125,6 +197,7 @@ function MonthlyCalendar(props: Props) {
         onMonthChange,
         weekDayNameClassName,
         dateClassName,
+        lastEditedAt,
         selectedDate,
     } = props;
 
@@ -133,6 +206,7 @@ function MonthlyCalendar(props: Props) {
 
     const { fullDate } = useContext(DateContext);
 
+    // FIXME: view can be reset internally. not need to expose this to parent
     const resetView = useCallback(
         (newYear: number, newMonth: number) => {
             setYear(newYear);
@@ -188,7 +262,7 @@ function MonthlyCalendar(props: Props) {
         [year, month],
     );
 
-    const [calendarDataResult] = useQuery<
+    const [calendarDataResult, reexecuteCalendarData] = useQuery<
         MonthlyCalendarDataQuery,
         MonthlyCalendarDataQueryVariables
     >({
@@ -197,71 +271,70 @@ function MonthlyCalendar(props: Props) {
         requestPolicy: 'cache-and-network',
     });
 
+    const debouncedLastEditedAt = useDebouncedValue(lastEditedAt, 2_000);
+    useEffect(() => {
+        if (!debouncedLastEditedAt) {
+            return;
+        }
+        reexecuteCalendarData({ requestPolicy: 'network-only' });
+    }, [debouncedLastEditedAt, reexecuteCalendarData]);
+
     const dateInfoMap = useMemo(() => {
         const map = new Map<string, DateInfo>();
 
-        calendarDataResult.data?.private.hoursPerDay.forEach((entry) => {
-            const dateStr = String(entry.date);
-            map.set(dateStr, {
-                totalMinutes: entry.totalMinutes,
-                targetMinutes: entry.targetMinutes,
-                isHoliday: entry.isHoliday,
-                leaveType: entry.leaveType,
-                wfhType: entry.wfhType,
+        const ensure = (dateStr: string): DateInfo => {
+            const existing = map.get(dateStr);
+            if (existing) {
+                return existing;
+            }
+            const fresh: DateInfo = {
                 hasEvent: false,
-            });
+                eventNames: [],
+                deadlineNames: [],
+            };
+            map.set(dateStr, fresh);
+            return fresh;
+        };
+
+        calendarDataResult.data?.private.hoursPerDay.forEach((entry) => {
+            const info = ensure(String(entry.date));
+            info.totalMinutes = entry.totalMinutes;
+            info.targetMinutes = entry.targetMinutes;
+            info.isHoliday = entry.isHoliday;
+            info.leaveType = entry.leaveType;
+            info.wfhType = entry.wfhType;
         });
 
-        calendarDataResult.data?.private.allProjects.forEach((project) => {
-            project.deadlines.forEach((deadline) => {
-                const dateStr = String(deadline.endDate);
-                const existing = map.get(dateStr) ?? {};
-                map.set(dateStr, { ...existing, hasEvent: true });
-            });
+        calendarDataResult.data?.private.allDeadlines.forEach((deadline) => {
+            const info = ensure(String(deadline.endDate));
+            info.hasEvent = true;
+            info.deadlineNames.push(deadline.displayName);
         });
 
         calendarDataResult.data?.private.events.items.forEach((event) => {
-            if (event.dates.length > 0) {
-                event.dates.forEach((d) => {
-                    const dateStr = String(d);
-                    const existing = map.get(dateStr) ?? {};
-                    map.set(dateStr, { ...existing, hasEvent: true });
-                });
-            } else {
-                let cursor = String(event.startDate);
-                const end = String(event.endDate);
-                while (cursor <= end) {
-                    const existing = map.get(cursor) ?? {};
-                    map.set(cursor, { ...existing, hasEvent: true });
-                    cursor = addDays(cursor, 1);
-                }
-            }
+            const eventName = event.name;
+            const dates = event.dates.length > 0
+                ? event.dates.map(String)
+                : getDatesInRange(String(event.startDate), String(event.endDate));
+            dates.forEach((dateStr) => {
+                const info = ensure(dateStr);
+                info.hasEvent = true;
+                info.eventNames.push(eventName);
+            });
         });
 
         return map;
     }, [calendarDataResult.data]);
 
-    // FIXME: We should be able be use a for loop here
     const daysInMonth = useMemo(() => {
-        // NOTE: getDate() starts at 1
-        // where as getDay() starts at 0
-        const startDate = new Date(year, month, 1);
-        const startDateOffset = startDate.getDay();
-        const days: Day[] = [];
-
-        while (startDate.getMonth() === month) {
-            const date = startDate.getDate();
-            days.push({
-                date,
-                dayOfWeek: startDate.getDay(),
-                week: Math.floor((startDateOffset + (date - 1)) / 7),
-            });
-
-            startDate.setDate(startDate.getDate() + 1);
-        }
-
-        return days;
-    }, [year, month]);
+        // getDay() returns 0 for Sun..6 for Sat
+        const startDateOffset = new Date(year, month, 1).getDay();
+        return getDatesInRange(monthStart, monthEnd).map((_, index) => ({
+            date: index + 1,
+            dayOfWeek: (startDateOffset + index) % 7,
+            week: Math.floor((startDateOffset + index) / 7),
+        }));
+    }, [year, month, monthStart, monthEnd]);
 
     const formattedDate = dateFormatter.format(new Date(year, month, 1));
 
@@ -306,24 +379,24 @@ function MonthlyCalendar(props: Props) {
                 ))}
                 {daysInMonth.map((day) => {
                     const date = encodeDate(new Date(year, month, day.date));
-
                     const info = dateInfoMap.get(date);
-                    const isPast = date <= fullDate;
-                    const targetMinutes = info?.targetMinutes ?? 0;
-                    const totalMinutes = info?.totalMinutes ?? 0;
-                    const fillPct = isPast && targetMinutes > 0
-                        ? Math.min(1, totalMinutes / targetMinutes)
-                        : 0;
-                    const hue = Math.round(fillPct * 120);
-                    const hoursBg = isPast && targetMinutes > 0
-                        ? `hsla(${hue}, 55%, 50%, 0.18)`
-                        : undefined;
 
-                    const effectiveLeaveType: JournalLeaveTypeEnum | null = info?.isHoliday
-                        ? 'FULL'
-                        : (info?.leaveType ?? null);
-                    const effectiveWfhType = info?.wfhType ?? null;
-                    const hasAvailability = effectiveLeaveType != null || effectiveWfhType != null;
+                    const isFuture = date > fullDate;
+
+                    const isWeekend = day.dayOfWeek === 0 || day.dayOfWeek === 6;
+                    const isOffDay = isWeekend
+                        || (info?.isHoliday ?? false)
+                        || info?.leaveType === 'FULL';
+
+                    const hasWork = (info?.totalMinutes ?? 0) > 0;
+                    let heatmapColor: string | undefined;
+                    if (isFuture) {
+                        heatmapColor = hasWork ? heatmapAt(1) : undefined;
+                    } else if (isOffDay) {
+                        heatmapColor = hasWork ? heatmapAt(1) : MUTED_COLOR;
+                    } else {
+                        heatmapColor = getHeatmapColor(info);
+                    }
 
                     return (
                         <Button
@@ -332,31 +405,22 @@ function MonthlyCalendar(props: Props) {
                                 styles.date,
                                 fullDate === date && styles.today,
                                 selectedDate === date && styles.selected,
+                                (info?.hasEvent || info?.isHoliday) && styles.hasMarker,
                                 dateClassName,
                             )}
                             name={date}
-                            title="Set date from calendar"
+                            title={getDateTooltip(date, info)}
                             key={day.date}
                             style={{
                                 gridColumnStart: day.dayOfWeek + 1,
                                 // Note +2 is due to the week day name row
                                 gridRowStart: day.week + 2,
-                                backgroundColor: hoursBg,
-                            }}
+                                ['--heatmap-bg-color' as string]: heatmapColor,
+                            } as React.CSSProperties}
                             variant="transparent"
                         >
                             <span className={styles.dateContent}>
                                 {day.date}
-                                {info?.hasEvent && (
-                                    <span className={styles.eventDot} />
-                                )}
-                                {hasAvailability && (
-                                    <AvailabilityIndicator
-                                        className={styles.availabilityIndicator}
-                                        leaveType={effectiveLeaveType}
-                                        wfhType={effectiveWfhType}
-                                    />
-                                )}
                             </span>
                         </Button>
                     );
