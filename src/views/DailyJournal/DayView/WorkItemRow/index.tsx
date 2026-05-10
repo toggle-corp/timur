@@ -223,13 +223,17 @@ function WorkItemRow(props: Props) {
 
     const handleShortcuts = useCallback(
         (event: KeyboardEvent<HTMLTextAreaElement>) => {
-            if (event.ctrlKey && event.key === 'Enter' && onAssist) {
+            if (event.ctrlKey && event.shiftKey && event.key === 'Enter' && onClone) {
+                event.preventDefault();
+                event.stopPropagation();
+                onClone(workItem.clientId);
+            } else if (event.ctrlKey && event.key === 'Enter' && onAssist) {
                 event.preventDefault();
                 event.stopPropagation();
                 onAssist(workItem.clientId);
             }
         },
-        [onAssist, workItem.clientId],
+        [onAssist, onClone, workItem.clientId],
     );
 
     const checkboxForStatus = config.checkboxForStatus || screen === 'mobile';

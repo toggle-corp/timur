@@ -49,6 +49,20 @@ function ShortcutsDialog(props: Props) {
             <div>
                 Hit
                 {' '}
+                <code>Ctrl+Enter</code>
+                {' '}
+                to assist on the focused entry.
+            </div>
+            <div>
+                Hit
+                {' '}
+                <code>Ctrl+Shift+Enter</code>
+                {' '}
+                to clone the focused entry.
+            </div>
+            <div>
+                Hit
+                {' '}
                 <code>Ctrl+Shift+Left</code>
                 {' '}
                 to go to previous day.
