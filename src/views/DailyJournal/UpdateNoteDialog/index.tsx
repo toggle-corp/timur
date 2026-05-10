@@ -77,7 +77,7 @@ const UPDATE_NOTE = gql`
 `;
 
 interface Props {
-    dialogOpenTriggerRef: React.MutableRefObject<(() => void) | undefined>;
+    dialogOpenTriggerRef: React.RefObject<(() => void) | undefined>;
     editingMode: EditingMode,
     date: string,
 }
