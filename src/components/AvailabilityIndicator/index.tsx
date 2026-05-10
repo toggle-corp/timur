@@ -34,7 +34,7 @@ function AvailabilityIndicator(props: Props) {
         return <>{fallback}</>;
     }
 
-    const wfhContent = <FcHome title="Work from home" />;
+    const wfhContent = <FcHome title="WFH" />;
     const leaveContent = <FcLandscape title="Leave" />;
     const officeContent = <FcOrganization title="Work" />;
 

@@ -43,12 +43,15 @@ const eventIcons: Record<EventTypeEnum, React.ReactNode> = {
 
 interface Props {
     prefixedDeadlineName?: boolean;
+    hideDaysRemaining?: boolean;
     deadlines?: DeadlineInput[];
     events?: EventInput[];
 }
 
 function UpcomingEventsList(props: Props) {
-    const { prefixedDeadlineName, deadlines, events } = props;
+    const {
+        prefixedDeadlineName, hideDaysRemaining, deadlines, events,
+    } = props;
 
     const items = useMemo<GeneralEventType[]>(
         () => [
@@ -82,6 +85,7 @@ function UpcomingEventsList(props: Props) {
                 <Fragment key={item.key}>
                     <GeneralEventOutput
                         generalEvent={item}
+                        hideDaysRemaining={hideDaysRemaining}
                     />
                     {item.remainingDays < 0
                         && nextItem

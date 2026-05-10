@@ -231,6 +231,16 @@ export function Component() {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [storedConfig] = useLocalStorage('timur-config');
 
+    const [lastEditedAt, setLastEditedAt] = useState<number | null>(null);
+    const initialEditWatchRef = useRef(true);
+    useEffect(() => {
+        if (initialEditWatchRef.current) {
+            initialEditWatchRef.current = false;
+            return;
+        }
+        setLastEditedAt(Date.now());
+    }, [workItems]);
+
     // UI
     const {
         focus,
@@ -665,6 +675,10 @@ export function Component() {
                     setSelectedDate={setSelectedDate}
                     onShortcutsClick={handleShortcutsButtonClick}
                     onWorkItemCreateFromCalendar={handleWorkItemCreateFromCalendar}
+                    dayWorkItems={filteredWorkItems}
+                    leaveType={leaveType}
+                    wfhType={wfhType}
+                    lastEditedAt={lastEditedAt}
                 />
             )}
             endAsideContent={(
