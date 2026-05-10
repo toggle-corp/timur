@@ -86,7 +86,7 @@ const UPDATE_JOURNAL = gql`
 `;
 
 interface Props {
-    dialogOpenTriggerRef: React.MutableRefObject<(() => void) | undefined>;
+    dialogOpenTriggerRef: React.RefObject<(() => void) | undefined>;
     date: string;
 }
 

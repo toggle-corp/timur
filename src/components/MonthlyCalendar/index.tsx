@@ -181,7 +181,7 @@ interface Props {
     initialMonth: number;
     onDateClick?: (date: string) => void;
     onMonthChange?: (year: number, month: number) => void;
-    componentRef?: React.MutableRefObject<{
+    componentRef?: React.RefObject<{
         resetView: (year: number, month: number) => void;
     } | null>;
     lastEditedAt?: number | null;

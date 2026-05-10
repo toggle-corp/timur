@@ -9,7 +9,7 @@ import Dialog from '#components/Dialog';
 import styles from './styles.module.css';
 
 interface Props {
-    dialogOpenTriggerRef: React.MutableRefObject<(() => void) | undefined>;
+    dialogOpenTriggerRef: React.RefObject<(() => void) | undefined>;
 }
 
 function ShortcutsDialog(props: Props) {
