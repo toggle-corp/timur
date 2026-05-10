@@ -77,23 +77,50 @@ import UpdateNoteDialog from './UpdateNoteDialog';
 import styles from './styles.module.css';
 
 function inferTypeFromDescription(desc: string): TimeEntryTypeEnum | undefined {
-    const sanitizedDesc = desc.toLowerCase();
-    if (sanitizedDesc.includes('meeting') || sanitizedDesc.includes('standup') || sanitizedDesc.includes('all hands') || sanitizedDesc.includes('catchup')) {
+    const lower = desc.toLowerCase();
+    const matches = (pattern: RegExp) => pattern.test(lower);
+
+    if (matches(/\b(client meeting|client call|external meeting)\b/)) {
+        return 'EXTERNAL_MEETING';
+    }
+
+    if (
+        matches(/\b(meeting|standup|stand-up|all hands|all-hands)\b/)
+        || matches(/\b1:1\b/)
+    ) {
         return 'INTERNAL_MEETING';
     }
-    if (sanitizedDesc.includes('discuss')) {
+    if (matches(/\b(client discussion|external discussion)\b/)) {
+        return 'EXTERNAL_DISCUSSION';
+    }
+    if (matches(/\b(discuss|discussion|brainstorm)\b/)) {
         return 'INTERNAL_DISCUSSION';
     }
-    if (sanitizedDesc.includes('deploy')) {
+    if (matches(/\b(review|pull request|merge request)\b/)) {
+        return 'REVIEW';
+    }
+    if (matches(/\b(deploy|deployment|pipeline|ci|cd|infra|release)\b/)) {
         return 'DEV_OPS';
     }
-    if (sanitizedDesc.includes('research') || sanitizedDesc.includes('study')) {
+    if (matches(/\b(test|tests|testing|qa|qc|regression)\b/)) {
+        return 'TESTING';
+    }
+    if (matches(/\b(design|wireframe|mockup|ux|ui)\b/)) {
+        return 'DESIGN';
+    }
+    if (matches(/\b(research|study|investigate|spike|explore)\b/)) {
         return 'RESEARCH';
     }
-    if (sanitizedDesc.includes('documentation')) {
+    if (matches(/\b(documentation|docs|readme|wiki|document)\b/)) {
         return 'DOCUMENTATION';
     }
-    if (sanitizedDesc.includes('review pr') || sanitizedDesc.includes('refactor') || sanitizedDesc.includes('fix') || sanitizedDesc.includes('debug')) {
+    if (matches(/\b(planning|project board|plan|roadmap|backlog|estimate|estimation)\b/)) {
+        return 'PROJECT_MANAGEMENT';
+    }
+    if (matches(/\b(annotation|annotate|labelling|labeling|label)\b/)) {
+        return 'ANNOTATION';
+    }
+    if (matches(/\b(refactor|fix|fixing|fixed|fixes|bugfix|hotfix|debug|implement|implementation|feature)\b/)) {
         return 'DEVELOPMENT';
     }
     return undefined;
@@ -215,7 +242,8 @@ export function Component() {
     interface CalendarElement {
         resetView:(year: number, month: number) => void;
     }
-    const dialogOpenTriggerRef = useRef<(() => void) | undefined>(undefined);
+    const dialogOpenTriggerRef = useRef<((description: string | undefined) => void) | undefined>(
+        undefined);
     const noteDialogOpenTriggerRef = useRef<(() => void) | undefined>(undefined);
     const shortcutsDialogOpenTriggerRef = useRef<(() => void) | undefined>(undefined);
     const availabilityDialogOpenTriggerRef = useRef<(() => void) | undefined>(undefined);
@@ -324,9 +352,14 @@ export function Component() {
 
     const handleWorkItemCreateFromCalendar = useCallback(
         (override: Partial<WorkItem>) => {
-            pendingCalendarOverrideRef.current = override;
+            pendingCalendarOverrideRef.current = {
+                ...override,
+                type: override.description
+                    ? inferTypeFromDescription(override.description)
+                    : undefined,
+            };
             if (dialogOpenTriggerRef.current) {
-                dialogOpenTriggerRef.current();
+                dialogOpenTriggerRef.current(override.description ?? undefined);
             }
         },
         [],
@@ -493,7 +526,7 @@ export function Component() {
     const handleAddEntryClick = useCallback(
         () => {
             if (dialogOpenTriggerRef.current) {
-                dialogOpenTriggerRef.current();
+                dialogOpenTriggerRef.current(undefined);
             }
         },
         [],
