@@ -134,16 +134,12 @@ function GoogleAllDayChips(props: GoogleAllDayChipsProps) {
 
 interface Props {
     selectedDate: string;
-    showEvents: boolean;
-    googleCalendarEnabled?: boolean;
     loading?: boolean;
 }
 
 function DayEventChipsSection(props: Props) {
     const {
         selectedDate,
-        showEvents,
-        googleCalendarEnabled,
         loading,
     } = props;
 
@@ -184,37 +180,28 @@ function DayEventChipsSection(props: Props) {
             : [];
 
         const allDeadlines: Deadline[] = dayDataResult.data?.private.allDeadlines ?? [];
-        const deadlineChips: Chip[] = showEvents
-            ? allDeadlines
-                .filter((deadline) => deadline.endDate === selectedDate)
-                .map((deadline) => ({
-                    key: `deadline-${deadline.id}`,
-                    icon: deadline.isExternal ? <FcHighPriority /> : <FcLeave />,
-                    name: deadline.displayName,
-                }))
-            : [];
+        const deadlineChips: Chip[] = allDeadlines
+            .filter((deadline) => deadline.endDate === selectedDate)
+            .map((deadline) => ({
+                key: `deadline-${deadline.id}`,
+                icon: deadline.isExternal ? <FcHighPriority /> : <FcLeave />,
+                name: deadline.displayName,
+            }));
 
         const events: DayEvent[] = dayDataResult.data?.private.events.items ?? [];
-        const eventChips: Chip[] = showEvents
-            ? events.map((event) => ({
-                key: `event-${event.id}`,
-                icon: eventIcons[event.type as keyof typeof eventIcons],
-                name: event.name,
-            }))
-            : [];
+        const eventChips: Chip[] = events.map((event) => ({
+            key: `event-${event.id}`,
+            icon: eventIcons[event.type as keyof typeof eventIcons],
+            name: event.name,
+        }));
 
         return [...leaveChips, ...wfhChips, ...deadlineChips, ...eventChips];
     }, [
-        showEvents,
         dayDataResult.data,
         selectedDate,
         leaveType,
         wfhType,
     ]);
-
-    if (dayEventChips.length === 0 && !googleCalendarEnabled) {
-        return null;
-    }
 
     return (
         <div
@@ -231,9 +218,7 @@ function DayEventChipsSection(props: Props) {
                     {item.name}
                 </Pill>
             ))}
-            {googleCalendarEnabled && (
-                <GoogleAllDayChips date={selectedDate} />
-            )}
+            <GoogleAllDayChips date={selectedDate} />
         </div>
     );
 }

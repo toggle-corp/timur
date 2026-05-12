@@ -12,7 +12,6 @@ import Button from '#components/Button';
 import Link from '#components/Link';
 import MonthlyCalendar from '#components/MonthlyCalendar';
 import useGoogleCalendar from '#hooks/useGoogleCalendar';
-import useLocalStorage from '#hooks/useLocalStorage';
 import { type WorkItem } from '#utils/types';
 
 import DayEventChipsSection from './DayEventChipsSection';
@@ -41,12 +40,9 @@ function StartSidebar(props: Props) {
 
     const deferredSelectedDate = useDeferredValue(selectedDate);
 
-    const [storedConfig] = useLocalStorage('timur-config');
-    const { googleCalendarEnabled, showEvents } = storedConfig;
-
     const { isConnected: isGoogleCalendarConnected } = useGoogleCalendar();
 
-    const googleEnabled = googleCalendarEnabled && isGoogleCalendarConnected;
+    const googleEnabled = isGoogleCalendarConnected;
 
     const addedDescriptions = useMemo(() => {
         const set = new Set<string>();
@@ -69,8 +65,6 @@ function StartSidebar(props: Props) {
                 <DayEventChipsSection
                     loading={selectedDate !== deferredSelectedDate}
                     selectedDate={deferredSelectedDate}
-                    showEvents={showEvents}
-                    googleCalendarEnabled={googleEnabled}
                 />
                 {googleEnabled && (
                     <GoogleCalendarSection
