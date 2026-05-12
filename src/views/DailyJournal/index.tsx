@@ -212,6 +212,17 @@ export function Component() {
         redoable,
     } = useContext(CommandContext);
 
+    // NOTE: logical time
+    const [lastEditedAt, setLastEditedAt] = useState<number>(1);
+
+    const interceptedWatch: typeof watch = useCallback(
+        (...args) => {
+            watch(...args);
+            setLastEditedAt((val) => val + 1);
+        },
+        [watch],
+    );
+
     const {
         entries: workItems,
         setEntries: setWorkItems,
@@ -223,7 +234,7 @@ export function Component() {
         commands,
         filter,
         keySelector,
-        watch,
+        watch: interceptedWatch,
         zeitgeist,
         setZeitgeist,
         setCommands,
@@ -231,16 +242,6 @@ export function Component() {
 
     const [tasks, setTasks] = useState<Task[]>([]);
     const [storedConfig] = useLocalStorage('timur-config');
-
-    const [lastEditedAt, setLastEditedAt] = useState<number | null>(null);
-    const initialEditWatchRef = useRef(true);
-    useEffect(() => {
-        if (initialEditWatchRef.current) {
-            initialEditWatchRef.current = false;
-            return;
-        }
-        setLastEditedAt(Date.now());
-    }, [workItems]);
 
     // UI
     const {
