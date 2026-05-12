@@ -56,6 +56,12 @@ const DAY_EVENTS_AND_DEADLINES = gql`
                 isExternal
                 endDate
             }
+            journal(date: $date) {
+                id
+                date
+                leaveType
+                wfhType
+            }
         }
     }
 `;
@@ -129,8 +135,6 @@ function GoogleAllDayChips(props: GoogleAllDayChipsProps) {
 interface Props {
     selectedDate: string;
     showEvents: boolean;
-    leaveType?: JournalLeaveTypeEnum | null;
-    wfhType?: JournalWorkFromHomeTypeEnum | null;
     googleCalendarEnabled?: boolean;
     loading?: boolean;
 }
@@ -139,8 +143,6 @@ function DayEventChipsSection(props: Props) {
     const {
         selectedDate,
         showEvents,
-        leaveType,
-        wfhType,
         googleCalendarEnabled,
         loading,
     } = props;
@@ -151,13 +153,12 @@ function DayEventChipsSection(props: Props) {
     >({
         query: DAY_EVENTS_AND_DEADLINES,
         variables: { date: selectedDate },
-        pause: !showEvents,
         requestPolicy: 'cache-and-network',
         context: CONTEXT,
     });
 
-    const allDeadlines: Deadline[] = dayDataResult.data?.private.allDeadlines ?? [];
-    const events: DayEvent[] = dayDataResult.data?.private.events.items ?? [];
+    const leaveType = dayDataResult.data?.private.journal?.leaveType;
+    const wfhType = dayDataResult.data?.private.journal?.wfhType;
 
     const dayEventChips = useMemo<Chip[]>(() => {
         const eventIcons = {
@@ -182,6 +183,7 @@ function DayEventChipsSection(props: Props) {
             }]
             : [];
 
+        const allDeadlines: Deadline[] = dayDataResult.data?.private.allDeadlines ?? [];
         const deadlineChips: Chip[] = showEvents
             ? allDeadlines
                 .filter((deadline) => deadline.endDate === selectedDate)
@@ -192,6 +194,7 @@ function DayEventChipsSection(props: Props) {
                 }))
             : [];
 
+        const events: DayEvent[] = dayDataResult.data?.private.events.items ?? [];
         const eventChips: Chip[] = showEvents
             ? events.map((event) => ({
                 key: `event-${event.id}`,
@@ -203,8 +206,7 @@ function DayEventChipsSection(props: Props) {
         return [...leaveChips, ...wfhChips, ...deadlineChips, ...eventChips];
     }, [
         showEvents,
-        allDeadlines,
-        events,
+        dayDataResult.data,
         selectedDate,
         leaveType,
         wfhType,
