@@ -778,7 +778,8 @@ export function Component() {
             >
                 <DayView
                     loading={myTimeEntriesResult.fetching}
-                    errored={!!myTimeEntriesResult.error}
+                    // FIXME: Add a Suspense block
+                    // errored={false}
                     workItems={filteredWorkItems}
                     tasks={tasks}
                     onWorkItemClone={handleWorkItemClone}
