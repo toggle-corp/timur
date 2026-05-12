@@ -57,6 +57,7 @@ const MONTHLY_CALENDAR_DATA = gql`
                 wfhType
             }
             events(
+                pagination: { limit: 999 },
                 filters: {
                     startDate: { lte: $dateLte }
                     endDate: { gte: $dateGte }

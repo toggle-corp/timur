@@ -32,6 +32,7 @@ const DAY_EVENTS_AND_DEADLINES = gql`
         private {
             id
             events(
+                pagination: { limit: 999 },
                 filters: {
                     startDate: { lte: $date }
                     endDate: { gte: $date }

@@ -88,6 +88,7 @@ const DAILY_STANDUP_QUERY = gql`
                 type
             }
             contracts(
+                pagination: { limit: 999 },
                 filters: {
                     projectId: { exact: $projectId },
                     isArchived: { exact: false },
