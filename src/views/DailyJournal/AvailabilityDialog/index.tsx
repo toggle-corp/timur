@@ -56,6 +56,7 @@ const dateFormatter = new Intl.DateTimeFormat(
 const AVAILABILITY = gql`
     query Availability($date: Date!) {
         private {
+            id
             journal(date: $date) {
                 id
                 date

@@ -49,6 +49,7 @@ const DAILY_STANDUP_QUERY = gql`
         private {
             id
             dailyStandup(date: $date) {
+                id
                 projectStat(pk: $projectId) {
                     id
                     project {

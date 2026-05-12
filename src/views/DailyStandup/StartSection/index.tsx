@@ -45,6 +45,7 @@ function getUnavailability(
 const USERS_AVAILABILITY = gql`
     query UsersAvailability {
         private {
+            id
             users(pagination: {limit: 999}, filters: {departments: [DEVELOPMENT, DESIGN, PROJECT_MANAGER, QUALITY_ASSURANCE]}) {
                 items {
                     id

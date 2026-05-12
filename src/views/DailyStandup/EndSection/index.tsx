@@ -18,6 +18,7 @@ const DAILY_QUOTE_QUERY = gql`
         private {
             id
             dailyStandup(date: $date) {
+                id
                 quote {
                     id
                     text

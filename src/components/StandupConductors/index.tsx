@@ -18,6 +18,7 @@ import styles from './styles.module.css';
 const STANDUP_CONDUCTORS = gql`
     query StandupConductors($date: Date!){
         private {
+            id
             dailyStandup(date: $date) {
                 conductor {
                     id

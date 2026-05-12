@@ -69,7 +69,7 @@ function DurationInput<const T>(props: Props<T>) {
     }, [valueFromProps, counter]);
 
     const handleChange: RawInputProps<T>['onChange'] = useCallback((v) => {
-        // TODO: Also call onChange if v is valid
+        // FIXME: Also call onChange if v is valid
         if (
             !v
             // decimal = 10.5

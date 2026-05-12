@@ -42,13 +42,13 @@ interface DateInfo {
     deadlineNames: string[];
 }
 
-// FIXME: events are paginated.
-// FIXME: allDeadlines should be filtered (also show expired ones).
+// TODO: events are paginated. use separate api
 const MONTHLY_CALENDAR_DATA = gql`
     query MonthlyCalendarData($dateGte: Date!, $dateLte: Date!) {
         private {
             id
             hoursPerDay(dateGte: $dateGte, dateLte: $dateLte) {
+                id
                 date
                 totalMinutes
                 targetMinutes
@@ -206,7 +206,7 @@ function MonthlyCalendar(props: Props) {
 
     const { fullDate } = useContext(DateContext);
 
-    // FIXME: view can be reset internally. not need to expose this to parent
+    // TODO: view can be reset internally. not need to expose this to parent
     const resetView = useCallback(
         (newYear: number, newMonth: number) => {
             setYear(newYear);
