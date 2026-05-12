@@ -53,7 +53,7 @@ function initializeEntries<T, K>(args: {
 function useCommand<T, K>(props: {
     defaultEntries: T[],
     keySelector: (entry: T) => K,
-    filter: (entry: T) => boolean,
+    initialFilter: (entry: T) => boolean,
     commands: React.MutableRefObject<Command<T, K>[]>,
     zeitgeist: React.MutableRefObject<number>,
     setCommands: (value: Command<T, K>[]) => void,
@@ -63,7 +63,7 @@ function useCommand<T, K>(props: {
     const {
         defaultEntries,
         keySelector,
-        filter,
+        initialFilter,
         commands,
         zeitgeist,
         watch,
@@ -76,7 +76,7 @@ function useCommand<T, K>(props: {
         const newEntries = initializeEntries({
             entries: defaultEntries,
             keySelector,
-            filter,
+            filter: initialFilter,
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             commands: commands.current!,
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -87,7 +87,7 @@ function useCommand<T, K>(props: {
     });
 
     const handleEntriesSet = useCallback(
-        (e: T[]) => {
+        (e: T[], filter: (entry: T) => boolean) => {
             const newEntries = initializeEntries({
                 entries: e,
                 keySelector,
@@ -100,11 +100,11 @@ function useCommand<T, K>(props: {
             setEntries(newEntries);
             entriesRef.current = newEntries;
         },
-        [commands, filter, keySelector, zeitgeist],
+        [commands, keySelector, zeitgeist],
     );
 
     const handleRedo = useCallback(
-        () => {
+        (filter: (entry: T) => boolean) => {
             const newState = forward(
                 {
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -118,14 +118,14 @@ function useCommand<T, K>(props: {
                 1,
             );
             setZeitgeist(newState.zeitgeist);
-            setEntries(newState.entries);
+            setEntries(newState.entries.filter(filter));
             entriesRef.current = newState.entries;
         },
         [commands, keySelector, watch, zeitgeist, setZeitgeist],
     );
 
     const handleUndo = useCallback(
-        () => {
+        (filter: (entry: T) => boolean) => {
             const newState = backward(
                 {
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -138,7 +138,7 @@ function useCommand<T, K>(props: {
                 },
                 1,
             );
-            setEntries(newState.entries);
+            setEntries(newState.entries.filter(filter));
             entriesRef.current = newState.entries;
             setZeitgeist(newState.zeitgeist);
         },
@@ -146,7 +146,7 @@ function useCommand<T, K>(props: {
     );
 
     const handleUpdate = useCallback(
-        (command: Command<T, K>) => {
+        (command: Command<T, K>, filter: (entry: T) => boolean) => {
             const newState = act(
                 {
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -159,7 +159,7 @@ function useCommand<T, K>(props: {
                 },
                 command,
             );
-            setEntries(newState.entries);
+            setEntries(newState.entries.filter(filter));
             entriesRef.current = newState.entries;
             setZeitgeist(newState.zeitgeist);
             setCommands(newState.commands);
