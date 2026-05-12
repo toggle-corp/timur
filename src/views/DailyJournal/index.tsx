@@ -185,11 +185,11 @@ export function Component() {
     const { midActionsRef } = useContext(NavbarContext);
 
     // State
-    const filter = useCallback(
+    const initialWorkItemFilter = useCallback(
         (entry: WorkItem) => entry.date === selectedDate,
         [selectedDate],
     );
-    const keySelector = useCallback(
+    const workItemKeySelector = useCallback(
         (entry: WorkItem) => entry.clientId,
         [],
     );
@@ -224,8 +224,8 @@ export function Component() {
     } = useCommand({
         defaultEntries: [],
         commands,
-        filter,
-        keySelector,
+        initialFilter: initialWorkItemFilter,
+        keySelector: workItemKeySelector,
         watch: interceptedWatch,
         zeitgeist,
         setZeitgeist,
@@ -269,7 +269,10 @@ export function Component() {
                 return;
             }
             if (myTimeEntriesResult.error) {
-                setWorkItems([]);
+                setWorkItems(
+                    [],
+                    (entry) => entry.date === selectedDate,
+                );
                 return;
             }
 
@@ -293,13 +296,17 @@ export function Component() {
             );
 
             setTasks(tasksFromServer);
-            setWorkItems(workItemsFromServer);
+            setWorkItems(
+                workItemsFromServer,
+                (entry) => entry.date === selectedDate,
+            );
         },
         [
             myTimeEntriesResult.fetching,
             myTimeEntriesResult.data,
             myTimeEntriesResult.error,
             setWorkItems,
+            selectedDate,
         ],
     );
 
@@ -318,12 +325,15 @@ export function Component() {
                 ...override,
             };
 
-            setWorkItemChange({
-                type: 'add',
-                key: newItem.clientId,
-                newValue: newItem,
-                timestamp: new Date().getTime(),
-            });
+            setWorkItemChange(
+                {
+                    type: 'add',
+                    key: newItem.clientId,
+                    newValue: newItem,
+                    timestamp: new Date().getTime(),
+                },
+                (entry) => entry.date === selectedDate,
+            );
 
             focus(String(newId));
         },
@@ -374,16 +384,19 @@ export function Component() {
                 delete newItem.duration;
             }
 
-            setWorkItemChange({
-                type: 'add',
-                key: newItem.clientId,
-                newValue: newItem,
-                timestamp: new Date().getTime(),
-            });
+            setWorkItemChange(
+                {
+                    type: 'add',
+                    key: newItem.clientId,
+                    newValue: newItem,
+                    timestamp: new Date().getTime(),
+                },
+                (entry) => entry.date === selectedDate,
+            );
 
             focus(String(newId));
         },
-        [workItems, setWorkItemChange, focus],
+        [workItems, setWorkItemChange, selectedDate, focus],
     );
 
     const handleWorkItemAssist = useCallback(
@@ -419,30 +432,36 @@ export function Component() {
                 delete targetItem.id;
                 delete targetItem.duration;
 
-                setWorkItemChange({
-                    type: 'add',
-                    key: targetItem.clientId,
-                    newValue: targetItem,
-                    timestamp: now,
-                });
+                setWorkItemChange(
+                    {
+                        type: 'add',
+                        key: targetItem.clientId,
+                        newValue: targetItem,
+                        timestamp: now,
+                    },
+                    (entry) => entry.date === selectedDate,
+                );
             });
 
-            setWorkItemChange({
-                type: 'edit',
-                key: sourceItem.clientId,
-                oldValue: {
-                    description: sourceItem.description,
-                    type: sourceItem.type,
+            setWorkItemChange(
+                {
+                    type: 'edit',
+                    key: sourceItem.clientId,
+                    oldValue: {
+                        description: sourceItem.description,
+                        type: sourceItem.type,
+                    },
+                    newValue: {
+                        description: firstDescription,
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        type: inferTypeFromDescription(firstDescription!) ?? sourceItem.type,
+                    },
+                    timestamp: now,
                 },
-                newValue: {
-                    description: firstDescription,
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    type: inferTypeFromDescription(firstDescription!) ?? sourceItem.type,
-                },
-                timestamp: now,
-            });
+                (entry) => entry.date === selectedDate,
+            );
         },
-        [workItems, setWorkItemChange],
+        [workItems, setWorkItemChange, selectedDate],
     );
 
     const handleWorkItemDelete = useCallback(
@@ -453,14 +472,31 @@ export function Component() {
                 console.error(`Could not find item ${workItemClientId} while deleting`);
                 return;
             }
-            setWorkItemChange({
-                type: 'delete',
-                key: workItemClientId,
-                oldValue: oldItem,
-                timestamp: new Date().getTime(),
-            });
+            setWorkItemChange(
+                {
+                    type: 'delete',
+                    key: workItemClientId,
+                    oldValue: oldItem,
+                    timestamp: new Date().getTime(),
+                },
+                (entry) => entry.date === selectedDate,
+            );
         },
-        [setWorkItemChange, workItems],
+        [setWorkItemChange, workItems, selectedDate],
+    );
+
+    const handleWorkItemUndo = useCallback(
+        () => {
+            undo((entry) => entry.date === selectedDate);
+        },
+        [undo, selectedDate],
+    );
+
+    const handleWorkItemRedo = useCallback(
+        () => {
+            redo((entry) => entry.date === selectedDate);
+        },
+        [redo, selectedDate],
     );
 
     const handleWorkItemChange = useCallback(
@@ -489,15 +525,18 @@ export function Component() {
                 changes.status = 'DOING';
             }
 
-            setWorkItemChange({
-                type: 'edit',
-                key: workItemClientId,
-                oldValue: pick(oldItem, Object.keys(changes) as (keyof WorkItem)[]),
-                newValue: changes,
-                timestamp: new Date().getTime(),
-            });
+            setWorkItemChange(
+                {
+                    type: 'edit',
+                    key: workItemClientId,
+                    oldValue: pick(oldItem, Object.keys(changes) as (keyof WorkItem)[]),
+                    newValue: changes,
+                    timestamp: new Date().getTime(),
+                },
+                (entry) => entry.date === selectedDate,
+            );
         },
-        [setWorkItemChange, workItems],
+        [setWorkItemChange, workItems, selectedDate],
     );
 
     const handleNoteUpdateClick = useCallback(
@@ -633,9 +672,6 @@ export function Component() {
 
     const editMode = storedConfig.editingMode ?? defaultConfigValue.editingMode;
 
-    // FIXME: memoize this
-    const filteredWorkItems = workItems.filter((item) => item.date === selectedDate);
-
     return (
         <Page
             documentTitle="Timur - Daily Journal"
@@ -647,13 +683,13 @@ export function Component() {
                     setSelectedDate={setSelectedDate}
                     onShortcutsClick={handleShortcutsButtonClick}
                     onWorkItemCreateFromCalendar={handleWorkItemCreateFromCalendar}
-                    dayWorkItems={filteredWorkItems}
+                    dayWorkItems={workItems}
                     lastEditedAt={lastEditedAt}
                 />
             )}
             endAsideContent={(
                 <EndSidebar
-                    workItems={filteredWorkItems}
+                    workItems={workItems}
                     onWorkItemCreate={handleWorkItemCreate}
                 />
             )}
@@ -699,7 +735,7 @@ export function Component() {
                         <Button
                             name={undefined}
                             title="Undo"
-                            onClick={undo}
+                            onClick={handleWorkItemUndo}
                             variant="tertiary"
                         >
                             <RiArrowGoBackFill />
@@ -709,7 +745,7 @@ export function Component() {
                         <Button
                             name={undefined}
                             title="Redo"
-                            onClick={redo}
+                            onClick={handleWorkItemRedo}
                             variant="tertiary"
                         >
                             <RiArrowGoForwardFill />
@@ -745,7 +781,7 @@ export function Component() {
                     loading={myTimeEntriesResult.fetching}
                     // FIXME: Add a Suspense block
                     // errored={false}
-                    workItems={filteredWorkItems}
+                    workItems={workItems}
                     tasks={tasks}
                     onWorkItemClone={handleWorkItemClone}
                     onWorkItemAssist={handleWorkItemAssist}
