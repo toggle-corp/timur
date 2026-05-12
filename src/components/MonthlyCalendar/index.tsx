@@ -179,55 +179,42 @@ interface Props {
     weekDayNameClassName?: string;
     dateClassName?: string;
     selectedDate: string | undefined;
-    initialYear: number;
-    initialMonth: number;
     onDateClick?: (date: string) => void;
-    onMonthChange?: (year: number, month: number) => void;
-    componentRef?: React.RefObject<{
-        resetView: (year: number, month: number) => void;
-    } | null>;
     lastEditedAt?: number | null;
 }
 
 function MonthlyCalendar(props: Props) {
     const {
-        initialYear,
-        initialMonth,
-        componentRef,
         className,
         onDateClick,
-        onMonthChange,
         weekDayNameClassName,
         dateClassName,
         lastEditedAt,
         selectedDate,
     } = props;
 
-    const [year, setYear] = useState(initialYear);
-    const [month, setMonth] = useState(initialMonth);
+    const { year: yearFromContext, month: monthFromContext } = useContext(DateContext);
+
+    const [year, setYear] = useState(() => (
+        selectedDate ? new Date(selectedDate).getFullYear() : yearFromContext
+    ));
+    const [month, setMonth] = useState(() => (
+        selectedDate ? new Date(selectedDate).getMonth() : monthFromContext
+    ));
 
     const { fullDate } = useContext(DateContext);
 
-    // TODO: view can be reset internally. not need to expose this to parent
-    const resetView = useCallback(
-        (newYear: number, newMonth: number) => {
-            setYear(newYear);
-            setMonth(newMonth);
+    useEffect(
+        () => {
+            if (!selectedDate) {
+                return;
+            }
+            const date = new Date(selectedDate);
+            setYear(date.getFullYear());
+            setMonth(date.getMonth());
         },
-        [],
+        [selectedDate],
     );
-
-    useEffect(() => {
-        if (componentRef) {
-            componentRef.current = {
-                resetView,
-            };
-        }
-    }, [componentRef, resetView]);
-
-    useEffect(() => {
-        onMonthChange?.(year, month);
-    }, [onMonthChange, year, month]);
 
     const handlePrevMonth = useCallback(
         () => {
