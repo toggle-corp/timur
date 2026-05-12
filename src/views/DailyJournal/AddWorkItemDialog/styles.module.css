@@ -29,13 +29,6 @@
                 .display-picture {
                     font-size: var(--font-size-xl);
                 }
-
-                .usage-count {
-                    flex-shrink: 0;
-                    border-radius: var(--border-radius-lg);
-                    background-color: var(--color-tertiary);
-                    padding: 0 var(--spacing-sm);
-                }
             }
         }
     }

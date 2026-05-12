@@ -815,7 +815,6 @@ export function Component() {
             />
             <AddWorkItemDialog
                 dialogOpenTriggerRef={dialogOpenTriggerRef}
-                workItems={filteredWorkItems}
                 onWorkItemCreate={handleWorkItemCreate}
             />
         </Page>
