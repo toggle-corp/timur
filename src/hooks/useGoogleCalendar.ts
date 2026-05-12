@@ -106,6 +106,7 @@ function useGoogleCalendar() {
     const fetchEventsForDateRange = useCallback(async (
         startDate: string,
         endDate: string,
+        options?: { fullDayOnly?: boolean },
     ): Promise<GoogleCalendarEvent[]> => {
         if (!isConnected || !storedToken) return [];
 
@@ -133,11 +134,17 @@ function useGoogleCalendar() {
         }
 
         const data = await response.json() as { items?: GoogleCalendarEvent[] };
-        return data.items ?? [];
+        const items = data.items ?? [];
+        if (options?.fullDayOnly) {
+            return items.filter((event) => !!event.start.date && !event.start.dateTime);
+        }
+        return items;
     }, [isConnected, storedToken, clearToken]);
 
     const fetchEvents = useCallback(
-        (date: string) => fetchEventsForDateRange(date, date),
+        (date: string, options?: { fullDayOnly?: boolean }) => (
+            fetchEventsForDateRange(date, date, options)
+        ),
         [fetchEventsForDateRange],
     );
 

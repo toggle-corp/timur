@@ -1,6 +1,11 @@
 .google-calendar-events {
     display: flex;
     flex-direction: column;
+    transition: opacity var(--duration-transition-medium) ease-in-out 100ms;
+
+    &.loading {
+        opacity: 0.5;
+    }
 
     .schedule {
         display: flex;

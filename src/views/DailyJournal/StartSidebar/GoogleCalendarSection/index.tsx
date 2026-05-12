@@ -1,9 +1,9 @@
 import {
     Fragment,
-    use,
     useCallback,
     useMemo,
 } from 'react';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import {
     _cs,
     decodeDate,
@@ -11,7 +11,7 @@ import {
 } from '@togglecorp/fujs';
 
 import Button from '#components/Button';
-import { type GoogleCalendarEvent } from '#hooks/useGoogleCalendar';
+import useGoogleCalendar from '#hooks/useGoogleCalendar';
 import { type WorkItem } from '#utils/types';
 
 import styles from './styles.module.css';
@@ -124,20 +124,25 @@ function ScheduleRow(props: ScheduleRowProps) {
 
 interface Props {
     date: string;
-    promise: Promise<GoogleCalendarEvent[]>;
     addedDescriptions: Set<string>;
     onWorkItemCreateFromCalendar: (override: Partial<WorkItem>) => void;
+    loading?: boolean;
 }
 
 function GoogleCalendarSection(props: Props) {
     const {
         date,
-        promise,
         addedDescriptions,
         onWorkItemCreateFromCalendar,
+        loading,
     } = props;
 
-    const googleEvents = use(promise);
+    const { fetchEvents } = useGoogleCalendar();
+
+    const { data: googleEvents } = useSuspenseQuery({
+        queryKey: ['googleCalendarEvents', date],
+        queryFn: () => fetchEvents(date, { fullDayOnly: false }),
+    });
 
     const { timedGoogleEvents, latestEndMs } = useMemo(() => {
         const timed = googleEvents.map((event) => {
@@ -216,7 +221,12 @@ function GoogleCalendarSection(props: Props) {
     }
 
     return (
-        <div className={styles.googleCalendarEvents}>
+        <div
+            className={_cs(
+                styles.googleCalendarEvents,
+                loading && styles.loading,
+            )}
+        >
             <div className={styles.schedule}>
                 {leadingGapMinutes > 0 && (
                     <ScheduleGap minutes={leadingGapMinutes} />

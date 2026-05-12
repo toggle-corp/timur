@@ -71,7 +71,12 @@ const MONTHLY_CALENDAR_DATA = gql`
                     dates
                 }
             }
-            allDeadlines {
+            allDeadlines(
+                filters: {
+                    endDate: { lte: $dateLte, gte: $dateGte }
+                    isArchived: { inList: [true, false] }
+                }
+            ) {
                 id
                 displayName
                 endDate
@@ -114,13 +119,10 @@ function heatmapAt(pct: number): string {
 
 function getHeatmapColor(info: DateInfo | undefined): string | undefined {
     const leaveType = info?.leaveType;
-    const totalHours = (info?.totalMinutes ?? 0) / 60;
+    const total = (info?.totalMinutes ?? 0);
+    const target = (info?.targetMinutes ?? 1);
 
-    const fillPct = Math.min(1, totalHours / (
-        leaveType === 'FIRST_HALF' || leaveType === 'SECOND_HALF'
-            ? 7
-            : 3.5
-    ));
+    const fillPct = Math.min(1, total / target);
     const heatmapColor = heatmapAt(fillPct);
 
     if (leaveType === 'FIRST_HALF') {
