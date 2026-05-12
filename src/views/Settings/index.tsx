@@ -8,6 +8,10 @@ import {
     RiDraggable,
 } from 'react-icons/ri';
 import {
+    useLocation,
+    useNavigate,
+} from 'react-router-dom';
+import {
     closestCenter,
     DndContext,
     DragEndEvent,
@@ -387,6 +391,16 @@ export function Component() {
     const [storedConfig, setStoredConfig] = useLocalStorage('timur-config');
     const setConfigFieldValue = useSetFieldValue(setStoredConfig);
 
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const handleBackClick = useCallback((event: React.MouseEvent<HTMLAnchorElement>) => {
+        if (location.key !== 'default') {
+            event.preventDefault();
+            navigate(-1);
+        }
+    }, [location.key, navigate]);
+
     const {
         isAvailable: isGoogleCalendarAvailable,
         isConnected: isGoogleCalendarConnected,
@@ -496,6 +510,7 @@ export function Component() {
                 to="dailyJournal"
                 variant="tertiary"
                 icons={<RiArrowLeftLine />}
+                onClick={handleBackClick}
             >
                 Back to Journal
             </Link>
