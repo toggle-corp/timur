@@ -8,7 +8,6 @@ import {
     useState,
 } from 'react';
 import { RiSearchLine } from 'react-icons/ri';
-import { listToGroupList } from '@togglecorp/fujs';
 
 import Dialog from '#components/Dialog';
 import DisplayPicture from '#components/DisplayPicture';
@@ -16,36 +15,23 @@ import RawButton from '#components/RawButton';
 import TextInput from '#components/TextInput';
 import EnumsContext from '#contexts/enums';
 import { fuzzySearch } from '#utils/common';
-import { WorkItem } from '#utils/types';
 
 import styles from './styles.module.css';
 
 interface Props {
     dialogOpenTriggerRef: React.RefObject<((description?: string) => void) | undefined>;
-    workItems: WorkItem[] | undefined;
     onWorkItemCreate: (taskId: string) => void;
 }
 
 function AddWorkItemDialog(props: Props) {
     const {
         dialogOpenTriggerRef,
-        workItems,
         onWorkItemCreate,
     } = props;
 
     const [showAddWorkItemDialog, setShowAddWorkItemDialog] = useState(false);
     const [searchText, setSearchText] = useState<string | undefined>();
     const titleInputRef = useRef<HTMLInputElement>(null);
-
-    const taskCountMapping = useMemo(
-        () => listToGroupList(
-            workItems,
-            (item) => item.task,
-            undefined,
-            (items) => items.length,
-        ),
-        [workItems],
-    );
 
     const { enums } = useContext(EnumsContext);
 
@@ -162,7 +148,6 @@ function AddWorkItemDialog(props: Props) {
                 {filteredTaskList.map((task) => {
                     const { contract } = task;
                     const { project } = contract;
-                    const count = taskCountMapping?.[task.id] ?? 0;
 
                     return (
                         <RawButton
@@ -192,11 +177,6 @@ function AddWorkItemDialog(props: Props) {
                                 </div>
                                 {task.name}
                             </div>
-                            {count > 0 && (
-                                <div className={styles.usageCount}>
-                                    {count}
-                                </div>
-                            )}
                         </RawButton>
                     );
                 })}
