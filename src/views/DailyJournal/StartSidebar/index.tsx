@@ -11,10 +11,6 @@ import {
 import Button from '#components/Button';
 import Link from '#components/Link';
 import MonthlyCalendar from '#components/MonthlyCalendar';
-import {
-    type JournalLeaveTypeEnum,
-    type JournalWorkFromHomeTypeEnum,
-} from '#generated/types/graphql';
 import useGoogleCalendar from '#hooks/useGoogleCalendar';
 import useLocalStorage from '#hooks/useLocalStorage';
 import { type WorkItem } from '#utils/types';
@@ -30,8 +26,6 @@ interface Props {
     onWorkItemCreateFromCalendar: (override: Partial<WorkItem>) => void;
     onShortcutsClick: () => void;
     dayWorkItems: WorkItem[];
-    leaveType?: JournalLeaveTypeEnum | null;
-    wfhType?: JournalWorkFromHomeTypeEnum | null;
     lastEditedAt: number | null;
 }
 
@@ -42,8 +36,6 @@ function StartSidebar(props: Props) {
         onShortcutsClick,
         onWorkItemCreateFromCalendar,
         dayWorkItems,
-        leaveType,
-        wfhType,
         lastEditedAt,
     } = props;
 
@@ -78,8 +70,6 @@ function StartSidebar(props: Props) {
                     loading={selectedDate !== deferredSelectedDate}
                     selectedDate={deferredSelectedDate}
                     showEvents={showEvents}
-                    leaveType={leaveType}
-                    wfhType={wfhType}
                     googleCalendarEnabled={googleEnabled}
                 />
                 {googleEnabled && (

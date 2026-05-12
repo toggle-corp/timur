@@ -13,7 +13,6 @@ import {
     RiArrowLeftSLine,
     RiArrowRightSLine,
     RiCalendarCheckLine,
-    RiHomeOfficeLine,
     RiStickyNoteAddLine,
 } from 'react-icons/ri';
 import {
@@ -33,7 +32,6 @@ import {
     useQuery,
 } from 'urql';
 
-import AvailabilityIndicator from '#components/AvailabilityIndicator';
 import Button from '#components/Button';
 import Link, { resolvePath } from '#components/Link';
 import Page from '#components/Page';
@@ -69,6 +67,7 @@ import AddWorkItemDialog from './AddWorkItemDialog';
 import AvailabilityDialog from './AvailabilityDialog';
 import DayView from './DayView';
 import EndSidebar from './EndSidebar';
+import MyAvailabilityIndicator from './MyAvailabilityIndicator';
 import ShortcutsDialog from './ShortcutsDialog';
 import StartSidebar from './StartSidebar';
 import UpdateNoteDialog from './UpdateNoteDialog';
@@ -160,12 +159,6 @@ const MY_TIME_ENTRIES_QUERY = gql`
                         }
                     }
                 }
-            }
-            journal(date: $date) {
-                id
-                date
-                leaveType
-                wfhType
             }
         }
     }
@@ -516,7 +509,7 @@ export function Component() {
         [],
     );
 
-    const handleAddEntryClick = useCallback(
+    const handleAddWorkItemCreate = useCallback(
         () => {
             if (dialogOpenTriggerRef.current) {
                 dialogOpenTriggerRef.current(undefined);
@@ -559,7 +552,7 @@ export function Component() {
             if (event.ctrlKey && (event.key === ' ' || event.code === 'Space')) {
                 event.preventDefault();
                 event.stopPropagation();
-                handleAddEntryClick();
+                handleAddWorkItemCreate();
             } else if (event.ctrlKey && event.shiftKey && event.key === 'ArrowLeft') {
                 event.preventDefault();
                 event.stopPropagation();
@@ -582,7 +575,7 @@ export function Component() {
             fullDate,
             selectedDate,
             setSelectedDate,
-            handleAddEntryClick,
+            handleAddWorkItemCreate,
             handleShortcutsButtonClick,
         ],
     );
@@ -643,9 +636,6 @@ export function Component() {
     // FIXME: memoize this
     const filteredWorkItems = workItems.filter((item) => item.date === selectedDate);
 
-    const leaveType = myTimeEntriesResult.data?.private.journal?.leaveType;
-    const wfhType = myTimeEntriesResult.data?.private.journal?.wfhType;
-
     return (
         <Page
             documentTitle="Timur - Daily Journal"
@@ -658,8 +648,6 @@ export function Component() {
                     onShortcutsClick={handleShortcutsButtonClick}
                     onWorkItemCreateFromCalendar={handleWorkItemCreateFromCalendar}
                     dayWorkItems={filteredWorkItems}
-                    leaveType={leaveType}
-                    wfhType={wfhType}
                     lastEditedAt={lastEditedAt}
                 />
             )}
@@ -746,11 +734,7 @@ export function Component() {
                         title="Update availability"
                         variant="tertiary"
                     >
-                        <AvailabilityIndicator
-                            wfhType={wfhType}
-                            leaveType={leaveType}
-                            fallback={<RiHomeOfficeLine />}
-                        />
+                        <MyAvailabilityIndicator date={selectedDate} />
                     </Button>
                 </div>
             </Portal>
@@ -776,7 +760,7 @@ export function Component() {
                     styles.fab,
                     storedConfig.startSidebarShown && styles.startSidebarShown,
                 )}
-                onClick={handleAddEntryClick}
+                onClick={handleAddWorkItemCreate}
                 icons={<RiAddLine />}
                 title="Add entry"
                 variant="primary"
