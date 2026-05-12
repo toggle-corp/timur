@@ -50,6 +50,7 @@ const dateFormatter = new Intl.DateTimeFormat(
 const NOTE = gql`
     query Note($date: Date!) {
         private {
+            id
             journal(date: $date) {
                 id
                 date
