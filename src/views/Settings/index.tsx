@@ -652,23 +652,6 @@ export function Component() {
                     </div>
                     <div className={styles.section}>
                         <h4>
-                            Show Events
-                        </h4>
-                        <Checkbox
-                            name="showEvents"
-                            label="System"
-                            value={storedConfig.showEvents}
-                            onChange={setConfigFieldValue}
-                        />
-                        <Checkbox
-                            name="googleCalendarEnabled"
-                            label="Google Calendar"
-                            value={storedConfig.googleCalendarEnabled}
-                            onChange={setConfigFieldValue}
-                        />
-                    </div>
-                    <div className={styles.section}>
-                        <h4>
                             Google Calendar
                         </h4>
                         {!isGoogleCalendarAvailable && (

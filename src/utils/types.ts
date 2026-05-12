@@ -55,8 +55,6 @@ export type ConfigStorage = {
     collapsedGroups: string[],
     startSidebarShown: boolean,
     endSidebarShown: boolean,
-    showEvents: boolean,
-    googleCalendarEnabled: boolean,
 }
 
 export interface GeneralEventType {
