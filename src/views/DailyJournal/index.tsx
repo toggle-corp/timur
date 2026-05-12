@@ -166,6 +166,12 @@ const MY_TIME_ENTRIES_QUERY = gql`
 
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
+    const navigate = useNavigate();
+
+    const routes = useContext(RouteContext);
+
+    const { midActionsRef } = useContext(NavbarContext);
+
     const { date: dateFromParams } = useParams<{ date: string | undefined}>();
     const { fullDate } = useContext(DateContext);
     const selectedDate = useMemo(() => {
@@ -179,10 +185,6 @@ export function Component() {
         }
         return encodeDate(date);
     }, [dateFromParams, fullDate]);
-
-    const navigate = useNavigate();
-    const routes = useContext(RouteContext);
-    const { midActionsRef } = useContext(NavbarContext);
 
     // State
     const initialWorkItemFilter = useCallback(
@@ -204,9 +206,10 @@ export function Component() {
         redoable,
     } = useContext(CommandContext);
 
-    // NOTE: logical time
+    // NOTE: Used to clear refetch calendar heatmap when the logical time of edit changes
     const [lastEditedAt, setLastEditedAt] = useState<number>(1);
 
+    // NOTE: Update logical time of edit when there is any change
     const interceptedWatch: typeof watch = useCallback(
         (...args) => {
             watch(...args);
@@ -241,6 +244,14 @@ export function Component() {
         register,
         unregister,
     } = useFocusManager();
+
+    const focusContextValue = useMemo(
+        () => ({
+            register,
+            unregister,
+        }),
+        [register, unregister],
+    );
 
     const dialogOpenTriggerRef = useRef<((description: string | undefined) => void) | undefined>(
         undefined);
@@ -621,53 +632,28 @@ export function Component() {
 
     useKeybind(handleKeybindingsPress);
 
-    const handleDateSelection = useCallback(
-        (newDate: string | undefined) => {
-            setSelectedDate(newDate);
-        },
-        [setSelectedDate],
-    );
-
     const handleSwipeLeft = useCallback(
         () => {
-            handleDateSelection(addDays(selectedDate, 1));
+            setSelectedDate(addDays(selectedDate, 1));
         },
-        [selectedDate, handleDateSelection],
+        [selectedDate, setSelectedDate],
     );
 
     const handleSwipeRight = useCallback(
         () => {
-            handleDateSelection(addDays(selectedDate, -1));
+            setSelectedDate(addDays(selectedDate, -1));
         },
-        [selectedDate, handleDateSelection],
+        [selectedDate, setSelectedDate],
     );
 
-    const focusContextValue = useMemo(
-        () => ({
-            register,
-            unregister,
-        }),
-        [register, unregister],
-    );
-
-    const getNextDay = useCallback(() => {
-        const nextDay = addDays(selectedDate, 1);
-
-        if (fullDate === nextDay) {
-            return undefined;
-        }
-
-        return nextDay;
+    const nextDate = useMemo(() => {
+        const newDate = addDays(selectedDate, 1);
+        return fullDate === newDate ? undefined : newDate;
     }, [selectedDate, fullDate]);
 
-    const getPrevDay = useCallback(() => {
-        const prevDay = addDays(selectedDate, -1);
-
-        if (fullDate === prevDay) {
-            return undefined;
-        }
-
-        return prevDay;
+    const prevDate = useMemo(() => {
+        const newDate = addDays(selectedDate, -1);
+        return fullDate === newDate ? undefined : newDate;
     }, [selectedDate, fullDate]);
 
     const editMode = storedConfig.editingMode ?? defaultConfigValue.editingMode;
@@ -700,7 +686,7 @@ export function Component() {
                 <div className={styles.dateNavigation}>
                     <Link
                         to="dailyJournal"
-                        urlParams={{ date: getPrevDay() }}
+                        urlParams={{ date: prevDate }}
                         className={styles.desktopOnly}
                         variant="tertiary"
                         title="Previous day"
@@ -709,7 +695,7 @@ export function Component() {
                     </Link>
                     <Link
                         to="dailyJournal"
-                        urlParams={{ date: getNextDay() }}
+                        urlParams={{ date: nextDate }}
                         className={styles.desktopOnly}
                         variant="tertiary"
                         title="Next day"
