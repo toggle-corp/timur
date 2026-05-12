@@ -1,7 +1,6 @@
 import {
     useCallback,
     useContext,
-    useEffect,
     useLayoutEffect,
     useMemo,
     useRef,
@@ -250,30 +249,12 @@ export function Component() {
         unregister,
     } = useFocusManager();
 
-    // NOTE: We are opening the dialog from this parent component
-    interface CalendarElement {
-        resetView:(year: number, month: number) => void;
-    }
     const dialogOpenTriggerRef = useRef<((description: string | undefined) => void) | undefined>(
         undefined);
     const noteDialogOpenTriggerRef = useRef<(() => void) | undefined>(undefined);
     const shortcutsDialogOpenTriggerRef = useRef<(() => void) | undefined>(undefined);
     const availabilityDialogOpenTriggerRef = useRef<(() => void) | undefined>(undefined);
     const pendingCalendarOverrideRef = useRef<Partial<WorkItem> | undefined>(undefined);
-    const calendarRef = useRef<CalendarElement>(null);
-
-    useEffect(
-        () => {
-            if (calendarRef.current && selectedDate) {
-                const selectedDateObj = new Date(selectedDate);
-                calendarRef.current.resetView(
-                    selectedDateObj.getFullYear(),
-                    selectedDateObj.getMonth(),
-                );
-            }
-        },
-        [selectedDate],
-    );
 
     const [
         myTimeEntriesResult,
@@ -672,7 +653,6 @@ export function Component() {
             contentClassName={styles.content}
             startAsideContent={(
                 <StartSidebar
-                    calendarComponentRef={calendarRef}
                     selectedDate={selectedDate}
                     setSelectedDate={setSelectedDate}
                     onShortcutsClick={handleShortcutsButtonClick}

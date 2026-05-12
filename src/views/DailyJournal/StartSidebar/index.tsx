@@ -1,6 +1,5 @@
 import {
     Suspense,
-    useContext,
     useDeferredValue,
     useMemo,
 } from 'react';
@@ -12,7 +11,6 @@ import {
 import Button from '#components/Button';
 import Link from '#components/Link';
 import MonthlyCalendar from '#components/MonthlyCalendar';
-import DateContext from '#contexts/date';
 import {
     type JournalLeaveTypeEnum,
     type JournalWorkFromHomeTypeEnum,
@@ -30,9 +28,6 @@ interface Props {
     selectedDate: string;
     setSelectedDate: (newDate: string) => void;
     onWorkItemCreateFromCalendar: (override: Partial<WorkItem>) => void;
-    calendarComponentRef?: React.RefObject<{
-        resetView: (year: number, month: number) => void;
-    } | null>;
     onShortcutsClick: () => void;
     dayWorkItems: WorkItem[];
     leaveType?: JournalLeaveTypeEnum | null;
@@ -42,7 +37,6 @@ interface Props {
 
 function StartSidebar(props: Props) {
     const {
-        calendarComponentRef,
         selectedDate,
         setSelectedDate,
         onShortcutsClick,
@@ -54,8 +48,6 @@ function StartSidebar(props: Props) {
     } = props;
 
     const deferredSelectedDate = useDeferredValue(selectedDate);
-
-    const { year, month } = useContext(DateContext);
 
     const [storedConfig] = useLocalStorage('timur-config');
     const { googleCalendarEnabled, showEvents } = storedConfig;
@@ -77,10 +69,7 @@ function StartSidebar(props: Props) {
     return (
         <div className={styles.startSidebar}>
             <MonthlyCalendar
-                componentRef={calendarComponentRef}
                 selectedDate={selectedDate}
-                initialYear={selectedDate ? new Date(selectedDate).getFullYear() : year}
-                initialMonth={selectedDate ? new Date(selectedDate).getMonth() : month}
                 onDateClick={setSelectedDate}
                 lastEditedAt={lastEditedAt}
             />
