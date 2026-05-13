@@ -56,14 +56,12 @@
             }
 
             &.today {
-                color: var(--color-primary);
                 font-weight: var(--font-weight-bold);
             }
 
             &.selected {
                 z-index: 1;
                 animation: date-bounce 0.4s ease-in-out;
-                font-weight: var(--font-weight-bold);
             }
 
             &.selected::before {

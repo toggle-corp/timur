@@ -12,9 +12,13 @@
     --color-primary-text: #9c3c1f;
 
     --color-secondary: #b8c878;
-    --color-secondary-text: #7d8a3d;
+    --color-secondary-text: #667224;
 
     --color-tertiary: #eae2bf;
+
+    --color-success: #7CB342;
+    --color-info: #039BE5;
+    --color-error: red;
 
     --color-background: #f4f1e3;
     --color-foreground: #ffffff;
@@ -26,15 +30,17 @@
     --color-separator: rgba(0, 0, 0, 0.1);
     --color-separator-dark: rgba(0, 0, 0, 0.2);
 
+    --color-backdrop: rgba(0, 0, 0, 0.5);
+
     --color-focus: color-mix(in srgb, var(--color-secondary) 45%, var(--color-background));
 
     --cs-0-fg: #454447;
     --cs-0-bg: #eaeaea;
     --cs-1-fg: #2840a9;
     --cs-1-bg: #dce3fa;
-    --cs-2-fg: #0474a6;
+    --cs-2-fg: #006e9f;
     --cs-2-bg: #c1f0fe;
-    --cs-3-fg: #007a5a;
+    --cs-3-fg: #057758;
     --cs-3-bg: #c3f6e0;
     --cs-4-fg: #c01343;
     --cs-4-bg: #ffd6e4;
@@ -42,7 +48,7 @@
     --cs-5-bg: #e5f5b8;
     --cs-6-fg: #83388a;
     --cs-6-bg: #f4daff;
-    --cs-7-fg: #a86e00;
+    --cs-7-fg: #8d5b01;
     --cs-7-bg: #fde3aa;
     --cs-8-fg: #7d5327;
     --cs-8-bg: #ecdecc;
