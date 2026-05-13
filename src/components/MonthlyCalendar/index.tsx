@@ -47,7 +47,7 @@ const MONTHLY_CALENDAR_DATA = gql`
     query MonthlyCalendarData($dateGte: Date!, $dateLte: Date!) {
         private {
             id
-            hoursPerDay(dateGte: $dateGte, dateLte: $dateLte) {
+            dailySummary(dateGte: $dateGte, dateLte: $dateLte) {
                 id
                 date
                 totalMinutes
@@ -286,7 +286,7 @@ function MonthlyCalendar(props: Props) {
             return fresh;
         };
 
-        calendarDataResult.data?.private.hoursPerDay.forEach((entry) => {
+        calendarDataResult.data?.private.dailySummary.forEach((entry) => {
             const info = ensure(String(entry.date));
             info.totalMinutes = entry.totalMinutes;
             info.targetMinutes = entry.targetMinutes;
