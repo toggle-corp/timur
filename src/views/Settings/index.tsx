@@ -709,6 +709,7 @@ export function Component() {
                                 workItems={sampleWorkItems}
                                 tasks={sampleTasks}
                                 loading={false}
+                                errored={false}
                                 selectedDate={SAMPLE_DATE}
                                 onWorkItemClone={noop}
                                 onWorkItemAssist={noop}
