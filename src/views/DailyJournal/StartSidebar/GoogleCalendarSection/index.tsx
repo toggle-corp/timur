@@ -3,7 +3,6 @@ import {
     useCallback,
     useMemo,
 } from 'react';
-import { useSuspenseQuery } from '@tanstack/react-query';
 import {
     _cs,
     decodeDate,
@@ -11,7 +10,7 @@ import {
 } from '@togglecorp/fujs';
 
 import Button from '#components/Button';
-import useGoogleCalendar from '#hooks/useGoogleCalendar';
+import { type GoogleCalendarEvent } from '#hooks/useGoogleCalendar';
 import { type WorkItem } from '#utils/types';
 
 import styles from './styles.module.css';
@@ -127,6 +126,7 @@ interface Props {
     addedDescriptions: Set<string>;
     onWorkItemCreateFromCalendar: (override: Partial<WorkItem>) => void;
     loading?: boolean;
+    googleEvents: GoogleCalendarEvent[];
 }
 
 function GoogleCalendarSection(props: Props) {
@@ -135,14 +135,8 @@ function GoogleCalendarSection(props: Props) {
         addedDescriptions,
         onWorkItemCreateFromCalendar,
         loading,
+        googleEvents,
     } = props;
-
-    const { fetchEvents } = useGoogleCalendar();
-
-    const { data: googleEvents } = useSuspenseQuery({
-        queryKey: ['googleCalendarEvents', date],
-        queryFn: () => fetchEvents(date, { fullDayOnly: false }),
-    });
 
     const { timedGoogleEvents, latestEndMs } = useMemo(() => {
         const timed = googleEvents.map((event) => {

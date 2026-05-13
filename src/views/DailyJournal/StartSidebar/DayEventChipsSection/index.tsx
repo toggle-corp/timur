@@ -8,65 +8,17 @@ import {
     FcNews,
     FcNightLandscape,
 } from 'react-icons/fc';
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { _cs } from '@togglecorp/fujs';
-import {
-    gql,
-    useQuery,
-} from 'urql';
 
 import Pill from '#components/Pill';
 import {
     type DayEventsAndDeadlinesQuery,
-    type DayEventsAndDeadlinesQueryVariables,
     type JournalLeaveTypeEnum,
     type JournalWorkFromHomeTypeEnum,
 } from '#generated/types/graphql';
-import useGoogleCalendar from '#hooks/useGoogleCalendar';
+import { type GoogleCalendarEvent } from '#hooks/useGoogleCalendar';
 
 import styles from './styles.module.css';
-
-// TODO: events are paginated. use separate api
-const DAY_EVENTS_AND_DEADLINES = gql`
-    query DayEventsAndDeadlines($date: Date!) {
-        private {
-            id
-            events(
-                pagination: { limit: 999 },
-                filters: {
-                    startDate: { lte: $date }
-                    endDate: { gte: $date }
-                    types: [HOLIDAY, RETREAT, MISC]
-                }
-            ) {
-                items {
-                    id
-                    name
-                    type
-                }
-            }
-            allDeadlines(
-                filters: {
-                    endDate: { lte: $date, gte: $date }
-                    isArchived: { inList: [true, false] }
-                }
-            ) {
-                id
-                displayName
-                isExternal
-                endDate
-            }
-            journal(date: $date) {
-                id
-                date
-                leaveType
-                wfhType
-            }
-        }
-    }
-`;
-
-const CONTEXT = { suspense: true } as const;
 
 type Deadline = DayEventsAndDeadlinesQuery['private']['allDeadlines'][number];
 type DayEvent = DayEventsAndDeadlinesQuery['private']['events']['items'][number];
@@ -103,58 +55,23 @@ interface Chip {
     name: string;
 }
 
-interface GoogleAllDayChipsProps {
-    date: string;
-}
-
-function GoogleAllDayChips(props: GoogleAllDayChipsProps) {
-    const { date } = props;
-    const { fetchEvents } = useGoogleCalendar();
-
-    const { data: googleEvents } = useSuspenseQuery({
-        queryKey: ['googleCalendarEvents', date],
-        queryFn: () => fetchEvents(date, { fullDayOnly: true }),
-    });
-
-    return (
-        <>
-            {googleEvents
-                .filter((event) => !event.start.dateTime)
-                .map((event) => (
-                    <Pill
-                        key={`gcal-${event.id}`}
-                        icon={<FcCalendar />}
-                    >
-                        {event.summary ?? '(No title)'}
-                    </Pill>
-                ))}
-        </>
-    );
-}
-
 interface Props {
     selectedDate: string;
     loading?: boolean;
+    dayData: DayEventsAndDeadlinesQuery | undefined;
+    googleEvents: GoogleCalendarEvent[];
 }
 
 function DayEventChipsSection(props: Props) {
     const {
         selectedDate,
         loading,
+        dayData,
+        googleEvents,
     } = props;
 
-    const [dayDataResult] = useQuery<
-        DayEventsAndDeadlinesQuery,
-        DayEventsAndDeadlinesQueryVariables
-    >({
-        query: DAY_EVENTS_AND_DEADLINES,
-        variables: { date: selectedDate },
-        requestPolicy: 'cache-and-network',
-        context: CONTEXT,
-    });
-
-    const leaveType = dayDataResult.data?.private.journal?.leaveType;
-    const wfhType = dayDataResult.data?.private.journal?.wfhType;
+    const leaveType = dayData?.private.journal?.leaveType;
+    const wfhType = dayData?.private.journal?.wfhType;
 
     const dayEventChips = useMemo<Chip[]>(() => {
         const eventIcons = {
@@ -179,7 +96,7 @@ function DayEventChipsSection(props: Props) {
             }]
             : [];
 
-        const allDeadlines: Deadline[] = dayDataResult.data?.private.allDeadlines ?? [];
+        const allDeadlines: Deadline[] = dayData?.private.allDeadlines ?? [];
         const deadlineChips: Chip[] = allDeadlines
             .filter((deadline) => deadline.endDate === selectedDate)
             .map((deadline) => ({
@@ -188,19 +105,34 @@ function DayEventChipsSection(props: Props) {
                 name: deadline.displayName,
             }));
 
-        const events: DayEvent[] = dayDataResult.data?.private.events.items ?? [];
+        const events: DayEvent[] = dayData?.private.events.items ?? [];
         const eventChips: Chip[] = events.map((event) => ({
             key: `event-${event.id}`,
             icon: eventIcons[event.type as keyof typeof eventIcons],
             name: event.name,
         }));
 
-        return [...leaveChips, ...wfhChips, ...deadlineChips, ...eventChips];
+        const allDayGoogleChips: Chip[] = googleEvents
+            .filter((event) => !event.start.dateTime)
+            .map((event) => ({
+                key: `gcal-${event.id}`,
+                icon: <FcCalendar />,
+                name: event.summary ?? '(No title)',
+            }));
+
+        return [
+            ...leaveChips,
+            ...wfhChips,
+            ...deadlineChips,
+            ...eventChips,
+            ...allDayGoogleChips,
+        ];
     }, [
-        dayDataResult.data,
+        dayData,
         selectedDate,
         leaveType,
         wfhType,
+        googleEvents,
     ]);
 
     return (
@@ -218,7 +150,6 @@ function DayEventChipsSection(props: Props) {
                     {item.name}
                 </Pill>
             ))}
-            <GoogleAllDayChips date={selectedDate} />
         </div>
     );
 }
