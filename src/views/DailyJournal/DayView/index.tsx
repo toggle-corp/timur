@@ -56,6 +56,7 @@ interface Props {
     workItems: WorkItem[] | undefined;
     tasks: Task[] | undefined;
     loading: boolean;
+    errored: boolean;
     onWorkItemClone: (clientId: string, override?: Partial<WorkItem>) => void;
     onWorkItemAssist: (clientId: string) => void;
     onWorkItemChange: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
@@ -72,6 +73,7 @@ function DayView(props: Props) {
         onWorkItemChange,
         onWorkItemDelete,
         loading,
+        errored,
         selectedDate,
         tasks,
     } = props;
@@ -254,14 +256,16 @@ function DayView(props: Props) {
             </header>
             <DefaultMessage
                 filtered={false}
-                pending={false}
-                errored={false}
+                pending={groupedItems.length === 0 && loading}
+                errored={errored}
                 empty={groupedItems.length === 0}
                 emptyMessage="No entries found!"
+                pendingMessage="Looking for your entries..."
+                errorMessage="Can't find your entries"
             />
             <div
                 className={_cs(
-                    loading && styles.loading,
+                    groupedItems.length > 0 && loading && styles.loading,
                     styles.newGroup,
                 )}
             >
