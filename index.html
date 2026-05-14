@@ -5,7 +5,8 @@
 >
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <!-- NOTE: interactive-widget=resizes-visual keeps the layout viewport stable when the virtual keyboard opens so position:fixed/sticky bottom UI doesn't get pushed up into view. viewport-fit=cover lets the page paint under the device safe areas (notch, home indicator); pair with env(safe-area-inset-*) on edge-aligned elements. -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-visual, viewport-fit=cover" />
         <meta name="description" content="Timur - Phase Zero" />
         <!-- Vite is configured to automatically inject favicon and other images -->
         <title>

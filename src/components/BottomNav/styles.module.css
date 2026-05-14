@@ -8,7 +8,8 @@
         justify-content: space-around;
         border-top: var(--width-separator-sm) solid var(--color-separator);
         background-color: var(--color-foreground);
-        min-height: 3.5rem;
+        padding-bottom: env(safe-area-inset-bottom);
+        min-height: var(--height-bottom-nav);
     }
 
     .nav-item {
