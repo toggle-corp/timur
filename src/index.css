@@ -204,12 +204,25 @@ body {
     font-weight: var(--font-weight-normal);
     font-style: normal;
     font-optical-sizing: auto;
+    -webkit-tap-highlight-color: transparent;
 
     @media screen {
         margin: 0;
         background-color: var(--color-background);
         padding: 0;
     }
+}
+
+/* NOTE: touch-action: Enable panning and pinch zoom gestures, but disable
+ * additional non-standard gestures such as double-tap to zoom */
+button,
+a,
+[role="button"],
+input,
+select,
+textarea,
+label {
+    touch-action: manipulation;
 }
 
 ul, ol, p {
