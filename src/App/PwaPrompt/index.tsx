@@ -1,4 +1,7 @@
-import { useCallback } from 'react';
+import {
+    useCallback,
+    useEffect,
+} from 'react';
 import { pwaInfo } from 'virtual:pwa-info';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
@@ -38,6 +41,22 @@ function PwaPrompt() {
             console.error('SW registration error', error);
         },
     });
+
+    // NOTE: without persistent storage browsers can clear localStorage
+    useEffect(() => {
+        if (!navigator.storage?.persist) {
+            return;
+        }
+        navigator.storage.persist()
+            .then((granted) => {
+                // eslint-disable-next-line no-console
+                console.info(`Persistent storage ${granted ? 'granted' : 'not granted'}`);
+            })
+            .catch((error) => {
+                // eslint-disable-next-line no-console
+                console.error('Persistent storage request failed', error);
+            });
+    }, []);
 
     const reload = useCallback(
         () => {
