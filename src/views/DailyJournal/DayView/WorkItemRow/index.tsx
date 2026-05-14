@@ -27,7 +27,6 @@ import DurationInput from '#components/DurationInput';
 import MonthlyCalendar from '#components/MonthlyCalendar';
 import SelectInput from '#components/SelectInput';
 import TextArea from '#components/TextArea';
-import DateContext from '#contexts/date';
 import EnumsContext from '#contexts/enums';
 import SizeContext from '#contexts/size';
 import { EnumsQuery } from '#generated/types/graphql';
@@ -223,13 +222,17 @@ function WorkItemRow(props: Props) {
 
     const handleShortcuts = useCallback(
         (event: KeyboardEvent<HTMLTextAreaElement>) => {
-            if (event.ctrlKey && event.key === 'Enter' && onAssist) {
+            if (event.ctrlKey && event.shiftKey && event.key === 'Enter' && onClone) {
+                event.preventDefault();
+                event.stopPropagation();
+                onClone(workItem.clientId);
+            } else if (event.ctrlKey && event.key === 'Enter' && onAssist) {
                 event.preventDefault();
                 event.stopPropagation();
                 onAssist(workItem.clientId);
             }
         },
-        [onAssist, workItem.clientId],
+        [onAssist, onClone, workItem.clientId],
     );
 
     const checkboxForStatus = config.checkboxForStatus || screen === 'mobile';
@@ -407,8 +410,6 @@ function WorkItemRow(props: Props) {
         </div>
     );
 
-    const { year, month } = useContext(DateContext);
-
     return (
         <>
             <div
@@ -457,8 +458,6 @@ function WorkItemRow(props: Props) {
             >
                 <MonthlyCalendar
                     selectedDate={workItem.date}
-                    initialYear={workItem.date ? new Date(workItem.date).getFullYear() : year}
-                    initialMonth={workItem.date ? new Date(workItem.date).getMonth() : month}
                     onDateClick={handleMoveOrCopyEntry}
                 />
             </Dialog>

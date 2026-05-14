@@ -89,7 +89,7 @@ function AuthProvider(props: BaseProps) {
 
     // NOTE: We should block page for authentication before we mount routes
     if (!ready) {
-        // TODO: Handle error with authentication
+        // FIXME: Handle error with authentication
         return fallbackElement;
     }
 

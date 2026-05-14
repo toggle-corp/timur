@@ -18,10 +18,11 @@ function getFormattedDaysRemaining(numDays: number) {
 
 interface Props {
     generalEvent: GeneralEventType;
+    hideDaysRemaining?: boolean;
 }
 
 function GeneralEvent(props: Props) {
-    const { generalEvent } = props;
+    const { generalEvent, hideDaysRemaining } = props;
 
     return (
         <div
@@ -33,9 +34,11 @@ function GeneralEvent(props: Props) {
             <div className={styles.icon}>
                 {generalEvent.icon}
             </div>
-            <div className={styles.days}>
-                {getFormattedDaysRemaining(generalEvent.remainingDays)}
-            </div>
+            {!hideDaysRemaining && (
+                <div className={styles.days}>
+                    {getFormattedDaysRemaining(generalEvent.remainingDays)}
+                </div>
+            )}
             <div className={styles.name}>
                 {generalEvent.name}
             </div>

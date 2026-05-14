@@ -1,0 +1,11 @@
+.day-events {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: var(--spacing-2xs);
+    transition: opacity var(--duration-transition-medium) ease-in-out 100ms;
+
+    &.loading {
+        opacity: 0.5;
+    }
+}

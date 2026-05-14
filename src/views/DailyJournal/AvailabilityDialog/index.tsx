@@ -56,6 +56,7 @@ const dateFormatter = new Intl.DateTimeFormat(
 const AVAILABILITY = gql`
     query Availability($date: Date!) {
         private {
+            id
             journal(date: $date) {
                 id
                 date
@@ -86,7 +87,7 @@ const UPDATE_JOURNAL = gql`
 `;
 
 interface Props {
-    dialogOpenTriggerRef: React.MutableRefObject<(() => void) | undefined>;
+    dialogOpenTriggerRef: React.RefObject<(() => void) | undefined>;
     date: string;
 }
 

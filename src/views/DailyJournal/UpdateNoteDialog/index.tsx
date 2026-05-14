@@ -50,6 +50,7 @@ const dateFormatter = new Intl.DateTimeFormat(
 const NOTE = gql`
     query Note($date: Date!) {
         private {
+            id
             journal(date: $date) {
                 id
                 date
@@ -77,7 +78,7 @@ const UPDATE_NOTE = gql`
 `;
 
 interface Props {
-    dialogOpenTriggerRef: React.MutableRefObject<(() => void) | undefined>;
+    dialogOpenTriggerRef: React.RefObject<(() => void) | undefined>;
     editingMode: EditingMode,
     date: string,
 }

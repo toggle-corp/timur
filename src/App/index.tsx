@@ -3,6 +3,10 @@ import {
     RouterProvider,
 } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
+import {
+    QueryClient,
+    QueryClientProvider,
+} from '@tanstack/react-query';
 import { cacheExchange } from '@urql/exchange-graphcache';
 import {
     Client as UrqlClient,
@@ -33,6 +37,7 @@ const gqlClient = new UrqlClient({
             PublicQuery: () => null,
             AppEnumCollection: () => null,
             DailyStandUpType: () => null,
+            DailyHoursType: () => null,
             AppEnumCollectionTimeEntryType: (item) => String(item.key),
             AppEnumCollectionTimeEntryStatus: (item) => String(item.key),
             AppEnumCollectionJournalLeaveType: (item) => String(item.key),
@@ -44,6 +49,15 @@ const gqlClient = new UrqlClient({
         credentials: 'include',
     }),
     requestPolicy: 'network-only',
+});
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: 5 * 60 * 1000,
+            gcTime: 30 * 60 * 1000,
+        },
+    },
 });
 
 const sentryCreateBrowserRouter = Sentry.wrapCreateBrowserRouter(
@@ -67,26 +81,28 @@ function App() {
         <>
             <PwaPrompt />
             <UrqlProvider value={gqlClient}>
-                <AuthProvider>
-                    <DateProvider>
-                        <NavbarProvider>
-                            <SizeProvider>
-                                <LocalStorageProvider>
-                                    <EnumsProvider>
-                                        <CommandProvider>
-                                            <RouteContext.Provider value={wrappedRoutes}>
-                                                <RouterProvider
-                                                    router={router}
-                                                    fallbackElement={fallbackElement}
-                                                />
-                                            </RouteContext.Provider>
-                                        </CommandProvider>
-                                    </EnumsProvider>
-                                </LocalStorageProvider>
-                            </SizeProvider>
-                        </NavbarProvider>
-                    </DateProvider>
-                </AuthProvider>
+                <QueryClientProvider client={queryClient}>
+                    <AuthProvider>
+                        <DateProvider>
+                            <NavbarProvider>
+                                <SizeProvider>
+                                    <LocalStorageProvider>
+                                        <EnumsProvider>
+                                            <CommandProvider>
+                                                <RouteContext.Provider value={wrappedRoutes}>
+                                                    <RouterProvider
+                                                        router={router}
+                                                        fallbackElement={fallbackElement}
+                                                    />
+                                                </RouteContext.Provider>
+                                            </CommandProvider>
+                                        </EnumsProvider>
+                                    </LocalStorageProvider>
+                                </SizeProvider>
+                            </NavbarProvider>
+                        </DateProvider>
+                    </AuthProvider>
+                </QueryClientProvider>
             </UrqlProvider>
         </>
     );
