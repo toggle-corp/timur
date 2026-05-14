@@ -9,7 +9,7 @@ import Dialog from '#components/Dialog';
 import styles from './styles.module.css';
 
 interface Props {
-    dialogOpenTriggerRef: React.MutableRefObject<(() => void) | undefined>;
+    dialogOpenTriggerRef: React.RefObject<(() => void) | undefined>;
 }
 
 function ShortcutsDialog(props: Props) {
@@ -45,6 +45,20 @@ function ShortcutsDialog(props: Props) {
                 <code>Ctrl+Space</code>
                 {' '}
                 to add a new entry.
+            </div>
+            <div>
+                Hit
+                {' '}
+                <code>Ctrl+Enter</code>
+                {' '}
+                to assist on the focused entry.
+            </div>
+            <div>
+                Hit
+                {' '}
+                <code>Ctrl+Shift+Enter</code>
+                {' '}
+                to clone the focused entry.
             </div>
             <div>
                 Hit

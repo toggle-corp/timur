@@ -1,7 +1,6 @@
 import {
     useCallback,
     useContext,
-    useEffect,
     useLayoutEffect,
     useMemo,
     useRef,
@@ -13,7 +12,7 @@ import {
     RiArrowGoForwardFill,
     RiArrowLeftSLine,
     RiArrowRightSLine,
-    RiHomeOfficeLine,
+    RiCalendarCheckLine,
     RiStickyNoteAddLine,
 } from 'react-icons/ri';
 import {
@@ -33,7 +32,6 @@ import {
     useQuery,
 } from 'urql';
 
-import AvailabilityIndicator from '#components/AvailabilityIndicator';
 import Button from '#components/Button';
 import Link, { resolvePath } from '#components/Link';
 import Page from '#components/Page';
@@ -69,6 +67,7 @@ import AddWorkItemDialog from './AddWorkItemDialog';
 import AvailabilityDialog from './AvailabilityDialog';
 import DayView from './DayView';
 import EndSidebar from './EndSidebar';
+import MyAvailabilityIndicator from './MyAvailabilityIndicator';
 import ShortcutsDialog from './ShortcutsDialog';
 import StartSidebar from './StartSidebar';
 import UpdateNoteDialog from './UpdateNoteDialog';
@@ -76,23 +75,50 @@ import UpdateNoteDialog from './UpdateNoteDialog';
 import styles from './styles.module.css';
 
 function inferTypeFromDescription(desc: string): TimeEntryTypeEnum | undefined {
-    const sanitizedDesc = desc.toLowerCase();
-    if (sanitizedDesc.includes('meeting') || sanitizedDesc.includes('standup') || sanitizedDesc.includes('all hands') || sanitizedDesc.includes('catchup')) {
+    const lower = desc.toLowerCase();
+    const matches = (pattern: RegExp) => pattern.test(lower);
+
+    if (matches(/\b(client meeting|client call|external meeting)\b/)) {
+        return 'EXTERNAL_MEETING';
+    }
+
+    if (
+        matches(/\b(meeting|standup|stand-up|all hands|all-hands)\b/)
+        || matches(/\b1:1\b/)
+    ) {
         return 'INTERNAL_MEETING';
     }
-    if (sanitizedDesc.includes('discuss')) {
+    if (matches(/\b(client discussion|external discussion)\b/)) {
+        return 'EXTERNAL_DISCUSSION';
+    }
+    if (matches(/\b(discuss|discussion|brainstorm)\b/)) {
         return 'INTERNAL_DISCUSSION';
     }
-    if (sanitizedDesc.includes('deploy')) {
+    if (matches(/\b(review|pull request|merge request)\b/)) {
+        return 'REVIEW';
+    }
+    if (matches(/\b(deploy|deployment|pipeline|ci|cd|infra|release)\b/)) {
         return 'DEV_OPS';
     }
-    if (sanitizedDesc.includes('research') || sanitizedDesc.includes('study')) {
+    if (matches(/\b(test|tests|testing|qa|qc|regression)\b/)) {
+        return 'TESTING';
+    }
+    if (matches(/\b(design|wireframe|mockup|ux|ui)\b/)) {
+        return 'DESIGN';
+    }
+    if (matches(/\b(research|study|investigate|spike|explore)\b/)) {
         return 'RESEARCH';
     }
-    if (sanitizedDesc.includes('documentation')) {
+    if (matches(/\b(documentation|docs|readme|wiki|document)\b/)) {
         return 'DOCUMENTATION';
     }
-    if (sanitizedDesc.includes('review pr') || sanitizedDesc.includes('refactor') || sanitizedDesc.includes('fix') || sanitizedDesc.includes('debug')) {
+    if (matches(/\b(planning|project board|plan|roadmap|backlog|estimate|estimation)\b/)) {
+        return 'PROJECT_MANAGEMENT';
+    }
+    if (matches(/\b(annotation|annotate|labelling|labeling|label)\b/)) {
+        return 'ANNOTATION';
+    }
+    if (matches(/\b(refactor|fix|fixing|fixed|fixes|bugfix|hotfix|debug|implement|implementation|feature)\b/)) {
         return 'DEVELOPMENT';
     }
     return undefined;
@@ -122,6 +148,7 @@ const MY_TIME_ENTRIES_QUERY = gql`
                         project {
                             id
                             name
+                            shortName
                             logo {
                                 url
                             }
@@ -133,18 +160,18 @@ const MY_TIME_ENTRIES_QUERY = gql`
                     }
                 }
             }
-            journal(date: $date) {
-                id
-                date
-                leaveType
-                wfhType
-            }
         }
     }
 `;
 
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
+    const navigate = useNavigate();
+
+    const routes = useContext(RouteContext);
+
+    const { midActionsRef } = useContext(NavbarContext);
+
     const { date: dateFromParams } = useParams<{ date: string | undefined}>();
     const { fullDate } = useContext(DateContext);
     const selectedDate = useMemo(() => {
@@ -159,16 +186,12 @@ export function Component() {
         return encodeDate(date);
     }, [dateFromParams, fullDate]);
 
-    const navigate = useNavigate();
-    const routes = useContext(RouteContext);
-    const { midActionsRef } = useContext(NavbarContext);
-
     // State
-    const filter = useCallback(
+    const initialWorkItemFilter = useCallback(
         (entry: WorkItem) => entry.date === selectedDate,
         [selectedDate],
     );
-    const keySelector = useCallback(
+    const workItemKeySelector = useCallback(
         (entry: WorkItem) => entry.clientId,
         [],
     );
@@ -183,6 +206,18 @@ export function Component() {
         redoable,
     } = useContext(CommandContext);
 
+    // NOTE: Used to clear refetch calendar heatmap when the logical time of edit changes
+    const [lastEditedAt, setLastEditedAt] = useState<number>(1);
+
+    // NOTE: Update logical time of edit when there is any change
+    const interceptedWatch: typeof watch = useCallback(
+        (...args) => {
+            watch(...args);
+            setLastEditedAt((val) => val + 1);
+        },
+        [watch],
+    );
+
     const {
         entries: workItems,
         setEntries: setWorkItems,
@@ -192,9 +227,9 @@ export function Component() {
     } = useCommand({
         defaultEntries: [],
         commands,
-        filter,
-        keySelector,
-        watch,
+        initialFilter: initialWorkItemFilter,
+        keySelector: workItemKeySelector,
+        watch: interceptedWatch,
         zeitgeist,
         setZeitgeist,
         setCommands,
@@ -210,28 +245,20 @@ export function Component() {
         unregister,
     } = useFocusManager();
 
-    // NOTE: We are opening the dialog from this parent component
-    interface CalendarElement {
-        resetView:(year: number, month: number) => void;
-    }
-    const dialogOpenTriggerRef = useRef<(() => void) | undefined>(undefined);
+    const focusContextValue = useMemo(
+        () => ({
+            register,
+            unregister,
+        }),
+        [register, unregister],
+    );
+
+    const dialogOpenTriggerRef = useRef<((description: string | undefined) => void) | undefined>(
+        undefined);
     const noteDialogOpenTriggerRef = useRef<(() => void) | undefined>(undefined);
     const shortcutsDialogOpenTriggerRef = useRef<(() => void) | undefined>(undefined);
     const availabilityDialogOpenTriggerRef = useRef<(() => void) | undefined>(undefined);
-    const calendarRef = useRef<CalendarElement>(null);
-
-    useEffect(
-        () => {
-            if (calendarRef.current && selectedDate) {
-                const selectedDateObj = new Date(selectedDate);
-                calendarRef.current.resetView(
-                    selectedDateObj.getFullYear(),
-                    selectedDateObj.getMonth(),
-                );
-            }
-        },
-        [selectedDate],
-    );
+    const pendingCalendarOverrideRef = useRef<Partial<WorkItem> | undefined>(undefined);
 
     const [
         myTimeEntriesResult,
@@ -253,7 +280,10 @@ export function Component() {
                 return;
             }
             if (myTimeEntriesResult.error) {
-                setWorkItems([]);
+                setWorkItems(
+                    [],
+                    (entry) => entry.date === selectedDate,
+                );
                 return;
             }
 
@@ -277,18 +307,25 @@ export function Component() {
             );
 
             setTasks(tasksFromServer);
-            setWorkItems(workItemsFromServer);
+            setWorkItems(
+                workItemsFromServer,
+                (entry) => entry.date === selectedDate,
+            );
         },
         [
             myTimeEntriesResult.fetching,
             myTimeEntriesResult.data,
             myTimeEntriesResult.error,
             setWorkItems,
+            selectedDate,
         ],
     );
 
     const handleWorkItemCreate = useCallback(
         (taskId: string) => {
+            const override = pendingCalendarOverrideRef.current;
+            pendingCalendarOverrideRef.current = undefined;
+
             const newId = getNewId();
             const newItem: WorkItem = {
                 clientId: newId,
@@ -296,14 +333,18 @@ export function Component() {
                 type: storedConfig.defaultTaskType,
                 status: storedConfig.defaultTaskStatus,
                 date: selectedDate,
+                ...override,
             };
 
-            setWorkItemChange({
-                type: 'add',
-                key: newItem.clientId,
-                newValue: newItem,
-                timestamp: new Date().getTime(),
-            });
+            setWorkItemChange(
+                {
+                    type: 'add',
+                    key: newItem.clientId,
+                    newValue: newItem,
+                    timestamp: new Date().getTime(),
+                },
+                (entry) => entry.date === selectedDate,
+            );
 
             focus(String(newId));
         },
@@ -314,6 +355,21 @@ export function Component() {
             setWorkItemChange,
             focus,
         ],
+    );
+
+    const handleWorkItemCreateFromCalendar = useCallback(
+        (override: Partial<WorkItem>) => {
+            pendingCalendarOverrideRef.current = {
+                ...override,
+                type: override.description
+                    ? inferTypeFromDescription(override.description)
+                    : undefined,
+            };
+            if (dialogOpenTriggerRef.current) {
+                dialogOpenTriggerRef.current(override.description ?? undefined);
+            }
+        },
+        [],
     );
 
     const handleWorkItemClone = useCallback(
@@ -339,16 +395,19 @@ export function Component() {
                 delete newItem.duration;
             }
 
-            setWorkItemChange({
-                type: 'add',
-                key: newItem.clientId,
-                newValue: newItem,
-                timestamp: new Date().getTime(),
-            });
+            setWorkItemChange(
+                {
+                    type: 'add',
+                    key: newItem.clientId,
+                    newValue: newItem,
+                    timestamp: new Date().getTime(),
+                },
+                (entry) => entry.date === selectedDate,
+            );
 
             focus(String(newId));
         },
-        [workItems, setWorkItemChange, focus],
+        [workItems, setWorkItemChange, selectedDate, focus],
     );
 
     const handleWorkItemAssist = useCallback(
@@ -384,30 +443,36 @@ export function Component() {
                 delete targetItem.id;
                 delete targetItem.duration;
 
-                setWorkItemChange({
-                    type: 'add',
-                    key: targetItem.clientId,
-                    newValue: targetItem,
-                    timestamp: now,
-                });
+                setWorkItemChange(
+                    {
+                        type: 'add',
+                        key: targetItem.clientId,
+                        newValue: targetItem,
+                        timestamp: now,
+                    },
+                    (entry) => entry.date === selectedDate,
+                );
             });
 
-            setWorkItemChange({
-                type: 'edit',
-                key: sourceItem.clientId,
-                oldValue: {
-                    description: sourceItem.description,
-                    type: sourceItem.type,
+            setWorkItemChange(
+                {
+                    type: 'edit',
+                    key: sourceItem.clientId,
+                    oldValue: {
+                        description: sourceItem.description,
+                        type: sourceItem.type,
+                    },
+                    newValue: {
+                        description: firstDescription,
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        type: inferTypeFromDescription(firstDescription!) ?? sourceItem.type,
+                    },
+                    timestamp: now,
                 },
-                newValue: {
-                    description: firstDescription,
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    type: inferTypeFromDescription(firstDescription!) ?? sourceItem.type,
-                },
-                timestamp: now,
-            });
+                (entry) => entry.date === selectedDate,
+            );
         },
-        [workItems, setWorkItemChange],
+        [workItems, setWorkItemChange, selectedDate],
     );
 
     const handleWorkItemDelete = useCallback(
@@ -418,14 +483,31 @@ export function Component() {
                 console.error(`Could not find item ${workItemClientId} while deleting`);
                 return;
             }
-            setWorkItemChange({
-                type: 'delete',
-                key: workItemClientId,
-                oldValue: oldItem,
-                timestamp: new Date().getTime(),
-            });
+            setWorkItemChange(
+                {
+                    type: 'delete',
+                    key: workItemClientId,
+                    oldValue: oldItem,
+                    timestamp: new Date().getTime(),
+                },
+                (entry) => entry.date === selectedDate,
+            );
         },
-        [setWorkItemChange, workItems],
+        [setWorkItemChange, workItems, selectedDate],
+    );
+
+    const handleWorkItemUndo = useCallback(
+        () => {
+            undo((entry) => entry.date === selectedDate);
+        },
+        [undo, selectedDate],
+    );
+
+    const handleWorkItemRedo = useCallback(
+        () => {
+            redo((entry) => entry.date === selectedDate);
+        },
+        [redo, selectedDate],
     );
 
     const handleWorkItemChange = useCallback(
@@ -454,15 +536,18 @@ export function Component() {
                 changes.status = 'DOING';
             }
 
-            setWorkItemChange({
-                type: 'edit',
-                key: workItemClientId,
-                oldValue: pick(oldItem, Object.keys(changes) as (keyof WorkItem)[]),
-                newValue: changes,
-                timestamp: new Date().getTime(),
-            });
+            setWorkItemChange(
+                {
+                    type: 'edit',
+                    key: workItemClientId,
+                    oldValue: pick(oldItem, Object.keys(changes) as (keyof WorkItem)[]),
+                    newValue: changes,
+                    timestamp: new Date().getTime(),
+                },
+                (entry) => entry.date === selectedDate,
+            );
         },
-        [setWorkItemChange, workItems],
+        [setWorkItemChange, workItems, selectedDate],
     );
 
     const handleNoteUpdateClick = useCallback(
@@ -474,10 +559,10 @@ export function Component() {
         [],
     );
 
-    const handleAddEntryClick = useCallback(
+    const handleAddWorkItemCreate = useCallback(
         () => {
             if (dialogOpenTriggerRef.current) {
-                dialogOpenTriggerRef.current();
+                dialogOpenTriggerRef.current(undefined);
             }
         },
         [],
@@ -517,7 +602,7 @@ export function Component() {
             if (event.ctrlKey && (event.key === ' ' || event.code === 'Space')) {
                 event.preventDefault();
                 event.stopPropagation();
-                handleAddEntryClick();
+                handleAddWorkItemCreate();
             } else if (event.ctrlKey && event.shiftKey && event.key === 'ArrowLeft') {
                 event.preventDefault();
                 event.stopPropagation();
@@ -540,87 +625,57 @@ export function Component() {
             fullDate,
             selectedDate,
             setSelectedDate,
-            handleAddEntryClick,
+            handleAddWorkItemCreate,
             handleShortcutsButtonClick,
         ],
     );
 
     useKeybind(handleKeybindingsPress);
 
-    const handleDateSelection = useCallback(
-        (newDate: string | undefined) => {
-            setSelectedDate(newDate);
-        },
-        [setSelectedDate],
-    );
-
     const handleSwipeLeft = useCallback(
         () => {
-            handleDateSelection(addDays(selectedDate, 1));
+            setSelectedDate(addDays(selectedDate, 1));
         },
-        [selectedDate, handleDateSelection],
+        [selectedDate, setSelectedDate],
     );
 
     const handleSwipeRight = useCallback(
         () => {
-            handleDateSelection(addDays(selectedDate, -1));
+            setSelectedDate(addDays(selectedDate, -1));
         },
-        [selectedDate, handleDateSelection],
+        [selectedDate, setSelectedDate],
     );
 
-    const focusContextValue = useMemo(
-        () => ({
-            register,
-            unregister,
-        }),
-        [register, unregister],
-    );
-
-    const getNextDay = useCallback(() => {
-        const nextDay = addDays(selectedDate, 1);
-
-        if (fullDate === nextDay) {
-            return undefined;
-        }
-
-        return nextDay;
+    const nextDate = useMemo(() => {
+        const newDate = addDays(selectedDate, 1);
+        return fullDate === newDate ? undefined : newDate;
     }, [selectedDate, fullDate]);
 
-    const getPrevDay = useCallback(() => {
-        const prevDay = addDays(selectedDate, -1);
-
-        if (fullDate === prevDay) {
-            return undefined;
-        }
-
-        return prevDay;
+    const prevDate = useMemo(() => {
+        const newDate = addDays(selectedDate, -1);
+        return fullDate === newDate ? undefined : newDate;
     }, [selectedDate, fullDate]);
 
     const editMode = storedConfig.editingMode ?? defaultConfigValue.editingMode;
-
-    // FIXME: memoize this
-    const filteredWorkItems = workItems.filter((item) => item.date === selectedDate);
-
-    const leaveType = myTimeEntriesResult.data?.private.journal?.leaveType;
-    const wfhType = myTimeEntriesResult.data?.private.journal?.wfhType;
 
     return (
         <Page
             documentTitle="Timur - Daily Journal"
             className={styles.dailyJournal}
             contentClassName={styles.content}
-            startAsideContainerClassName={styles.startAside}
             startAsideContent={(
                 <StartSidebar
-                    calendarComponentRef={calendarRef}
                     selectedDate={selectedDate}
                     setSelectedDate={setSelectedDate}
                     onShortcutsClick={handleShortcutsButtonClick}
+                    onWorkItemCreateFromCalendar={handleWorkItemCreateFromCalendar}
+                    dayWorkItems={workItems}
+                    lastEditedAt={lastEditedAt}
                 />
             )}
             endAsideContent={(
                 <EndSidebar
-                    workItems={filteredWorkItems}
+                    workItems={workItems}
                     onWorkItemCreate={handleWorkItemCreate}
                 />
             )}
@@ -631,7 +686,7 @@ export function Component() {
                 <div className={styles.dateNavigation}>
                     <Link
                         to="dailyJournal"
-                        urlParams={{ date: getPrevDay() }}
+                        urlParams={{ date: prevDate }}
                         className={styles.desktopOnly}
                         variant="tertiary"
                         title="Previous day"
@@ -640,13 +695,22 @@ export function Component() {
                     </Link>
                     <Link
                         to="dailyJournal"
-                        urlParams={{ date: getNextDay() }}
+                        urlParams={{ date: nextDate }}
                         className={styles.desktopOnly}
                         variant="tertiary"
                         title="Next day"
                     >
                         <RiArrowRightSLine />
                     </Link>
+                    {selectedDate !== fullDate && (
+                        <Link
+                            to="dailyJournal"
+                            variant="tertiary"
+                            title="Jump to today"
+                        >
+                            <RiCalendarCheckLine />
+                        </Link>
+                    )}
                     {(undoable || redoable) && (
                         <div
                             className={_cs(styles.separator, styles.desktopOnly)}
@@ -657,7 +721,7 @@ export function Component() {
                         <Button
                             name={undefined}
                             title="Undo"
-                            onClick={undo}
+                            onClick={handleWorkItemUndo}
                             variant="tertiary"
                         >
                             <RiArrowGoBackFill />
@@ -667,7 +731,7 @@ export function Component() {
                         <Button
                             name={undefined}
                             title="Redo"
-                            onClick={redo}
+                            onClick={handleWorkItemRedo}
                             variant="tertiary"
                         >
                             <RiArrowGoForwardFill />
@@ -692,11 +756,7 @@ export function Component() {
                         title="Update availability"
                         variant="tertiary"
                     >
-                        <AvailabilityIndicator
-                            wfhType={wfhType}
-                            leaveType={leaveType}
-                            fallback={<RiHomeOfficeLine />}
-                        />
+                        <MyAvailabilityIndicator date={selectedDate} />
                     </Button>
                 </div>
             </Portal>
@@ -706,7 +766,7 @@ export function Component() {
                 <DayView
                     loading={myTimeEntriesResult.fetching}
                     errored={!!myTimeEntriesResult.error}
-                    workItems={filteredWorkItems}
+                    workItems={workItems}
                     tasks={tasks}
                     onWorkItemClone={handleWorkItemClone}
                     onWorkItemAssist={handleWorkItemAssist}
@@ -721,7 +781,7 @@ export function Component() {
                     styles.fab,
                     storedConfig.startSidebarShown && styles.startSidebarShown,
                 )}
-                onClick={handleAddEntryClick}
+                onClick={handleAddWorkItemCreate}
                 icons={<RiAddLine />}
                 title="Add entry"
                 variant="primary"
@@ -742,7 +802,6 @@ export function Component() {
             />
             <AddWorkItemDialog
                 dialogOpenTriggerRef={dialogOpenTriggerRef}
-                workItems={filteredWorkItems}
                 onWorkItemCreate={handleWorkItemCreate}
             />
         </Page>
