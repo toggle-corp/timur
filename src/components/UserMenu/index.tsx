@@ -4,6 +4,7 @@ import {
 } from 'react';
 import {
     RiAdminLine,
+    RiLoginBoxLine,
     RiLogoutBoxLine,
 } from 'react-icons/ri';
 import {
@@ -65,9 +66,10 @@ function UserMenu(props: Props) {
             <Link
                 className={className}
                 external
+                title="Login"
                 href={`${import.meta.env.APP_GRAPHQL_DOMAIN}/?redirect_to=${window.location.href}`}
             >
-                Login
+                <RiLoginBoxLine />
             </Link>
         );
     }
