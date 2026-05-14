@@ -93,6 +93,20 @@ export default defineConfig(({ mode }) => {
                     launch_handler: {
                         client_mode: 'navigate-existing',
                     },
+                    shortcuts: [
+                        {
+                            name: 'Daily Journal',
+                            short_name: 'Journal',
+                            description: 'Open today\'s journal',
+                            url: '/daily-journal',
+                        },
+                        {
+                            name: 'Daily Standup',
+                            short_name: 'Standup',
+                            description: 'Open today\'s standup',
+                            url: '/daily-standup',
+                        },
+                    ],
                 },
                 workbox: {
                     globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
