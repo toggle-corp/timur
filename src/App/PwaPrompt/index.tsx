@@ -29,7 +29,7 @@ function PwaPrompt() {
                         console.info('Checking for SW update');
                         registration.update();
                     },
-                    20000,
+                    5 * 60 * 1000,
                 );
             } else {
                 // eslint-disable-next-line no-console
