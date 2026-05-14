@@ -112,6 +112,37 @@ export default defineConfig(({ mode }) => {
                     globPatterns: ['**/*.{js,css,html,png,svg,ico,woff,woff2}'],
                     cleanupOutdatedCaches: true,
                     navigateFallbackDenylist: [/^\/api/, /^\/admin/, /^\/graphql/],
+                    runtimeCaching: [
+                        {
+                            // NOTE: Google profile picture URLs are content-addressed (the URL changes when the image changes), so CacheFirst is safe and avoids redundant network round-trips.
+                            urlPattern: ({ url }) => (
+                                /\.googleusercontent\.com$/.test(url.hostname)
+                            ),
+                            handler: 'CacheFirst',
+                            options: {
+                                cacheName: 'google-user-images',
+                                expiration: {
+                                    maxEntries: 60,
+                                    maxAgeSeconds: 60 * 60 * 24 * 30,
+                                },
+                                cacheableResponse: { statuses: [0, 200] },
+                            },
+                        },
+                        {
+                            urlPattern: ({ request, sameOrigin }) => (
+                                !sameOrigin && request.destination === 'image'
+                            ),
+                            handler: 'StaleWhileRevalidate',
+                            options: {
+                                cacheName: 'external-images',
+                                expiration: {
+                                    maxEntries: 100,
+                                    maxAgeSeconds: 60 * 60 * 24 * 7,
+                                },
+                                cacheableResponse: { statuses: [0, 200] },
+                            },
+                        },
+                    ],
                 },
                 pwaAssets: {
                     config: true,
