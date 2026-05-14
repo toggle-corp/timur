@@ -109,7 +109,9 @@ export default defineConfig(({ mode }) => {
                     ],
                 },
                 workbox: {
-                    globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+                    globPatterns: ['**/*.{js,css,html,png,svg,ico,woff,woff2}'],
+                    cleanupOutdatedCaches: true,
+                    navigateFallbackDenylist: [/^\/api/, /^\/admin/, /^\/graphql/],
                 },
                 pwaAssets: {
                     config: true,
