@@ -34,6 +34,8 @@ ENV APP_SENTRY_DSN=https://xyzl@sentry.example.com/123
 ENV APP_UMAMI_SRC=WEB_APP_SERVE_PLACEHOLDER__APP_UMAMI_SRC
 ENV APP_UMAMI_ID=WEB_APP_SERVE_PLACEHOLDER__APP_UMAMI_ID
 
+ENV APP_GOOGLE_OAUTH_CLIENT_ID=000000000000-pvc00000000000000000000000000000.apps.googleusercontent.com
+
 # NOTE: Static env variables:
 # These env variables are used during build
 ENV APP_GRAPHQL_CODEGEN_ENDPOINT=./backend/schema.graphql
