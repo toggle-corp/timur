@@ -70,7 +70,8 @@ export default defineConfig(({ mode }) => {
                 // buildBase: './build/',
                 strategies: 'generateSW',
                 registerType: 'prompt',
-                injectRegister: 'script',
+                // NOTE: registration is done using useRegisterSW
+                injectRegister: false,
                 devOptions: { enabled: false },
                 includeAssets: ['app-icon.svg'],
                 manifest: {
