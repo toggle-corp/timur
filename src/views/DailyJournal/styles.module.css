@@ -8,9 +8,9 @@
     }
 
     .fab {
-        position: absolute;
-        right: var(--spacing-lg);
+        position: sticky;
         bottom: var(--spacing-lg);
+        align-self: flex-end;
         z-index: 1;
         box-shadow: var(--box-shadow-lg);
 
