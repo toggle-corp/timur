@@ -88,6 +88,11 @@ export default defineConfig(({ mode }) => {
                     theme_color: '#fafaf0',
                     background_color: '#fafaf0',
                     categories: ['productivity'],
+                    // NOTE: handle_links lets the installed PWA capture in-scope URLs opened from Custom Tabs or external browsers (e.g. OAuth callback). launch_handler then routes that capture into the existing PWA window instead of opening a fresh blank one.
+                    handle_links: 'preferred',
+                    launch_handler: {
+                        client_mode: 'navigate-existing',
+                    },
                 },
                 workbox: {
                     globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
