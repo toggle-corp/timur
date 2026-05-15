@@ -25,7 +25,9 @@ function useScrollHide(scrollRef: RefObject<HTMLElement | null>, options: Option
         let currentHidden = false;
         const handler = () => {
             const currentY = el.scrollTop;
-            // NOTE: while near the top, always force-reveal regardless of direction. Covers programmatic scrolls, content removal, and any clamped scrollTop that would otherwise leave the element stuck off-screen at the top.
+            // NOTE: while near the top, always force-reveal regardless of direction.
+            // Covers programmatic scrolls, content removal, and any clamped scrollTop
+            // that would otherwise leave the element stuck off-screen at the top.
             if (currentY <= revealBelow) {
                 if (currentHidden) {
                     currentHidden = false;
@@ -35,7 +37,8 @@ function useScrollHide(scrollRef: RefObject<HTMLElement | null>, options: Option
                 return;
             }
             const delta = currentY - lastY;
-            // NOTE: deadband filters out rubber-band/overscroll jitter that would otherwise toggle state on micro-movements.
+            // NOTE: deadband filters out rubber-band/overscroll jitter that
+            // would otherwise toggle state on micro-movements.
             if (Math.abs(delta) < deadband) {
                 return;
             }
