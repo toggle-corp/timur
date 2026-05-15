@@ -3,7 +3,6 @@
     position: relative;
     flex-grow: 1;
     gap: var(--spacing-md);
-    isolation: isolate;
 
     --width-start-sidebar: 20rem;
     --width-end-sidebar: 20rem;
@@ -25,14 +24,21 @@
 
     .start-aside {
         display: flex;
-        position: absolute;
-        top: 0;
+        position: fixed;
+        top: var(--height-navbar);
+        bottom: 0;
         left: 0;
         flex-direction: column;
-        z-index: 1;
+        z-index: 3;
         border-right: var(--width-separator-sm) solid var(--color-separator);
         width: var(--width-start-sidebar);
-        height: 100%;
+
+        .start-aside-inner {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            overflow-y: auto;
+        }
 
         .close-left-pane-button {
             position: absolute;
@@ -43,6 +49,7 @@
         }
 
         @media screen and (max-width: 900px) {
+            bottom: var(--height-bottom-nav);
             background-color: var(--color-background);
             width: 100%;
 
@@ -54,15 +61,22 @@
 
     .end-aside {
         display: flex;
-        position: absolute;
-        top: 0;
+        position: fixed;
+        top: var(--height-navbar);
         right: 0;
+        bottom: 0;
         flex-direction: column;
         flex-shrink: 0;
-        z-index: 1;
+        z-index: 3;
         border-left: var(--width-separator-sm) solid var(--color-separator);
         width: var(--width-end-sidebar);
-        height: 100%;
+
+        .end-aside-inner {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            overflow-y: auto;
+        }
 
         .close-right-pane-button {
             position: absolute;
@@ -70,6 +84,10 @@
             left: 0;
             transform: translate(-50%);
             font-size: var(--font-size-xl);
+        }
+
+        @media screen and (max-width: 900px) {
+            bottom: var(--height-bottom-nav);
         }
     }
 

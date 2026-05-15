@@ -142,7 +142,9 @@ function Page(props: Props) {
             )}
             {startAsideContent && (
                 <aside className={_cs(styles.startAside, startAsideContainerClassName)}>
-                    {startAsideContent}
+                    <div className={styles.startAsideInner}>
+                        {startAsideContent}
+                    </div>
                     {startSidebarShown && (
                         <Button
                             name={false}
@@ -176,7 +178,9 @@ function Page(props: Props) {
             )}
             {endAsideContent && screen === 'desktop' && (
                 <aside className={_cs(styles.endAside, endAsideContainerClassName)}>
-                    {endAsideContent}
+                    <div className={styles.endAsideInner}>
+                        {endAsideContent}
+                    </div>
                     {endSidebarShown && (
                         <Button
                             name={false}
