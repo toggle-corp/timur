@@ -11,9 +11,9 @@
         position: sticky;
         bottom: var(--spacing-lg);
         align-self: flex-end;
+        z-index: 1;
         /* NOTE: pushes the FAB to the bottom of .content even when entries don't fill the column, so it stays at the bottom edge instead of riding up under sparse content. */
         margin-top: auto;
-        z-index: 1;
         box-shadow: var(--box-shadow-lg);
 
         @media screen and (max-width: 900px) {
