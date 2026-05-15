@@ -1,6 +1,7 @@
 import {
     useContext,
     useMemo,
+    useRef,
 } from 'react';
 import {
     Outlet,
@@ -17,6 +18,7 @@ import CommandContext from '#contexts/command';
 import UserContext from '#contexts/user';
 import useCurrentDate from '#hooks/useCurrentDate';
 import useDebouncedValue from '#hooks/useDebouncedValue';
+import useScrollHide from '#hooks/useScrollHide';
 import icon from '#resources/icon.svg';
 
 import styles from './styles.module.css';
@@ -41,6 +43,8 @@ export function Component() {
         userAuth?.loginExpire,
     ]);
 
+    const pageContentRef = useRef<HTMLDivElement>(null);
+    const navbarHidden = useScrollHide(pageContentRef);
     return (
         <div className={styles.root}>
             {(isLoading || isLoadingDebounced) && (
@@ -51,18 +55,27 @@ export function Component() {
                     )}
                 />
             )}
-            <Navbar className={styles.navbar} />
             {userAuth && daysBeforeLogout < REMAINING_DAYS_THRESHOLD && (
                 <div className={styles.nagbar}>
                     {`You'll be automatically logged out in ${Math.floor(daysBeforeLogout)} days unless you re-login.`}
                 </div>
             )}
-            <div className={styles.pageContent}>
+            <div
+                ref={pageContentRef}
+                className={styles.pageContent}
+            >
+                <Navbar
+                    className={_cs(
+                        styles.navbar,
+                        navbarHidden && styles.navbarHidden,
+                    )}
+                />
                 <Outlet />
                 <div
                     className={_cs(
                         styles.savingIndicator,
                         inFlight && styles.active,
+                        navbarHidden && styles.navbarHidden,
                     )}
                 >
                     <img
