@@ -28,7 +28,19 @@
         color: var(--color-text-on-dark);
     }
     .navbar {
+        position: sticky;
+        top: 0;
         flex-shrink: 0;
+        z-index: 4;
+        background-color: var(--color-background);
+
+        @media screen and (max-width: 900px) {
+            transition: transform var(--duration-transition-medium) ease;
+
+            &.navbar-hidden {
+                transform: translateY(-100%);
+            }
+        }
     }
 
     .page-content {
@@ -40,12 +52,13 @@
 
         .saving-indicator {
             display: flex;
-            position: absolute;
-            top: var(--spacing-md);
+            position: fixed;
+            /* NOTE: offset below the sticky navbar. When the navbar slides up via .navbar-hidden, this collapses to spacing-md so the pill follows. */
+            top: calc(var(--spacing-md) + var(--height-navbar));
             left: 50%;
             align-items: center;
             transform: translateX(-50%);
-            transition: .3s opacity ease-in-out;
+            transition: opacity .3s ease-in-out, top var(--duration-transition-medium) ease;
             opacity: 0;
             z-index: 2;
             border-radius: var(--border-radius-full);
@@ -58,6 +71,10 @@
 
             .saving-icon {
                 height: 1rem;
+            }
+
+            &.navbar-hidden {
+                top: calc(var(--spacing-md) + env(safe-area-inset-top));
             }
 
             &.active {
@@ -97,6 +114,7 @@
     from { opacity: 1; }
     to { opacity: 0; }
 }
+
 
 @keyframes shake-it-off {
     10% {
