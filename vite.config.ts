@@ -44,6 +44,7 @@ function umamiPlugin(options: { id: string | undefined, src: string | undefined 
 
 export default defineConfig(({ mode }) => {
     const isProd = mode === 'production';
+    const isDev = mode === 'development';
     console.log('Mode:', mode);
     const env = loadEnv(mode, process.cwd(), '');
 
@@ -67,6 +68,7 @@ export default defineConfig(({ mode }) => {
                 src: env.APP_UMAMI_SRC,
             }) : undefined,
             VitePWA({
+                disable: isDev,
                 // buildBase: './build/',
                 strategies: 'generateSW',
                 registerType: 'prompt',
@@ -171,6 +173,9 @@ export default defineConfig(({ mode }) => {
             port: 3000,
             strictPort: true,
             host: '0.0.0.0',
+            hmr: {
+                clientPort: 5173,
+            },
         },
         build: {
             outDir: './build',
