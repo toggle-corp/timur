@@ -90,7 +90,7 @@ function buildGroupLevelOptions(attributes: DailyJournalAttribute[]): NumericOpt
         label: attributes
             .slice(0, index + 1)
             .map(getAttributeLabel)
-            .join(', '),
+            .join(' + '),
     }));
 }
 
@@ -109,7 +109,7 @@ function buildJoinLevelOptions(
                 .map(getAttributeLabel)
                 .join(' › '),
         };
-    });
+    }).reverse();
 }
 
 interface ItemProps {
