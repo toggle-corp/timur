@@ -3,11 +3,9 @@
     align-items: center;
     justify-content: center;
     border-bottom: var(--width-separator-sm) solid var(--color-separator);
-    padding:
-        calc(var(--spacing-sm) + env(safe-area-inset-top))
-        var(--spacing-md)
-        var(--spacing-sm);
-    min-height: var(--height-navbar);
+    padding-top: env(safe-area-inset-top);
+    padding-inline: var(--spacing-md);
+    height: var(--height-navbar);
     gap: var(--spacing-md);
 
     .start-actions,

@@ -40,8 +40,12 @@
         left: unset;
         margin: auto 0;
         width: 40rem;
-        height: 100vh;
+        height: 100svh;
         max-height: unset;
+
+        @media (display-mode: standalone) {
+            height: 100dvh;
+        }
     }
 
     &.center-mode {
