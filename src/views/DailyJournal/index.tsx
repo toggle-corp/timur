@@ -150,6 +150,7 @@ const MY_TIME_ENTRIES_QUERY = gql`
                             id
                             name
                             shortName
+                            slideOrder
                             logo {
                                 url
                             }

@@ -24,6 +24,7 @@ export const defaultConfigValue: ConfigStorage = {
         { key: 'task', sortDirection: 1 },
         { key: 'status', sortDirection: 1 },
     ],
+    projectSortOrder: 'name',
     collapsedGroups: [],
     quickActions: ['clone'],
 };
