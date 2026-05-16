@@ -1,5 +1,6 @@
 {
     "name": "timur",
+    "description": "Daily journaling and standup notes, made simple.",
     "version": "0.0.1",
     "type": "module",
     "private": true,

@@ -80,7 +80,7 @@ export default defineConfig(({ mode }) => {
                     id: 'timur-app',
                     name: 'Timur',
                     short_name: 'Timur',
-                    description: 'Timur - Phase Zero',
+                    description: 'Daily journaling and standup notes, made simple.',
                     lang: 'en',
                     start_url: '/',
                     scope: '/',
