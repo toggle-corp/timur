@@ -5,9 +5,8 @@
 >
     <head>
         <meta charset="UTF-8" />
-        <!-- NOTE: interactive-widget=resizes-visual keeps the layout viewport stable when the virtual keyboard opens so position:fixed/sticky bottom UI doesn't get pushed up into view. viewport-fit=cover lets the page paint under the device safe areas (notch, home indicator); pair with env(safe-area-inset-*) on edge-aligned elements. -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-visual, viewport-fit=cover" />
-        <meta name="description" content="Timur - Phase Zero" />
+        <meta name="description" content="Daily journaling and standup notes, made simple." />
         <meta name="theme-color" content="#fafaf0" media="(prefers-color-scheme: light)" />
         <meta name="theme-color" content="#1c1b17" media="(prefers-color-scheme: dark)" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -32,6 +31,7 @@
                 font-style: normal;
             }
 
+            /* Define background color to avoid white splash */
             @media screen {
                 body {
                     background-color: #fafaf0;
