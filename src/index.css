@@ -183,8 +183,7 @@
     --height-content--min: 20rem;
     --height-compact-content--min: 1rem;
 
-    /* NOTE: include safe-area-inset in the floor so layout math (e.g. the navbar slide-out negative margin) matches the actual rendered height on notched devices. */
-    --height-navbar: calc(3.5rem + env(safe-area-inset-top));
+    --height-navbar: calc(4rem + env(safe-area-inset-top));
     --height-bottom-nav: calc(3.5rem + env(safe-area-inset-bottom));
 }
 

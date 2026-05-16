@@ -2,8 +2,12 @@
     display: flex;
     position: relative;
     flex-direction: column;
-    height: 100vh;
+    height: 100svh;
     overflow: auto;
+
+    @media (display-mode: standalone) {
+        height: 100dvh;
+    }
 
     .navigation-loader {
         position: fixed;
