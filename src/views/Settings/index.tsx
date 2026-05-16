@@ -54,6 +54,7 @@ import {
     DailyJournalGrouping,
     EditingMode,
     NumericOption,
+    ProjectSortOrder,
     Task,
     WorkItem,
     WorkItemAction,
@@ -223,6 +224,18 @@ const editingOptions: EditingOption[] = [
     { key: 'vim', label: 'Vim Masterace' },
 ];
 
+type ProjectSortOrderOption = { key: ProjectSortOrder, label: string };
+function projectSortOrderKeySelector(item: ProjectSortOrderOption) {
+    return item.key;
+}
+function projectSortOrderLabelSelector(item: ProjectSortOrderOption) {
+    return item.label;
+}
+const projectSortOrderOptions: ProjectSortOrderOption[] = [
+    { key: 'name', label: 'Name' },
+    { key: 'standup-order', label: 'Standup Order' },
+];
+
 type WorkItemTypeOption = EnumsQuery['enums']['TimeEntryType'][number];
 function workItemTypeKeySelector(item: WorkItemTypeOption) {
     return item.key;
@@ -263,6 +276,7 @@ const timurContract = {
         id: 'project-timur',
         name: 'Timur',
         shortName: 'Timur',
+        slideOrder: 1,
         logo: null,
         projectClient: { id: 'client-internal', name: 'Internal' },
     },
@@ -275,6 +289,7 @@ const chronoContract = {
         id: 'project-chrono',
         name: 'Chrono',
         shortName: 'Timur',
+        slideOrder: 2,
         logo: null,
         projectClient: { id: 'client-internal', name: 'Internal' },
     },
@@ -616,6 +631,18 @@ export function Component() {
                             options={joinLevelOptions}
                             keySelector={numericOptionKeySelector}
                             labelSelector={numericOptionLabelSelector}
+                            nonClearable
+                        />
+                        <div className={styles.description}>
+                            Choose how projects are sorted
+                        </div>
+                        <SelectInput
+                            name="projectSortOrder"
+                            value={storedConfig.projectSortOrder}
+                            onChange={setConfigFieldValue}
+                            options={projectSortOrderOptions}
+                            keySelector={projectSortOrderKeySelector}
+                            labelSelector={projectSortOrderLabelSelector}
                             nonClearable
                         />
                     </div>

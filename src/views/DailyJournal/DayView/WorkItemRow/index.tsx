@@ -8,8 +8,8 @@ import {
 import {
     RiDeleteBin2Line,
     RiFileAddLine,
-    RiFileCopyLine,
     RiFileCopy2Line,
+    RiFileCopyLine,
     RiFileTransferLine,
     RiMoreLine,
 } from 'react-icons/ri';

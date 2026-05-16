@@ -43,6 +43,7 @@ const ENUMS_QUERY = gql`
                         id
                         name
                         shortName
+                        slideOrder
                         logo {
                             url
                         }

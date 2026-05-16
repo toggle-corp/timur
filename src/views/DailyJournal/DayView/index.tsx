@@ -12,11 +12,13 @@ import {
 import {
     _cs,
     bound,
+    compareNumber,
     compareString,
     isDefined,
     isNotDefined,
     listToMap,
     sum,
+    unique,
 } from '@togglecorp/fujs';
 
 import Button from '#components/Button';
@@ -129,7 +131,23 @@ function DayView(props: Props) {
         indent,
         enableCollapsibleGroups,
         collapsedGroups,
+        projectSortOrder,
     } = storedConfig;
+
+    const projectSlideOrderMapping = useMemo(() => {
+        if (projectSortOrder !== 'standup-order' || isNotDefined(taskById)) {
+            return undefined;
+        }
+        const projects = unique(
+            Object.values(taskById).map((task) => task.contract.project),
+            (project) => project.id,
+        );
+        return listToMap(
+            projects,
+            (project) => project.id,
+            (project) => project.slideOrder,
+        );
+    }, [projectSortOrder, taskById]);
 
     const getWorkItemLabelFromAttr = useCallback((
         item: WorkItem,
@@ -203,13 +221,31 @@ function DayView(props: Props) {
         const sortedWorkItems = sortByAttributes(
             workItems,
             dailyJournalAttributeOrder,
-            (a, b, attr) => (
-                compareString(
+            (a, b, attr) => {
+                if (attr.key === 'project' && isDefined(projectSlideOrderMapping)) {
+                    const aProjectId = taskById[a.task]?.contract.project.id;
+                    const bProjectId = taskById[b.task]?.contract.project.id;
+                    if (!aProjectId || !bProjectId) {
+                        return 0;
+                    }
+
+                    const aSlideOrder = isDefined(aProjectId)
+                        ? projectSlideOrderMapping[aProjectId]
+                        : undefined;
+                    const bSlideOrder = isDefined(bProjectId)
+                        ? projectSlideOrderMapping[bProjectId]
+                        : undefined;
+                    return (
+                        compareNumber(aSlideOrder, bSlideOrder, attr.sortDirection)
+                        || compareNumber(Number(aProjectId), Number(bProjectId), attr.sortDirection)
+                    );
+                }
+                return compareString(
                     getWorkItemLabelFromAttr(a, attr),
                     getWorkItemLabelFromAttr(b, attr),
                     attr.sortDirection,
-                )
-            ),
+                );
+            },
         );
 
         const result = groupListByAttributes(
@@ -233,6 +269,7 @@ function DayView(props: Props) {
         getWorkItemLabelFromAttr,
         dailyJournalAttributeOrder,
         groupLevel,
+        projectSlideOrderMapping,
     ]);
 
     return (

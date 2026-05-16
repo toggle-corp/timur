@@ -35,6 +35,8 @@ export interface DailyJournalGrouping {
     joinLevel: number;
 }
 
+export type ProjectSortOrder = 'name' | 'standup-order';
+
 export type ConfigStorage = {
     defaultTaskType: WorkItemType | undefined,
     defaultTaskStatus: WorkItemStatus,
@@ -49,6 +51,7 @@ export type ConfigStorage = {
 
     dailyJournalAttributeOrder: DailyJournalAttribute[];
     dailyJournalGrouping: DailyJournalGrouping;
+    projectSortOrder: ProjectSortOrder;
 
     quickActions: WorkItemAction[];
 
