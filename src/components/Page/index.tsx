@@ -10,6 +10,7 @@ import {
     RiListUnordered,
     RiMenuLine,
 } from 'react-icons/ri';
+import { unstable_useBlocker as useBlocker } from 'react-router-dom';
 import {
     _cs,
     isDefined,
@@ -75,6 +76,23 @@ function Page(props: Props) {
         (newValue: boolean) => setFieldValue(newValue, 'endSidebarShown'),
         [setFieldValue],
     );
+
+    const shouldBlockBack = screen === 'mobile' && startSidebarShown && !!startAsideContent;
+    const backBlocker = useBlocker(
+        useCallback(
+            ({ historyAction }: { historyAction: string }) => (
+                shouldBlockBack && historyAction === 'POP'
+            ),
+            [shouldBlockBack],
+        ),
+    );
+
+    useEffect(() => {
+        if (backBlocker.state === 'blocked') {
+            setFieldValue(false, 'startSidebarShown');
+            backBlocker.reset();
+        }
+    }, [backBlocker, setFieldValue]);
 
     useEffect(() => {
         document.title = documentTitle;
