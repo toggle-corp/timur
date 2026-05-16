@@ -13,6 +13,7 @@ import {
     RiArrowLeftSLine,
     RiArrowRightSLine,
     RiCalendarEventLine,
+    RiSettingsLine,
     RiStickyNoteAddLine,
 } from 'react-icons/ri';
 import {
@@ -758,6 +759,14 @@ export function Component() {
                     >
                         <MyAvailabilityIndicator date={selectedDate} />
                     </Button>
+                    <Link
+                        className={styles.mobileOnly}
+                        to="settings"
+                        title="Settings"
+                        variant="tertiary"
+                    >
+                        <RiSettingsLine />
+                    </Link>
                 </div>
             </Portal>
             <FocusContext.Provider

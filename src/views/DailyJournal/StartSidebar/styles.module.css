@@ -11,9 +11,7 @@
         flex-wrap: wrap;
         margin-top: auto;
         gap: var(--spacing-sm);
-    }
 
-    .desktop-only {
         @media screen and (max-width: 900px) {
             display: none;
         }

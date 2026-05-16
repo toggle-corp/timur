@@ -40,6 +40,12 @@
         height: 1.5rem;
     }
 
+    .mobile-only {
+        @media screen and (min-width: 900px) {
+            display: none;
+        }
+    }
+
     .desktop-only {
         @media screen and (max-width: 900px) {
             display: none;
