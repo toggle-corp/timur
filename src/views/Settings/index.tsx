@@ -63,11 +63,13 @@ import DayView from '../DailyJournal/DayView';
 
 import styles from './styles.module.css';
 
+// FIXME: This should be re-used
 const workItemActionLabels: { key: WorkItemAction; label: string }[] = [
-    { key: 'clone', label: 'Clone entry' },
+    { key: 'clone', label: 'Clone' },
+    { key: 'clone-with-description', label: 'Clone with description' },
     { key: 'copy', label: 'Copy to another day' },
     { key: 'move', label: 'Move to another day' },
-    { key: 'delete', label: 'Delete entry' },
+    { key: 'delete', label: 'Delete' },
 ];
 
 const dailyJournalAttributeDetails: Record<DailyJournalAttributeKeys, { label: string }> = {

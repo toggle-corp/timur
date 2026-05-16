@@ -57,7 +57,7 @@ interface Props {
     tasks: Task[] | undefined;
     loading: boolean;
     errored: boolean;
-    onWorkItemClone: (clientId: string, override?: Partial<WorkItem>) => void;
+    onWorkItemClone: (clientId: string, override: Partial<WorkItem>) => void;
     onWorkItemAssist: (clientId: string) => void;
     onWorkItemChange: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
     onWorkItemDelete: (clientId: string) => void;

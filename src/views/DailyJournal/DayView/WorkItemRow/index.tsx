@@ -9,6 +9,7 @@ import {
     RiDeleteBin2Line,
     RiFileAddLine,
     RiFileCopyLine,
+    RiFileCopy2Line,
     RiFileTransferLine,
     RiMoreLine,
 } from 'react-icons/ri';
@@ -94,7 +95,7 @@ interface Props {
     typeErrored?: boolean;
     durationErrored?: boolean;
 
-    onClone?: (clientId: string, override?: Partial<WorkItem>) => void;
+    onClone?: (clientId: string, override: Partial<WorkItem>) => void;
     onAssist?: (clientId: string) => void;
     onChange?: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
     onDelete?: (clientId: string) => void;
@@ -214,7 +215,17 @@ function WorkItemRow(props: Props) {
     const handleClone = useCallback(
         () => {
             if (onClone) {
-                onClone(workItem.clientId);
+                onClone(workItem.clientId, { duration: undefined, description: undefined });
+            }
+        },
+        [onClone, workItem.clientId],
+    );
+
+    const handleCloneWithDescription = useCallback(
+        () => {
+            if (onClone) {
+                // NOTE: we only want to clear duration
+                onClone(workItem.clientId, { duration: undefined });
             }
         },
         [onClone, workItem.clientId],
@@ -225,7 +236,7 @@ function WorkItemRow(props: Props) {
             if (event.ctrlKey && event.shiftKey && event.key === 'Enter' && onClone) {
                 event.preventDefault();
                 event.stopPropagation();
-                onClone(workItem.clientId);
+                onClone(workItem.clientId, { duration: undefined, description: undefined });
             } else if (event.ctrlKey && event.key === 'Enter' && onAssist) {
                 event.preventDefault();
                 event.stopPropagation();
@@ -337,9 +348,16 @@ function WorkItemRow(props: Props) {
         {
             key: 'clone',
             title: 'Clone this entry',
-            label: 'Clone entry',
+            label: 'Clone',
             icon: <RiFileCopyLine />,
             onClick: handleClone,
+        },
+        {
+            key: 'clone-with-description',
+            title: 'Clone this entry with description',
+            label: 'Clone with description',
+            icon: <RiFileCopy2Line />,
+            onClick: handleCloneWithDescription,
         },
         {
             key: 'copy',
@@ -358,7 +376,7 @@ function WorkItemRow(props: Props) {
         {
             key: 'delete',
             title: 'Delete this entry',
-            label: 'Delete entry',
+            label: 'Delete',
             icon: <RiDeleteBin2Line />,
             onClick: handleDeleteClick,
         },
