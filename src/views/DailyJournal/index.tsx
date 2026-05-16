@@ -703,40 +703,39 @@ export function Component() {
                     >
                         <RiArrowRightSLine />
                     </Link>
-                    {selectedDate !== fullDate && (
-                        <Link
-                            to="dailyJournal"
-                            variant="tertiary"
-                            title="Jump to today"
-                        >
-                            <RiCalendarCheckLine />
-                        </Link>
-                    )}
+                    <Link
+                        to="dailyJournal"
+                        variant="tertiary"
+                        title="Jump to today"
+                        disabled={selectedDate === fullDate}
+                    >
+                        <RiCalendarEventLine />
+                    </Link>
                     {(undoable || redoable) && (
-                        <div
-                            className={_cs(styles.separator, styles.desktopOnly)}
-                            role="separator"
-                        />
-                    )}
-                    {undoable && (
-                        <Button
-                            name={undefined}
-                            title="Undo"
-                            onClick={handleWorkItemUndo}
-                            variant="tertiary"
-                        >
-                            <RiArrowGoBackFill />
-                        </Button>
-                    )}
-                    {redoable && (
-                        <Button
-                            name={undefined}
-                            title="Redo"
-                            onClick={handleWorkItemRedo}
-                            variant="tertiary"
-                        >
-                            <RiArrowGoForwardFill />
-                        </Button>
+                        <>
+                            <div
+                                className={_cs(styles.separator, styles.desktopOnly)}
+                                role="separator"
+                            />
+                            <Button
+                                name={undefined}
+                                title="Undo"
+                                onClick={handleWorkItemUndo}
+                                variant="tertiary"
+                                disabled={!undoable}
+                            >
+                                <RiArrowGoBackFill />
+                            </Button>
+                            <Button
+                                name={undefined}
+                                title="Redo"
+                                onClick={handleWorkItemRedo}
+                                variant="tertiary"
+                                disabled={!redoable}
+                            >
+                                <RiArrowGoForwardFill />
+                            </Button>
+                        </>
                     )}
                     <div className={styles.spacer} />
                     <Button
