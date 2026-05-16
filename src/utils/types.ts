@@ -15,7 +15,7 @@ export type SpacingVariant = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export type EditingMode = 'normal' | 'vim';
 
-export type WorkItemAction = 'clone' | 'copy' | 'move' | 'delete';
+export type WorkItemAction = 'clone' | 'clone-with-description' | 'copy' | 'move' | 'delete';
 
 export type Task = EnumsQuery['private']['allActiveTasks'][number];
 

@@ -12,7 +12,7 @@ import {
     RiArrowGoForwardFill,
     RiArrowLeftSLine,
     RiArrowRightSLine,
-    RiCalendarCheckLine,
+    RiCalendarEventLine,
     RiStickyNoteAddLine,
 } from 'react-icons/ri';
 import {
@@ -373,7 +373,7 @@ export function Component() {
     );
 
     const handleWorkItemClone = useCallback(
-        (workItemClientId: string, override?: Partial<WorkItem>) => {
+        (workItemClientId: string, override: Partial<WorkItem>) => {
             const oldItem = workItems.find((item) => item.clientId === workItemClientId);
             if (!oldItem) {
                 // eslint-disable-next-line no-console
@@ -388,12 +388,6 @@ export function Component() {
                 clientId: newId,
             };
             delete newItem.id;
-            // NOTE: If we have defined overrides, we don't need to clear
-            // description and duration
-            if (!override) {
-                delete newItem.description;
-                delete newItem.duration;
-            }
 
             setWorkItemChange(
                 {
@@ -419,8 +413,10 @@ export function Component() {
                 return;
             }
 
+            const sourceDescription = (sourceItem.description ?? '').trim();
+
             // NOTE: split on 2 new liness
-            const descriptions = (sourceItem.description ?? '')
+            const descriptions = sourceDescription
                 .split(/\n\n+/)
                 .map((line) => line.trim()).filter((item) => item !== '');
 
@@ -429,9 +425,10 @@ export function Component() {
             }
 
             const [firstDescription, ...otherDescriptions] = descriptions;
-
             const now = new Date().getTime();
 
+            // NOTE: We want to create otherDescrptions first then edit existing one
+            // for safer edit history
             otherDescriptions.forEach((desc) => {
                 const type = inferTypeFromDescription(desc);
                 const targetItem = {
@@ -454,23 +451,26 @@ export function Component() {
                 );
             });
 
-            setWorkItemChange(
-                {
-                    type: 'edit',
-                    key: sourceItem.clientId,
-                    oldValue: {
-                        description: sourceItem.description,
-                        type: sourceItem.type,
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const inferredType = inferTypeFromDescription(firstDescription!) ?? sourceItem.type;
+            if (firstDescription !== sourceDescription || inferredType !== sourceItem.type) {
+                setWorkItemChange(
+                    {
+                        type: 'edit',
+                        key: sourceItem.clientId,
+                        oldValue: {
+                            description: sourceItem.description,
+                            type: sourceItem.type,
+                        },
+                        newValue: {
+                            description: firstDescription,
+                            type: inferredType,
+                        },
+                        timestamp: now,
                     },
-                    newValue: {
-                        description: firstDescription,
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                        type: inferTypeFromDescription(firstDescription!) ?? sourceItem.type,
-                    },
-                    timestamp: now,
-                },
-                (entry) => entry.date === selectedDate,
-            );
+                    (entry) => entry.date === selectedDate,
+                );
+            }
         },
         [workItems, setWorkItemChange, selectedDate],
     );
