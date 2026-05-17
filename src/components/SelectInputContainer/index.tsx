@@ -297,8 +297,8 @@ function SelectInputContainer<
                         className={styles.input}
                         // NOTE: We are not using isNotDefined as we can have empty string
                         style={(searchText || !valueDisplay) ? undefined : {
-                            backgroundColor: valueBgColor ?? colorscheme[0][1],
-                            color: valueFgColor ?? colorscheme[0][0],
+                            backgroundColor: valueBgColor ?? colorscheme[1][1],
+                            color: valueFgColor ?? colorscheme[1][0],
                         }}
                         id={inputId}
                         name={name}

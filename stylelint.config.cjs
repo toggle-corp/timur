@@ -18,7 +18,7 @@ module.exports = {
         },
         'csstools/value-no-unknown-custom-properties': [
             true, {
-                importFrom: ['./src/index.css']
+                importFrom: ['./src/index.css', './src/themes.css']
             },
         ],
         'selector-pseudo-class-no-unknown': [

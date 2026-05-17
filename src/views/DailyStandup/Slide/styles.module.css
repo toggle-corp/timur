@@ -60,7 +60,7 @@
 
                 .primary-description {
                     overflow-wrap: break-word;
-                    color: var(--color-text-light);
+                    color: var(--color-text-muted);
                     font-size: var(--font-size-md);
                 }
             }

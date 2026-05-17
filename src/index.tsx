@@ -1,3 +1,4 @@
+import './themes.css';
 import './index.css';
 
 import React, { useEffect } from 'react';
@@ -15,6 +16,9 @@ import { isNotDefined } from '@togglecorp/fujs';
 import { Component as TemplateView } from '#components/TemplateView';
 
 import App from './App/index.tsx';
+import { bootstrapTheme } from './App/providers/ThemeProvider.tsx';
+
+bootstrapTheme();
 
 const webappRootId = 'webapp-root';
 const webappRootElement = document.getElementById(webappRootId);

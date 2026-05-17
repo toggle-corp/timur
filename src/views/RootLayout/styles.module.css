@@ -29,7 +29,7 @@
         background: var(--color-primary);
         padding: var(--spacing-xs);
         text-align: center;
-        color: var(--color-text-on-dark);
+        color: var(--color-on-primary);
     }
     .navbar {
         position: sticky;
@@ -66,9 +66,9 @@
             opacity: 0;
             z-index: 2;
             border-radius: var(--border-radius-full);
-            background-color: var(--color-tertiary);
+            background-color: var(--color-primary-bg-subtle);
             padding: var(--spacing-xs) var(--spacing-md);
-            color: var(--color-text-light);
+            color: var(--color-text-muted);
             font-size: var(--font-size-sm);
             pointer-events: none;
             gap: var(--spacing-xs);

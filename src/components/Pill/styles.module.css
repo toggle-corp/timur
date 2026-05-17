@@ -5,7 +5,7 @@
     border-radius: var(--border-radius-full);
     padding: var(--spacing-2xs) var(--spacing-sm);
     max-width: 100%;
-    color: var(--color-text-light);
+    color: var(--color-text-muted);
     font-size: var(--font-size-sm);
     gap: var(--spacing-2xs);
 

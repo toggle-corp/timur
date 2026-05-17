@@ -41,8 +41,40 @@
             gap: var(--spacing-sm);
 
             .description {
-                color: var(--color-text-light);
+                color: var(--color-text-muted);
                 font-size: var(--font-size-sm);
+            }
+        }
+    }
+
+    .palette-groups {
+        display: flex;
+        gap: var(--spacing-md);
+
+        @media screen and (max-width: 900px) {
+            flex-direction: column;
+        }
+
+        .palette-radio-list {
+            flex-direction: column;
+        }
+    }
+
+    .palette-label {
+        display: flex;
+        align-items: center;
+        flex: 1;
+        gap: var(--spacing-xs);
+
+        .swatches {
+            display: inline-flex;
+            border: 1pt solid var(--color-separator-strong);
+            border-radius: var(--border-radius-md);
+            height: calc(0.625rem + 2 * 1pt);
+            overflow: hidden;
+
+            .swatch {
+                width: calc(2 * 0.625rem);
             }
         }
     }

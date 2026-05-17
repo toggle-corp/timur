@@ -81,7 +81,7 @@
 
     &.primary {
         --color-background: var(--color-primary);
-        --color-text: var(--color-text-on-dark);
+        --color-text: var(--color-on-primary);
 
         &.disabled {
             filter: saturate(50%);
@@ -96,7 +96,7 @@
 
     &.secondary {
         --color-background: var(--color-secondary);
-        --color-text: var(--color-text-on-dark);
+        --color-text: var(--color-on-secondary);
 
         &.disabled {
             filter: saturate(50%);
@@ -110,7 +110,7 @@
     }
 
     &.tertiary {
-        --color-background: var(--color-tertiary);
+        --color-background: var(--color-primary-bg-subtle);
 
         &.disabled {
             filter: saturate(50%);

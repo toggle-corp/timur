@@ -37,9 +37,17 @@ export interface DailyJournalGrouping {
 
 export type ProjectSortOrder = 'name' | 'standup-order';
 
+export type Palette = 'catppuccin' | 'gruvbox' | 'monokai' | 'solarized' | 'terracotta';
+
+export type ThemeMode = 'auto' | 'light' | 'dark';
+
 export type ConfigStorage = {
     defaultTaskType: WorkItemType | undefined,
     defaultTaskStatus: WorkItemStatus,
+
+    themeMode: ThemeMode,
+    lightPalette: Palette,
+    darkPalette: Palette,
 
     editingMode: EditingMode,
 

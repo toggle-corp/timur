@@ -11,7 +11,7 @@
 
     .icon {
         line-height: 0;
-        color: var(--color-text-light);
+        color: var(--color-text-muted);
         font-size: 4rem;
 
         .spinner {
@@ -20,12 +20,12 @@
     }
 
     .title {
-        color: var(--color-text-light);
+        color: var(--color-text-muted);
         font-size: var(--font-size-xl);
     }
 
     .description {
-        color: var(--color-text-light);
+        color: var(--color-text-muted);
         font-size: var(--font-size-md);
     }
 

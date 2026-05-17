@@ -87,6 +87,7 @@ export default defineConfig(({ mode }) => {
                     display: 'standalone',
                     display_override: ['standalone'],
                     orientation: 'any',
+                    // NOTE: keep in sync with terracotta --color-background in src/themes.css
                     theme_color: '#fafaf0',
                     background_color: '#fafaf0',
                     categories: ['productivity'],
@@ -173,9 +174,6 @@ export default defineConfig(({ mode }) => {
             port: 3000,
             strictPort: true,
             host: '0.0.0.0',
-            hmr: {
-                clientPort: 5173,
-            },
         },
         build: {
             outDir: './build',
