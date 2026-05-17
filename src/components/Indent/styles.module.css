@@ -5,7 +5,7 @@
     min-height: 1.5rem;
 
     .item {
-        border-right: var(--width-separator-sm) solid var(--color-separator-dark);
+        border-right: var(--width-separator-sm) solid var(--color-separator-strong);
         width: var(--spacing-2xs);
         height: 100%;
     }

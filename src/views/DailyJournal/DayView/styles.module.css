@@ -17,7 +17,7 @@
             gap: 0 var(--spacing-sm);
 
             .relative-date {
-                color: var(--color-text-light);
+                color: var(--color-text-muted);
             }
         }
 
@@ -52,7 +52,7 @@
             display: flex;
             align-items: center;
             gap: var(--spacing-sm);
-            color: var(--color-text-light);
+            color: var(--color-text-muted);
             font-weight: var(--font-weight-semibold);
 
             &h2 {
@@ -82,7 +82,7 @@
             display: flex;
             align-items: center;
             gap: var(--spacing-sm);
-            color: var(--color-text-light);
+            color: var(--color-text-muted);
             font-weight: var(--font-weight-semibold);
 
             .separator {

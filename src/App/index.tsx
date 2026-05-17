@@ -24,6 +24,7 @@ import EnumsProvider from './providers/EnumsProvider';
 import LocalStorageProvider from './providers/LocalStorageProvider';
 import NavbarProvider from './providers/NavbarProvider';
 import SizeProvider from './providers/SizeProvider';
+import ThemeProvider from './providers/ThemeProvider';
 import PwaPrompt from './PwaPrompt';
 import wrappedRoutes, { unwrappedRoutes } from './routes';
 
@@ -87,16 +88,18 @@ function App() {
                             <NavbarProvider>
                                 <SizeProvider>
                                     <LocalStorageProvider>
-                                        <EnumsProvider>
-                                            <CommandProvider>
-                                                <RouteContext.Provider value={wrappedRoutes}>
-                                                    <RouterProvider
-                                                        router={router}
-                                                        fallbackElement={fallbackElement}
-                                                    />
-                                                </RouteContext.Provider>
-                                            </CommandProvider>
-                                        </EnumsProvider>
+                                        <ThemeProvider>
+                                            <EnumsProvider>
+                                                <CommandProvider>
+                                                    <RouteContext.Provider value={wrappedRoutes}>
+                                                        <RouterProvider
+                                                            router={router}
+                                                            fallbackElement={fallbackElement}
+                                                        />
+                                                    </RouteContext.Provider>
+                                                </CommandProvider>
+                                            </EnumsProvider>
+                                        </ThemeProvider>
                                     </LocalStorageProvider>
                                 </SizeProvider>
                             </NavbarProvider>

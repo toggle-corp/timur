@@ -17,7 +17,7 @@
 
         .author {
             align-self: end;
-            color: var(--color-text-light);
+            color: var(--color-text-muted);
             font-size: var(--font-size-xl);
 
             &:before {

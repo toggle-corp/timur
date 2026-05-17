@@ -3,7 +3,7 @@
 
     position: absolute;
     margin: var(--spacing-sm);
-    border: var(--width-separator-sm) solid var(--color-separator-dark);
+    border: var(--width-separator-sm) solid var(--color-separator-strong);
     border-radius: var(--spacing-xs);
     box-shadow: var(--box-shadow-xl);
     background-color: var(--color-foreground);

@@ -73,12 +73,12 @@ function workItemStatusLabelSelector(item: WorkItemStatusOption) {
 }
 function workItemStatusColorSelector(item: WorkItemStatusOption): readonly [string, string] {
     if (item.key === 'DOING') {
-        return colorscheme[1];
+        return colorscheme[0];
     }
     if (item.key === 'DONE') {
-        return colorscheme[5];
+        return colorscheme[4];
     }
-    return colorscheme[7];
+    return colorscheme[6];
 }
 
 function defaultColorSelector<T>(_: T, i: number): readonly [string, string] {

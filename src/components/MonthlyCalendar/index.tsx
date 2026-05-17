@@ -115,7 +115,7 @@ function getDatesInRange(startDate: string, endDate: string): string[] {
 const MUTED_COLOR = 'hsla(0, 0%, 50%, 0.12)';
 
 function heatmapAt(pct: number): string {
-    return `color-mix(in oklch, color-mix(in oklch, var(--color-secondary) ${Math.round(pct * 100)}%, var(--color-primary)) 50%, var(--color-background))`;
+    return `color-mix(in oklch, color-mix(in oklch, var(--color-heatmap-high) ${Math.round(pct * 100)}%, var(--color-heatmap-low)) 50%, var(--color-background))`;
 }
 
 function getHeatmapColor(info: DateInfo | undefined): string | undefined {

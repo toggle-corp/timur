@@ -57,14 +57,14 @@
                         max-width: 100%;
                         overflow: hidden;
                         white-space: nowrap;
-                        color: var(--color-text-light);
+                        color: var(--color-text-muted);
                         font-size: var(--font-size-sm);
                         font-weight: var(--font-weight-normal);
                     }
 
                     .app-icon {
                         border-radius: var(--border-radius-md);
-                        background-color: var(--color-tertiary);
+                        background-color: var(--color-primary-bg-subtle);
                         padding: var(--spacing-xs);
                         width: 2rem;
                         height: 2rem;

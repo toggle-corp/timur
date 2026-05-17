@@ -36,6 +36,7 @@ import Button from '#components/Button';
 import Checkbox from '#components/Checkbox';
 import Link from '#components/Link';
 import Page from '#components/Page';
+import RadioInput from '#components/RadioInput';
 import SelectInput from '#components/SelectInput';
 import EnumsContext from '#contexts/enums';
 import { EnumsQuery } from '#generated/types/graphql';
@@ -47,6 +48,8 @@ import {
     defaultConfigValue,
     numericOptionKeySelector,
     numericOptionLabelSelector,
+    paletteOptions,
+    themeModeOptions,
 } from '#utils/constants';
 import {
     DailyJournalAttribute,
@@ -56,6 +59,7 @@ import {
     NumericOption,
     ProjectSortOrder,
     Task,
+    ThemeMode,
     WorkItem,
     WorkItemAction,
 } from '#utils/types';
@@ -212,6 +216,48 @@ function SortableItem(props: SortableItemProps) {
     );
 }
 
+type PaletteVariant = 'light' | 'dark';
+
+function paletteKeySelector(option: typeof paletteOptions[number]) {
+    return option.key;
+}
+
+interface PaletteLabelProps {
+    option: typeof paletteOptions[number];
+    variant: PaletteVariant;
+}
+
+function PaletteLabel({ option, variant }: PaletteLabelProps) {
+    const swatches = option.swatches[variant];
+    return (
+        <span className={styles.paletteLabel}>
+            <span className={styles.swatches}>
+                <span className={styles.swatch} style={{ backgroundColor: swatches.background }} />
+                <span className={styles.swatch} style={{ backgroundColor: swatches.primary }} />
+                <span className={styles.swatch} style={{ backgroundColor: swatches.secondary }} />
+            </span>
+            <span>
+                {option.label}
+            </span>
+        </span>
+    );
+}
+
+function lightPaletteLabelSelector(option: typeof paletteOptions[number]) {
+    return <PaletteLabel option={option} variant="light" />;
+}
+
+function darkPaletteLabelSelector(option: typeof paletteOptions[number]) {
+    return <PaletteLabel option={option} variant="dark" />;
+}
+
+function themeModeKeySelector(item: { key: ThemeMode }) {
+    return item.key;
+}
+function themeModeLabelSelector(item: { label: string }) {
+    return item.label;
+}
+
 type EditingOption = { key: EditingMode, label: string };
 function editingOptionKeySelector(item: EditingOption) {
     return item.key;
@@ -253,12 +299,12 @@ function workItemStatusLabelSelector(item: WorkItemStatusOption) {
 }
 function workItemStatusColorSelector(item: WorkItemStatusOption): readonly [string, string] {
     if (item.key === 'DOING') {
-        return colorscheme[1];
+        return colorscheme[0];
     }
     if (item.key === 'DONE') {
-        return colorscheme[5];
+        return colorscheme[4];
     }
-    return colorscheme[7];
+    return colorscheme[6];
 }
 
 function defaultColorSelector<T>(_: T, i: number): readonly [string, string] {
@@ -428,7 +474,7 @@ export function Component() {
 
     const googleCalendarStatusMessage = useMemo(() => {
         if (!isGoogleCalendarConnected) {
-            return 'Connect to view events from Google Calendar.';
+            return 'Connect to view events from Google Calendar. ✨';
         }
         if (!googleCalendarExpiresAt) {
             return 'Connected to Google Calendar.';
@@ -535,17 +581,53 @@ export function Component() {
                 <div className={styles.settingsColumn}>
                     <div className={styles.section}>
                         <h4>
+                            Appearance
+                        </h4>
+                        <RadioInput
+                            label="Choose how light and dark modes are selected, then pick a color palette for each. ✨"
+                            name="themeMode"
+                            options={themeModeOptions}
+                            keySelector={themeModeKeySelector}
+                            labelSelector={themeModeLabelSelector}
+                            onChange={setConfigFieldValue}
+                            value={storedConfig.themeMode}
+                        />
+                        <div className={styles.paletteGroups}>
+                            <RadioInput
+                                name="lightPalette"
+                                label="Light theme"
+                                options={paletteOptions}
+                                keySelector={paletteKeySelector}
+                                labelSelector={lightPaletteLabelSelector}
+                                value={storedConfig.lightPalette}
+                                onChange={setConfigFieldValue}
+                                listContainerClassName={styles.paletteRadioList}
+                            />
+                            <RadioInput
+                                label="Dark theme"
+                                name="darkPalette"
+                                options={paletteOptions}
+                                keySelector={paletteKeySelector}
+                                labelSelector={darkPaletteLabelSelector}
+                                value={storedConfig.darkPalette}
+                                onChange={setConfigFieldValue}
+                                listContainerClassName={styles.paletteRadioList}
+                            />
+                        </div>
+                    </div>
+                    <div className={styles.section}>
+                        <h4>
                             Entry
                         </h4>
                         <Checkbox
                             name="compactTextArea"
-                            label="Only expand text area on focus"
+                            label="Expand text area only on focus"
                             value={storedConfig.compactTextArea}
                             onChange={setConfigFieldValue}
                         />
                         <Checkbox
                             name="checkboxForStatus"
-                            label="Use compact status indicator"
+                            label="Make status compact"
                             tooltip="Use checkbox instead of select input for the status. i.e. to toggle TODO, DOING and DONE"
                             value={storedConfig.checkboxForStatus}
                             onChange={setConfigFieldValue}
@@ -556,8 +638,9 @@ export function Component() {
                             value={storedConfig.enableStrikethrough}
                             onChange={setConfigFieldValue}
                         />
+                        {/* FIXME: Create CheckboxInput */}
                         <div className={styles.description}>
-                            Choose which actions are visible outside the popup. 🧪
+                            Choose which actions are visible outside the popup. ✨
                         </div>
                         {workItemActionLabels.map(({ key, label }) => (
                             <Checkbox
@@ -610,7 +693,7 @@ export function Component() {
                             </DndContext>
                         </div>
                         <div className={styles.description}>
-                            Choose which attributes are used for grouping
+                            Choose which attributes are used for grouping ✨
                         </div>
                         <SelectInput
                             name="groupLevel"
@@ -622,7 +705,7 @@ export function Component() {
                             nonClearable
                         />
                         <div className={styles.description}>
-                            Choose which groups are combined into a single heading
+                            Choose which groups are combined into a single heading ✨
                         </div>
                         <SelectInput
                             name="joinLevel"
@@ -633,17 +716,14 @@ export function Component() {
                             labelSelector={numericOptionLabelSelector}
                             nonClearable
                         />
-                        <div className={styles.description}>
-                            Choose how projects are sorted
-                        </div>
-                        <SelectInput
+                        <RadioInput
+                            label="Choose how projects are sorted ✨"
                             name="projectSortOrder"
                             value={storedConfig.projectSortOrder}
                             onChange={setConfigFieldValue}
                             options={projectSortOrderOptions}
                             keySelector={projectSortOrderKeySelector}
                             labelSelector={projectSortOrderLabelSelector}
-                            nonClearable
                         />
                     </div>
                     <div className={styles.section}>
@@ -683,7 +763,7 @@ export function Component() {
                         <div className={styles.description}>
                             Choose the editing mode for the editor
                         </div>
-                        <SelectInput
+                        <RadioInput
                             name="editingMode"
                             options={editingOptions}
                             keySelector={editingOptionKeySelector}
@@ -691,7 +771,6 @@ export function Component() {
                             // colorSelector={defaultColorSelector}
                             onChange={setConfigFieldValue}
                             value={storedConfig.editingMode}
-                            nonClearable
                         />
                     </div>
                     <div className={styles.section}>

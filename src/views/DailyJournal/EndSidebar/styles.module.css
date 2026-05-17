@@ -59,7 +59,7 @@
                         overflow: hidden;
                         text-overflow: ellipsis;
                         white-space: nowrap;
-                        color: var(--color-text-light);
+                        color: var(--color-text-muted);
                         font-size: var(--font-size-xs);
                     }
                     */
@@ -67,7 +67,7 @@
                     .usage-count {
                         flex-shrink: 0;
                         border-radius: var(--border-radius-lg);
-                        background-color: var(--color-tertiary);
+                        background-color: var(--color-primary-bg-subtle);
                         padding: 0 var(--spacing-sm);
                     }
                 }
