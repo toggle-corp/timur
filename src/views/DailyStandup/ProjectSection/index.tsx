@@ -17,6 +17,7 @@ import {
     DailyStandupQuery,
     DailyStandupQueryVariables,
     UserDepartmentTypeEnum,
+    AllProjectsQuery,
 } from '#generated/types/graphql';
 import useCurrentDate from '#hooks/useCurrentDate';
 import { formatDateTime } from '#utils/common';
@@ -24,6 +25,8 @@ import { formatDateTime } from '#utils/common';
 import Slide from '../Slide';
 
 import styles from './styles.module.css';
+
+type ProjectType = AllProjectsQuery['private']['allProjects'][number];
 
 const mapping: {
     [key in UserDepartmentTypeEnum]: number;
@@ -38,6 +41,7 @@ const mapping: {
 
 interface Props {
     projectId: string;
+    project: ProjectType;
     date: string;
     className?: string;
     currentSlide: number | undefined;
@@ -106,6 +110,7 @@ const DAILY_STANDUP_QUERY = gql`
 function ProjectSection(props: Props) {
     const {
         projectId,
+        project: projectFromProps,
         date,
         className,
         currentSlide,
@@ -119,6 +124,7 @@ function ProjectSection(props: Props) {
     });
 
     const stats = standupResponse.data?.private.dailyStandup.projectStat;
+    const project = stats?.project ?? projectFromProps;
     const deadlines = stats?.project?.deadlines;
     const events = standupResponse.data?.private.relativeEvents;
     const activeContracts = standupResponse.data?.private.contracts.items;
@@ -150,10 +156,10 @@ function ProjectSection(props: Props) {
         <Slide
             variant="split"
             className={_cs(styles.projectSection, className)}
-            primaryHeading={stats?.project.name}
-            primaryDescription={stats?.project.description && (
+            primaryHeading={project.name}
+            primaryDescription={project.description && (
                 <p>
-                    {stats.project.description}
+                    {project.description}
                 </p>
             )}
             tertiaryContent={(
@@ -195,8 +201,8 @@ function ProjectSection(props: Props) {
                 </>
             )}
             secondaryHeading="Team members"
-            secondaryBackground={isDefined(stats?.project.logoHd)
-                ? `url(${stats.project.logoHd.url})`
+            secondaryBackground={isDefined(project.logoHd)
+                ? `url(${project.logoHd.url})`
                 : undefined}
             secondaryContent={(
                 <>
