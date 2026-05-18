@@ -49,6 +49,7 @@ const ALL_PROJECTS = gql`
             allProjects {
                 id
                 name
+                description
                 logoHd {
                     url
                 }
@@ -316,6 +317,7 @@ export function Component() {
                 )}
                 {mapId !== 'start' && mapId !== 'end' && mapId !== 'deadlines' && (
                     <ProjectSection
+                        project={projectsMap?.[mapId]}
                         date={selectedDate}
                         projectId={mapId}
                         currentSlide={currentSlide}
