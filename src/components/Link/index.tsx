@@ -123,11 +123,13 @@ type InternalLinkProps = {
     urlSearch?: string;
     urlHash?: string;
     href?: never;
+    newTab?: never;
 }
 
 type ExternalLinkProps = {
     external: true;
     href: string | undefined | null;
+    newTab?: boolean;
     urlParams?: never;
     urlSearch?: never;
     urlHash?: never;
@@ -221,6 +223,8 @@ function Link(props: Props) {
             }
             // eslint-disable-next-line react/destructuring-assignment
             if (props.external) {
+                // eslint-disable-next-line react/destructuring-assignment
+                const newTab = props.newTab !== false;
                 return (
                     <a
                         // eslint-disable-next-line react/jsx-props-no-spreading
@@ -230,8 +234,8 @@ function Link(props: Props) {
                             styles.linkElement,
                             containerClassName,
                         )}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        target={newTab ? '_blank' : undefined}
+                        rel={newTab ? 'noopener noreferrer' : undefined}
                         href={toLink}
                     >
                         {content}
@@ -272,6 +276,8 @@ function Link(props: Props) {
             props.urlHash,
             // eslint-disable-next-line react/destructuring-assignment
             props.external,
+            // eslint-disable-next-line react/destructuring-assignment
+            props.newTab,
         ],
     );
 

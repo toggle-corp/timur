@@ -66,6 +66,7 @@ function UserMenu(props: Props) {
             <Link
                 className={className}
                 external
+                newTab={false}
                 title="Login"
                 href={`${import.meta.env.APP_GRAPHQL_DOMAIN}/?redirect_to=${window.location.href}`}
             >
