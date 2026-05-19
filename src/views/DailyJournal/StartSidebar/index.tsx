@@ -14,6 +14,7 @@ import {
 } from 'urql';
 
 import Button from '#components/Button';
+import DefaultMessage from '#components/DefaultMessage';
 import Link from '#components/Link';
 import MonthlyCalendar from '#components/MonthlyCalendar';
 import {
@@ -99,8 +100,8 @@ function DayEventsAndCalendar(props: DayEventsAndCalendarProps) {
     });
 
     const { data: googleEvents } = useSuspenseQuery({
-        queryKey: ['googleCalendarEvents', deferredSelectedDate],
-        queryFn: () => fetchEvents(deferredSelectedDate),
+        queryKey: ['googleCalendarEvents', isConnected, deferredSelectedDate],
+        queryFn: () => (isConnected ? fetchEvents(deferredSelectedDate) : Promise.resolve([])),
         staleTime: Infinity,
     });
 
@@ -161,7 +162,18 @@ function StartSidebar(props: Props) {
                 onDateClick={setSelectedDate}
                 lastEditedAt={lastEditedAt}
             />
-            <Suspense fallback={null}>
+            <Suspense
+                fallback={(
+                    <DefaultMessage
+                        compact
+                        filtered={false}
+                        empty={false}
+                        errored={false}
+                        pending
+                        pendingMessage="Searching the universe"
+                    />
+                )}
+            >
                 <DayEventsAndCalendar
                     selectedDate={selectedDate}
                     addedDescriptions={addedDescriptions}
