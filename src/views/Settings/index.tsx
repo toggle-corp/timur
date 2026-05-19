@@ -754,6 +754,7 @@ export function Component() {
                             colorSelector={defaultColorSelector}
                             onChange={setConfigFieldValue}
                             value={storedConfig.defaultTaskType}
+                            placeholder="Empty"
                         />
                     </div>
                     <div className={styles.section}>
