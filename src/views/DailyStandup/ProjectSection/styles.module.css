@@ -31,7 +31,12 @@
     .sub-section {
         display: flex;
         flex-direction: column;
+        transition: opacity var(--duration-transition-medium) ease-in-out 100ms;
         gap: var(--spacing-sm);
+
+        &.loading {
+            opacity: 0.5;
+        }
 
         .sub-heading {
             color: var(--color-secondary-text);
@@ -45,6 +50,14 @@
             margin: 0;
             padding-left: var(--spacing-lg);
             gap: var(--spacing-xs);
+        }
+    }
+
+    .users {
+        transition: opacity var(--duration-transition-medium) ease-in-out 100ms;
+
+        &.loading {
+            opacity: 0.5;
         }
     }
 

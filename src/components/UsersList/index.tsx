@@ -18,18 +18,19 @@ interface UserItem {
 }
 
 interface Props {
+    className?: string;
     users: UserItem[];
     strikeoutForStandup?: boolean;
 }
 
 function UsersList(props: Props) {
-    const { users, strikeoutForStandup } = props;
+    const { className, users, strikeoutForStandup } = props;
 
     return users.map((user) => (
         <div
             key={user.id}
             role="listitem"
-            className={styles.user}
+            className={_cs(styles.user, className)}
         >
             <DisplayPicture
                 className={styles.displayPicture}
