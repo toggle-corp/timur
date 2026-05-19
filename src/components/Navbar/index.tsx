@@ -4,7 +4,6 @@ import { _cs } from '@togglecorp/fujs';
 import Link from '#components/Link';
 import UserMenu from '#components/UserMenu';
 import NavbarContext from '#contexts/navbar';
-import icon from '#resources/icon.svg';
 
 import styles from './styles.module.css';
 
@@ -28,18 +27,15 @@ function Navbar(props: Props) {
             />
             <div className={styles.brand}>
                 <Link
+                    className={styles.desktopOnly}
                     linkElementClassName={styles.homeLink}
                     to="home"
-                    icons={(
-                        <img
-                            className={styles.appLogo}
-                            alt=""
-                            src={icon}
-                        />
-                    )}
                 >
                     Timur
                 </Link>
+                <span className={_cs(styles.homeLink, styles.mobileOnly)}>
+                    Timur
+                </span>
             </div>
             <div
                 className={styles.middleActions}
