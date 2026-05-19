@@ -89,12 +89,14 @@ const UPDATE_JOURNAL = gql`
 interface Props {
     dialogOpenTriggerRef: React.RefObject<(() => void) | undefined>;
     date: string;
+    onAvailabilityChange: () => void;
 }
 
 function AvailabilityDialog(props: Props) {
     const {
         dialogOpenTriggerRef,
         date,
+        onAvailabilityChange,
     } = props;
 
     const [showDialog, setShowDialog] = useState(false);
@@ -169,9 +171,10 @@ function AvailabilityDialog(props: Props) {
                 leaveType: dialogState.leaveType ?? null,
                 wfhType: dialogState.wfhType ?? null,
             });
+            onAvailabilityChange();
             handleModalClose();
         },
-        [date, dialogState, handleModalClose, updateAvailability],
+        [date, dialogState, handleModalClose, updateAvailability, onAvailabilityChange],
     );
 
     // FIXME: Use memo
