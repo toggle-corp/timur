@@ -211,11 +211,12 @@ function ProjectSection(props: Props) {
                         users={sortedUsers}
                     />
                     <DefaultMessage
+                        compact
                         filtered={false}
                         empty={sortedUsers.length === 0}
-                        pending={standupResponse.fetching}
+                        pending={sortedUsers.length === 0 && standupResponse.fetching}
                         errored={!!standupResponse.error}
-                        pendingMessage="Rounding up the team..."
+                        pendingMessage="Rounding up the team"
                         errorMessage="Something went sideways!"
                         emptyMessage="No activity here!"
                     />

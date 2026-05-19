@@ -130,11 +130,12 @@ function StartSection(props: Props) {
                         users={sortedUsers}
                     />
                     <DefaultMessage
+                        compact
                         filtered={false}
                         empty={sortedUsers.length === 0}
-                        pending={usersAvailability.fetching}
+                        pending={sortedUsers.length === 0 && usersAvailability.fetching}
                         errored={!!usersAvailability.error}
-                        pendingMessage="Checking who's around..."
+                        pendingMessage="Checking who's around"
                         errorMessage="Something went sideways!"
                         emptyMessage="Looks like everyone is here!"
                     />

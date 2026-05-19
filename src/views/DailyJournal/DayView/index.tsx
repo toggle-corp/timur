@@ -296,8 +296,8 @@ function DayView(props: Props) {
                 pending={groupedItems.length === 0 && loading}
                 errored={errored}
                 empty={groupedItems.length === 0}
-                emptyMessage="No entries found!"
-                pendingMessage="Looking for your entries..."
+                emptyMessage="You do not have any entry!"
+                pendingMessage="Looking for your entries"
                 errorMessage="Can't find your entries"
             />
             <div

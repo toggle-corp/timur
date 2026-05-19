@@ -325,6 +325,7 @@ function SelectInputContainer<
                 >
                     <List<OPTION, OPTION_KEY, GenericOptionProps<RENDER_PROPS, OPTION_KEY, OPTION>>
                         className={styles.list}
+                        messageClassName={styles.message}
                         data={options}
                         keySelector={optionKeySelector}
                         renderer={GenericOption}
@@ -332,7 +333,7 @@ function SelectInputContainer<
                         errored={optionsErrored}
                         filtered={optionsFiltered}
                         pending={optionsPending}
-                        pendingMessage="Fetching options..."
+                        pendingMessage="Fetching options"
                         emptyMessage="No option available"
                         filteredEmptyMessage="No option available for the search"
                         errorMessage="Failed to load options"

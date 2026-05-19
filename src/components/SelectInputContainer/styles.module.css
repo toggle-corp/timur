@@ -29,6 +29,10 @@
         }
     }
 
+    .message {
+        padding: var(--spacing-sm);
+    }
+
     .info-message {
         padding: var(--spacing-sm);
         text-align: center;
