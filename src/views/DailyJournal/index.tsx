@@ -330,6 +330,13 @@ export function Component() {
         [],
     );
 
+    const handleWorkItemCreateCancel = useCallback(
+        () => {
+            pendingCalendarOverrideRef.current = undefined;
+        },
+        [],
+    );
+
     const handleWorkItemCreate = useCallback(
         (taskId: string) => {
             const override = pendingCalendarOverrideRef.current;
@@ -820,6 +827,7 @@ export function Component() {
             <AddWorkItemDialog
                 dialogOpenTriggerRef={dialogOpenTriggerRef}
                 onWorkItemCreate={handleWorkItemCreate}
+                onWorkItemCreateCancel={handleWorkItemCreateCancel}
             />
         </Page>
     );

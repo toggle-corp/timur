@@ -21,12 +21,14 @@ import styles from './styles.module.css';
 interface Props {
     dialogOpenTriggerRef: React.RefObject<((description?: string) => void) | undefined>;
     onWorkItemCreate: (taskId: string) => void;
+    onWorkItemCreateCancel: () => void;
 }
 
 function AddWorkItemDialog(props: Props) {
     const {
         dialogOpenTriggerRef,
         onWorkItemCreate,
+        onWorkItemCreateCancel,
     } = props;
 
     const [showAddWorkItemDialog, setShowAddWorkItemDialog] = useState(false);
@@ -83,6 +85,14 @@ function AddWorkItemDialog(props: Props) {
         [onWorkItemCreate, handleModalClose],
     );
 
+    const handleWorkItemCreateCancel = useCallback(
+        () => {
+            onWorkItemCreateCancel();
+            handleModalClose();
+        },
+        [onWorkItemCreateCancel, handleModalClose],
+    );
+
     const filteredTaskList = useMemo(
         () => fuzzySearch(
             enums?.private.allActiveTasks ?? [],
@@ -119,7 +129,7 @@ function AddWorkItemDialog(props: Props) {
     return (
         <Dialog
             open={showAddWorkItemDialog}
-            onClose={handleModalClose}
+            onClose={handleWorkItemCreateCancel}
             heading="Add entry"
             contentClassName={styles.modalContent}
             className={styles.addWorkItemDialog}
