@@ -53,6 +53,15 @@ const dateFormatter = new Intl.DateTimeFormat(
     },
 );
 
+const dateFormatterShort = new Intl.DateTimeFormat(
+    [],
+    {
+        month: 'short',
+        day: 'numeric',
+        weekday: 'short',
+    },
+);
+
 interface Props {
     className?: string;
     workItems: WorkItem[] | undefined;
@@ -199,7 +208,10 @@ function DayView(props: Props) {
         return undefined;
     }, [taskById]);
 
-    const formattedDate = dateFormatter.format(new Date(selectedDate));
+    const date = new Date(selectedDate);
+    const formattedDate = date.getMonth() === 0
+        ? dateFormatter.format(date)
+        : dateFormatterShort.format(date);
     const formattedRelativeDate = useFormattedRelativeDate(selectedDate);
 
     const totalHours = useMemo(

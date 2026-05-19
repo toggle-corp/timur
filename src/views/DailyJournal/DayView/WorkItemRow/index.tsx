@@ -327,7 +327,7 @@ function WorkItemRow(props: Props) {
             title="Hours"
             value={workItem.duration}
             onChange={setFieldValue}
-            placeholder="hh:mm"
+            placeholder="00:00"
         />
     );
 
