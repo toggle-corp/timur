@@ -5,7 +5,7 @@ import {
 import {
     FcHighPriority,
     FcLandscape,
-    FcLeave,
+    FcMediumPriority,
     FcNews,
     FcNightLandscape,
     FcSportsMode,
@@ -59,7 +59,7 @@ function UpcomingEventsList(props: Props) {
                 key: `DEADLINE-${deadline.id}`,
                 type: 'DEADLINE' as const,
                 typeDisplay: 'Deadline',
-                icon: deadline.isExternal ? <FcHighPriority /> : <FcLeave />,
+                icon: deadline.isExternal ? <FcHighPriority /> : <FcMediumPriority />,
                 name: prefixedDeadlineName ? deadline.displayName : deadline.name,
                 remainingDays: deadline.remainingDays,
             })) ?? []),
