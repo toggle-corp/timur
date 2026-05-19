@@ -323,6 +323,13 @@ export function Component() {
         ],
     );
 
+    const handleAvailabilityChange = useCallback(
+        () => {
+            setLastEditedAt((val) => val + 1);
+        },
+        [],
+    );
+
     const handleWorkItemCreate = useCallback(
         (taskId: string) => {
             const override = pendingCalendarOverrideRef.current;
@@ -803,6 +810,7 @@ export function Component() {
             <AvailabilityDialog
                 dialogOpenTriggerRef={availabilityDialogOpenTriggerRef}
                 date={selectedDate}
+                onAvailabilityChange={handleAvailabilityChange}
             />
             <UpdateNoteDialog
                 dialogOpenTriggerRef={noteDialogOpenTriggerRef}
