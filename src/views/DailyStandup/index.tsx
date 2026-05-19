@@ -42,6 +42,8 @@ import StartSection from './StartSection';
 
 import styles from './styles.module.css';
 
+type ProjectType = AllProjectsQuery['private']['allProjects'][number];
+
 const ALL_PROJECTS = gql`
     query AllProjects {
         private {
@@ -105,22 +107,31 @@ export function Component() {
             return undefined;
         }
 
-        const initialMap: Record<string, Record<'next' | 'prev', string | undefined>> = {
+        interface PageParams {
+            prev: string | undefined;
+            next: string | undefined;
+            project: ProjectType | undefined;
+        }
+
+        const initialMap: Record<string, PageParams> = {
             start: {
                 prev: undefined,
                 next: 'deadlines',
+                project: undefined,
             },
             deadlines: {
                 prev: 'start',
                 // NOTE: This is safe because allProjectsData.length has been checked
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 next: allProjectsData[0]!.id,
+                project: undefined,
             },
             end: {
                 // NOTE: This is safe because allProjectsData.length has been checked
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 prev: allProjectsData[allProjectsData.length - 1]!.id,
                 next: undefined,
+                project: undefined,
             },
         };
 
@@ -133,6 +144,7 @@ export function Component() {
                     // NOTE: This is safe because boundary for allProjectsData has been checked
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     prev: index === 0 ? 'deadlines' : allProjectsData[index - 1]!.id,
+                    project: allProjectsData[index],
                 };
 
                 acc[val.id] = currentMap;
@@ -317,7 +329,7 @@ export function Component() {
                 )}
                 {mapId !== 'start' && mapId !== 'end' && mapId !== 'deadlines' && (
                     <ProjectSection
-                        project={projectsMap?.[mapId]}
+                        project={projectsMap?.[mapId]?.project}
                         date={selectedDate}
                         projectId={mapId}
                         currentSlide={currentSlide}

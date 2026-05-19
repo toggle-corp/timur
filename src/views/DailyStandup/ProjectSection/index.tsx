@@ -14,10 +14,10 @@ import SlideCounter from '#components/SlideCounter';
 import UpcomingEventsList from '#components/UpcomingEventsList';
 import UsersList from '#components/UsersList';
 import {
+    AllProjectsQuery,
     DailyStandupQuery,
     DailyStandupQueryVariables,
     UserDepartmentTypeEnum,
-    AllProjectsQuery,
 } from '#generated/types/graphql';
 import useCurrentDate from '#hooks/useCurrentDate';
 import { formatDateTime } from '#utils/common';
@@ -41,7 +41,7 @@ const mapping: {
 
 interface Props {
     projectId: string;
-    project: ProjectType;
+    project: ProjectType | undefined;
     date: string;
     className?: string;
     currentSlide: number | undefined;
@@ -124,12 +124,15 @@ function ProjectSection(props: Props) {
     });
 
     const stats = standupResponse.data?.private.dailyStandup.projectStat;
-    const project = stats?.project ?? projectFromProps;
     const deadlines = stats?.project?.deadlines;
     const events = standupResponse.data?.private.relativeEvents;
     const activeContracts = standupResponse.data?.private.contracts.items;
     const hasActiveContracts = (activeContracts?.length ?? 0) > 0;
     const hasUpcomingEvents = (deadlines?.length ?? 0) + (events?.length ?? 0) > 0;
+
+    const project = standupResponse.fetching
+        ? projectFromProps
+        : stats?.project;
 
     const todayDate = useCurrentDate();
 
@@ -156,17 +159,22 @@ function ProjectSection(props: Props) {
         <Slide
             variant="split"
             className={_cs(styles.projectSection, className)}
-            primaryHeading={project.name}
-            primaryDescription={project.description && (
+            primaryHeading={project?.name}
+            primaryDescription={project?.description && (
                 <p>
-                    {project.description}
+                    {project?.description}
                 </p>
             )}
             tertiaryContent={(
                 <>
                     <div className={styles.subSections}>
                         {hasActiveContracts && (
-                            <div className={styles.subSection}>
+                            <div
+                                className={_cs(
+                                    styles.subSection,
+                                    standupResponse.fetching && styles.loading,
+                                )}
+                            >
                                 <h3 className={styles.subHeading}>
                                     Active Contracts
                                 </h3>
@@ -180,7 +188,12 @@ function ProjectSection(props: Props) {
                             </div>
                         )}
                         {hasUpcomingEvents && (
-                            <div className={styles.subSection}>
+                            <div
+                                className={_cs(
+                                    styles.subSection,
+                                    standupResponse.fetching && styles.loading,
+                                )}
+                            >
                                 <h3 className={styles.subHeading}>
                                     Deadlines & Events
                                 </h3>
@@ -201,12 +214,16 @@ function ProjectSection(props: Props) {
                 </>
             )}
             secondaryHeading="Team members"
-            secondaryBackground={isDefined(project.logoHd)
-                ? `url(${project.logoHd.url})`
+            secondaryBackground={isDefined(project?.logoHd)
+                ? `url(${project?.logoHd.url})`
                 : undefined}
             secondaryContent={(
                 <>
                     <UsersList
+                        className={_cs(
+                            styles.users,
+                            standupResponse.fetching && styles.loading,
+                        )}
                         strikeoutForStandup
                         users={sortedUsers}
                     />
