@@ -64,6 +64,16 @@
         --spacing-3xl: calc(var(--base-spacing) * 2.44);
         --spacing-4xl: calc(var(--base-spacing) * 3);
         --spacing-5xl: calc(var(--base-spacing) * 3.8);
+
+        --font-size-2xs: calc(var(--base-font-size) * 0.75);
+        --font-size-xs: calc(var(--base-font-size) * 0.825);
+        --font-size-sm: calc(var(--base-font-size) * 0.9);
+        --font-size-md: var(--base-font-size);
+        --font-size-lg: calc(var(--base-font-size) * 1.15);
+        --font-size-xl: calc(var(--base-font-size) * 1.3);
+        --font-size-2xl: calc(var(--base-font-size) * 1.5);
+        --font-size-3xl: calc(var(--base-font-size) * 1.85);
+        --font-size-4xl: calc(var(--base-font-size) * 2.4);
     }
 
     --width-separator-sm: 1pt;
