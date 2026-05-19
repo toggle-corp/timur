@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import {
-    FcSynchronize,
-    FcViewDetails,
+    FcChargeBattery,
+    FcEmptyBattery,
 } from 'react-icons/fc';
 import { _cs } from '@togglecorp/fujs';
 
@@ -51,7 +51,7 @@ function DefaultMessage(props: Props) {
     const messageTitle = useMemo(
         () => {
             if (pending) {
-                return pendingMessage ?? 'Fetching data...';
+                return pendingMessage ?? 'Fetching data';
             }
 
             if (errored) {
@@ -121,10 +121,11 @@ function DefaultMessage(props: Props) {
             className={_cs(
                 styles.defaultMessage,
                 pending && overlayPending && styles.overlay,
-                pending && styles.animated,
+                styles.animated,
                 className,
             )}
-            icon={!pending ? <FcViewDetails /> : <FcSynchronize />}
+            icon={!pending ? <FcEmptyBattery /> : <FcChargeBattery />}
+            pending={pending}
             compact={compact}
             title={messageTitle}
             description={messageDescription}

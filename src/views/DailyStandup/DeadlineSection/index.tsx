@@ -107,11 +107,12 @@ function DeadlineSection(props: Props) {
                         events={events}
                     />
                     <DefaultMessage
+                        compact
                         filtered={false}
                         empty={isEmpty}
-                        pending={deadlinesAndEvents.fetching}
+                        pending={isEmpty && deadlinesAndEvents.fetching}
                         errored={!!deadlinesAndEvents.error}
-                        pendingMessage="Looking ahead..."
+                        pendingMessage="Looking ahead"
                         errorMessage="Something went sideways!"
                         emptyMessage="Nothing on the horizon!"
                     />
