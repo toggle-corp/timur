@@ -59,11 +59,13 @@ const APP_GROUPS: AppGroup[] = [
     {
         title: 'Mapswipe',
         apps: [
-            { name: 'Mobile App', url: 'https://play.google.com/store/apps/details?id=org.missingmaps.mapswipe&pli=1', icon: 'https://mapswipe.org/logo-compact.svg' },
+            { name: 'iOS App', url: 'https://apps.apple.com/us/app/mapswipe/id1133855392', icon: 'https://mapswipe.org/logo-compact.svg' },
+            { name: 'Android App', url: 'https://play.google.com/store/apps/details?id=org.missingmaps.mapswipe&pli=1', icon: 'https://mapswipe.org/logo-compact.svg' },
             { name: 'Web App', url: 'https://web.mapswipe.org', icon: 'https://mapswipe.org/logo-compact.svg' },
             { name: 'Website', url: 'https://mapswipe.org', icon: 'https://mapswipe.org/logo-compact.svg' },
             { name: 'Community Dashboard', url: 'https://community.mapswipe.org/', icon: 'https://mapswipe.org/logo-compact.svg' },
             { name: 'Manager Dashboard', url: 'https://managers.mapswipe.org/', icon: 'https://mapswipe.org/logo-compact.svg' },
+            { name: 'Docs', url: 'https://docs.mapswipe.org/', icon: 'https://mapswipe.org/logo-compact.svg' },
         ],
     },
     {
@@ -231,14 +233,7 @@ export function Component() {
                                         linkElementClassName={styles.appLink}
                                         icons={<AppIcon icon={app.icon} name={app.name} />}
                                     >
-                                        <div className={styles.appText}>
-                                            <span>
-                                                {app.name}
-                                            </span>
-                                            <span className={styles.appUrl}>
-                                                {app.url}
-                                            </span>
-                                        </div>
+                                        {app.name}
                                     </Link>
                                 ))}
                             </div>
