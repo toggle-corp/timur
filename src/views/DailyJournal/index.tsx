@@ -45,7 +45,6 @@ import RouteContext from '#contexts/route';
 import {
     MyTimeEntriesQuery,
     MyTimeEntriesQueryVariables,
-    TimeEntryTypeEnum,
 } from '#generated/types/graphql';
 import useCommand from '#hooks/useCommand';
 import { useFocusManager } from '#hooks/useFocus';
@@ -63,6 +62,7 @@ import {
     Task,
     WorkItem,
 } from '#utils/types';
+import inferTypeFromDescription from '#utils/workItemClassifier';
 
 import AddWorkItemDialog from './AddWorkItemDialog';
 import AvailabilityDialog from './AvailabilityDialog';
@@ -74,56 +74,6 @@ import StartSidebar from './StartSidebar';
 import UpdateNoteDialog from './UpdateNoteDialog';
 
 import styles from './styles.module.css';
-
-function inferTypeFromDescription(desc: string): TimeEntryTypeEnum | undefined {
-    const lower = desc.toLowerCase();
-    const matches = (pattern: RegExp) => pattern.test(lower);
-
-    if (matches(/\b(client meeting|client call|external meeting)\b/)) {
-        return 'EXTERNAL_MEETING';
-    }
-
-    if (
-        matches(/\b(meeting|standup|stand-up|all hands|all-hands)\b/)
-        || matches(/\b1:1\b/)
-    ) {
-        return 'INTERNAL_MEETING';
-    }
-    if (matches(/\b(client discussion|external discussion)\b/)) {
-        return 'EXTERNAL_DISCUSSION';
-    }
-    if (matches(/\b(discuss|discussion|brainstorm)\b/)) {
-        return 'INTERNAL_DISCUSSION';
-    }
-    if (matches(/\b(review|pull request|merge request)\b/)) {
-        return 'REVIEW';
-    }
-    if (matches(/\b(deploy|deployment|pipeline|ci|cd|infra|release)\b/)) {
-        return 'DEV_OPS';
-    }
-    if (matches(/\b(test|tests|testing|qa|qc|regression)\b/)) {
-        return 'TESTING';
-    }
-    if (matches(/\b(design|wireframe|mockup|ux|ui)\b/)) {
-        return 'DESIGN';
-    }
-    if (matches(/\b(research|study|investigate|spike|explore)\b/)) {
-        return 'RESEARCH';
-    }
-    if (matches(/\b(documentation|docs|readme|wiki|document)\b/)) {
-        return 'DOCUMENTATION';
-    }
-    if (matches(/\b(planning|project board|plan|roadmap|backlog|estimate|estimation)\b/)) {
-        return 'PROJECT_MANAGEMENT';
-    }
-    if (matches(/\b(annotation|annotate|labelling|labeling|label)\b/)) {
-        return 'ANNOTATION';
-    }
-    if (matches(/\b(refactor|fix|fixing|fixed|fixes|bugfix|hotfix|debug|implement|implementation|feature)\b/)) {
-        return 'DEVELOPMENT';
-    }
-    return undefined;
-}
 
 const MY_TIME_ENTRIES_QUERY = gql`
     query MyTimeEntries($date: Date!) {
