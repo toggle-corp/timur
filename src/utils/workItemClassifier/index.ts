@@ -1,21 +1,23 @@
-// Work-item type classifier — inference side.
-//
-// Reads a logistic-regression model trained externally (see scripts/README.md
-// for the training pipeline and design decisions) and suggests a
-// TimeEntryTypeEnum value for a given description. Returns `undefined` when
-// the top-class probability is below that class's threshold.
-//
-// Train/serve contract — this code MUST stay in sync with the analyzer in
-// scripts/train_work_item_classifier.py. Specifically:
-//   - lowercase
-//   - tokenize on /[^a-z0-9]+/
-//   - emit unigrams + adjacent bigrams (bigrams joined with '_')
-//   - apply IDF + L2 normalize (TF-IDF features)
-// The training side additionally substitutes entity names (people, projects,
-// clients) with sentinel tokens; this frontend does NOT — entity tokens in
-// real descriptions just miss the vocab and are silently ignored, which is
-// the desired privacy-preserving behavior.
-import type { TimeEntryTypeEnum } from '#generated/types/graphql';
+import { useMemo } from 'react';
+import {
+    isDefined,
+    listToGroupList,
+    listToMap,
+    mapToList,
+    mapToMap,
+    sum,
+    unique,
+} from '@togglecorp/fujs';
+import {
+    gql,
+    useQuery,
+} from 'urql';
+
+import {
+    TimeEntryTypeEnum,
+    WorkItemClassifierEntitiesQuery,
+    WorkItemClassifierEntitiesQueryVariables,
+} from '#generated/types/graphql';
 
 import type { WorkItemClassifierModel } from './types';
 
@@ -23,98 +25,194 @@ import modelData from './model.json';
 
 const model = modelData as unknown as WorkItemClassifierModel;
 
-const vocabIndex = new Map<string, number>(
-    model.vocabulary.map((token, idx) => [token, idx]),
+const vocabIndex: Record<string, number> = listToMap(
+    model.vocabulary,
+    (token) => token,
+    (_token, _key, idx) => idx,
 );
+
+// We want to replace specific names to either of these
+type Sentinel = 'project' | 'client' | 'colleague';
+
+// Clean up multi-word phrases
+function normalizePhrase(phrase: string): string {
+    return phrase.toLowerCase().split(/\s+/).filter((p) => p.length > 0).join(' ');
+}
+
+function expandName(name: string, sentinel: Sentinel): [string, Sentinel][] {
+    const parts = name.split(' ');
+    const entries: [string, Sentinel][] = [[name, sentinel]];
+    if (parts.length >= 2) {
+        const first = parts[0];
+        const last = parts[parts.length - 1];
+        if (first !== undefined) {
+            entries.push([first, sentinel]);
+        }
+        if (last !== undefined) {
+            entries.push([last, sentinel]);
+        }
+    }
+    return entries;
+}
+
+function buildSubstituteMap(
+    data: WorkItemClassifierEntitiesQuery | undefined,
+): Record<string, Sentinel> {
+    if (!data) {
+        return {};
+    }
+    const projectNames = unique(
+        data.private.allProjects.flatMap((p) => [p.name, p.shortName]),
+    );
+    const clientOrgNames = unique([
+        ...data.private.clients.items.map((c) => c.name),
+        ...data.private.contractors.items.map((c) => c.name),
+    ]);
+    const userNames = unique(
+        data.private.users.items.map((u) => u.displayName).filter(isDefined),
+    );
+
+    // Priority: project, client, then colleague.
+    // There are cases where project and client names are the same
+    const candidates: [string, Sentinel][] = [
+        ...projectNames.map<[string, Sentinel]>((p) => [normalizePhrase(p), 'project']),
+        ...clientOrgNames.map<[string, Sentinel]>((c) => [normalizePhrase(c), 'client']),
+        ...userNames.flatMap((name) => expandName(normalizePhrase(name), 'colleague')),
+    ];
+
+    return candidates.reduce<Record<string, Sentinel>>((acc, [key, sentinel]) => {
+        if (key.length > 0 && !(key in acc)) {
+            acc[key] = sentinel;
+        }
+        return acc;
+    }, {});
+}
+
+function l2Norm(values: number[]): number {
+    return Math.sqrt(sum(values.map((v) => v * v)));
+}
+
+function softmax(scores: number[]): number[] {
+    // Subtract the max before exponentiating for numerical stability.
+    const maxScore = Math.max(...scores);
+    const exps = scores.map((s) => Math.exp(s - maxScore));
+    const denom = sum(exps);
+    return exps.map((e) => e / denom);
+}
+
+function argmax(values: number[]): number {
+    return values.indexOf(Math.max(...values));
+}
+
+function dotProduct(
+    classWeights: [number, number][],
+    features: Record<number, number>,
+): number {
+    return sum(classWeights.map(([tokenIdx, weight]) => {
+        const cnt = features[tokenIdx];
+        return cnt === undefined ? 0 : weight * cnt;
+    }));
+}
+
+// ─── Tokenization + entity substitution ───────────────────────────────────
 
 function tokenize(text: string): string[] {
     return text.toLowerCase().split(/[^a-z0-9]+/).filter((t) => t.length > 0);
 }
 
-function buildFeatures(text: string): Map<number, number> {
-    // Mirrors sklearn TfidfTransformer(norm='l2', use_idf=True, smooth_idf=True,
-    // sublinear_tf=False) applied to count features. Steps:
-    //   1. Tokenize (unigrams + adjacent bigrams)
-    //   2. Multiply each count by the token's IDF (from model.idf)
-    //   3. L2-normalize the row vector
-    const tokens = tokenize(text);
-    const rawCounts = new Map<number, number>();
-
-    const bump = (token: string) => {
-        const idx = vocabIndex.get(token);
-        if (idx !== undefined) {
-            rawCounts.set(idx, (rawCounts.get(idx) ?? 0) + 1);
-        }
-    };
-
-    tokens.forEach((tok) => bump(tok));
-    for (let i = 0; i + 1 < tokens.length; i += 1) {
-        const a = tokens[i];
-        const b = tokens[i + 1];
-        if (a !== undefined && b !== undefined) {
-            bump(`${a}_${b}`);
-        }
-    }
-
-    // tf × idf
-    const tfidf = new Map<number, number>();
-    rawCounts.forEach((count, idx) => {
-        const idf = model.idf[idx] ?? 0;
-        tfidf.set(idx, count * idf);
-    });
-
-    // L2 normalize
-    let normSquared = 0;
-    tfidf.forEach((v) => { normSquared += v * v; });
-    const norm = Math.sqrt(normSquared);
-    if (norm > 0) {
-        tfidf.forEach((v, idx) => { tfidf.set(idx, v / norm); });
-    }
-
-    return tfidf;
+// NOTE: Needs space-padded input
+function cleanupClientProjectPairs(s: string): string {
+    // We are recursing until we get no substitution.
+    // Space-padding both sides to simplify boundary detection without regex
+    const next = s
+        .replaceAll(' client project ', ' project ')
+        .replaceAll(' project client ', ' project ')
+        .replaceAll(' project project ', ' project ');
+    return next === s ? s : cleanupClientProjectPairs(next);
 }
 
-function inferTypeFromDescription(
+function substituteEntities(
+    tokens: string[],
+    substituteMap: Record<string, Sentinel>,
+    sortedPhrases: string[],
+): string[] {
+    // Space-padding both sides to simplify boundary detection without regex
+    const padded = ` ${tokens.join(' ')} `;
+    const substituted = sortedPhrases.reduce(
+        (acc, phrase) => acc.replaceAll(` ${phrase} `, ` ${substituteMap[phrase]} `),
+        padded,
+    );
+    return cleanupClientProjectPairs(substituted).split(' ').filter((t) => t.length > 0);
+}
+
+function bigrams(tokens: string[]): string[] {
+    return tokens.slice(0, -1).flatMap((a, i) => {
+        const b = tokens[i + 1];
+        return b === undefined ? [] : [`${a}_${b}`];
+    });
+}
+
+function countNgrams(ngrams: string[]): Record<number, number> {
+    const vocabHits = ngrams
+        .map((ngram) => vocabIndex[ngram])
+        .filter((idx): idx is number => idx !== undefined);
+    const grouped = listToGroupList(vocabHits, (idx) => idx);
+    return mapToMap(grouped, undefined, (group) => group.length);
+}
+
+function buildFeatures(
+    text: string,
+    substituteMap: Record<string, Sentinel>,
+    sortedPhrases: string[],
+): Record<number, number> {
+    // TfidfTransformer(norm='l2', use_idf=True, smooth_idf=True, sublinear_tf=False)
+    const tokens = substituteEntities(tokenize(text), substituteMap, sortedPhrases);
+    const rawCounts = countNgrams([...tokens, ...bigrams(tokens)]);
+
+    const tfidf = mapToMap(rawCounts, undefined, (count, key) => {
+        const idx = Number(key);
+        const idf = model.idf[idx] ?? 0;
+        return count * idf;
+    });
+
+    const norm = l2Norm(mapToList(tfidf));
+    return norm > 0
+        ? mapToMap(tfidf, undefined, (v) => v / norm)
+        : tfidf;
+}
+
+function classScore(
+    intercept: number,
+    classWeights: [number, number][] | undefined,
+    features: Record<number, number>,
+): number {
+    if (!classWeights) {
+        return intercept;
+    }
+    return intercept + dotProduct(classWeights, features);
+}
+
+function inferType(
     description: string,
+    substituteMap: Record<string, Sentinel>,
+    sortedPhrases: string[],
 ): TimeEntryTypeEnum | undefined {
     if (description.trim().length === 0) {
         return undefined;
     }
 
-    const counts = buildFeatures(description);
-    if (counts.size === 0) {
+    const features = buildFeatures(description, substituteMap, sortedPhrases);
+    if (Object.keys(features).length === 0) {
         return undefined;
     }
 
-    const scores = model.intercepts.map((intercept, classIdx) => {
-        let s = intercept;
-        const classWeights = model.weights[classIdx];
-        if (classWeights) {
-            classWeights.forEach(([tokenIdx, weight]) => {
-                const cnt = counts.get(tokenIdx);
-                if (cnt !== undefined) {
-                    s += weight * cnt;
-                }
-            });
-        }
-        return s;
-    });
+    const scores = model.intercepts.map(
+        (intercept, classIdx) => classScore(intercept, model.weights[classIdx], features),
+    );
+    const probabilities = softmax(scores);
+    const bestIdx = argmax(probabilities);
 
-    const maxScore = Math.max(...scores);
-    const exps = scores.map((s) => Math.exp(s - maxScore));
-    const sum = exps.reduce((a, b) => a + b, 0);
-
-    let bestIdx = 0;
-    let bestExp = exps[0] ?? 0;
-    for (let c = 1; c < exps.length; c += 1) {
-        const e = exps[c];
-        if (e !== undefined && e > bestExp) {
-            bestExp = e;
-            bestIdx = c;
-        }
-    }
-
-    const bestProb = bestExp / sum;
+    const bestProb = probabilities[bestIdx] ?? 0;
     const classThreshold = model.thresholds[bestIdx] ?? 1.0;
     if (bestProb < classThreshold) {
         return undefined;
@@ -123,4 +221,53 @@ function inferTypeFromDescription(
     return model.classes[bestIdx];
 }
 
-export default inferTypeFromDescription;
+const WORK_ITEM_CLASSIFIER_ENTITIES_QUERY = gql`
+    query WorkItemClassifierEntities {
+        private {
+            id
+            allProjects {
+                id
+                name
+                shortName
+            }
+            clients(pagination: { limit: 9999 }) {
+                items {
+                    id
+                    name
+                }
+            }
+            contractors(pagination: { limit: 9999 }) {
+                items {
+                    id
+                    name
+                }
+            }
+            users(pagination: { limit: 9999 }) {
+                items {
+                    id
+                    displayName
+                }
+            }
+        }
+    }
+`;
+
+function useWorkItemClassifier(): (description: string) => TimeEntryTypeEnum | undefined {
+    const [result] = useQuery<
+        WorkItemClassifierEntitiesQuery,
+        WorkItemClassifierEntitiesQueryVariables
+    >({
+        query: WORK_ITEM_CLASSIFIER_ENTITIES_QUERY,
+        requestPolicy: 'cache-and-network',
+    });
+    const { data } = result;
+
+    return useMemo(() => {
+        const substituteMap = buildSubstituteMap(data);
+        // Sort phrases longest-first so multi-word names win over their parts
+        const sortedPhrases = Object.keys(substituteMap).sort((a, b) => b.length - a.length);
+        return (description: string) => inferType(description, substituteMap, sortedPhrases);
+    }, [data]);
+}
+
+export default useWorkItemClassifier;

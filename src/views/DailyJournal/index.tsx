@@ -62,7 +62,7 @@ import {
     Task,
     WorkItem,
 } from '#utils/types';
-import inferTypeFromDescription from '#utils/workItemClassifier';
+import useWorkItemClassifier from '#utils/workItemClassifier';
 
 import AddWorkItemDialog from './AddWorkItemDialog';
 import AvailabilityDialog from './AvailabilityDialog';
@@ -123,6 +123,8 @@ export function Component() {
     const routes = useContext(RouteContext);
 
     const { midActionsRef } = useContext(NavbarContext);
+
+    const inferTypeFromDescription = useWorkItemClassifier();
 
     const { date: dateFromParams } = useParams<{ date: string | undefined}>();
     const { fullDate } = useContext(DateContext);
@@ -335,7 +337,7 @@ export function Component() {
                 dialogOpenTriggerRef.current(override.description ?? undefined);
             }
         },
-        [],
+        [inferTypeFromDescription],
     );
 
     const handleWorkItemClone = useCallback(
@@ -438,7 +440,7 @@ export function Component() {
                 );
             }
         },
-        [workItems, setWorkItemChange, selectedDate],
+        [workItems, setWorkItemChange, selectedDate, inferTypeFromDescription],
     );
 
     const handleWorkItemDelete = useCallback(
