@@ -21,6 +21,7 @@ import AuthProvider from './providers/AuthProvider';
 import CommandProvider from './providers/CommandProvider';
 import DateProvider from './providers/DateProvider';
 import EnumsProvider from './providers/EnumsProvider';
+import GoogleCalendarProvider from './providers/GoogleCalendarProvider';
 import LocalStorageProvider from './providers/LocalStorageProvider';
 import NavbarProvider from './providers/NavbarProvider';
 import SizeProvider from './providers/SizeProvider';
@@ -83,28 +84,32 @@ function App() {
             <PwaPrompt />
             <UrqlProvider value={gqlClient}>
                 <QueryClientProvider client={queryClient}>
-                    <AuthProvider>
-                        <DateProvider>
-                            <NavbarProvider>
-                                <SizeProvider>
-                                    <LocalStorageProvider>
-                                        <ThemeProvider>
-                                            <EnumsProvider>
-                                                <CommandProvider>
-                                                    <RouteContext.Provider value={wrappedRoutes}>
-                                                        <RouterProvider
-                                                            router={router}
-                                                            fallbackElement={fallbackElement}
-                                                        />
-                                                    </RouteContext.Provider>
-                                                </CommandProvider>
-                                            </EnumsProvider>
-                                        </ThemeProvider>
-                                    </LocalStorageProvider>
-                                </SizeProvider>
-                            </NavbarProvider>
-                        </DateProvider>
-                    </AuthProvider>
+                    <GoogleCalendarProvider>
+                        <AuthProvider>
+                            <DateProvider>
+                                <NavbarProvider>
+                                    <SizeProvider>
+                                        <LocalStorageProvider>
+                                            <ThemeProvider>
+                                                <EnumsProvider>
+                                                    <CommandProvider>
+                                                        <RouteContext.Provider
+                                                            value={wrappedRoutes}
+                                                        >
+                                                            <RouterProvider
+                                                                router={router}
+                                                                fallbackElement={fallbackElement}
+                                                            />
+                                                        </RouteContext.Provider>
+                                                    </CommandProvider>
+                                                </EnumsProvider>
+                                            </ThemeProvider>
+                                        </LocalStorageProvider>
+                                    </SizeProvider>
+                                </NavbarProvider>
+                            </DateProvider>
+                        </AuthProvider>
+                    </GoogleCalendarProvider>
                 </QueryClientProvider>
             </UrqlProvider>
         </>

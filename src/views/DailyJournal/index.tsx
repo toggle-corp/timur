@@ -774,7 +774,6 @@ export function Component() {
                         <MyAvailabilityIndicator date={selectedDate} />
                     </Button>
                     <Link
-                        className={styles.mobileOnly}
                         to="settings"
                         title="Settings"
                         variant="tertiary"

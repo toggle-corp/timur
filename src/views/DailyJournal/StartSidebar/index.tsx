@@ -4,7 +4,7 @@ import {
     useMemo,
 } from 'react';
 import {
-    RiSettingsLine,
+    RiGoogleFill,
     RiTerminalBoxLine,
 } from 'react-icons/ri';
 import { useSuspenseQuery } from '@tanstack/react-query';
@@ -15,7 +15,6 @@ import {
 
 import Button from '#components/Button';
 import DefaultMessage from '#components/DefaultMessage';
-import Link from '#components/Link';
 import MonthlyCalendar from '#components/MonthlyCalendar';
 import {
     type DayEventsAndDeadlinesQuery,
@@ -145,6 +144,28 @@ function StartSidebar(props: Props) {
         lastEditedAt,
     } = props;
 
+    const {
+        isAvailable: isGoogleCalendarAvailable,
+        isConnected: isGoogleCalendarConnected,
+        expiresAt: googleCalendarExpiresAt,
+        connect: connectGoogleCalendar,
+        disconnect: disconnectGoogleCalendar,
+    } = useGoogleCalendar();
+
+    const googleCalendarStatusMessage = useMemo(() => {
+        if (!isGoogleCalendarConnected) {
+            return 'Connect to view events from Google Calendar. ✨';
+        }
+        if (!googleCalendarExpiresAt) {
+            return 'Connected to Google Calendar.';
+        }
+        const expiresOn = new Date(googleCalendarExpiresAt).toLocaleString([], {
+            dateStyle: 'medium',
+            timeStyle: 'short',
+        });
+        return `Connected. Integration expires on ${expiresOn}.`;
+    }, [isGoogleCalendarConnected, googleCalendarExpiresAt]);
+
     const addedDescriptions = useMemo(() => {
         const set = new Set<string>();
         dayWorkItems.forEach((item) => {
@@ -190,14 +211,19 @@ function StartSidebar(props: Props) {
                 >
                     Shortcuts
                 </Button>
-                <Link
-                    to="settings"
-                    title="Settings"
-                    variant="tertiary"
-                    icons={<RiSettingsLine />}
-                >
-                    Settings
-                </Link>
+                {isGoogleCalendarAvailable && (
+                    <Button
+                        name={undefined}
+                        title={googleCalendarStatusMessage}
+                        onClick={isGoogleCalendarConnected
+                            ? disconnectGoogleCalendar
+                            : connectGoogleCalendar}
+                        variant="tertiary"
+                        icons={<RiGoogleFill />}
+                    >
+                        {isGoogleCalendarConnected ? 'Disconnect' : 'Connect'}
+                    </Button>
+                )}
             </div>
         </div>
     );
