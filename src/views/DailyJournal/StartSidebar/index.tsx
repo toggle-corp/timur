@@ -72,7 +72,7 @@ const QUERY_CONTEXT = { suspense: true } as const;
 
 interface DayEventsAndCalendarProps {
     selectedDate: string;
-    addedDescriptions: Set<string>;
+    addedDescriptions: string[];
     onWorkItemCreateFromCalendar: (override: Partial<WorkItem>) => void;
 }
 
@@ -167,13 +167,13 @@ function StartSidebar(props: Props) {
     }, [isGoogleCalendarConnected, googleCalendarExpiresAt]);
 
     const addedDescriptions = useMemo(() => {
-        const set = new Set<string>();
+        const list: string[] = [];
         dayWorkItems.forEach((item) => {
             if (item.description) {
-                set.add(item.description.trim().toLowerCase());
+                list.push(item.description.trim().toLowerCase());
             }
         });
-        return set;
+        return list;
     }, [dayWorkItems]);
 
     return (

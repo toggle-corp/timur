@@ -123,7 +123,7 @@ function ScheduleRow(props: ScheduleRowProps) {
 
 interface Props {
     date: string;
-    addedDescriptions: Set<string>;
+    addedDescriptions: string[];
     onWorkItemCreateFromCalendar: (override: Partial<WorkItem>) => void;
     loading?: boolean;
     googleEvents: GoogleCalendarEvent[];
@@ -226,9 +226,9 @@ function GoogleCalendarSection(props: Props) {
                     <ScheduleGap minutes={leadingGapMinutes} />
                 )}
                 {timedGoogleEvents.map((event, index) => {
-                    const isAdded = event.summary
-                        ? addedDescriptions.has(event.summary.trim().toLowerCase())
-                        : false;
+                    const normalizedSummary = event.summary?.trim().toLowerCase() ?? '';
+                    const isAdded = normalizedSummary.length > 0
+                        && addedDescriptions.some((d) => d.includes(normalizedSummary));
 
                     return (
                         <Fragment key={event.id}>
