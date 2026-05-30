@@ -15,6 +15,7 @@ import { compareNumber } from '@togglecorp/fujs';
 import { type EventTypeEnum } from '#generated/types/graphql';
 import { type GeneralEventType } from '#utils/types';
 
+import AdminEditLink from '../AdminEditLink';
 import GeneralEventOutput from '../GeneralEvent';
 
 import styles from './styles.module.css';
@@ -57,6 +58,7 @@ function UpcomingEventsList(props: Props) {
         () => [
             ...(deadlines?.map((deadline) => ({
                 key: `DEADLINE-${deadline.id}`,
+                id: deadline.id,
                 type: 'DEADLINE' as const,
                 typeDisplay: 'Deadline',
                 icon: deadline.isExternal ? <FcHighPriority /> : <FcMediumPriority />,
@@ -65,6 +67,7 @@ function UpcomingEventsList(props: Props) {
             })) ?? []),
             ...(events?.map((event) => ({
                 key: `${event.type}-${event.id}`,
+                id: event.id,
                 type: event.type,
                 typeDisplay: event.typeDisplay,
                 icon: eventIcons[event.type],
@@ -83,10 +86,15 @@ function UpcomingEventsList(props: Props) {
 
             return (
                 <Fragment key={item.key}>
-                    <GeneralEventOutput
-                        generalEvent={item}
-                        hideDaysRemaining={hideDaysRemaining}
-                    />
+                    <AdminEditLink
+                        entity={item.type === 'DEADLINE' ? 'deadline' : 'event'}
+                        id={item.id}
+                    >
+                        <GeneralEventOutput
+                            generalEvent={item}
+                            hideDaysRemaining={hideDaysRemaining}
+                        />
+                    </AdminEditLink>
                     {item.remainingDays < 0
                         && nextItem
                         && nextItem.remainingDays >= 0

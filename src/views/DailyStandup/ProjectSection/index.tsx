@@ -9,6 +9,7 @@ import {
     useQuery,
 } from 'urql';
 
+import AdminEditLink from '#components/AdminEditLink';
 import DefaultMessage from '#components/DefaultMessage';
 import SlideCounter from '#components/SlideCounter';
 import UpcomingEventsList from '#components/UpcomingEventsList';
@@ -159,7 +160,11 @@ function ProjectSection(props: Props) {
         <Slide
             variant="split"
             className={_cs(styles.projectSection, className)}
-            primaryHeading={project?.name}
+            primaryHeading={project && (
+                <AdminEditLink entity="project" id={project.id}>
+                    {project.name}
+                </AdminEditLink>
+            )}
             primaryDescription={project?.description && (
                 <p>
                     {project?.description}
@@ -181,7 +186,9 @@ function ProjectSection(props: Props) {
                                 <ul className={styles.contracts}>
                                     {activeContracts?.map((contract) => (
                                         <li key={contract.id}>
-                                            {contract.name}
+                                            <AdminEditLink entity="contract" id={contract.id}>
+                                                {contract.name}
+                                            </AdminEditLink>
                                         </li>
                                     ))}
                                 </ul>
