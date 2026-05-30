@@ -73,6 +73,7 @@ interface Props {
     onWorkItemChange: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
     onWorkItemDelete: (clientId: string) => void;
     selectedDate: string;
+    inferTypeFromDescription?: (description: string) => WorkItem['type'];
 }
 
 function DayView(props: Props) {
@@ -87,6 +88,7 @@ function DayView(props: Props) {
         errored,
         selectedDate,
         tasks,
+        inferTypeFromDescription,
     } = props;
 
     const { taskById: oldTaskById } = useContext(EnumsContext);
@@ -471,6 +473,7 @@ function DayView(props: Props) {
                                 onAssist={onWorkItemAssist}
                                 onChange={onWorkItemChange}
                                 onDelete={onWorkItemDelete}
+                                inferTypeFromDescription={inferTypeFromDescription}
                             />
                         </div>
                     );

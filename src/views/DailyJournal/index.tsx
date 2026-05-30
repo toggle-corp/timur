@@ -747,6 +747,7 @@ export function Component() {
                     onWorkItemChange={handleWorkItemChange}
                     onWorkItemDelete={handleWorkItemDelete}
                     selectedDate={selectedDate}
+                    inferTypeFromDescription={inferTypeFromDescription}
                 />
             </FocusContext.Provider>
             <Button
