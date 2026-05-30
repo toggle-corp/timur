@@ -70,6 +70,7 @@ export type ConfigStorage = {
 
 export interface GeneralEventType {
     key: string;
+    id: string;
     type: EventTypeEnum | 'DEADLINE';
     typeDisplay: string;
     icon: React.ReactNode;
