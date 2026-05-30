@@ -86,7 +86,7 @@ export default defineConfig(({ mode }) => {
                     scope: '/',
                     display: 'standalone',
                     display_override: ['standalone'],
-                    orientation: 'any',
+                    orientation: 'portrait',
                     // NOTE: keep in sync with terracotta --color-background in src/themes.css
                     theme_color: '#fafaf0',
                     background_color: '#fafaf0',
