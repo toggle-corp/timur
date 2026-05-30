@@ -614,6 +614,13 @@ export function Component() {
                             value={storedConfig.enableStrikethrough}
                             onChange={setConfigFieldValue}
                         />
+                        <Checkbox
+                            name="autoInferTypeOnBlur"
+                            label="Auto-detect work item type on description blur ✨"
+                            tooltip="When you tab away from a description, suggest a type for the entry — only fills in a type if it's currently empty."
+                            value={storedConfig.autoInferTypeOnBlur}
+                            onChange={setConfigFieldValue}
+                        />
                         {/* FIXME: Create CheckboxInput */}
                         <div className={styles.description}>
                             Choose which actions are visible outside the popup. ✨

@@ -99,6 +99,7 @@ interface Props {
     onAssist?: (clientId: string) => void;
     onChange?: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
     onDelete?: (clientId: string) => void;
+    inferTypeFromDescription?: (description: string) => WorkItem['type'];
 }
 
 function WorkItemRow(props: Props) {
@@ -112,6 +113,7 @@ function WorkItemRow(props: Props) {
         onChange,
         typeErrored,
         durationErrored,
+        inferTypeFromDescription,
     } = props;
 
     const { enums } = useContext(EnumsContext);
@@ -127,6 +129,29 @@ function WorkItemRow(props: Props) {
             }
         },
         [workItem.clientId, onChange],
+    );
+
+    const handleDescriptionBlur = useCallback(
+        () => {
+            if (!config.autoInferTypeOnBlur || workItem.type || !inferTypeFromDescription) {
+                return;
+            }
+            const description = workItem.description?.trim();
+            if (!description) {
+                return;
+            }
+            const inferred = inferTypeFromDescription(description);
+            if (inferred) {
+                setFieldValue(inferred, 'type');
+            }
+        },
+        [
+            config.autoInferTypeOnBlur,
+            workItem.type,
+            workItem.description,
+            inferTypeFromDescription,
+            setFieldValue,
+        ],
     );
 
     const taskList: Task[] = useMemo(
@@ -215,20 +240,27 @@ function WorkItemRow(props: Props) {
     const handleClone = useCallback(
         () => {
             if (onClone) {
-                onClone(workItem.clientId, { duration: undefined, description: undefined });
+                onClone(workItem.clientId, {
+                    duration: undefined,
+                    description: undefined,
+                    ...(config.autoInferTypeOnBlur && { type: undefined }),
+                });
             }
         },
-        [onClone, workItem.clientId],
+        [onClone, workItem.clientId, config.autoInferTypeOnBlur],
     );
 
     const handleCloneWithDescription = useCallback(
         () => {
             if (onClone) {
                 // NOTE: we only want to clear duration
-                onClone(workItem.clientId, { duration: undefined });
+                onClone(workItem.clientId, {
+                    duration: undefined,
+                    ...(config.autoInferTypeOnBlur && { type: undefined }),
+                });
             }
         },
-        [onClone, workItem.clientId],
+        [onClone, workItem.clientId, config.autoInferTypeOnBlur],
     );
 
     const handleShortcuts = useCallback(
@@ -301,6 +333,7 @@ function WorkItemRow(props: Props) {
             value={workItem.description}
             onChange={setFieldValue}
             onKeyDown={handleShortcuts}
+            onBlur={handleDescriptionBlur}
             placeholder="Description"
             compact={config.compactTextArea}
         />

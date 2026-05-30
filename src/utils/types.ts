@@ -56,6 +56,7 @@ export type ConfigStorage = {
     indent: boolean,
     enableCollapsibleGroups: boolean,
     enableStrikethrough: boolean,
+    autoInferTypeOnBlur: boolean,
 
     dailyJournalAttributeOrder: DailyJournalAttribute[];
     dailyJournalGrouping: DailyJournalGrouping;
