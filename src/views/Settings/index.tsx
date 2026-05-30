@@ -32,7 +32,6 @@ import {
     isNotDefined,
 } from '@togglecorp/fujs';
 
-import Button from '#components/Button';
 import Checkbox from '#components/Checkbox';
 import Link from '#components/Link';
 import Page from '#components/Page';
@@ -40,7 +39,6 @@ import RadioInput from '#components/RadioInput';
 import SelectInput from '#components/SelectInput';
 import EnumsContext from '#contexts/enums';
 import { EnumsQuery } from '#generated/types/graphql';
-import useGoogleCalendar from '#hooks/useGoogleCalendar';
 import useLocalStorage from '#hooks/useLocalStorage';
 import useSetFieldValue from '#hooks/useSetFieldValue';
 import {
@@ -464,28 +462,6 @@ export function Component() {
         }
     }, [location.key, navigate]);
 
-    const {
-        isAvailable: isGoogleCalendarAvailable,
-        isConnected: isGoogleCalendarConnected,
-        expiresAt: googleCalendarExpiresAt,
-        connect: connectGoogleCalendar,
-        disconnect: disconnectGoogleCalendar,
-    } = useGoogleCalendar();
-
-    const googleCalendarStatusMessage = useMemo(() => {
-        if (!isGoogleCalendarConnected) {
-            return 'Connect to view events from Google Calendar. ✨';
-        }
-        if (!googleCalendarExpiresAt) {
-            return 'Connected to Google Calendar.';
-        }
-        const expiresOn = new Date(googleCalendarExpiresAt).toLocaleString([], {
-            dateStyle: 'medium',
-            timeStyle: 'short',
-        });
-        return `Connected. Integration expires on ${expiresOn}.`;
-    }, [isGoogleCalendarConnected, googleCalendarExpiresAt]);
-
     const updateJournalGrouping = useCallback((value: number, name: 'groupLevel' | 'joinLevel') => {
         const oldValue = storedConfig.dailyJournalGrouping
             ?? defaultConfigValue.dailyJournalGrouping;
@@ -773,39 +749,6 @@ export function Component() {
                             onChange={setConfigFieldValue}
                             value={storedConfig.editingMode}
                         />
-                    </div>
-                    <div className={styles.section}>
-                        <h4>
-                            Google Calendar
-                        </h4>
-                        {!isGoogleCalendarAvailable && (
-                            <p>
-                                Google Calendar integration requires
-                                {' '}
-                                <code>APP_GOOGLE_OAUTH_CLIENT_ID</code>
-                                {' '}
-                                to be configured.
-                            </p>
-                        )}
-                        {isGoogleCalendarAvailable && (
-                            <>
-                                <p>
-                                    {googleCalendarStatusMessage}
-                                </p>
-                                <Button
-                                    name={undefined}
-                                    title={isGoogleCalendarConnected
-                                        ? 'Disconnect Google Calendar'
-                                        : 'Connect Google Calendar'}
-                                    onClick={isGoogleCalendarConnected
-                                        ? disconnectGoogleCalendar
-                                        : connectGoogleCalendar}
-                                    variant="tertiary"
-                                >
-                                    {isGoogleCalendarConnected ? 'Disconnect' : 'Connect'}
-                                </Button>
-                            </>
-                        )}
                     </div>
                 </div>
                 <div className={styles.previewColumn}>
