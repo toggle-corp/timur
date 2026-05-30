@@ -1,8 +1,32 @@
 .shortcuts-dialog {
     .modal-content {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-md);
-        font-size: var(--font-size-md);
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        column-gap: var(--spacing-md);
+        row-gap: var(--spacing-sm);
+
+        .subheading {
+            padding-top: var(--spacing-md);
+            grid-column: 1 / -1;
+        }
+
+        .description {
+            grid-column: 1;
+        }
+
+        .key {
+            display: inline-flex;
+            grid-column: 3;
+            justify-self: end;
+            align-items: center;
+            border: var(--width-separator-sm) solid var(--color-separator);
+            border-radius: var(--border-radius-md);
+            background-color: var(--color-foreground);
+            padding: var(--spacing-3xs) var(--spacing-xs);
+            color: var(--color-primary-text);
+            font-family: var(--font-family-mono);
+            font-size: var(--font-size-sm);
+        }
     }
 }
