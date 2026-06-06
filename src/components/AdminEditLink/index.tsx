@@ -4,7 +4,7 @@ import UserContext from '#contexts/user';
 
 import styles from './styles.module.css';
 
-export type AdminEntity = 'project' | 'deadline' | 'event' | 'contract';
+type AdminEntity = 'project' | 'deadline' | 'event' | 'contract';
 
 const entityAdminPath: Record<AdminEntity, string> = {
     project: 'project/project',

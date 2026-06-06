@@ -1,6 +1,6 @@
 import type { TimeEntryTypeEnum } from '#generated/types/graphql';
 
-export interface WorkItemClassifierModelMeta {
+interface WorkItemClassifierModelMeta {
     trainedAt: string;
     trainSize: number;
     evalSize: number;

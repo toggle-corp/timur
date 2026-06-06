@@ -35,7 +35,7 @@ export const defaultConfigValue: ConfigStorage = {
     quickActions: ['clone'],
 };
 
-export interface ThemeModeOption {
+interface ThemeModeOption {
     key: ThemeMode;
     label: string;
 }
@@ -46,7 +46,7 @@ export const themeModeOptions: ThemeModeOption[] = [
     { key: 'dark', label: 'Dark' },
 ];
 
-export interface PaletteOption {
+interface PaletteOption {
     key: Palette;
     label: string;
     swatches: {
