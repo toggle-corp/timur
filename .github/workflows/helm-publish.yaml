@@ -5,13 +5,17 @@ on:
   push:
     branches:
       - develop
+      # TODO: This was added to test the integration, it can be removed after this is merged to repo's default branch
+      - feat/web-app-serve-helm
 
 permissions:
-  packages: write
+  contents: read       # checkout — a permissions block zeroes unlisted scopes
+  packages: write      # push image + chart to GHCR
+  pull-requests: read  # helm provenance writer resolves the PR from the commit
 
 jobs:
   publish_image:
-    name: Publish Docker Image
+    name: Publish Docker Image + Helm Chart
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,6 +23,7 @@ jobs:
           submodules: true
 
       - name: Publish web-app-serve
-        uses: toggle-corp/web-app-serve-action@v0.1.1
+        uses: toggle-corp/web-app-serve-action@v0.2.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          helm_publish: true
