@@ -1,5 +1,5 @@
-# NOTE: The name should is mandatory and should be unique
-name: toggle-corp-timur
+# NOTE: The name is mandatory and should be unique
+name: ${COMPOSE_PROJECT_NAME:-toggle-corp-timur}
 
 services:
   web-app-serve:
@@ -7,9 +7,18 @@ services:
       context: ../
       target: web-app-serve
     environment:
-      # web-app-serve config
-      APPLY_CONFIG__ENABLE_DEBUG: true
-    # NOTE: See "Dockerfile" to get dynamic env variables for .env file
-    env_file: .env
+      # web-app-serve config: dumps unreplaced placeholders + diffs at /__debug/
+      APPLY_CONFIG__ENABLE_DEBUG: "true"
+      # Dynamic configs (local defaults; override via an optional local .env)
+      APP_TITLE: "${APP_TITLE:-Timur}"
+      APP_ENVIRONMENT: "${APP_ENVIRONMENT:-development}"
+      APP_GRAPHQL_DOMAIN: "${APP_GRAPHQL_DOMAIN:-http://localhost:8060}"
+      APP_UMAMI_SRC: "${APP_UMAMI_SRC:-}"
+      APP_UMAMI_ID: "${APP_UMAMI_ID:-}"
+      APP_SENTRY_DSN: "${APP_SENTRY_DSN:-}"
+    # NOTE: See "Dockerfile" for the full set of dynamic env variables.
+    env_file:
+      - path: .env
+        required: false
     ports:
       - '8050:80'
