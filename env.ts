@@ -2,7 +2,7 @@ import {
     defineConfig,
     overrideDefineForWebAppServe,
     Schema,
-} from '@julr/vite-plugin-validate-env';
+} from '@togglecorp/vite-plugin-validate-env';
 
 const webAppServeEnabled = process.env.WEB_APP_SERVE_ENABLED?.toLowerCase() === 'true';
 if (webAppServeEnabled) {
@@ -28,7 +28,7 @@ export default defineConfig({
             }
             if (value === 'APP_ENVIRONMENT_PLACEHOLDER') {
                 // eslint-disable-next-line no-console
-                console.warn(`Using ${value} for app environment. Make sure to not use this for builds without nginx-serve`);
+                console.warn(`Using ${value} for app environment. Make sure to not use this for builds without web-app-serve`);
             }
             return value as ('production' | 'staging' | 'testing' | `alpha-${number}` | 'development' | 'APP_ENVIRONMENT_PLACEHOLDER');
         },
