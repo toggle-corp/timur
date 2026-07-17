@@ -11,7 +11,7 @@ RUN apt-get update -y \
 
 WORKDIR /code
 
-# -------------------------- Nginx - Builder --------------------------------
+# -------------------------- web-app-serve - Builder ------------------------
 FROM dev AS web-app-serve-build
 
 COPY ./package.json ./pnpm-lock.yaml /code/
@@ -46,7 +46,6 @@ RUN pnpm generate:type && WEB_APP_SERVE_ENABLED=true pnpm build
 # Final image using web-app-serve
 FROM ghcr.io/toggle-corp/web-app-serve:v0.1.2 AS web-app-serve
 
-MAINTAINER navin
 LABEL org.opencontainers.image.source="https://github.com/toggle-corp/timur"
 LABEL org.opencontainers.image.authors="dev@togglecorp.com"
 

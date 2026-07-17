@@ -70,9 +70,9 @@ devDependencies:
   '@graphql-typed-document-node/core':
     specifier: ^3.2.0
     version: 3.2.0(graphql@16.9.0)
-  '@julr/vite-plugin-validate-env':
-    specifier: git+https://github.com/toggle-corp/vite-plugin-validate-env#v2.2.0-tc.1
-    version: github.com/toggle-corp/vite-plugin-validate-env/3225c8405bdadf1168f1fa6f8a6de76c6777b620(vite@5.0.10)
+  '@togglecorp/vite-plugin-validate-env':
+    specifier: ^2.2.1
+    version: 2.2.1(vite@5.0.10)
   '@types/node':
     specifier: ^20.11.6
     version: 20.11.6
@@ -634,14 +634,6 @@ packages:
       chalk: 2.4.2
       js-tokens: 4.0.0
       picocolors: 1.0.1
-    dev: true
-
-  /@babel/parser@7.25.3:
-    resolution: {integrity: sha512-iLTJKDbJ4hMvFPgQwwsVoxtHyWpKKPBrxkANrSYewDPaPpT5py5yeVkgPIJ7XYXhndxJpaA3PyALSXQ7u8e/Dw==}
-    engines: {node: '>=6.0.0'}
-    hasBin: true
-    dependencies:
-      '@babel/types': 7.25.6
     dev: true
 
   /@babel/parser@7.25.6:
@@ -1694,7 +1686,7 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       '@babel/code-frame': 7.24.7
-      '@babel/parser': 7.25.3
+      '@babel/parser': 7.25.6
       '@babel/types': 7.25.2
     dev: true
 
@@ -4315,6 +4307,19 @@ packages:
     dependencies:
       '@babel/runtime-corejs3': 7.24.8
     dev: false
+
+  /@togglecorp/vite-plugin-validate-env@2.2.1(vite@5.0.10):
+    resolution: {integrity: sha512-K39bpXSOdliJPMNfHuK17pszgWWNRJfaB4NRDQBuWx9h4O4/qF1nl7DpwBqSB006e3E284jZAZEw2r7RoHdG4w==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      vite: ^2.9.0 || ^3.0.0-0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
+    dependencies:
+      '@poppinss/cliui': 6.4.4
+      '@poppinss/validator-lite': 2.1.1
+      '@standard-schema/spec': 1.0.0
+      unconfig: 7.3.2
+      vite: 5.0.10(@types/node@20.11.6)
+    dev: true
 
   /@tybys/wasm-util@0.10.0:
     resolution: {integrity: sha512-VyyPYFlOMNylG45GoAe0xDoLwWuowvf92F9kySqzYh8vmYm7D2u4iUJKa1tOUpS70Ku13ASrOkS4ScXFsTaCNQ==}
@@ -9898,6 +9903,7 @@ packages:
   /source-map@0.8.0-beta.0:
     resolution: {integrity: sha512-2ymg6oRBpebeZi9UUNsgQ89bhx01TcTkmNTGnNO88imTmbSgy4nfujrgVEFKWpMTEGA11EDkTt7mqObTPdigIA==}
     engines: {node: '>= 8'}
+    deprecated: The work that was done in this beta branch won't be included in future versions
     dependencies:
       whatwg-url: 7.1.0
     dev: true
@@ -10682,7 +10688,7 @@ packages:
 
   /uuid@3.4.0:
     resolution: {integrity: sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==}
-    deprecated: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
     dev: true
 
@@ -11055,6 +11061,7 @@ packages:
 
   /whatwg-encoding@1.0.5:
     resolution: {integrity: sha512-b5lim54JOPN9HtzvK9HFXvBma/rnfFeqsic0hSpjtDbVxR3dJKLc+KB4V6GgiGOvl7CY/KNh8rxSo9DKQrnUEw==}
+    deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
     dependencies:
       iconv-lite: 0.4.24
     dev: true
@@ -11478,22 +11485,4 @@ packages:
       - canvas
       - supports-color
       - utf-8-validate
-    dev: true
-
-  github.com/toggle-corp/vite-plugin-validate-env/3225c8405bdadf1168f1fa6f8a6de76c6777b620(vite@5.0.10):
-    resolution: {tarball: https://codeload.github.com/toggle-corp/vite-plugin-validate-env/tar.gz/3225c8405bdadf1168f1fa6f8a6de76c6777b620}
-    id: github.com/toggle-corp/vite-plugin-validate-env/3225c8405bdadf1168f1fa6f8a6de76c6777b620
-    name: '@julr/vite-plugin-validate-env'
-    version: 2.2.0
-    engines: {node: '>=22'}
-    prepare: true
-    requiresBuild: true
-    peerDependencies:
-      vite: ^2.9.0 || ^3.0.0-0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
-    dependencies:
-      '@poppinss/cliui': 6.4.4
-      '@poppinss/validator-lite': 2.1.1
-      '@standard-schema/spec': 1.0.0
-      unconfig: 7.3.2
-      vite: 5.0.10(@types/node@20.11.6)
     dev: true
