@@ -1,47 +1,11 @@
-import {
-    useCallback,
-    useContext,
-} from 'react';
-import {
-    RiAdminLine,
-    RiLogoutBoxLine,
-    RiSettings4Line,
-} from 'react-icons/ri';
-import {
-    _cs,
-    isDefined,
-    isNotDefined,
-} from '@togglecorp/fujs';
-import {
-    gql,
-    useMutation,
-} from 'urql';
+import { useContext } from 'react';
+import { _cs } from '@togglecorp/fujs';
 
-import DisplayPicture from '#components/DisplayPicture';
-import DropdownMenu from '#components/DropdownMenu';
-import DropdownMenuItem from '#components/DropdownMenuItem';
 import Link from '#components/Link';
+import UserMenu from '#components/UserMenu';
 import NavbarContext from '#contexts/navbar';
-import UserContext from '#contexts/user';
-import {
-    LogoutMutation,
-    LogoutMutationVariables,
-} from '#generated/types/graphql';
-
-import timurLogo from '../../App/icon.svg';
 
 import styles from './styles.module.css';
-
-const LOGOUT_MUTATION = gql`
-    mutation Logout {
-        public {
-            logout {
-                ok
-                errors
-            }
-        }
-    }
-`;
 
 interface Props {
     className?: string;
@@ -50,28 +14,10 @@ interface Props {
 function Navbar(props: Props) {
     const { className } = props;
     const {
-        userAuth,
-        removeUserAuth,
-    } = useContext(UserContext);
-    const {
         startActionsRef,
         midActionsRef,
         endActionsRef,
     } = useContext(NavbarContext);
-
-    const [{ fetching }, triggerLogout] = useMutation<LogoutMutation, LogoutMutationVariables>(
-        LOGOUT_MUTATION,
-    );
-
-    const handleLogoutClick = useCallback(
-        async () => {
-            const response = await triggerLogout({});
-            if (response.data?.public.logout.ok) {
-                removeUserAuth();
-            }
-        },
-        [triggerLogout, removeUserAuth],
-    );
 
     return (
         <nav className={_cs(styles.navbar, className)}>
@@ -81,78 +27,21 @@ function Navbar(props: Props) {
             />
             <div className={styles.brand}>
                 <Link
+                    className={styles.desktopOnly}
                     linkElementClassName={styles.homeLink}
                     to="home"
-                    icons={(
-                        <img
-                            className={styles.appLogo}
-                            alt=""
-                            src={timurLogo}
-                        />
-                    )}
                 >
                     Timur
                 </Link>
+                <span className={_cs(styles.homeLink, styles.mobileOnly)}>
+                    Timur
+                </span>
             </div>
             <div
                 className={styles.middleActions}
                 ref={midActionsRef}
             />
-            <div className={styles.auth}>
-                {isNotDefined(userAuth) && (
-                    <Link
-                        external
-                        href={`${import.meta.env.APP_GRAPHQL_DOMAIN}/?redirect_to=${window.location.href}`}
-                    >
-                        Login
-                    </Link>
-                )}
-                {isDefined(userAuth) && (
-                    <DropdownMenu
-                        variant="transparent"
-                        withoutDropdownIcon
-                        label={(
-                            <DisplayPicture
-                                className={styles.displayPicture}
-                                imageUrl={userAuth.displayPicture}
-                                displayName={userAuth.displayName ?? userAuth.email}
-                            />
-                        )}
-                        title="Show user actions"
-                    >
-                        <div className={styles.greetings}>
-                            {`Hello ${userAuth.displayName}!`}
-                        </div>
-                        {userAuth.isStaff && (
-                            <DropdownMenuItem
-                                type="link"
-                                external
-                                href={`${import.meta.env.APP_GRAPHQL_DOMAIN}/admin`}
-                                icons={<RiAdminLine />}
-                            >
-                                Admin Panel
-                            </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem
-                            type="link"
-                            to="settings"
-                            icons={<RiSettings4Line />}
-                        >
-                            Settings
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                            type="button"
-                            name={undefined}
-                            onClick={handleLogoutClick}
-                            disabled={fetching}
-                            icons={<RiLogoutBoxLine />}
-                            title="Log out"
-                        >
-                            Log out
-                        </DropdownMenuItem>
-                    </DropdownMenu>
-                )}
-            </div>
+            <UserMenu className={styles.auth} />
             <div
                 className={styles.endActions}
                 ref={endActionsRef}

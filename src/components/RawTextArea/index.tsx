@@ -15,7 +15,7 @@ export interface Props<N> extends Omit<React.HTMLProps<HTMLTextAreaElement>, 're
     name: N,
     e?: React.ChangeEvent<HTMLTextAreaElement> | undefined,
   ) => void;
-  elementRef?: React.Ref<HTMLTextAreaElement>;
+  elementRef?: React.RefObject<HTMLTextAreaElement | null>;
   compact?: boolean;
 }
 

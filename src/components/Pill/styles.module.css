@@ -1,0 +1,23 @@
+.pill {
+    display: inline-flex;
+    align-items: center;
+    border: var(--width-separator-sm) solid var(--color-separator);
+    border-radius: var(--border-radius-full);
+    padding: var(--spacing-2xs) var(--spacing-sm);
+    max-width: 100%;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+    gap: var(--spacing-2xs);
+
+    .icon {
+        display: inline-flex;
+        align-items: center;
+        font-size: 1em;
+    }
+
+    .label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}

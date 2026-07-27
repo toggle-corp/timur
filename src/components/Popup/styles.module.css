@@ -1,13 +1,23 @@
-.popup {
-    position: fixed;
+.popover {
+    --popup-width: 16rem;
+
+    position: absolute;
+    margin: var(--spacing-sm);
+    border: var(--width-separator-sm) solid var(--color-separator-strong);
     border-radius: var(--spacing-xs);
-    box-shadow: var(--box-shadow-2xl);
-    background-color: var(--color-text-on-dark);
+    box-shadow: var(--box-shadow-xl);
+    background-color: var(--color-foreground);
+
+    width: var(--popup-width, auto);
+    min-width: anchor-size(width);
     max-height: 40vh;
     overflow: auto;
 
-    &.top-orientation {
-        /* FIXME: add variable */
-        box-shadow: 0 -8pt 20pt -5pt rgb(0 0 0 / 0.5);
+    position-visibility: anchors-visible;
+    position-area: bottom;
+    position-try-fallbacks: bottom, bottom left, bottom right, top, top left, top right;
+
+    ::backdrop {
+        display: none;
     }
 }

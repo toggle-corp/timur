@@ -29,9 +29,13 @@
         }
     }
 
+    .message {
+        padding: var(--spacing-sm);
+    }
+
     .info-message {
         padding: var(--spacing-sm);
         text-align: center;
-        color: var(--color-text-light);
+        color: var(--color-text-muted);
     }
 }

@@ -1,64 +1,91 @@
-import { useContext } from 'react';
-import { _cs } from '@togglecorp/fujs';
-
-import Portal from '#components/Portal';
-import DialogContext from '#contexts/dialog';
-import useFloatPlacement from '#hooks/useFloatPlacement';
+import {
+    useEffect,
+    useLayoutEffect,
+    useMemo,
+    useRef,
+} from 'react';
+import {
+    _cs,
+    randomString,
+} from '@togglecorp/fujs';
 
 import styles from './styles.module.css';
 
 interface Props {
     className?: string;
-    elementRef?: React.RefObject<HTMLDivElement>;
-    parentRef: React.RefObject<HTMLElement | undefined>;
     children?: React.ReactNode;
-    preferredWidth?: number;
+    parentRef: React.RefObject<HTMLElement | null>;
+    open?: boolean;
+    setOpen?: (isOpen: boolean) => void;
 }
 
 function Popup(props: Props) {
     const {
-        parentRef,
-        elementRef,
-        children,
         className,
-        preferredWidth,
+        children,
+        parentRef,
+        open,
+        setOpen,
     } = props;
 
-    const placements = useFloatPlacement(parentRef, preferredWidth);
+    const anchorName = useMemo(() => `anchor_${randomString(8)}`, []);
 
-    const {
-        dialogRef,
-    } = useContext(DialogContext);
+    const popoverRef = useRef<HTMLDivElement>(null);
 
-    if (!placements) {
-        return null;
-    }
+    useLayoutEffect(() => {
+        if (parentRef.current) {
+            parentRef.current.style.setProperty('anchor-name', `--${anchorName}`);
+        }
+    }, [anchorName, parentRef]);
 
-    const {
-        content,
-        width,
-        orientation,
-    } = placements;
+    useEffect(() => {
+        const popover = popoverRef.current;
+        if (!popover) {
+            return;
+        }
+
+        const isOpen = popover.matches(':popover-open');
+        if (open && !isOpen) {
+            popover.showPopover();
+        } else if (!open && isOpen) {
+            popover.hidePopover();
+        }
+    }, [open]);
+
+    useLayoutEffect(() => {
+        const popover = popoverRef.current;
+        if (!popover) {
+            return undefined;
+        }
+
+        const handler = (event: Event) => {
+            const { newState } = event as (Event & { newState: string });
+            const newValue = newState === 'open';
+            if (setOpen) {
+                setOpen(newValue);
+            }
+        };
+
+        popover.addEventListener('toggle', handler);
+        return () => {
+            popover.removeEventListener('toggle', handler);
+        };
+    }, [setOpen]);
 
     return (
-        <Portal
-            container={dialogRef}
+        <div
+            popover="auto"
+            ref={popoverRef}
+            style={{
+                positionAnchor: `--${anchorName}`,
+            }}
+            className={_cs(
+                styles.popover,
+                className,
+            )}
         >
-            <div
-                ref={elementRef}
-                style={{
-                    ...content,
-                    width,
-                }}
-                className={_cs(
-                    styles.popup,
-                    orientation.vertical === 'bottom' && styles.topOrientation,
-                    className,
-                )}
-            >
-                {children}
-            </div>
-        </Portal>
+            {children}
+        </div>
     );
 }
 

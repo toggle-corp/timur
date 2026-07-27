@@ -1,4 +1,7 @@
-import { useCallback } from 'react';
+import {
+    useCallback,
+    useEffect,
+} from 'react';
 import { pwaInfo } from 'virtual:pwa-info';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
@@ -26,7 +29,7 @@ function PwaPrompt() {
                         console.info('Checking for SW update');
                         registration.update();
                     },
-                    20000,
+                    5 * 60 * 1000,
                 );
             } else {
                 // eslint-disable-next-line no-console
@@ -38,6 +41,22 @@ function PwaPrompt() {
             console.error('SW registration error', error);
         },
     });
+
+    // NOTE: without persistent storage browsers can clear localStorage
+    useEffect(() => {
+        if (!navigator.storage?.persist) {
+            return;
+        }
+        navigator.storage.persist()
+            .then((granted) => {
+                // eslint-disable-next-line no-console
+                console.info(`Persistent storage ${granted ? 'granted' : 'not granted'}`);
+            })
+            .catch((error) => {
+                // eslint-disable-next-line no-console
+                console.error('Persistent storage request failed', error);
+            });
+    }, []);
 
     const reload = useCallback(
         () => {
@@ -67,6 +86,7 @@ function PwaPrompt() {
             contentClassName={styles.modalContent}
             className={styles.promptDialog}
             size="auto"
+            closeOnOutsideClick
         >
             <div>
                 {offlineReady
@@ -78,7 +98,7 @@ function PwaPrompt() {
                     title="Close SW update prompt"
                     name={undefined}
                     onClick={close}
-                    variant="quaternary"
+                    variant="tertiary"
                 >
                     Close
                 </Button>

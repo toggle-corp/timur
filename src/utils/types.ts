@@ -15,6 +15,8 @@ export type SpacingVariant = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export type EditingMode = 'normal' | 'vim';
 
+export type WorkItemAction = 'clone' | 'clone-with-description' | 'copy' | 'move' | 'delete';
+
 export type Task = EnumsQuery['private']['allActiveTasks'][number];
 
 type WorkItemType = TimeEntryTypeEnum;
@@ -33,9 +35,19 @@ export interface DailyJournalGrouping {
     joinLevel: number;
 }
 
+export type ProjectSortOrder = 'name' | 'standup-order';
+
+export type Palette = 'catppuccin' | 'gruvbox' | 'monokai' | 'solarized' | 'terracotta';
+
+export type ThemeMode = 'auto' | 'light' | 'dark';
+
 export type ConfigStorage = {
     defaultTaskType: WorkItemType | undefined,
     defaultTaskStatus: WorkItemStatus,
+
+    themeMode: ThemeMode,
+    lightPalette: Palette,
+    darkPalette: Palette,
 
     editingMode: EditingMode,
 
@@ -44,17 +56,22 @@ export type ConfigStorage = {
     indent: boolean,
     enableCollapsibleGroups: boolean,
     enableStrikethrough: boolean,
+    autoInferTypeOnBlur: boolean,
 
     dailyJournalAttributeOrder: DailyJournalAttribute[];
     dailyJournalGrouping: DailyJournalGrouping;
+    projectSortOrder: ProjectSortOrder;
+
+    quickActions: WorkItemAction[];
 
     collapsedGroups: string[],
     startSidebarShown: boolean,
     endSidebarShown: boolean,
 }
 
-export interface GeneralEvent {
+export interface GeneralEventType {
     key: string;
+    id: string;
     type: EventTypeEnum | 'DEADLINE';
     typeDisplay: string;
     icon: React.ReactNode;

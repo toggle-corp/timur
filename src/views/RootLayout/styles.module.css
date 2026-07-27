@@ -2,8 +2,12 @@
     display: flex;
     position: relative;
     flex-direction: column;
-    height: 100vh;
+    height: 100svh;
     overflow: auto;
+
+    @media (display-mode: standalone) {
+        height: 100dvh;
+    }
 
     .navigation-loader {
         position: fixed;
@@ -25,20 +29,73 @@
         background: var(--color-primary);
         padding: var(--spacing-xs);
         text-align: center;
-        color: var(--color-tertiary);
+        color: var(--color-on-primary);
     }
     .navbar {
+        position: sticky;
+        top: 0;
         flex-shrink: 0;
+        z-index: 4;
+        background-color: var(--color-background);
+
+        @media screen and (max-width: 900px) {
+            transition: transform var(--duration-transition-medium) ease;
+
+            &.navbar-hidden {
+                transform: translateY(-100%);
+            }
+        }
     }
 
     .page-content {
         display: flex;
+        position: relative;
         flex-direction: column;
         flex-grow: 1;
         overflow: auto;
+
+        .saving-indicator {
+            display: flex;
+            position: fixed;
+            /* NOTE: offset below the sticky navbar. When the navbar slides up via .navbar-hidden, this collapses to spacing-md so the pill follows. */
+            top: calc(var(--spacing-md) + var(--height-navbar));
+            left: 50%;
+            align-items: center;
+            transform: translateX(-50%);
+            transition: opacity .3s ease-in-out, top var(--duration-transition-medium) ease;
+            opacity: 0;
+            z-index: 2;
+            border-radius: var(--border-radius-full);
+            background-color: var(--color-primary-bg-subtle);
+            padding: var(--spacing-xs) var(--spacing-md);
+            color: var(--color-text-muted);
+            font-size: var(--font-size-sm);
+            pointer-events: none;
+            gap: var(--spacing-xs);
+
+            .saving-icon {
+                height: 1rem;
+            }
+
+            &.navbar-hidden {
+                top: calc(var(--spacing-md) + env(safe-area-inset-top));
+            }
+
+            &.active {
+                opacity: 1;
+
+                .saving-icon {
+                    animation: shake-it-off 2.2s ease-in infinite;
+                }
+            }
+        }
     }
 
     .footer {
+        flex-shrink: 0;
+    }
+
+    .bottom-nav {
         flex-shrink: 0;
     }
 }
@@ -60,4 +117,32 @@
 @keyframes fade-out {
     from { opacity: 1; }
     to { opacity: 0; }
+}
+
+
+@keyframes shake-it-off {
+    10% {
+        transform: rotate(0);
+    }
+    20% {
+        transform: rotate(-160deg);
+    }
+    30% {
+        transform: rotate(-160deg) translateY(2px);
+    }
+    35% {
+        transform: rotate(-160deg) translateY(-2px);
+    }
+    50% {
+        transform: rotate(-160deg) translateY(2px);
+    }
+    55% {
+        transform: rotate(-160deg) translateY(-2px);
+    }
+    70% {
+        transform: rotate(-160deg) translateY(0);
+    }
+    80% {
+        transform: rotate(0);
+    }
 }

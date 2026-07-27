@@ -1,4 +1,5 @@
 import {
+    KeyboardEvent,
     useCallback,
     useContext,
     useMemo,
@@ -6,10 +7,11 @@ import {
 } from 'react';
 import {
     RiDeleteBin2Line,
-    RiEditBoxLine,
+    RiFileAddLine,
+    RiFileCopy2Line,
     RiFileCopyLine,
+    RiFileTransferLine,
     RiMoreLine,
-    RiSwap2Line,
 } from 'react-icons/ri';
 import {
     _cs,
@@ -26,17 +28,18 @@ import DurationInput from '#components/DurationInput';
 import MonthlyCalendar from '#components/MonthlyCalendar';
 import SelectInput from '#components/SelectInput';
 import TextArea from '#components/TextArea';
-import DateContext from '#contexts/date';
 import EnumsContext from '#contexts/enums';
 import SizeContext from '#contexts/size';
 import { EnumsQuery } from '#generated/types/graphql';
 import { useFocusClient } from '#hooks/useFocus';
 import useLocalStorage from '#hooks/useLocalStorage';
+import { fuzzySearch } from '#utils/common';
 import { colorscheme } from '#utils/constants';
 import {
     EntriesAsList,
     Task,
     WorkItem,
+    WorkItemAction,
     WorkItemStatus,
 } from '#utils/types';
 
@@ -50,6 +53,11 @@ function taskKeySelector(item: Task) {
 }
 function taskLabelSelector(item: Task) {
     return item.name;
+}
+function taskDescriptionSelector(item: Task) {
+    const { contract } = item;
+    const { project } = contract;
+    return `${project.name} › ${contract.name}`;
 }
 function workItemTypeKeySelector(item: WorkItemTypeOption) {
     return item.key;
@@ -65,12 +73,12 @@ function workItemStatusLabelSelector(item: WorkItemStatusOption) {
 }
 function workItemStatusColorSelector(item: WorkItemStatusOption): readonly [string, string] {
     if (item.key === 'DOING') {
-        return colorscheme[1];
+        return colorscheme[0];
     }
     if (item.key === 'DONE') {
-        return colorscheme[5];
+        return colorscheme[4];
     }
-    return colorscheme[7];
+    return colorscheme[6];
 }
 
 function defaultColorSelector<T>(_: T, i: number): readonly [string, string] {
@@ -83,11 +91,15 @@ interface Props {
     className?: string;
     workItem: WorkItem;
     tasks: Task[] | undefined;
-    contractId: string | undefined;
 
-    onClone?: (clientId: string, override?: Partial<WorkItem>) => void;
+    typeErrored?: boolean;
+    durationErrored?: boolean;
+
+    onClone?: (clientId: string, override: Partial<WorkItem>) => void;
+    onAssist?: (clientId: string) => void;
     onChange?: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
     onDelete?: (clientId: string) => void;
+    inferTypeFromDescription?: (description: string) => WorkItem['type'];
 }
 
 function WorkItemRow(props: Props) {
@@ -95,10 +107,13 @@ function WorkItemRow(props: Props) {
         className,
         workItem,
         tasks,
-        contractId,
         onClone,
+        onAssist,
         onDelete,
         onChange,
+        typeErrored,
+        durationErrored,
+        inferTypeFromDescription,
     } = props;
 
     const { enums } = useContext(EnumsContext);
@@ -116,7 +131,30 @@ function WorkItemRow(props: Props) {
         [workItem.clientId, onChange],
     );
 
-    const filteredTaskList = useMemo(
+    const handleDescriptionBlur = useCallback(
+        () => {
+            if (!config.autoInferTypeOnBlur || workItem.type || !inferTypeFromDescription) {
+                return;
+            }
+            const description = workItem.description?.trim();
+            if (!description) {
+                return;
+            }
+            const inferred = inferTypeFromDescription(description);
+            if (inferred) {
+                setFieldValue(inferred, 'type');
+            }
+        },
+        [
+            config.autoInferTypeOnBlur,
+            workItem.type,
+            workItem.description,
+            inferTypeFromDescription,
+            setFieldValue,
+        ],
+    );
+
+    const taskList: Task[] = useMemo(
         () => (
             unique(
                 [
@@ -124,11 +162,31 @@ function WorkItemRow(props: Props) {
                     ...tasks ?? [],
                 ],
                 (item) => item.id,
-            ).filter(
-                (task) => task.contract.id === contractId,
             )
         ),
-        [contractId, enums, tasks],
+        [enums, tasks],
+    );
+
+    // FIXME: re-use this
+    const filterTaskList = useCallback(
+        (items: Task[], value: string | undefined | null): Task[] => {
+            if (!value) {
+                return items;
+            }
+            return fuzzySearch(
+                items,
+                value,
+                {
+                    keys: [
+                        (task) => task.name,
+                        (task) => task.contract.name,
+                        (task) => task.contract.project.name,
+                        (task) => task.contract.project.projectClient.name,
+                    ],
+                },
+            );
+        },
+        [],
     );
 
     const handleStatusCheck = useCallback(() => {
@@ -182,13 +240,47 @@ function WorkItemRow(props: Props) {
     const handleClone = useCallback(
         () => {
             if (onClone) {
-                onClone(workItem.clientId);
+                onClone(workItem.clientId, {
+                    duration: undefined,
+                    description: undefined,
+                    ...(config.autoInferTypeOnBlur && { type: undefined }),
+                });
             }
         },
-        [onClone, workItem.clientId],
+        [onClone, workItem.clientId, config.autoInferTypeOnBlur],
     );
 
-    const statusInput = config.checkboxForStatus ? (
+    const handleCloneWithDescription = useCallback(
+        () => {
+            if (onClone) {
+                // NOTE: we only want to clear duration
+                onClone(workItem.clientId, {
+                    duration: undefined,
+                    ...(config.autoInferTypeOnBlur && { type: undefined }),
+                });
+            }
+        },
+        [onClone, workItem.clientId, config.autoInferTypeOnBlur],
+    );
+
+    const handleShortcuts = useCallback(
+        (event: KeyboardEvent<HTMLTextAreaElement>) => {
+            if (event.ctrlKey && event.shiftKey && event.key === 'Enter' && onClone) {
+                event.preventDefault();
+                event.stopPropagation();
+                onClone(workItem.clientId, { duration: undefined, description: undefined });
+            } else if (event.ctrlKey && event.key === 'Enter' && onAssist) {
+                event.preventDefault();
+                event.stopPropagation();
+                onAssist(workItem.clientId);
+            }
+        },
+        [onAssist, onClone, workItem.clientId],
+    );
+
+    const checkboxForStatus = config.checkboxForStatus || screen === 'mobile';
+
+    const statusInput = checkboxForStatus ? (
         <Checkbox
             checkmarkClassName={_cs(
                 styles.statusCheckbox,
@@ -218,11 +310,12 @@ function WorkItemRow(props: Props) {
         <SelectInput
             className={styles.task}
             name="task"
-            options={filteredTaskList}
+            options={taskList}
             keySelector={taskKeySelector}
             labelSelector={taskLabelSelector}
-            // colorSelector={defaultColorSelector}
+            descriptionSelector={taskDescriptionSelector}
             onChange={setFieldValue}
+            sortFunction={filterTaskList}
             value={workItem.task}
             nonClearable
         />
@@ -239,6 +332,8 @@ function WorkItemRow(props: Props) {
             title="Description"
             value={workItem.description}
             onChange={setFieldValue}
+            onKeyDown={handleShortcuts}
+            onBlur={handleDescriptionBlur}
             placeholder="Description"
             compact={config.compactTextArea}
         />
@@ -246,7 +341,7 @@ function WorkItemRow(props: Props) {
 
     const typeInput = (
         <SelectInput
-            className={styles.type}
+            className={_cs(styles.type, typeErrored && styles.erroredInput)}
             name="type"
             placeholder="Type"
             options={enums?.enums.TimeEntryType}
@@ -260,94 +355,120 @@ function WorkItemRow(props: Props) {
 
     const durationInput = (
         <DurationInput
-            className={styles.hours}
+            className={_cs(styles.hours, durationErrored && styles.erroredInput)}
             name="duration"
             title="Hours"
             value={workItem.duration}
             onChange={setFieldValue}
-            placeholder="hh:mm"
+            placeholder="00:00"
         />
+    );
+
+    const handleDeleteClick = useCallback(
+        () => {
+            onDelete?.(workItem.clientId);
+        },
+        [onDelete, workItem.clientId],
+    );
+
+    const availableActionDefs: {
+        key: WorkItemAction;
+        title: string;
+        label: string;
+        icon: React.ReactNode;
+        onClick: () => void;
+    }[] = [
+        {
+            key: 'clone',
+            title: 'Clone this entry',
+            label: 'Clone',
+            icon: <RiFileCopyLine />,
+            onClick: handleClone,
+        },
+        {
+            key: 'clone-with-description',
+            title: 'Clone this entry with description',
+            label: 'Clone with description',
+            icon: <RiFileCopy2Line />,
+            onClick: handleCloneWithDescription,
+        },
+        {
+            key: 'copy',
+            title: 'Copy this entry to another day',
+            label: 'Copy to another day',
+            icon: <RiFileAddLine />,
+            onClick: handleCopyDialogOpen,
+        },
+        {
+            key: 'move',
+            title: 'Move this entry to another day',
+            label: 'Move to another day',
+            icon: <RiFileTransferLine />,
+            onClick: handleMoveDialogOpen,
+        },
+        {
+            key: 'delete',
+            title: 'Delete this entry',
+            label: 'Delete',
+            icon: <RiDeleteBin2Line />,
+            onClick: handleDeleteClick,
+        },
+    ];
+
+    const outsideSet = new Set(config.quickActions);
+    const outsideActionDefs = availableActionDefs.filter(
+        (actionDef) => outsideSet.has(actionDef.key),
+    );
+    const insideActionDefs = availableActionDefs.filter(
+        (actionDef) => !outsideSet.has(actionDef.key),
     );
 
     const actions = (
         <div className={styles.actions}>
-            <Button
-                name={undefined}
-                variant="quaternary"
-                title="Clone this entry"
-                onClick={handleClone}
-                spacing="xs"
-            >
-                <RiFileCopyLine />
-            </Button>
-            <DropdownMenu
-                label={<RiMoreLine />}
-                withoutDropdownIcon
-                variant="transparent"
-                persistent
-                title="Show additional entry options"
-            >
-                <DropdownMenuItem
-                    type="button"
-                    name={workItem.clientId}
-                    title="Edit this entry"
-                    onClick={undefined}
-                    icons={<RiEditBoxLine />}
-                    disabled
+            {outsideActionDefs.map((actionDef) => (
+                <Button
+                    key={actionDef.key}
+                    name={undefined}
+                    variant="tertiary"
+                    title={actionDef.title}
+                    onClick={actionDef.onClick}
+                    spacing="xs"
                 >
-                    Edit entry
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                    type="button"
-                    name={workItem.clientId}
-                    title="Move this entry to another day"
-                    onClick={handleCopyDialogOpen}
-                    icons={<RiFileCopyLine />}
+                    {actionDef.icon}
+                </Button>
+            ))}
+            {insideActionDefs.length > 0 && (
+                <DropdownMenu
+                    label={<RiMoreLine />}
+                    withoutDropdownIcon
+                    variant="transparent"
+                    title="Show additional entry options"
                 >
-                    Copy to another day
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                    type="button"
-                    name={workItem.clientId}
-                    title="Move this entry to another day"
-                    onClick={handleMoveDialogOpen}
-                    icons={<RiSwap2Line />}
-                >
-                    Move to another day
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                    type="confirm-button"
-                    name={workItem.clientId}
-                    title="Delete this entry"
-                    onClick={onDelete}
-                    confirmHeading="Delete entry"
-                    confirmDescription={(
-                        <div>
-                            <p>
-                                Do you want to delete this entry?
-                            </p>
-                            <p>
-                                This action cannot be reverted.
-                            </p>
-                        </div>
-                    )}
-                    icons={<RiDeleteBin2Line />}
-                >
-                    Delete entry
-                </DropdownMenuItem>
-            </DropdownMenu>
+                    {insideActionDefs.map((actionDef) => (
+                        <DropdownMenuItem
+                            key={actionDef.key}
+                            type="button"
+                            name={workItem.clientId}
+                            title={actionDef.title}
+                            onClick={actionDef.onClick}
+                            icons={actionDef.icon}
+                        >
+                            {actionDef.label}
+                        </DropdownMenuItem>
+                    ))}
+                </DropdownMenu>
+            )}
         </div>
     );
-
-    const { year, month } = useContext(DateContext);
 
     return (
         <>
             <div
                 role="listitem"
+                tabIndex={-1}
                 className={_cs(
                     styles.workItemRow,
-                    config.checkboxForStatus && styles.checkboxForStatus,
+                    checkboxForStatus && styles.checkboxForStatus,
                     className,
                 )}
             >
@@ -362,14 +483,16 @@ function WorkItemRow(props: Props) {
                     </>
                 ) : (
                     <>
-                        {config.checkboxForStatus && statusInput}
+                        {checkboxForStatus && statusInput}
                         {descriptionInput}
                         <div className={styles.compactOptions}>
-                            {!config.checkboxForStatus && statusInput}
+                            {!checkboxForStatus && statusInput}
                             {taskInput}
                             {typeInput}
-                            {durationInput}
-                            {actions}
+                            <div className={styles.optionGroup}>
+                                {durationInput}
+                                {actions}
+                            </div>
                         </div>
                     </>
                 )}
@@ -378,15 +501,14 @@ function WorkItemRow(props: Props) {
                 open={isDefined(dialogState)}
                 mode="center"
                 onClose={handleDialogClose}
-                heading="Select date"
+                heading={dialogState === 'move' ? 'Move to' : 'Copy to'}
                 contentClassName={styles.modalContent}
                 className={styles.calendarDialog}
                 size="auto"
+                closeOnOutsideClick
             >
                 <MonthlyCalendar
                     selectedDate={workItem.date}
-                    initialYear={workItem.date ? new Date(workItem.date).getFullYear() : year}
-                    initialMonth={workItem.date ? new Date(workItem.date).getMonth() : month}
                     onDateClick={handleMoveOrCopyEntry}
                 />
             </Dialog>

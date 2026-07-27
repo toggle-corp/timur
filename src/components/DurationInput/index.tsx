@@ -16,7 +16,7 @@ import {
 type InheritedProps<T> = (Omit<InputContainerProps, 'input' | 'htmlFor'> & Omit<RawInputProps<T>, 'onChange' | 'value' | 'id'>);
 
 interface Props<T> extends InheritedProps<T> {
-  inputElementRef?: React.RefObject<HTMLInputElement>;
+  inputElementRef?: React.RefObject<HTMLInputElement | null>;
   inputClassName?: string;
   value: number | undefined | null;
   onChange?: (
@@ -69,7 +69,7 @@ function DurationInput<const T>(props: Props<T>) {
     }, [valueFromProps, counter]);
 
     const handleChange: RawInputProps<T>['onChange'] = useCallback((v) => {
-        // TODO: Also call onChange if v is valid
+        // FIXME: Also call onChange if v is valid
         if (
             !v
             // decimal = 10.5
@@ -95,12 +95,12 @@ function DurationInput<const T>(props: Props<T>) {
     const handleBlur = useCallback(() => {
         const newValue = getDurationNumber(tempValue);
 
-        if (newValue !== null && onChange) {
+        if (onChange && newValue !== null && newValue !== valueFromProps) {
             onChange(newValue, name);
         }
 
         setCounter((oldVal) => (oldVal + 1));
-    }, [name, tempValue, onChange]);
+    }, [name, tempValue, valueFromProps, onChange]);
 
     const handleKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLInputElement>) => {

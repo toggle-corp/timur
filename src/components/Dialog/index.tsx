@@ -24,8 +24,9 @@ interface Props {
     mode?: 'right' | 'center';
     size?: 'auto-height' | 'auto';
     escapeDisabled?: boolean;
+    closeOnOutsideClick?: boolean;
 
-    focusElementRef?: RefObject<HTMLElement>;
+    focusElementRef?: RefObject<HTMLElement | null>;
 }
 
 function Dialog(props: Props) {
@@ -39,6 +40,7 @@ function Dialog(props: Props) {
         focusElementRef,
         mode = 'center',
         escapeDisabled,
+        closeOnOutsideClick,
         size,
     } = props;
 
@@ -76,10 +78,20 @@ function Dialog(props: Props) {
         onClose(false);
     }, [onClose]);
 
+    const handleDialogClick = useCallback((e: React.MouseEvent<HTMLDialogElement>) => {
+        // NOTE: When user clicks on the backdrop, the e.target will the the dialog
+        // else, e.target will be the children of dialog component
+        if (closeOnOutsideClick && e.target === dialogRef.current) {
+            onClose(false);
+        }
+    }, [closeOnOutsideClick, onClose]);
+
     return (
         <DialogContext.Provider
             value={contextValue}
         >
+            {/* eslint-disable-next-line max-len */}
+            {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */}
             <dialog
                 ref={dialogRef}
                 className={_cs(
@@ -93,13 +105,14 @@ function Dialog(props: Props) {
                 )}
                 onCancel={handleCancel}
                 onClose={handleClose}
+                onClick={handleDialogClick}
             >
                 {open && (
                     <>
                         <header className={styles.header}>
-                            <h2 className={styles.heading}>
+                            <h4 className={styles.heading}>
                                 {heading}
-                            </h2>
+                            </h4>
                             <Button
                                 className={styles.closeButton}
                                 name={undefined}

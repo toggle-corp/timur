@@ -1,6 +1,6 @@
-import React, {
+import {
     useCallback,
-    useId,
+    useMemo,
     useRef,
 } from 'react';
 import {
@@ -10,6 +10,7 @@ import {
 import {
     _cs,
     isTruthyString,
+    randomString,
 } from '@togglecorp/fujs';
 
 import Button from '#components/Button';
@@ -17,7 +18,6 @@ import InputContainer, { Props as InputContainerProps } from '#components/InputC
 import List from '#components/List';
 import Popup from '#components/Popup';
 import RawInput from '#components/RawInput';
-import useBlurEffect from '#hooks/useBlurEffect';
 import useKeyboard from '#hooks/useKeyboard';
 import { colorscheme } from '#utils/constants';
 
@@ -136,13 +136,12 @@ function SelectInputContainer<
         dropdownHidden,
     } = props;
 
-    const inputId = useId();
+    const inputId = useMemo(() => `btn_${randomString(8)}`, []);
+
     const options = optionsFromProps ?? (emptyList as OPTION[]);
 
-    const containerRef = useRef<HTMLLabelElement>(null);
     const inputSectionRef = useRef<HTMLDivElement>(null);
-    const inputElementRef = useRef<HTMLInputElement>(null);
-    const popupRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const handleSearchInputChange = useCallback(
         (value: string | undefined) => {
@@ -190,23 +189,12 @@ function SelectInputContainer<
         [readOnly, handleShowDropdown],
     );
 
-    const handlePopupBlur = useCallback(
-        (clickedInside: boolean, clickedInParent: boolean) => {
-            const isClickedWithin = clickedInside || clickedInParent;
-            if (!isClickedWithin) {
-                handleHideDropdown();
-            } else if (persistentOptionPopup && inputElementRef.current) {
-                inputElementRef.current.focus();
-            }
-        },
-        [handleHideDropdown, persistentOptionPopup],
-    );
-
     const handleOptionClick = useCallback(
         (valueKey: OPTION_KEY, value: OPTION) => {
             onOptionClick(valueKey, value, name);
             if (!persistentOptionPopup) {
                 handleHideDropdown();
+                inputRef.current?.focus();
             }
         },
         [onOptionClick, handleHideDropdown, persistentOptionPopup, name],
@@ -233,12 +221,7 @@ function SelectInputContainer<
         ],
     );
 
-    useBlurEffect(
-        dropdownShown,
-        handlePopupBlur,
-        popupRef,
-        containerRef,
-    );
+    // Native popover handles blur/close automatically via popover="auto"
 
     const handleKeyDown = useKeyboard(
         focusedKey,
@@ -267,7 +250,6 @@ function SelectInputContainer<
                 htmlFor={inputId}
                 actionsContainerClassName={actionsContainerClassName}
                 className={_cs(styles.selectInputContainer, className)}
-                containerRef={containerRef}
                 disabled={disabled}
                 hintContainerClassName={hintContainerClassName}
                 hint={hint}
@@ -311,15 +293,15 @@ function SelectInputContainer<
                 )}
                 input={(
                     <RawInput
+                        elementRef={inputRef}
                         className={styles.input}
                         // NOTE: We are not using isNotDefined as we can have empty string
                         style={(searchText || !valueDisplay) ? undefined : {
-                            backgroundColor: valueBgColor ?? colorscheme[0][1],
-                            color: valueFgColor ?? colorscheme[0][0],
+                            backgroundColor: valueBgColor ?? colorscheme[1][1],
+                            color: valueFgColor ?? colorscheme[1][0],
                         }}
                         id={inputId}
                         name={name}
-                        elementRef={inputElementRef}
                         readOnly={readOnly}
                         disabled={disabled}
                         value={(dropdownShown || focused) ? searchText : valueDisplay}
@@ -336,12 +318,14 @@ function SelectInputContainer<
             />
             {dropdownShownActual && (
                 <Popup
-                    elementRef={popupRef}
                     parentRef={inputSectionRef}
                     className={_cs(optionsPopupClassName, styles.popup)}
+                    open={dropdownShown}
+                    setOpen={onDropdownShownChange}
                 >
                     <List<OPTION, OPTION_KEY, GenericOptionProps<RENDER_PROPS, OPTION_KEY, OPTION>>
                         className={styles.list}
+                        messageClassName={styles.message}
                         data={options}
                         keySelector={optionKeySelector}
                         renderer={GenericOption}
@@ -349,7 +333,7 @@ function SelectInputContainer<
                         errored={optionsErrored}
                         filtered={optionsFiltered}
                         pending={optionsPending}
-                        pendingMessage="Fetching options..."
+                        pendingMessage="Fetching options"
                         emptyMessage="No option available"
                         filteredEmptyMessage="No option available for the search"
                         errorMessage="Failed to load options"

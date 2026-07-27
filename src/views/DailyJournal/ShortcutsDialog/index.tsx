@@ -9,7 +9,7 @@ import Dialog from '#components/Dialog';
 import styles from './styles.module.css';
 
 interface Props {
-    dialogOpenTriggerRef: React.MutableRefObject<(() => void) | undefined>;
+    dialogOpenTriggerRef: React.RefObject<(() => void) | undefined>;
 }
 
 function ShortcutsDialog(props: Props) {
@@ -31,54 +31,67 @@ function ShortcutsDialog(props: Props) {
 
     return (
         <Dialog
+            size="auto"
             open={showDialog}
             onClose={handleModalClose}
             heading="Shortcuts"
             contentClassName={styles.modalContent}
             className={styles.shortcutsDialog}
+            closeOnOutsideClick
         >
-            <div>
-                Hit
-                {' '}
-                <code>Ctrl+Space</code>
-                {' '}
-                to add a new entry.
+            <h5 className={styles.subheading}>
+                Entry
+            </h5>
+            <div className={styles.description}>
+                Add a new entry
             </div>
-            <div>
-                Hit
-                {' '}
-                <code>Ctrl+Enter</code>
-                {' '}
-                to add a new note.
+            <kbd className={styles.key}>
+                Ctrl+Space
+            </kbd>
+            <div className={styles.description}>
+                Assist on the focused entry
             </div>
-            <div>
-                Hit
-                {' '}
-                <code>Ctrl+Shift+Left</code>
-                {' '}
-                to go to previous day.
+            <kbd className={styles.key}>
+                Ctrl+Enter
+            </kbd>
+            <div className={styles.description}>
+                Clone the focused entry
             </div>
-            <div>
-                Hit
-                {' '}
-                <code>Ctrl+Shift+Right</code>
-                {' '}
-                to go to next day.
+            <kbd className={styles.key}>
+                Ctrl+Shift+Enter
+            </kbd>
+
+            <h5 className={styles.subheading}>
+                Navigation
+            </h5>
+            <div className={styles.description}>
+                Previous day
             </div>
-            <div>
-                Hit
-                {' '}
-                <code>Ctrl+Shift+Down</code>
-                {' '}
-                to go to present day.
+            <kbd className={styles.key}>
+                Ctrl+Shift+Left
+            </kbd>
+            <div className={styles.description}>
+                Next day
             </div>
-            <div>
-                Hit
-                {' '}
-                <code>Ctrl+Shift+?</code>
-                {' '}
-                to view shortcuts.
+            <kbd className={styles.key}>
+                Ctrl+Shift+Right
+            </kbd>
+            <div className={styles.description}>
+                Present day
             </div>
+            <kbd className={styles.key}>
+                Ctrl+Shift+Down
+            </kbd>
+
+            <h5 className={styles.subheading}>
+                Help
+            </h5>
+            <div className={styles.description}>
+                View shortcuts
+            </div>
+            <kbd className={styles.key}>
+                Ctrl+Shift+?
+            </kbd>
         </Dialog>
     );
 }

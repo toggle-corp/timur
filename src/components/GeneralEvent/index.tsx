@@ -1,6 +1,6 @@
 import { _cs } from '@togglecorp/fujs';
 
-import { GeneralEvent } from '#utils/types';
+import { GeneralEventType } from '#utils/types';
 
 import styles from './styles.module.css';
 
@@ -8,16 +8,6 @@ function getFormattedDaysRemaining(numDays: number) {
     if (numDays === 0) {
         return 'Today';
     }
-
-    /*
-    if (numDays === 1) {
-        return 'Tomorrow';
-    }
-
-    if (numDays === -1) {
-        return 'Yesterday';
-    }
-    */
 
     const dayLabel = Math.abs(numDays) === 1 ? 'day' : 'days';
 
@@ -27,11 +17,12 @@ function getFormattedDaysRemaining(numDays: number) {
 }
 
 interface Props {
-    generalEvent: GeneralEvent;
+    generalEvent: GeneralEventType;
+    hideDaysRemaining?: boolean;
 }
 
 function GeneralEvent(props: Props) {
-    const { generalEvent } = props;
+    const { generalEvent, hideDaysRemaining } = props;
 
     return (
         <div
@@ -43,9 +34,11 @@ function GeneralEvent(props: Props) {
             <div className={styles.icon}>
                 {generalEvent.icon}
             </div>
-            <div className={styles.days}>
-                {getFormattedDaysRemaining(generalEvent.remainingDays)}
-            </div>
+            {!hideDaysRemaining && (
+                <div className={styles.days}>
+                    {getFormattedDaysRemaining(generalEvent.remainingDays)}
+                </div>
+            )}
             <div className={styles.name}>
                 {generalEvent.name}
             </div>

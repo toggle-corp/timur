@@ -7,9 +7,10 @@ import {
     useQuery,
 } from 'urql';
 
-import AvailabilityIndicator from '#components/AvailabilityIndicator';
-import DisplayPicture from '#components/DisplayPicture';
+import DefaultMessage from '#components/DefaultMessage';
+import SlideCounter from '#components/SlideCounter';
 import StandupConductors from '#components/StandupConductors';
+import UsersList from '#components/UsersList';
 import {
     type JournalLeaveTypeEnum,
     type JournalWorkFromHomeTypeEnum,
@@ -44,6 +45,7 @@ function getUnavailability(
 const USERS_AVAILABILITY = gql`
     query UsersAvailability {
         private {
+            id
             users(pagination: {limit: 999}, filters: {departments: [DEVELOPMENT, DESIGN, PROJECT_MANAGER, QUALITY_ASSURANCE]}) {
                 items {
                     id
@@ -57,7 +59,14 @@ const USERS_AVAILABILITY = gql`
     }
 `;
 
-function StartSection() {
+interface Props {
+    currentSlide: number | undefined;
+    totalSlides: number | undefined;
+}
+
+function StartSection(props: Props) {
+    const { currentSlide, totalSlides } = props;
+
     const [usersAvailability] = useQuery<
         UsersAvailabilityQuery,
         UsersAvailabilityQueryVariables
@@ -78,43 +87,60 @@ function StartSection() {
                 foo.displayName,
                 bar.displayName,
             ),
-        );
+        )
+        .map((user) => ({
+            id: user.id,
+            displayPicture: user.displayPicture,
+            displayName: user.displayName,
+            leave: user.leaveToday,
+            workFromHome: user.workFromHomeToday,
+        })) ?? [];
     const todayDate = useCurrentDate();
 
     return (
         <Slide
             variant="split"
             className={styles.startSection}
-            primaryPreText="Welcome to"
+            primaryPreText="Welcome!"
             primaryHeading="Daily Standup"
             primaryDescription={(
-                <div className={styles.primarySection}>
-                    <div>{formatDateTime(todayDate)}</div>
-                    <StandupConductors />
-                </div>
+                <p>
+                    A quick sync about what you did yesterday, what&apos;s on for today,
+                    and anything blocking you.
+                </p>
             )}
-            secondaryHeading="Unavailability"
-            secondaryContent={sortedUsers?.map((user) => (
-                <div
-                    key={user.id}
-                    role="listitem"
-                    className={styles.user}
-                >
-                    <DisplayPicture
-                        className={styles.displayPicture}
-                        imageUrl={user.displayPicture}
-                        displayName={user.displayName ?? 'Anon'}
-                    />
-                    <div className={styles.name}>
-                        {user.displayName ?? 'Anon'}
-                        {' '}
-                        <AvailabilityIndicator
-                            wfhType={user.workFromHomeToday}
-                            leaveType={user.leaveToday}
+            tertiaryContent={(
+                <>
+                    <div className={styles.subSections}>
+                        <StandupConductors />
+                    </div>
+                    <div className={styles.currentTime}>
+                        <span>{formatDateTime(todayDate)}</span>
+                        <SlideCounter
+                            current={currentSlide}
+                            total={totalSlides}
                         />
                     </div>
-                </div>
-            ))}
+                </>
+            )}
+            secondaryHeading="Out of office"
+            secondaryContent={(
+                <>
+                    <UsersList
+                        users={sortedUsers}
+                    />
+                    <DefaultMessage
+                        compact
+                        filtered={false}
+                        empty={sortedUsers.length === 0}
+                        pending={sortedUsers.length === 0 && usersAvailability.fetching}
+                        errored={!!usersAvailability.error}
+                        pendingMessage="Checking who's around"
+                        errorMessage="Something went sideways!"
+                        emptyMessage="Looks like everyone is here!"
+                    />
+                </>
+            )}
         />
     );
 }

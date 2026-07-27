@@ -5,8 +5,15 @@
 >
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="description" content="Timur - Phase Zero" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-visual, viewport-fit=cover" />
+        <meta name="description" content="Daily journaling and standup notes, made simple." />
+        <!-- NOTE: keep in sync with terracotta --color-background in src/themes.css -->
+        <meta name="theme-color" content="#fafaf0" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#1c1b17" media="(prefers-color-scheme: dark)" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Timur" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <!-- Vite is configured to automatically inject favicon and other images -->
         <title>
             %APP_TITLE%
@@ -25,15 +32,20 @@
                 font-style: normal;
             }
 
+            /* Define background color to avoid white splash */
+            /* NOTE: keep in sync with terracotta --color-background in src/themes.css */
             @media screen {
                 body {
                     background-color: #fafaf0;
+                    @media (prefers-color-scheme: dark) {
+                        background-color: #1c1b17;
+                    }
                 }
             }
 
             #webapp-preload {
-                width: 100vw;
-                height: 100vh;
+                width: 100svw;
+                height: 100svh;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -44,9 +56,15 @@
                 align-items: center;
                 flex-direction: column;
                 justify-content: center;
-                width: 100vw;
-                height: 100vh;
-                gap: 1rem;
+                width: 100svw;
+                height: 100svh;
+            }
+
+            @media (display-mode: standalone) {
+                #webapp-preload,
+                .webapp_root_fallback_element {
+                    height: 100dvh;
+                }
             }
 
             .webapp_root_fallback_element_app_logo {

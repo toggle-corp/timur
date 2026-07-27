@@ -44,6 +44,7 @@ function umamiPlugin(options: { id: string | undefined, src: string | undefined 
 
 export default defineConfig(({ mode }) => {
     const isProd = mode === 'production';
+    const isDev = mode === 'development';
     console.log('Mode:', mode);
     const env = loadEnv(mode, process.cwd(), '');
 
@@ -67,20 +68,84 @@ export default defineConfig(({ mode }) => {
                 src: env.APP_UMAMI_SRC,
             }) : undefined,
             VitePWA({
+                disable: isDev,
                 // buildBase: './build/',
                 strategies: 'generateSW',
                 registerType: 'prompt',
-                injectRegister: 'script',
+                // NOTE: registration is done using useRegisterSW
+                injectRegister: false,
                 devOptions: { enabled: false },
                 includeAssets: ['app-icon.svg'],
                 manifest: {
+                    id: 'timur-app',
                     name: 'Timur',
                     short_name: 'Timur',
-                    description: 'Timur - Phase Zero',
+                    description: 'Daily journaling and standup notes, made simple.',
+                    lang: 'en',
+                    start_url: '/',
+                    scope: '/',
+                    display: 'standalone',
+                    display_override: ['standalone'],
+                    orientation: 'portrait',
+                    // NOTE: keep in sync with terracotta --color-background in src/themes.css
                     theme_color: '#fafaf0',
+                    background_color: '#fafaf0',
+                    categories: ['productivity'],
+                    // NOTE: handle_links lets the installed PWA capture in-scope URLs opened from Custom Tabs or external browsers (e.g. OAuth callback). launch_handler then routes that capture into the existing PWA window instead of opening a fresh blank one.
+                    handle_links: 'preferred',
+                    launch_handler: {
+                        client_mode: 'navigate-existing',
+                    },
+                    shortcuts: [
+                        {
+                            name: 'Daily Journal',
+                            short_name: 'Journal',
+                            description: 'Open today\'s journal',
+                            url: '/daily-journal',
+                        },
+                        {
+                            name: 'Daily Standup',
+                            short_name: 'Standup',
+                            description: 'Open today\'s standup',
+                            url: '/daily-standup',
+                        },
+                    ],
                 },
                 workbox: {
-                    globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+                    globPatterns: ['**/*.{js,css,html,png,svg,ico,woff,woff2}'],
+                    cleanupOutdatedCaches: true,
+                    navigateFallbackDenylist: [/^\/api/, /^\/admin/, /^\/graphql/],
+                    runtimeCaching: [
+                        {
+                            // NOTE: Google profile picture URLs are content-addressed (the URL changes when the image changes), so CacheFirst is safe and avoids redundant network round-trips.
+                            urlPattern: ({ url }) => (
+                                /\.googleusercontent\.com$/.test(url.hostname)
+                            ),
+                            handler: 'CacheFirst',
+                            options: {
+                                cacheName: 'google-user-images',
+                                expiration: {
+                                    maxEntries: 60,
+                                    maxAgeSeconds: 60 * 60 * 24 * 30,
+                                },
+                                cacheableResponse: { statuses: [0, 200] },
+                            },
+                        },
+                        {
+                            urlPattern: ({ request, sameOrigin }) => (
+                                !sameOrigin && request.destination === 'image'
+                            ),
+                            handler: 'StaleWhileRevalidate',
+                            options: {
+                                cacheName: 'external-images',
+                                expiration: {
+                                    maxEntries: 100,
+                                    maxAgeSeconds: 60 * 60 * 24 * 7,
+                                },
+                                cacheableResponse: { statuses: [0, 200] },
+                            },
+                        },
+                    ],
                 },
                 pwaAssets: {
                     config: true,

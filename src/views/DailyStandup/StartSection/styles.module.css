@@ -1,22 +1,17 @@
 .start-section {
-    .user {
-        display: flex;
-        font-size: var(--font-size-lg);
-        gap: var(--spacing-xs);
-
-        .display-picture {
-            font-size: var(--font-size-xl);
-        }
-
-        .name {
-            display: inline-flex;
-            gap: var(--spacing-xs);
-        }
-    }
-    .primary-section{
+    .sub-sections {
         display: flex;
         flex-direction: column;
-        text-align: center;
-        gap: var(--spacing-2xl);
+        flex-grow: 1;
+        gap: var(--spacing-lg);
     }
+
+    .current-time {
+        display: flex;
+        justify-content: space-between;
+        color: var(--color-text-muted);
+        font-size: var(--font-size-md);
+        gap: var(--spacing-sm);
+    }
+
 }

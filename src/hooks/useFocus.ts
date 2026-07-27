@@ -9,9 +9,9 @@ import FocusContext from '#contexts/focus';
 
 export function useFocusManager() {
     const data = useRef<{
-        [key: string]: React.RefObject<HTMLElement>
+        [key: string]: React.RefObject<HTMLElement | null>
     }>({});
-    const focusRequest = useRef<string | undefined>();
+    const focusRequest = useRef<string | undefined>(undefined);
 
     const focus = useCallback(
         (key: string) => {
@@ -34,7 +34,7 @@ export function useFocusManager() {
     );
 
     const register = useCallback(
-        (key: string, inputRef: React.RefObject<HTMLElement>) => {
+        (key: string, inputRef: React.RefObject<HTMLElement | null>) => {
             data.current[key] = inputRef;
 
             // To handle cases where we might call focus before register

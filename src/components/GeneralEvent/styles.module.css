@@ -8,6 +8,7 @@
 
     .days {
         width: 6rem;
-        color: var(--color-text-light);
+        color: var(--color-text-muted);
     }
 }
+

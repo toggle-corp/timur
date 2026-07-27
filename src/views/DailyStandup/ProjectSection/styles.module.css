@@ -6,18 +6,59 @@
         object-position: center center;
     }
 
-    .user {
+    .primary-section{
         display: flex;
-        font-size: var(--font-size-lg);
-        gap: var(--spacing-xs);
+        flex-direction: column;
+        text-align: center;
+        gap: var(--spacing-2xl);
+    }
 
-        .display-picture {
-            font-size: var(--font-size-xl);
+    .sub-sections {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        gap: var(--spacing-lg);
+    }
+
+    .current-time {
+        display: flex;
+        justify-content: space-between;
+        color: var(--color-text-muted);
+        font-size: var(--font-size-md);
+        gap: var(--spacing-sm);
+    }
+
+    .sub-section {
+        display: flex;
+        flex-direction: column;
+        transition: opacity var(--duration-transition-medium) ease-in-out 100ms;
+        gap: var(--spacing-sm);
+
+        &.loading {
+            opacity: 0.5;
         }
 
-        .name {
-            display: inline-flex;
+        .sub-heading {
+            color: var(--color-secondary-text);
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-normal);
+        }
+
+        .contracts {
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            padding-left: var(--spacing-lg);
             gap: var(--spacing-xs);
         }
     }
+
+    .users {
+        transition: opacity var(--duration-transition-medium) ease-in-out 100ms;
+
+        &.loading {
+            opacity: 0.5;
+        }
+    }
+
 }

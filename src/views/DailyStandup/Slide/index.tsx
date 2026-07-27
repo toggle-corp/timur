@@ -7,8 +7,10 @@ interface SplitVariantProps {
     primaryPreText?: React.ReactNode;
     primaryHeading?: React.ReactNode;
     primaryDescription?: React.ReactNode;
+    tertiaryContent?: React.ReactNode;
     secondaryHeading: React.ReactNode;
     secondaryContent: React.ReactNode;
+    secondaryBackground?: string | undefined;
 }
 
 interface GeneralVariantProps {
@@ -56,33 +58,48 @@ function Slide(props: Props) {
         primaryPreText,
         primaryHeading,
         primaryDescription,
+        tertiaryContent,
         secondaryHeading,
         secondaryContent,
+        secondaryBackground,
     } = props;
 
     return (
         <div className={className}>
             <section className={styles.startSection}>
-                {primaryPreText && (
-                    <div className={styles.primaryPreText}>
-                        {primaryPreText}
-                    </div>
-                )}
-                <h2 className={styles.primaryHeading}>
-                    {primaryHeading}
-                </h2>
-                {primaryDescription && (
-                    <div className={styles.primaryDescription}>
-                        {primaryDescription}
+                <div className={styles.primarySection}>
+                    {primaryPreText && (
+                        <div className={styles.primaryPreText}>
+                            {primaryPreText}
+                        </div>
+                    )}
+                    <h2 className={styles.primaryHeading}>
+                        {primaryHeading}
+                    </h2>
+                    {primaryDescription && (
+                        <div className={styles.primaryDescription}>
+                            {primaryDescription}
+                        </div>
+                    )}
+                </div>
+                {tertiaryContent && (
+                    <div className={styles.tertiarySection}>
+                        {tertiaryContent}
                     </div>
                 )}
             </section>
-            <section className={styles.endSection}>
+            <section
+                className={styles.endSection}
+            >
                 <h3 className={styles.secondaryHeading}>
                     {secondaryHeading}
                 </h3>
-                <hr className={styles.separator} />
-                <div className={styles.secondaryContent}>
+                <div
+                    className={styles.secondaryContent}
+                    style={{
+                        ['--project-slide-background' as string]: secondaryBackground,
+                    }}
+                >
                     {secondaryContent}
                 </div>
             </section>

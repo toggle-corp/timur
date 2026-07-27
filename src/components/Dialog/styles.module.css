@@ -10,7 +10,7 @@
 
         .header {
             display: flex;
-            padding: var(--spacing-md);
+            padding: var(--spacing-lg);
             padding-bottom: 0;
             gap: var(--spacing-md);
 
@@ -26,11 +26,12 @@
 
         .content {
             flex-grow: 1;
+            padding: var(--spacing-lg);
             overflow: auto;
         }
 
         &::backdrop {
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: var(--color-backdrop);
         }
     }
 
@@ -39,8 +40,12 @@
         left: unset;
         margin: auto 0;
         width: 40rem;
-        height: 100vh;
+        height: 100svh;
         max-height: unset;
+
+        @media (display-mode: standalone) {
+            height: 100dvh;
+        }
     }
 
     &.center-mode {

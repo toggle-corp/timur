@@ -1,13 +1,8 @@
 import {
-    caseInsensitiveSubmatch,
-    compareStringSearch,
     encodeDate,
     isDefined,
     isFalsyString,
     isNotDefined,
-    listToGroupList,
-    listToMap,
-    mapToList,
 } from '@togglecorp/fujs';
 import {
     matchSorter,
@@ -36,55 +31,8 @@ export function getWindowSize(): Size {
     };
 }
 
-function squash<T extends object>(items: T[]): T | undefined {
-    if (items.length <= 1) {
-        return items[0];
-    }
-    // NOTE: We should use items.slice(1) instead
-    return items.reduce(
-        (acc, val) => ({
-            ...acc,
-            ...val,
-        }),
-        items[0],
-    );
-}
-
-export function mergeList<T extends object>(
-    foo: T[],
-    bar: T[],
-    keySelector: (item: T) => string,
-) {
-    const items = [...foo, ...bar];
-    const squashedItemsMapping = listToGroupList(
-        items,
-        (item) => keySelector(item),
-        (item) => item,
-        (groupedItems) => squash(groupedItems),
-    );
-    return mapToList(squashedItemsMapping).filter(isDefined);
-}
-
 export function getNewId(): string {
     return ulid();
-}
-
-export function rankedSearchOnList<T>(
-    list: T[],
-    searchString: string | undefined,
-    labelSelector: (item: T) => string,
-) {
-    if (isFalsyString(searchString)) {
-        return list;
-    }
-
-    return list
-        .filter((option) => caseInsensitiveSubmatch(labelSelector(option), searchString))
-        .sort((a, b) => compareStringSearch(
-            labelSelector(a),
-            labelSelector(b),
-            searchString,
-        ));
 }
 
 export function getDurationString(totalMinutes: number) {
@@ -150,68 +98,13 @@ export function getDurationNumber(value: string | undefined) {
 }
 
 export function addDays(dateStr: string, numDays: number) {
-    // FIXME: we should always append time when converting date from string
-    const date = new Date(dateStr);
+    const date = new Date(`${dateStr}T00:00:00`);
     date.setDate(date.getDate() + numDays);
-
     return encodeDate(date);
 }
 
-export function getChangedItems<T>(
-    initialItems: T[] | undefined,
-    finalItems: T[] | undefined,
-    keySelector: (item: T) => string,
-) {
-    const initialKeysMap = listToMap(initialItems ?? [], keySelector);
-
-    const finalKeysMap = listToMap(finalItems ?? [], keySelector);
-
-    const addedKeys = Object.keys(finalKeysMap).filter(
-        (key) => !initialKeysMap[key],
-    );
-    const removedKeys = Object.keys(initialKeysMap).filter(
-        (key) => !finalKeysMap[key],
-    );
-    const updatedKeys = Object.keys(initialKeysMap).filter(
-        (key) => {
-            // This should be safe as we are using keys from Object.keys(initialKeysMap)
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const initialObj = initialKeysMap[key]!;
-            const finalObj = finalKeysMap[key];
-
-            if (isNotDefined(finalObj)) {
-                return false;
-            }
-
-            const initialJson = JSON.stringify(
-                initialObj,
-                initialObj ? Object.keys(initialObj).sort() : undefined,
-            );
-            const finalJson = JSON.stringify(
-                finalObj,
-                finalObj ? Object.keys(finalObj).sort() : undefined,
-            );
-
-            return initialJson !== finalJson;
-        },
-    );
-
-    return {
-        // NOTE: This should be safe as addedKeys is subset of Object.keys(finalKeysMap)
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        addedItems: addedKeys.map((key) => finalKeysMap[key]!),
-        // NOTE: This should be safe as removedKeys is subset of Object.keys(initialKeysMap)
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        removedItems: removedKeys.map((key) => initialKeysMap[key]!),
-        // NOTE: This should be safe as updatedKeys is subset of
-        // Object.keys(initialKeysMap) intersection Object.keys(finalKeysMap)
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        updatedItems: updatedKeys.map((key) => finalKeysMap[key]!),
-    };
-}
-
 export function fuzzySearch<ItemType = string>(
-    rows: ReadonlyArray<ItemType>,
+    rows: ItemType[],
     filterValue: string,
     options?: MatchSorterOptions<ItemType>,
 ) {
@@ -412,4 +305,24 @@ const dateTimeFormatter = new Intl.DateTimeFormat(
 
 export function formatDateTime(date: Date) {
     return dateTimeFormatter.format(date);
+}
+
+export function rankedSearchOnList<T>(
+    list: T[],
+    searchString: string | undefined,
+    labelSelector: (item: T) => string,
+) {
+    if (isFalsyString(searchString)) {
+        return list;
+    }
+
+    return fuzzySearch(
+        list,
+        searchString,
+        {
+            keys: [
+                labelSelector,
+            ],
+        },
+    );
 }

@@ -9,17 +9,25 @@ import {
     useQuery,
 } from 'urql';
 
-import AvailabilityIndicator from '#components/AvailabilityIndicator';
-import DisplayPicture from '#components/DisplayPicture';
+import AdminEditLink from '#components/AdminEditLink';
+import DefaultMessage from '#components/DefaultMessage';
+import SlideCounter from '#components/SlideCounter';
+import UpcomingEventsList from '#components/UpcomingEventsList';
+import UsersList from '#components/UsersList';
 import {
+    AllProjectsQuery,
     DailyStandupQuery,
     DailyStandupQueryVariables,
     UserDepartmentTypeEnum,
 } from '#generated/types/graphql';
+import useCurrentDate from '#hooks/useCurrentDate';
+import { formatDateTime } from '#utils/common';
 
 import Slide from '../Slide';
 
 import styles from './styles.module.css';
+
+type ProjectType = AllProjectsQuery['private']['allProjects'][number];
 
 const mapping: {
     [key in UserDepartmentTypeEnum]: number;
@@ -34,8 +42,11 @@ const mapping: {
 
 interface Props {
     projectId: string;
+    project: ProjectType | undefined;
     date: string;
     className?: string;
+    currentSlide: number | undefined;
+    totalSlides: number | undefined;
 }
 
 const DAILY_STANDUP_QUERY = gql`
@@ -43,13 +54,22 @@ const DAILY_STANDUP_QUERY = gql`
         private {
             id
             dailyStandup(date: $date) {
+                id
                 projectStat(pk: $projectId) {
                     id
                     project {
                         id
                         name
+                        description
                         logoHd {
                             url
+                        }
+                        deadlines {
+                            id
+                            name
+                            displayName
+                            isExternal
+                            remainingDays
                         }
                     }
                     users {
@@ -65,6 +85,25 @@ const DAILY_STANDUP_QUERY = gql`
                     }
                 }
             }
+            relativeEvents {
+                id
+                name
+                remainingDaysToStart
+                typeDisplay
+                type
+            }
+            contracts(
+                pagination: { limit: 999 },
+                filters: {
+                    projectId: { exact: $projectId },
+                    isArchived: { exact: false },
+                },
+            ) {
+                items {
+                    id
+                    name
+                }
+            }
         }
     }
 `;
@@ -72,8 +111,11 @@ const DAILY_STANDUP_QUERY = gql`
 function ProjectSection(props: Props) {
     const {
         projectId,
+        project: projectFromProps,
         date,
         className,
+        currentSlide,
+        totalSlides,
     } = props;
 
     const [standupResponse] = useQuery<DailyStandupQuery, DailyStandupQueryVariables>({
@@ -83,51 +125,127 @@ function ProjectSection(props: Props) {
     });
 
     const stats = standupResponse.data?.private.dailyStandup.projectStat;
+    const deadlines = stats?.project?.deadlines;
+    const events = standupResponse.data?.private.relativeEvents;
+    const activeContracts = standupResponse.data?.private.contracts.items;
+    const hasActiveContracts = (activeContracts?.length ?? 0) > 0;
+    const hasUpcomingEvents = (deadlines?.length ?? 0) + (events?.length ?? 0) > 0;
+
+    const project = standupResponse.fetching
+        ? projectFromProps
+        : stats?.project;
+
+    const todayDate = useCurrentDate();
+
     // FIXME: use memo
-    const sortedUsers = [...(stats?.users ?? [])].sort((foo, bar) => (
-        compareNumber(
-            foo.user.department ? mapping[foo.user.department] : undefined,
-            bar.user.department ? mapping[bar.user.department] : undefined,
-        ) || compareString(
-            foo.user.displayName,
-            bar.user.displayName,
-        )
-    ));
+    const sortedUsers = [...(stats?.users ?? [])]
+        .sort((foo, bar) => (
+            compareNumber(
+                foo.user.department ? mapping[foo.user.department] : undefined,
+                bar.user.department ? mapping[bar.user.department] : undefined,
+            ) || compareString(
+                foo.user.displayName,
+                bar.user.displayName,
+            )
+        ))
+        .map((stat) => ({
+            id: stat.id,
+            displayPicture: stat.user.displayPicture,
+            displayName: stat.user.displayName,
+            leave: stat.leave,
+            workFromHome: stat.workFromHome,
+        }));
 
     return (
         <Slide
             variant="split"
             className={_cs(styles.projectSection, className)}
-            primaryPreText={isDefined(stats?.project.logoHd) && (
-                <img
-                    className={styles.projectIcon}
-                    alt=""
-                    src={stats?.project.logoHd?.url}
-                />
+            primaryHeading={project && (
+                <AdminEditLink entity="project" id={project.id}>
+                    {project.name}
+                </AdminEditLink>
             )}
-            primaryHeading={stats?.project.name}
-            secondaryHeading="Team members"
-            secondaryContent={sortedUsers?.map((user) => (
-                <div
-                    key={user.id}
-                    role="listitem"
-                    className={styles.user}
-                >
-                    <DisplayPicture
-                        className={styles.displayPicture}
-                        imageUrl={user.user.displayPicture}
-                        displayName={user.user.displayName ?? 'Anon'}
-                    />
-                    <div className={styles.name}>
-                        {user.user.displayName ?? 'Anon'}
-                        {' '}
-                        <AvailabilityIndicator
-                            wfhType={user.workFromHome}
-                            leaveType={user.leave}
+            primaryDescription={project?.description && (
+                <p>
+                    {project?.description}
+                </p>
+            )}
+            tertiaryContent={(
+                <>
+                    <div className={styles.subSections}>
+                        {hasActiveContracts && (
+                            <div
+                                className={_cs(
+                                    styles.subSection,
+                                    standupResponse.fetching && styles.loading,
+                                )}
+                            >
+                                <h3 className={styles.subHeading}>
+                                    Active Contracts
+                                </h3>
+                                <ul className={styles.contracts}>
+                                    {activeContracts?.map((contract) => (
+                                        <li key={contract.id}>
+                                            <AdminEditLink entity="contract" id={contract.id}>
+                                                {contract.name}
+                                            </AdminEditLink>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                        {hasUpcomingEvents && (
+                            <div
+                                className={_cs(
+                                    styles.subSection,
+                                    standupResponse.fetching && styles.loading,
+                                )}
+                            >
+                                <h3 className={styles.subHeading}>
+                                    Deadlines & Events
+                                </h3>
+                                <UpcomingEventsList
+                                    deadlines={deadlines}
+                                    events={events}
+                                />
+                            </div>
+                        )}
+                    </div>
+                    <div className={styles.currentTime}>
+                        <span>{formatDateTime(todayDate)}</span>
+                        <SlideCounter
+                            current={currentSlide}
+                            total={totalSlides}
                         />
                     </div>
-                </div>
-            ))}
+                </>
+            )}
+            secondaryHeading="Team members"
+            secondaryBackground={isDefined(project?.logoHd)
+                ? `url(${project?.logoHd.url})`
+                : undefined}
+            secondaryContent={(
+                <>
+                    <UsersList
+                        className={_cs(
+                            styles.users,
+                            standupResponse.fetching && styles.loading,
+                        )}
+                        strikeoutForStandup
+                        users={sortedUsers}
+                    />
+                    <DefaultMessage
+                        compact
+                        filtered={false}
+                        empty={sortedUsers.length === 0}
+                        pending={sortedUsers.length === 0 && standupResponse.fetching}
+                        errored={!!standupResponse.error}
+                        pendingMessage="Rounding up the team"
+                        errorMessage="Something went sideways!"
+                        emptyMessage="No activity here!"
+                    />
+                </>
+            )}
         />
     );
 }

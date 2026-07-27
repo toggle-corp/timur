@@ -12,11 +12,13 @@ import {
 import {
     _cs,
     bound,
+    compareNumber,
     compareString,
     isDefined,
     isNotDefined,
     listToMap,
     sum,
+    unique,
 } from '@togglecorp/fujs';
 
 import Button from '#components/Button';
@@ -51,16 +53,27 @@ const dateFormatter = new Intl.DateTimeFormat(
     },
 );
 
+const dateFormatterShort = new Intl.DateTimeFormat(
+    [],
+    {
+        month: 'short',
+        day: 'numeric',
+        weekday: 'short',
+    },
+);
+
 interface Props {
     className?: string;
     workItems: WorkItem[] | undefined;
     tasks: Task[] | undefined;
     loading: boolean;
     errored: boolean;
-    onWorkItemClone: (clientId: string, override?: Partial<WorkItem>) => void;
+    onWorkItemClone: (clientId: string, override: Partial<WorkItem>) => void;
+    onWorkItemAssist: (clientId: string) => void;
     onWorkItemChange: (clientId: string, ...entries: EntriesAsList<WorkItem>) => void;
     onWorkItemDelete: (clientId: string) => void;
     selectedDate: string;
+    inferTypeFromDescription?: (description: string) => WorkItem['type'];
 }
 
 function DayView(props: Props) {
@@ -68,15 +81,16 @@ function DayView(props: Props) {
         className,
         workItems,
         onWorkItemClone,
+        onWorkItemAssist,
         onWorkItemChange,
         onWorkItemDelete,
         loading,
         errored,
         selectedDate,
         tasks,
+        inferTypeFromDescription,
     } = props;
 
-    // FIXME: We should still get archived tasks here
     const { taskById: oldTaskById } = useContext(EnumsContext);
 
     // FIXME: memoize this
@@ -128,7 +142,23 @@ function DayView(props: Props) {
         indent,
         enableCollapsibleGroups,
         collapsedGroups,
+        projectSortOrder,
     } = storedConfig;
+
+    const projectSlideOrderMapping = useMemo(() => {
+        if (projectSortOrder !== 'standup-order' || isNotDefined(taskById)) {
+            return undefined;
+        }
+        const projects = unique(
+            Object.values(taskById).map((task) => task.contract.project),
+            (project) => project.id,
+        );
+        return listToMap(
+            projects,
+            (project) => project.id,
+            (project) => project.slideOrder,
+        );
+    }, [projectSortOrder, taskById]);
 
     const getWorkItemLabelFromAttr = useCallback((
         item: WorkItem,
@@ -180,7 +210,10 @@ function DayView(props: Props) {
         return undefined;
     }, [taskById]);
 
-    const formattedDate = dateFormatter.format(new Date(selectedDate));
+    const date = new Date(selectedDate);
+    const formattedDate = date.getMonth() === 0
+        ? dateFormatter.format(date)
+        : dateFormatterShort.format(date);
     const formattedRelativeDate = useFormattedRelativeDate(selectedDate);
 
     const totalHours = useMemo(
@@ -202,13 +235,31 @@ function DayView(props: Props) {
         const sortedWorkItems = sortByAttributes(
             workItems,
             dailyJournalAttributeOrder,
-            (a, b, attr) => (
-                compareString(
+            (a, b, attr) => {
+                if (attr.key === 'project' && isDefined(projectSlideOrderMapping)) {
+                    const aProjectId = taskById[a.task]?.contract.project.id;
+                    const bProjectId = taskById[b.task]?.contract.project.id;
+                    if (!aProjectId || !bProjectId) {
+                        return 0;
+                    }
+
+                    const aSlideOrder = isDefined(aProjectId)
+                        ? projectSlideOrderMapping[aProjectId]
+                        : undefined;
+                    const bSlideOrder = isDefined(bProjectId)
+                        ? projectSlideOrderMapping[bProjectId]
+                        : undefined;
+                    return (
+                        compareNumber(aSlideOrder, bSlideOrder, attr.sortDirection)
+                        || compareNumber(Number(aProjectId), Number(bProjectId), attr.sortDirection)
+                    );
+                }
+                return compareString(
                     getWorkItemLabelFromAttr(a, attr),
                     getWorkItemLabelFromAttr(b, attr),
                     attr.sortDirection,
-                )
-            ),
+                );
+            },
         );
 
         const result = groupListByAttributes(
@@ -232,18 +283,18 @@ function DayView(props: Props) {
         getWorkItemLabelFromAttr,
         dailyJournalAttributeOrder,
         groupLevel,
+        projectSlideOrderMapping,
     ]);
 
     return (
         <section className={_cs(styles.dayView, className)}>
             <header className={styles.header}>
-                <h2 className={styles.heading}>
-                    {formattedDate}
-                    {' '}
+                <div className={styles.heading}>
+                    <h2>{formattedDate}</h2>
                     <span className={styles.relativeDate}>
-                        {`(${formattedRelativeDate})`}
+                        {`${formattedRelativeDate}`}
                     </span>
-                </h2>
+                </div>
                 {isDefined(totalHours) && (
                     <div
                         className={styles.duration}
@@ -256,176 +307,178 @@ function DayView(props: Props) {
             </header>
             <DefaultMessage
                 filtered={false}
-                empty={groupedItems.length === 0}
-                pending={loading}
+                pending={groupedItems.length === 0 && loading}
                 errored={errored}
+                empty={groupedItems.length === 0}
+                emptyMessage="You do not have any entry!"
+                pendingMessage="Looking for your entries"
+                errorMessage="Can't find your entries"
             />
-            {!errored && !loading && (
-                <div className={styles.newGroup}>
-                    {groupedItems.map((groupedItem) => {
-                        if (groupedItem.type === 'heading') {
-                            const hidden = enableCollapsibleGroups
-                                && collapsedGroups.some((groupKey) => (
-                                    groupedItem.groupKey !== groupKey
-                                    && groupedItem.groupKey.startsWith(groupKey)
-                                ));
-                            if (hidden) {
-                                return null;
-                            }
-
-                            // Main Heading
-                            // NOTE: Need to add 1 as groupLevel and level starts from 1 and 0 resp.
-                            if (groupedItem.level + 1 < (groupLevel - joinLevel + 1)) {
-                                const headingText = getWorkItemLabelFromAttr(
-                                    groupedItem.value,
-                                    groupedItem.attribute,
-                                );
-                                const currentIcon = getWorkItemIconFromAttr(
-                                    groupedItem.value,
-                                    groupedItem.attribute,
-                                );
-
-                                const headingLevel = bound(groupedItem.level + 2, 2, 4);
-                                const Heading = `h${headingLevel}` as unknown as ElementType;
-
-                                const key = `heading-${groupedItem.groupKey}`;
-                                return (
-                                    <Heading
-                                        key={key}
-                                        className={styles.nestedHeading}
-                                    >
-                                        {indent && <Indent level={groupedItem.level} />}
-                                        {currentIcon && (
-                                            <img
-                                                className={styles.icon}
-                                                src={currentIcon.url}
-                                                alt={headingText}
-                                            />
-                                        )}
-                                        {headingText}
-                                        {enableCollapsibleGroups && (
-                                            <Button
-                                                name={groupedItem.groupKey}
-                                                onClick={handleToggleCollapseGroup}
-                                                title="Toggle group visibility"
-                                                variant="transparent"
-                                            >
-                                                {collapsedGroups.includes(groupedItem.groupKey)
-                                                    ? <RiArrowUpSLine />
-                                                    : <RiArrowDownSLine />}
-                                            </Button>
-                                        )}
-                                    </Heading>
-                                );
-                            }
-
-                            // Sub Headings
-                            // NOTE: We only need to show one subheading after the main headings
-                            // NOTE: Need to add 1 as groupLevel and level starts from 1 and 0 resp.
-                            if (groupedItem.level + 1 === groupLevel) {
-                                const key = `sub-heading-${groupedItem.groupKey}`;
-                                return (
-                                    <h4
-                                        className={styles.joinedHeading}
-                                        key={key}
-                                    >
-                                        {indent && (
-                                            <Indent
-                                                level={groupedItem.level - joinLevel + 1}
-                                            />
-                                        )}
-                                        {dailyJournalAttributeOrder.map((attribute, i) => {
-                                            if (i >= groupLevel) {
-                                                return null;
-                                            }
-
-                                            const currentLabel = getWorkItemLabelFromAttr(
-                                                groupedItem.value,
-                                                attribute,
-                                            );
-                                            const currentIcon = getWorkItemIconFromAttr(
-                                                groupedItem.value,
-                                                attribute,
-                                            );
-
-                                            if (i < (groupLevel - joinLevel)) {
-                                                return null;
-                                            }
-
-                                            return (
-                                                <Fragment key={`sub-heading-${attribute.key}-of-${groupedItem.groupKey}`}>
-                                                    {i > (groupLevel - joinLevel) && (
-                                                        <div className={styles.separator} />
-                                                    )}
-                                                    {currentIcon && (
-                                                        <img
-                                                            className={styles.icon}
-                                                            src={currentIcon.url}
-                                                            alt={currentLabel}
-                                                        />
-                                                    )}
-                                                    <div>{currentLabel}</div>
-                                                </Fragment>
-                                            );
-                                        })}
-                                        {enableCollapsibleGroups && (
-                                            <Button
-                                                name={groupedItem.groupKey}
-                                                onClick={handleToggleCollapseGroup}
-                                                title="Toggle group visibility"
-                                                variant="transparent"
-                                            >
-                                                {collapsedGroups.includes(groupedItem.groupKey)
-                                                    ? <RiArrowUpSLine />
-                                                    : <RiArrowDownSLine />}
-                                            </Button>
-                                        )}
-                                    </h4>
-                                );
-                            }
-
-                            return null;
-                        }
-
+            <div
+                className={_cs(
+                    groupedItems.length > 0 && loading && styles.loading,
+                    styles.newGroup,
+                )}
+            >
+                {groupedItems.map((groupedItem) => {
+                    if (groupedItem.type === 'heading') {
                         const hidden = enableCollapsibleGroups
-                            && collapsedGroups.some(
-                                (groupKey) => groupedItem.itemKey.startsWith(groupKey),
-                            );
+                            && collapsedGroups.some((groupKey) => (
+                                groupedItem.groupKey !== groupKey
+                                && groupedItem.groupKey.startsWith(groupKey)
+                            ));
                         if (hidden) {
                             return null;
                         }
 
-                        const itemErrored = groupedItem.value.status !== 'TODO' && (
-                            isNotDefined(groupedItem.value.type)
-                            || isNotDefined(groupedItem.value.duration)
+                        // Main Heading
+                        // NOTE: Need to add 1 as groupLevel and level starts from 1 and 0 resp.
+                        if (groupedItem.level + 1 < (groupLevel - joinLevel + 1)) {
+                            const headingText = getWorkItemLabelFromAttr(
+                                groupedItem.value,
+                                groupedItem.attribute,
+                            );
+                            const currentIcon = getWorkItemIconFromAttr(
+                                groupedItem.value,
+                                groupedItem.attribute,
+                            );
+
+                            const headingLevel = bound(groupedItem.level + 2, 2, 4);
+                            const Heading = `h${headingLevel}` as unknown as ElementType;
+
+                            const key = `heading-${groupedItem.groupKey}`;
+                            return (
+                                <Heading
+                                    key={key}
+                                    className={styles.nestedHeading}
+                                >
+                                    {indent && <Indent level={groupedItem.level} />}
+                                    {currentIcon && (
+                                        <img
+                                            className={styles.icon}
+                                            src={currentIcon.url}
+                                            alt={headingText}
+                                        />
+                                    )}
+                                    {headingText}
+                                    {enableCollapsibleGroups && (
+                                        <Button
+                                            name={groupedItem.groupKey}
+                                            onClick={handleToggleCollapseGroup}
+                                            title="Toggle group visibility"
+                                            variant="transparent"
+                                        >
+                                            {collapsedGroups.includes(groupedItem.groupKey)
+                                                ? <RiArrowUpSLine />
+                                                : <RiArrowDownSLine />}
+                                        </Button>
+                                    )}
+                                </Heading>
+                            );
+                        }
+
+                        // Sub Headings
+                        // NOTE: We only need to show one subheading after the main headings
+                        // NOTE: Need to add 1 as groupLevel and level starts from 1 and 0 resp.
+                        if (groupedItem.level + 1 === groupLevel) {
+                            const key = `sub-heading-${groupedItem.groupKey}`;
+                            return (
+                                <h4
+                                    className={styles.joinedHeading}
+                                    key={key}
+                                >
+                                    {indent && (
+                                        <Indent
+                                            level={groupedItem.level - joinLevel + 1}
+                                        />
+                                    )}
+                                    {dailyJournalAttributeOrder.map((attribute, i) => {
+                                        if (i >= groupLevel) {
+                                            return null;
+                                        }
+
+                                        const currentLabel = getWorkItemLabelFromAttr(
+                                            groupedItem.value,
+                                            attribute,
+                                        );
+                                        const currentIcon = getWorkItemIconFromAttr(
+                                            groupedItem.value,
+                                            attribute,
+                                        );
+
+                                        if (i < (groupLevel - joinLevel)) {
+                                            return null;
+                                        }
+
+                                        return (
+                                            <Fragment key={`sub-heading-${attribute.key}-of-${groupedItem.groupKey}`}>
+                                                {i > (groupLevel - joinLevel) && (
+                                                    <div className={styles.separator} />
+                                                )}
+                                                {currentIcon && (
+                                                    <img
+                                                        className={styles.icon}
+                                                        src={currentIcon.url}
+                                                        alt={currentLabel}
+                                                    />
+                                                )}
+                                                <div>{currentLabel}</div>
+                                            </Fragment>
+                                        );
+                                    })}
+                                    {enableCollapsibleGroups && (
+                                        <Button
+                                            name={groupedItem.groupKey}
+                                            onClick={handleToggleCollapseGroup}
+                                            title="Toggle group visibility"
+                                            variant="transparent"
+                                        >
+                                            {collapsedGroups.includes(groupedItem.groupKey)
+                                                ? <RiArrowUpSLine />
+                                                : <RiArrowDownSLine />}
+                                        </Button>
+                                    )}
+                                </h4>
+                            );
+                        }
+
+                        return null;
+                    }
+
+                    const hidden = enableCollapsibleGroups
+                        && collapsedGroups.some(
+                            (groupKey) => groupedItem.itemKey.startsWith(groupKey),
                         );
+                    if (hidden) {
+                        return null;
+                    }
 
-                        const taskDetails = taskById?.[groupedItem.value.task];
-
-                        return (
-                            <div
-                                className={styles.workItemContainer}
-                                key={groupedItem.value.clientId}
-                            >
-                                {indent && (
-                                    <Indent
-                                        level={groupedItem.level - joinLevel + 1}
-                                    />
-                                )}
-                                <WorkItemRow
-                                    className={_cs(styles.workItem, itemErrored && styles.errored)}
-                                    workItem={groupedItem.value}
-                                    tasks={tasks}
-                                    onClone={onWorkItemClone}
-                                    onChange={onWorkItemChange}
-                                    onDelete={onWorkItemDelete}
-                                    contractId={taskDetails?.contract.id}
+                    return (
+                        <div
+                            className={styles.workItemContainer}
+                            key={groupedItem.value.clientId}
+                        >
+                            {indent && (
+                                <Indent
+                                    level={groupedItem.level - joinLevel + 1}
                                 />
-                            </div>
-                        );
-                    })}
-                </div>
-            )}
+                            )}
+                            <WorkItemRow
+                                className={styles.workItem}
+                                workItem={groupedItem.value}
+                                tasks={tasks}
+                                typeErrored={groupedItem.value.status !== 'TODO' && isNotDefined(groupedItem.value.type)}
+                                durationErrored={groupedItem.value.status !== 'TODO' && isNotDefined(groupedItem.value.duration)}
+                                onClone={onWorkItemClone}
+                                onAssist={onWorkItemAssist}
+                                onChange={onWorkItemChange}
+                                onDelete={onWorkItemDelete}
+                                inferTypeFromDescription={inferTypeFromDescription}
+                            />
+                        </div>
+                    );
+                })}
+            </div>
         </section>
     );
 }

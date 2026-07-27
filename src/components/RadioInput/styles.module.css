@@ -4,7 +4,7 @@
     gap: var(--spacing-xs);
 
     .label {
-        color: var(--color-text-light);
+        color: var(--color-text-muted);
         font-size: var(--font-size-sm);
     }
 
@@ -22,7 +22,7 @@
 
     .input-hint {
         padding: var(--spacing-xs);
-        color: var(--color-text-light);
+        color: var(--color-text-muted);
         font-size: var(--font-size-sm);
     }
 }

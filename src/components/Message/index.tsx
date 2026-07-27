@@ -13,6 +13,7 @@ interface Props {
     icon?: React.ReactNode;
     actions?: React.ReactNode;
     compact?: boolean;
+    pending?: boolean;
 
     title?: React.ReactNode;
     description?: React.ReactNode;
@@ -31,6 +32,7 @@ function Message(props: Props) {
         description,
         actions,
         compact = false,
+        pending,
         errored,
         erroredTitle,
         erroredDescription,
@@ -50,12 +52,16 @@ function Message(props: Props) {
         >
             {icon && (
                 <div className={styles.icon}>
-                    {/* pending && <Spinner className={styles.spinner} /> */}
                     {icon}
                 </div>
             )}
             {showTitle && (
-                <div className={styles.title}>
+                <div
+                    className={_cs(
+                        styles.title,
+                        pending && !errored && styles.pending,
+                    )}
+                >
                     {errored ? erroredTitle : title}
                 </div>
             )}

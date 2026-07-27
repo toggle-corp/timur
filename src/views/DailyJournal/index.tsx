@@ -1,21 +1,20 @@
 import {
     useCallback,
     useContext,
-    useEffect,
     useLayoutEffect,
     useMemo,
     useRef,
     useState,
 } from 'react';
-import { FcHighPriority } from 'react-icons/fc';
 import {
     RiAddLine,
+    RiArrowGoBackFill,
+    RiArrowGoForwardFill,
     RiArrowLeftSLine,
     RiArrowRightSLine,
-    RiCalendar2Line,
-    RiHomeOfficeLine,
+    RiCalendarEventLine,
+    RiSettingsLine,
     RiStickyNoteAddLine,
-    RiTerminalBoxLine,
 } from 'react-icons/ri';
 import {
     useNavigate,
@@ -31,31 +30,27 @@ import {
 } from '@togglecorp/fujs';
 import {
     gql,
-    useMutation,
     useQuery,
 } from 'urql';
 
-import AvailabilityIndicator from '#components/AvailabilityIndicator';
 import Button from '#components/Button';
-import CalendarInput from '#components/CalendarInput';
 import Link, { resolvePath } from '#components/Link';
 import Page from '#components/Page';
 import Portal from '#components/Portal';
+import CommandContext from '#contexts/command';
 import DateContext from '#contexts/date';
 import FocusContext from '#contexts/focus';
 import NavbarContext from '#contexts/navbar';
 import RouteContext from '#contexts/route';
-import SizeContext from '#contexts/size';
 import {
-    BulkTimeEntryMutation,
-    BulkTimeEntryMutationVariables,
     MyTimeEntriesQuery,
     MyTimeEntriesQueryVariables,
 } from '#generated/types/graphql';
-import useBackgroundSync from '#hooks/useBackgroundSync';
+import useCommand from '#hooks/useCommand';
 import { useFocusManager } from '#hooks/useFocus';
 import useKeybind from '#hooks/useKeybind';
 import useLocalStorage from '#hooks/useLocalStorage';
+import { pick } from '#utils/command';
 import {
     addDays,
     getNewId,
@@ -67,12 +62,13 @@ import {
     Task,
     WorkItem,
 } from '#utils/types';
+import useWorkItemClassifier from '#utils/workItemClassifier';
 
-import timurLogo from '../../App/icon.svg';
 import AddWorkItemDialog from './AddWorkItemDialog';
 import AvailabilityDialog from './AvailabilityDialog';
 import DayView from './DayView';
 import EndSidebar from './EndSidebar';
+import MyAvailabilityIndicator from './MyAvailabilityIndicator';
 import ShortcutsDialog from './ShortcutsDialog';
 import StartSidebar from './StartSidebar';
 import UpdateNoteDialog from './UpdateNoteDialog';
@@ -103,6 +99,8 @@ const MY_TIME_ENTRIES_QUERY = gql`
                         project {
                             id
                             name
+                            shortName
+                            slideOrder
                             logo {
                                 url
                             }
@@ -114,214 +112,107 @@ const MY_TIME_ENTRIES_QUERY = gql`
                     }
                 }
             }
-            journal(date: $date) {
-                id
-                date
-                leaveType
-                wfhType
-            }
         }
     }
 `;
 
-/*
-query MyQuery {
-  private {
-    allTimeEntries(filters: {statuses: TODO, users: "9"}) {
-      clientId
-      id
-      description
-      date
-      startTime
-      duration
-      status
-      taskId
-      type
-    }
-  }
-}
-*/
-
-const BULK_TIME_ENTRY_MUTATION = gql`
-    mutation BulkTimeEntry($timeEntries: [TimeEntryBulkCreateInput!], $deleteIds: [ID!]) {
-        private {
-            bulkTimeEntry(
-                items: $timeEntries,
-                deleteIds: $deleteIds
-            ) {
-                deleted {
-                    id
-                    clientId
-                }
-                errors
-                results {
-                    id
-                    clientId
-                    date
-                    description
-                    duration
-                    startTime
-                    status
-                    taskId
-                    type
-                }
-            }
-        }
-    }
-`;
-
-// TODO: Do not use JSON.stringify for comparison
-// TODO: use filtered localState instead of workItems
-/** @knipignore */
 // eslint-disable-next-line import/prefer-default-export
 export function Component() {
-    const [workItems, setWorkItems] = useState<WorkItem[]>([]);
-    const [tasks, setTasks] = useState<Task[]>([]);
-    const routes = useContext(RouteContext);
     const navigate = useNavigate();
 
-    const {
-        focus,
-        register,
-        unregister,
-    } = useFocusManager();
+    const routes = useContext(RouteContext);
+
+    const { midActionsRef } = useContext(NavbarContext);
+
+    const inferTypeFromDescription = useWorkItemClassifier();
 
     const { date: dateFromParams } = useParams<{ date: string | undefined}>();
     const { fullDate } = useContext(DateContext);
-
-    // NOTE: We are opening the dialog from this parent component
-    const dialogOpenTriggerRef = useRef<(() => void) | undefined>();
-    const noteDialogOpenTriggerRef = useRef<(() => void) | undefined>();
-    const shortcutsDialogOpenTriggerRef = useRef<(() => void) | undefined>();
-    const availabilityDialogOpenTriggerRef = useRef<(() => void) | undefined>();
-    const calendarRef = useRef<
-        { resetView:(year: number, month: number) => void; }
-            >(null);
-
     const selectedDate = useMemo(() => {
         if (isNotDefined(dateFromParams)) {
             return fullDate;
         }
 
         const date = new Date(dateFromParams);
-
         if (Number.isNaN(date.getTime())) {
             return fullDate;
         }
-
         return encodeDate(date);
     }, [dateFromParams, fullDate]);
 
-    useEffect(
-        () => {
-            if (calendarRef.current && selectedDate) {
-                const selectedDateObj = new Date(selectedDate);
-                calendarRef.current.resetView(
-                    selectedDateObj.getFullYear(),
-                    selectedDateObj.getMonth(),
-                );
-            }
-        },
+    // State
+    const initialWorkItemFilter = useCallback(
+        (entry: WorkItem) => entry.date === selectedDate,
         [selectedDate],
     );
-
-    const setSelectedDate = useCallback((newDateStr: string | undefined) => {
-        const newDate = newDateStr === fullDate ? undefined : newDateStr;
-
-        const { resolvedPath } = resolvePath('dailyJournal', routes, { date: newDate });
-        if (isNotDefined(resolvedPath)) {
-            return;
-        }
-
-        navigate(resolvedPath);
-    }, [routes, navigate, fullDate]);
-
-    const getNextDay = useCallback(() => {
-        const nextDay = addDays(selectedDate, 1);
-
-        if (fullDate === nextDay) {
-            return undefined;
-        }
-
-        return nextDay;
-    }, [selectedDate, fullDate]);
-
-    const getPrevDay = useCallback(() => {
-        const prevDay = addDays(selectedDate, -1);
-
-        if (fullDate === prevDay) {
-            return undefined;
-        }
-
-        return prevDay;
-    }, [selectedDate, fullDate]);
-
-    const [storedConfig] = useLocalStorage('timur-config');
-
-    const editMode = storedConfig.editingMode ?? defaultConfigValue.editingMode;
-
-    const [
-        bulkMutationState,
-        triggerBulkMutation,
-    ] = useMutation<BulkTimeEntryMutation, BulkTimeEntryMutationVariables>(
-        BULK_TIME_ENTRY_MUTATION,
-    );
-
-    const handleBulkAction = useCallback(
-        async (addedItems: WorkItem[], updatedItems: WorkItem[], removedItems: string[]) => {
-            const res = await triggerBulkMutation({
-                timeEntries: [
-                    ...addedItems,
-                    ...updatedItems.map((item) => ({
-                        // NOTE: We need to send null to the server so that we
-                        // can clear the values
-                        clientId: item.clientId ?? null,
-                        date: item.date ?? null,
-                        description: item.description ?? null,
-                        duration: item.duration ?? null,
-                        id: item.id ?? null,
-                        status: item.status ?? null,
-                        task: item.task ?? null,
-                        type: item.type ?? null,
-                    })),
-                ],
-                deleteIds: removedItems,
-            });
-            if (res.error) {
-                return { ok: false } as const;
-            }
-
-            const workItemsFromServer = removeNull(
-                res.data?.private.bulkTimeEntry.results?.map(
-                    (timeEntry) => {
-                        const { taskId, ...otherTimeEntryProps } = timeEntry;
-                        return {
-                            ...otherTimeEntryProps,
-                            task: taskId,
-                        };
-                    },
-                ) ?? [],
-            );
-
-            return {
-                ok: true as const,
-                savedValues: workItemsFromServer ?? [],
-                deletedValues: res.data?.private.bulkTimeEntry.deleted?.map(
-                    (item) => item.clientId,
-                ) ?? [],
-            } as const;
-        },
-        [triggerBulkMutation],
+    const workItemKeySelector = useCallback(
+        (entry: WorkItem) => entry.clientId,
+        [],
     );
 
     const {
-        addOrUpdateStateData,
-        removeFromStateData,
-        addOrUpdateServerData,
-        isObsolete,
-    } = useBackgroundSync<WorkItem>(
-        handleBulkAction,
+        zeitgeist,
+        commands,
+        setZeitgeist,
+        setCommands,
+        watch,
+        undoable,
+        redoable,
+    } = useContext(CommandContext);
+
+    // NOTE: Used to clear refetch calendar heatmap when the logical time of edit changes
+    const [lastEditedAt, setLastEditedAt] = useState<number>(1);
+
+    // NOTE: Update logical time of edit when there is any change
+    const interceptedWatch: typeof watch = useCallback(
+        (...args) => {
+            watch(...args);
+            setLastEditedAt((val) => val + 1);
+        },
+        [watch],
     );
+
+    const {
+        entries: workItems,
+        setEntries: setWorkItems,
+        update: setWorkItemChange,
+        redo,
+        undo,
+    } = useCommand({
+        defaultEntries: [],
+        commands,
+        initialFilter: initialWorkItemFilter,
+        keySelector: workItemKeySelector,
+        watch: interceptedWatch,
+        zeitgeist,
+        setZeitgeist,
+        setCommands,
+    });
+
+    const [tasks, setTasks] = useState<Task[]>([]);
+    const [storedConfig] = useLocalStorage('timur-config');
+
+    // UI
+    const {
+        focus,
+        register,
+        unregister,
+    } = useFocusManager();
+
+    const focusContextValue = useMemo(
+        () => ({
+            register,
+            unregister,
+        }),
+        [register, unregister],
+    );
+
+    const dialogOpenTriggerRef = useRef<((description: string | undefined) => void) | undefined>(
+        undefined);
+    const noteDialogOpenTriggerRef = useRef<(() => void) | undefined>(undefined);
+    const shortcutsDialogOpenTriggerRef = useRef<(() => void) | undefined>(undefined);
+    const availabilityDialogOpenTriggerRef = useRef<(() => void) | undefined>(undefined);
+    const pendingCalendarOverrideRef = useRef<Partial<WorkItem> | undefined>(undefined);
 
     const [
         myTimeEntriesResult,
@@ -343,7 +234,10 @@ export function Component() {
                 return;
             }
             if (myTimeEntriesResult.error) {
-                setWorkItems([]);
+                setWorkItems(
+                    [],
+                    (entry) => entry.date === selectedDate,
+                );
                 return;
             }
 
@@ -367,22 +261,39 @@ export function Component() {
             );
 
             setTasks(tasksFromServer);
-            setWorkItems(workItemsFromServer);
-            addOrUpdateServerData(workItemsFromServer);
-            addOrUpdateStateData(workItemsFromServer);
+            setWorkItems(
+                workItemsFromServer,
+                (entry) => entry.date === selectedDate,
+            );
         },
         [
             myTimeEntriesResult.fetching,
             myTimeEntriesResult.data,
             myTimeEntriesResult.error,
             setWorkItems,
-            addOrUpdateServerData,
-            addOrUpdateStateData,
+            selectedDate,
         ],
+    );
+
+    const handleAvailabilityChange = useCallback(
+        () => {
+            setLastEditedAt((val) => val + 1);
+        },
+        [],
+    );
+
+    const handleWorkItemCreateCancel = useCallback(
+        () => {
+            pendingCalendarOverrideRef.current = undefined;
+        },
+        [],
     );
 
     const handleWorkItemCreate = useCallback(
         (taskId: string) => {
+            const override = pendingCalendarOverrideRef.current;
+            pendingCalendarOverrideRef.current = undefined;
+
             const newId = getNewId();
             const newItem: WorkItem = {
                 clientId: newId,
@@ -390,139 +301,221 @@ export function Component() {
                 type: storedConfig.defaultTaskType,
                 status: storedConfig.defaultTaskStatus,
                 date: selectedDate,
+                ...override,
             };
 
-            setWorkItems((oldWorkItems = []) => ([
-                ...oldWorkItems,
-                newItem,
-            ]));
-            addOrUpdateStateData([newItem]);
+            setWorkItemChange(
+                {
+                    type: 'add',
+                    key: newItem.clientId,
+                    newValue: newItem,
+                    timestamp: new Date().getTime(),
+                },
+                (entry) => entry.date === selectedDate,
+            );
 
             focus(String(newId));
         },
         [
-            setWorkItems,
-            selectedDate,
-            storedConfig.defaultTaskStatus,
             storedConfig.defaultTaskType,
+            storedConfig.defaultTaskStatus,
+            selectedDate,
+            setWorkItemChange,
             focus,
-            addOrUpdateStateData,
         ],
     );
 
+    const handleWorkItemCreateFromCalendar = useCallback(
+        (override: Partial<WorkItem>) => {
+            pendingCalendarOverrideRef.current = {
+                ...override,
+                type: override.description
+                    ? inferTypeFromDescription(override.description)
+                    : undefined,
+            };
+            if (dialogOpenTriggerRef.current) {
+                dialogOpenTriggerRef.current(override.description ?? undefined);
+            }
+        },
+        [inferTypeFromDescription],
+    );
+
     const handleWorkItemClone = useCallback(
-        (workItemClientId: string, override?: Partial<WorkItem>) => {
+        (workItemClientId: string, override: Partial<WorkItem>) => {
+            const oldItem = workItems.find((item) => item.clientId === workItemClientId);
+            if (!oldItem) {
+                // eslint-disable-next-line no-console
+                console.error(`Could not find item ${workItemClientId} while cloning`);
+                return;
+            }
+
             const newId = getNewId();
-            setWorkItems((oldWorkItems) => {
-                if (isNotDefined(oldWorkItems)) {
-                    return oldWorkItems;
-                }
+            const newItem: WorkItem = {
+                ...oldItem,
+                ...override,
+                clientId: newId,
+            };
+            delete newItem.id;
 
-                const sourceItemIndex = oldWorkItems
-                    .findIndex(({ clientId }) => workItemClientId === clientId);
-                if (sourceItemIndex === -1) {
-                    return oldWorkItems;
-                }
+            setWorkItemChange(
+                {
+                    type: 'add',
+                    key: newItem.clientId,
+                    newValue: newItem,
+                    timestamp: new Date().getTime(),
+                },
+                (entry) => entry.date === selectedDate,
+            );
 
-                const targetItem = {
-                    // FIXME: This is safe as sourceItemIndex === -1 is already checked
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    ...oldWorkItems[sourceItemIndex]!,
-                    ...override,
-                    clientId: newId,
-                };
-                delete targetItem.id;
-                // NOTE: If we have defined overrides, we don't need to clear
-                // description and duration
-                if (!override) {
-                    delete targetItem.description;
-                    delete targetItem.duration;
-                }
-
-                const newWorkItems = [...oldWorkItems];
-                newWorkItems.splice(sourceItemIndex + 1, 0, targetItem);
-                addOrUpdateStateData(newWorkItems);
-
-                return newWorkItems;
-            });
             focus(String(newId));
         },
-        [setWorkItems, focus, addOrUpdateStateData],
+        [workItems, setWorkItemChange, selectedDate, focus],
+    );
+
+    const handleWorkItemAssist = useCallback(
+        (workItemClientId: string) => {
+            const sourceItem = workItems.find((item) => item.clientId === workItemClientId);
+            if (!sourceItem) {
+                // eslint-disable-next-line no-console
+                console.error(`Could not find item ${workItemClientId} while splitting`);
+                return;
+            }
+
+            const sourceDescription = (sourceItem.description ?? '').trim();
+
+            // NOTE: split on 2 new liness
+            const descriptions = sourceDescription
+                .split(/\n\n+/)
+                .map((line) => line.trim()).filter((item) => item !== '');
+
+            if (descriptions.length <= 0) {
+                return;
+            }
+
+            const [firstDescription, ...otherDescriptions] = descriptions;
+            const now = new Date().getTime();
+
+            // NOTE: We want to create otherDescrptions first then edit existing one
+            // for safer edit history
+            otherDescriptions.forEach((desc) => {
+                const type = inferTypeFromDescription(desc);
+                const targetItem = {
+                    ...sourceItem,
+                    description: desc,
+                    type,
+                    clientId: getNewId(),
+                };
+                delete targetItem.id;
+                delete targetItem.duration;
+
+                setWorkItemChange(
+                    {
+                        type: 'add',
+                        key: targetItem.clientId,
+                        newValue: targetItem,
+                        timestamp: now,
+                    },
+                    (entry) => entry.date === selectedDate,
+                );
+            });
+
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const inferredType = inferTypeFromDescription(firstDescription!) ?? sourceItem.type;
+            if (firstDescription !== sourceDescription || inferredType !== sourceItem.type) {
+                setWorkItemChange(
+                    {
+                        type: 'edit',
+                        key: sourceItem.clientId,
+                        oldValue: {
+                            description: sourceItem.description,
+                            type: sourceItem.type,
+                        },
+                        newValue: {
+                            description: firstDescription,
+                            type: inferredType,
+                        },
+                        timestamp: now,
+                    },
+                    (entry) => entry.date === selectedDate,
+                );
+            }
+        },
+        [workItems, setWorkItemChange, selectedDate, inferTypeFromDescription],
     );
 
     const handleWorkItemDelete = useCallback(
         (workItemClientId: string) => {
-            setWorkItems((oldWorkItems) => {
-                if (isNotDefined(oldWorkItems)) {
-                    return oldWorkItems;
-                }
-
-                const sourceItemIndex = oldWorkItems
-                    .findIndex(({ clientId }) => workItemClientId === clientId);
-                if (sourceItemIndex === -1) {
-                    return oldWorkItems;
-                }
-
-                // FIXME: This is safe as sourceItemIndex === -1 is already checked
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                const removedItem = oldWorkItems[sourceItemIndex]!;
-                removeFromStateData(removedItem.clientId);
-
-                const newWorkItems = [...oldWorkItems];
-                newWorkItems.splice(sourceItemIndex, 1);
-
-                return newWorkItems;
-            });
+            const oldItem = workItems.find((item) => item.clientId === workItemClientId);
+            if (!oldItem) {
+                // eslint-disable-next-line no-console
+                console.error(`Could not find item ${workItemClientId} while deleting`);
+                return;
+            }
+            setWorkItemChange(
+                {
+                    type: 'delete',
+                    key: workItemClientId,
+                    oldValue: oldItem,
+                    timestamp: new Date().getTime(),
+                },
+                (entry) => entry.date === selectedDate,
+            );
         },
-        [setWorkItems, removeFromStateData],
+        [setWorkItemChange, workItems, selectedDate],
+    );
+
+    const handleWorkItemUndo = useCallback(
+        () => {
+            undo((entry) => entry.date === selectedDate);
+        },
+        [undo, selectedDate],
+    );
+
+    const handleWorkItemRedo = useCallback(
+        () => {
+            redo((entry) => entry.date === selectedDate);
+        },
+        [redo, selectedDate],
     );
 
     const handleWorkItemChange = useCallback(
         (workItemClientId: string, ...entries: EntriesAsList<WorkItem>) => {
-            setWorkItems((oldWorkItems) => {
-                if (isNotDefined(oldWorkItems)) {
-                    return oldWorkItems;
-                }
+            const oldItem = workItems.find((item) => item.clientId === workItemClientId);
+            if (!oldItem) {
+                // eslint-disable-next-line no-console
+                console.error(`Could not find item ${workItemClientId} while editing`);
+                return;
+            }
+            const changes: Partial<WorkItem> = {
+                [entries[1]]: entries[0],
+            };
 
-                const sourceItemIndex = oldWorkItems
-                    .findIndex(({ clientId }) => workItemClientId === clientId);
+            const tentativeNewItem = {
+                ...oldItem,
+                ...changes,
+            };
 
-                if (sourceItemIndex === -1) {
-                    return oldWorkItems;
-                }
+            if (
+                isDefined(tentativeNewItem.duration)
+                && tentativeNewItem.duration > 0
+                && oldItem.duration !== tentativeNewItem.duration
+                && tentativeNewItem.status === 'TODO'
+            ) {
+                changes.status = 'DOING';
+            }
 
-                // FIXME: This is safe as sourceItemIndex === -1 is already checked
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                const obsoleteWorkItem = oldWorkItems[sourceItemIndex]!;
-
-                const newWorkItem = {
-                    ...obsoleteWorkItem,
-                    [entries[1]]: entries[0],
-                };
-
-                if (
-                    isDefined(newWorkItem.duration)
-                    && newWorkItem.duration > 0
-                    && obsoleteWorkItem.duration !== newWorkItem.duration
-                    && newWorkItem.status === 'TODO'
-                ) {
-                    newWorkItem.status = 'DOING';
-                }
-
-                addOrUpdateStateData([newWorkItem]);
-
-                const newWorkItems = [...oldWorkItems];
-
-                newWorkItems.splice(
-                    sourceItemIndex,
-                    1,
-                    newWorkItem,
-                );
-
-                return newWorkItems;
-            });
+            setWorkItemChange(
+                {
+                    type: 'edit',
+                    key: workItemClientId,
+                    oldValue: pick(oldItem, Object.keys(changes) as (keyof WorkItem)[]),
+                    newValue: changes,
+                    timestamp: new Date().getTime(),
+                },
+                (entry) => entry.date === selectedDate,
+            );
         },
-        [setWorkItems, addOrUpdateStateData],
+        [setWorkItemChange, workItems, selectedDate],
     );
 
     const handleNoteUpdateClick = useCallback(
@@ -534,10 +527,10 @@ export function Component() {
         [],
     );
 
-    const handleAddEntryClick = useCallback(
+    const handleAddWorkItemCreate = useCallback(
         () => {
             if (dialogOpenTriggerRef.current) {
-                dialogOpenTriggerRef.current();
+                dialogOpenTriggerRef.current(undefined);
             }
         },
         [],
@@ -561,16 +554,23 @@ export function Component() {
         [],
     );
 
+    const setSelectedDate = useCallback((newDateStr: string | undefined) => {
+        const newDate = newDateStr === fullDate ? undefined : newDateStr;
+
+        const { resolvedPath } = resolvePath('dailyJournal', routes, { date: newDate });
+        if (isNotDefined(resolvedPath)) {
+            return;
+        }
+
+        navigate(resolvedPath);
+    }, [routes, navigate, fullDate]);
+
     const handleKeybindingsPress = useCallback(
         (event: KeyboardEvent) => {
             if (event.ctrlKey && (event.key === ' ' || event.code === 'Space')) {
                 event.preventDefault();
                 event.stopPropagation();
-                handleAddEntryClick();
-            } else if (event.ctrlKey && event.key === 'Enter') {
-                event.preventDefault();
-                event.stopPropagation();
-                handleNoteUpdateClick();
+                handleAddWorkItemCreate();
             } else if (event.ctrlKey && event.shiftKey && event.key === 'ArrowLeft') {
                 event.preventDefault();
                 event.stopPropagation();
@@ -593,169 +593,145 @@ export function Component() {
             fullDate,
             selectedDate,
             setSelectedDate,
-            handleAddEntryClick,
+            handleAddWorkItemCreate,
             handleShortcutsButtonClick,
-            handleNoteUpdateClick,
         ],
     );
 
     useKeybind(handleKeybindingsPress);
 
-    const focusContextValue = useMemo(
-        () => ({
-            register,
-            unregister,
-        }),
-        [register, unregister],
-    );
-
-    const handleDateSelection = useCallback(
-        (newDate: string | undefined) => {
-            setSelectedDate(newDate);
-        },
-        [setSelectedDate],
-    );
-
-    const { midActionsRef } = useContext(NavbarContext);
-    const { screen } = useContext(SizeContext);
-
     const handleSwipeLeft = useCallback(
         () => {
-            handleDateSelection(addDays(selectedDate, 1));
+            setSelectedDate(addDays(selectedDate, 1));
         },
-        [selectedDate, handleDateSelection],
+        [selectedDate, setSelectedDate],
     );
 
     const handleSwipeRight = useCallback(
         () => {
-            handleDateSelection(addDays(selectedDate, -1));
+            setSelectedDate(addDays(selectedDate, -1));
         },
-        [selectedDate, handleDateSelection],
+        [selectedDate, setSelectedDate],
     );
 
-    // FIXME: memoize this
-    const filteredWorkItems = workItems.filter((item) => item.date === selectedDate);
+    const nextDate = useMemo(() => {
+        const newDate = addDays(selectedDate, 1);
+        return fullDate === newDate ? undefined : newDate;
+    }, [selectedDate, fullDate]);
 
-    const entriesWithError = filteredWorkItems
-        .filter((item) => (
-            item.status !== 'TODO' && (
-                isNotDefined(item.type)
-                || isNotDefined(item.duration)
-            )
-        )).length;
+    const prevDate = useMemo(() => {
+        const newDate = addDays(selectedDate, -1);
+        return fullDate === newDate ? undefined : newDate;
+    }, [selectedDate, fullDate]);
 
-    const leaveType = myTimeEntriesResult.data?.private.journal?.leaveType;
-    const wfhType = myTimeEntriesResult.data?.private.journal?.wfhType;
+    const editMode = storedConfig.editingMode ?? defaultConfigValue.editingMode;
 
     return (
         <Page
             documentTitle="Timur - Daily Journal"
             className={styles.dailyJournal}
             contentClassName={styles.content}
-            startAsideContainerClassName={styles.startAside}
             startAsideContent={(
                 <StartSidebar
-                    calendarComponentRef={calendarRef}
                     selectedDate={selectedDate}
                     setSelectedDate={setSelectedDate}
+                    onShortcutsClick={handleShortcutsButtonClick}
+                    onWorkItemCreateFromCalendar={handleWorkItemCreateFromCalendar}
+                    dayWorkItems={workItems}
+                    lastEditedAt={lastEditedAt}
                 />
             )}
             endAsideContent={(
                 <EndSidebar
-                    workItems={filteredWorkItems}
+                    workItems={workItems}
                     onWorkItemCreate={handleWorkItemCreate}
                 />
             )}
             onSwipeLeft={handleSwipeLeft}
             onSwipeRight={handleSwipeRight}
         >
-            <div
-                className={_cs(
-                    styles.lastSavedStatus,
-                    (isObsolete || bulkMutationState.fetching) && styles.active,
-                )}
-            >
-                <img
-                    className={styles.timurIcon}
-                    alt="Timur Icon"
-                    src={timurLogo}
-                />
-                <div>
-                    Syncing...
-                </div>
-            </div>
             <Portal container={midActionsRef}>
                 <div className={styles.dateNavigation}>
-                    {screen === 'desktop' && (
-                        <>
-                            <Link
-                                to="dailyJournal"
-                                urlParams={{ date: getPrevDay() }}
-                                variant="quaternary"
-                                title="Previous day"
-                            >
-                                <RiArrowLeftSLine />
-                            </Link>
-                            <Link
-                                to="dailyJournal"
-                                urlParams={{ date: getNextDay() }}
-                                variant="quaternary"
-                                title="Next day"
-                            >
-                                <RiArrowRightSLine />
-                            </Link>
-                        </>
-                    )}
-                    <CalendarInput
-                        title="Open calendar"
-                        name={undefined}
-                        variant="quaternary"
-                        value={selectedDate}
-                        onChange={setSelectedDate}
+                    <Link
+                        to="dailyJournal"
+                        urlParams={{ date: prevDate }}
+                        className={styles.desktopOnly}
+                        variant="tertiary"
+                        title="Previous day"
                     >
-                        <RiCalendar2Line />
-                    </CalendarInput>
-                    {entriesWithError > 0 && (
-                        <div className={styles.warningBadge}>
-                            <FcHighPriority />
-                            <span>
-                                {`${entriesWithError} issues`}
-                            </span>
-                        </div>
+                        <RiArrowLeftSLine />
+                    </Link>
+                    <Link
+                        to="dailyJournal"
+                        urlParams={{ date: nextDate }}
+                        className={styles.desktopOnly}
+                        variant="tertiary"
+                        title="Next day"
+                    >
+                        <RiArrowRightSLine />
+                    </Link>
+                    <Link
+                        to="dailyJournal"
+                        variant="tertiary"
+                        title="Jump to today"
+                        disabled={selectedDate === fullDate}
+                    >
+                        <RiCalendarEventLine />
+                    </Link>
+                    {(undoable || redoable) && (
+                        <>
+                            <div
+                                className={_cs(styles.separator, styles.desktopOnly)}
+                                role="separator"
+                            />
+                            <Button
+                                name={undefined}
+                                title="Undo"
+                                onClick={handleWorkItemUndo}
+                                variant="tertiary"
+                                disabled={!undoable}
+                            >
+                                <RiArrowGoBackFill />
+                            </Button>
+                            <Button
+                                name={undefined}
+                                title="Redo"
+                                onClick={handleWorkItemRedo}
+                                variant="tertiary"
+                                disabled={!redoable}
+                            >
+                                <RiArrowGoForwardFill />
+                            </Button>
+                        </>
                     )}
                     <div className={styles.spacer} />
                     <Button
                         name={undefined}
+                        className={styles.desktopOnly}
+                        onClick={handleNoteUpdateClick}
+                        title="Update Note"
+                        variant="tertiary"
+                        icons={(
+                            <RiStickyNoteAddLine />
+                        )}
+                    >
+                        Note
+                    </Button>
+                    <Button
+                        name={undefined}
                         onClick={handleAvailabilityButtonClick}
                         title="Update availability"
-                        variant="quaternary"
+                        variant="tertiary"
                     >
-                        <AvailabilityIndicator
-                            wfhType={wfhType}
-                            leaveType={leaveType}
-                            fallback={<RiHomeOfficeLine />}
-                        />
+                        <MyAvailabilityIndicator date={selectedDate} />
                     </Button>
-                    {screen === 'desktop' && (
-                        <Button
-                            name={undefined}
-                            onClick={handleNoteUpdateClick}
-                            title="Update Note"
-                            variant="quaternary"
-                        >
-                            <RiStickyNoteAddLine />
-                        </Button>
-                    )}
-                    {screen === 'desktop' && (
-                        <Button
-                            title="Show shortcuts"
-                            name={undefined}
-                            variant="quaternary"
-                            onClick={handleShortcutsButtonClick}
-                        >
-                            <RiTerminalBoxLine />
-                        </Button>
-                    )}
+                    <Link
+                        to="settings"
+                        title="Settings"
+                        variant="tertiary"
+                    >
+                        <RiSettingsLine />
+                    </Link>
                 </div>
             </Portal>
             <FocusContext.Provider
@@ -764,38 +740,36 @@ export function Component() {
                 <DayView
                     loading={myTimeEntriesResult.fetching}
                     errored={!!myTimeEntriesResult.error}
-                    workItems={filteredWorkItems}
+                    workItems={workItems}
                     tasks={tasks}
                     onWorkItemClone={handleWorkItemClone}
+                    onWorkItemAssist={handleWorkItemAssist}
                     onWorkItemChange={handleWorkItemChange}
                     onWorkItemDelete={handleWorkItemDelete}
                     selectedDate={selectedDate}
+                    inferTypeFromDescription={inferTypeFromDescription}
                 />
             </FocusContext.Provider>
-            <div className={styles.bottomActions}>
-                <Button
-                    name={undefined}
-                    onClick={handleAddEntryClick}
-                    icons={<RiAddLine />}
-                    title="Add entry"
-                >
-                    Add entry
-                </Button>
-                {selectedDate !== fullDate && (
-                    <Link
-                        to="dailyJournal"
-                        variant="quaternary"
-                    >
-                        Go to today
-                    </Link>
+            <Button
+                name={undefined}
+                className={_cs(
+                    styles.fab,
+                    storedConfig.startSidebarShown && styles.startSidebarShown,
                 )}
-            </div>
+                onClick={handleAddWorkItemCreate}
+                icons={<RiAddLine />}
+                title="Add entry"
+                variant="primary"
+            >
+                Add entry
+            </Button>
             <ShortcutsDialog
                 dialogOpenTriggerRef={shortcutsDialogOpenTriggerRef}
             />
             <AvailabilityDialog
                 dialogOpenTriggerRef={availabilityDialogOpenTriggerRef}
                 date={selectedDate}
+                onAvailabilityChange={handleAvailabilityChange}
             />
             <UpdateNoteDialog
                 dialogOpenTriggerRef={noteDialogOpenTriggerRef}
@@ -804,8 +778,8 @@ export function Component() {
             />
             <AddWorkItemDialog
                 dialogOpenTriggerRef={dialogOpenTriggerRef}
-                workItems={filteredWorkItems}
                 onWorkItemCreate={handleWorkItemCreate}
+                onWorkItemCreateCancel={handleWorkItemCreateCancel}
             />
         </Page>
     );

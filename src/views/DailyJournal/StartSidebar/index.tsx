@@ -1,296 +1,230 @@
 import {
-    useCallback,
-    useContext,
+    Suspense,
+    useDeferredValue,
     useMemo,
 } from 'react';
-import { RiDraggable } from 'react-icons/ri';
 import {
-    closestCenter,
-    DndContext,
-    DragEndEvent,
-    DraggableAttributes,
-    PointerSensor,
-    useSensor,
-    useSensors,
-} from '@dnd-kit/core';
-import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
+    RiGoogleFill,
+    RiTerminalBoxLine,
+} from 'react-icons/ri';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import {
-    SortableContext,
-    useSortable,
-    verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import {
-    _cs,
-    isDefined,
-    isNotDefined,
-} from '@togglecorp/fujs';
+    gql,
+    useQuery,
+} from 'urql';
 
-import Link from '#components/Link';
+import Button from '#components/Button';
+import DefaultMessage from '#components/DefaultMessage';
 import MonthlyCalendar from '#components/MonthlyCalendar';
-import RadioInput from '#components/RadioInput';
-import DateContext from '#contexts/date';
-import useLocalStorage from '#hooks/useLocalStorage';
-import useSetFieldValue from '#hooks/useSetFieldValue';
 import {
-    defaultConfigValue,
-    numericOptionKeySelector,
-    numericOptionLabelSelector,
-    numericOptions,
-} from '#utils/constants';
-import {
-    DailyJournalAttribute,
-    DailyJournalAttributeKeys,
-    DailyJournalGrouping,
-} from '#utils/types';
+    type DayEventsAndDeadlinesQuery,
+    type DayEventsAndDeadlinesQueryVariables,
+} from '#generated/types/graphql';
+import useGoogleCalendar from '#hooks/useGoogleCalendar';
+import { type WorkItem } from '#utils/types';
+
+import DayEventChipsSection from './DayEventChipsSection';
+import GoogleCalendarSection from './GoogleCalendarSection';
 
 import styles from './styles.module.css';
 
-const dailyJournalAttributeDetails: Record<DailyJournalAttributeKeys, { label: string }> = {
-    project: { label: 'Project' },
-    contract: { label: 'Contract' },
-    task: { label: 'Task' },
-    status: { label: 'Status' },
-};
-
-interface ItemProps {
-    className?: string;
-    attribute: DailyJournalAttribute;
-    setNodeRef?: (node: HTMLElement | null) => void;
-    draggableAttributes?: DraggableAttributes;
-    draggableListeners?: SyntheticListenerMap | undefined;
-    transformStyle?: string | undefined;
-    transitionStyle?: string | undefined;
-}
-
-function Item(props: ItemProps) {
-    const {
-        className,
-        setNodeRef,
-        attribute,
-        draggableAttributes,
-        draggableListeners,
-        transformStyle,
-        transitionStyle,
-    } = props;
-
-    return (
-        <div
-            className={className}
-            ref={setNodeRef}
-            style={{
-                transition: transitionStyle,
-                transform: transformStyle,
-            }}
-        >
-            <div
-                // eslint-disable-next-line react/jsx-props-no-spreading
-                {...draggableAttributes}
-                // eslint-disable-next-line react/jsx-props-no-spreading
-                {...draggableListeners}
-                className={styles.dragHandle}
-            >
-                <RiDraggable />
-            </div>
-            <div className={styles.label}>
-                {dailyJournalAttributeDetails[attribute.key].label}
-            </div>
-        </div>
-    );
-}
-
-interface SortableItemProps {
-    className?: string;
-    attribute: DailyJournalAttribute;
-}
-
-function SortableItem(props: SortableItemProps) {
-    const {
-        attribute,
-        className,
-    } = props;
-
-    const {
-        attributes,
-        listeners,
-        setNodeRef,
-        transform,
-        transition,
-        isDragging,
-        over,
-    } = useSortable({ id: attribute.key });
-
-    const transformStyle = useMemo(() => {
-        if (isNotDefined(transform)) {
-            return undefined;
+// TODO: events are paginated. use separate api
+const DAY_EVENTS_AND_DEADLINES = gql`
+    query DayEventsAndDeadlines($date: Date!) {
+        private {
+            id
+            events(
+                pagination: { limit: 999 },
+                filters: {
+                    startDate: { lte: $date }
+                    endDate: { gte: $date }
+                    types: [HOLIDAY, RETREAT, MISC]
+                }
+            ) {
+                items {
+                    id
+                    name
+                    type
+                }
+            }
+            allDeadlines(
+                filters: {
+                    endDate: { lte: $date, gte: $date }
+                    isArchived: { inList: [true, false] }
+                }
+            ) {
+                id
+                displayName
+                isExternal
+                endDate
+            }
+            journal(date: $date) {
+                id
+                date
+                leaveType
+                wfhType
+            }
         }
+    }
+`;
 
-        const transformations = [
-            // isDefined(transform.x) && `translateX(${transform.x}px)`,
-            isDefined(transform.y) && `translateY(${transform.y}px)`,
-            isDefined(transform.scaleX) && `scaleY(${transform.scaleX})`,
-            isDefined(transform.scaleY) && `scaleY(${transform.scaleY})`,
-        ];
+const QUERY_CONTEXT = { suspense: true } as const;
 
-        return transformations.filter(Boolean).join(' ');
-    }, [transform]);
+interface DayEventsAndCalendarProps {
+    selectedDate: string;
+    addedDescriptions: string[];
+    onWorkItemCreateFromCalendar: (override: Partial<WorkItem>) => void;
+}
+
+function DayEventsAndCalendar(props: DayEventsAndCalendarProps) {
+    const {
+        selectedDate,
+        addedDescriptions,
+        onWorkItemCreateFromCalendar,
+    } = props;
+
+    const deferredSelectedDate = useDeferredValue(selectedDate);
+    const loading = selectedDate !== deferredSelectedDate;
+
+    const { fetchEvents, isConnected } = useGoogleCalendar();
+
+    const [dayDataResult] = useQuery<
+        DayEventsAndDeadlinesQuery,
+        DayEventsAndDeadlinesQueryVariables
+    >({
+        query: DAY_EVENTS_AND_DEADLINES,
+        variables: { date: deferredSelectedDate },
+        context: QUERY_CONTEXT,
+        requestPolicy: 'cache-first',
+    });
+
+    const { data: googleEvents } = useSuspenseQuery({
+        queryKey: ['googleCalendarEvents', isConnected, deferredSelectedDate],
+        queryFn: () => (isConnected ? fetchEvents(deferredSelectedDate) : Promise.resolve([])),
+        staleTime: Infinity,
+    });
 
     return (
-        <Item
-            className={_cs(
-                styles.attribute,
-                isDragging && styles.dragging,
-                className,
+        <>
+            <DayEventChipsSection
+                loading={loading}
+                selectedDate={deferredSelectedDate}
+                dayData={dayDataResult.data}
+                googleEvents={googleEvents}
+            />
+            {isConnected && (
+                <GoogleCalendarSection
+                    loading={loading}
+                    date={deferredSelectedDate}
+                    addedDescriptions={addedDescriptions}
+                    onWorkItemCreateFromCalendar={onWorkItemCreateFromCalendar}
+                    googleEvents={googleEvents}
+                />
             )}
-            setNodeRef={setNodeRef}
-            attribute={attribute}
-            draggableAttributes={attributes}
-            draggableListeners={listeners}
-            transformStyle={transformStyle}
-            transitionStyle={(isDragging || over?.id === attribute.key) ? transition : undefined}
-        />
+        </>
     );
 }
 
 interface Props {
     selectedDate: string;
     setSelectedDate: (newDate: string) => void;
-    calendarComponentRef?: React.MutableRefObject<{
-        resetView: (year: number, month: number) => void;
-    } | null>;
+    onWorkItemCreateFromCalendar: (override: Partial<WorkItem>) => void;
+    onShortcutsClick: () => void;
+    dayWorkItems: WorkItem[];
+    lastEditedAt: number | null;
 }
 
 function StartSidebar(props: Props) {
     const {
-        calendarComponentRef,
         selectedDate,
         setSelectedDate,
+        onShortcutsClick,
+        onWorkItemCreateFromCalendar,
+        dayWorkItems,
+        lastEditedAt,
     } = props;
 
-    const [storedConfig, setStoredConfig] = useLocalStorage('timur-config');
+    const {
+        isAvailable: isGoogleCalendarAvailable,
+        isConnected: isGoogleCalendarConnected,
+        expiresAt: googleCalendarExpiresAt,
+        connect: connectGoogleCalendar,
+        disconnect: disconnectGoogleCalendar,
+    } = useGoogleCalendar();
 
-    const setConfigFieldValue = useSetFieldValue(setStoredConfig);
-
-    const { year, month } = useContext(DateContext);
-
-    const updateJournalGrouping = useCallback((value: number, name: 'groupLevel' | 'joinLevel') => {
-        const oldValue = storedConfig.dailyJournalGrouping
-            ?? defaultConfigValue.dailyJournalGrouping;
-
-        if (name === 'groupLevel') {
-            setConfigFieldValue({
-                groupLevel: value,
-                joinLevel: Math.min(oldValue.joinLevel, value),
-            } satisfies DailyJournalGrouping, 'dailyJournalGrouping');
-
-            return;
+    const googleCalendarStatusMessage = useMemo(() => {
+        if (!isGoogleCalendarConnected) {
+            return 'Connect to view events from Google Calendar. ✨';
         }
-
-        setConfigFieldValue({
-            groupLevel: oldValue.groupLevel,
-            joinLevel: Math.min(oldValue.groupLevel, value),
-        } satisfies DailyJournalGrouping, 'dailyJournalGrouping');
-    }, [storedConfig.dailyJournalGrouping, setConfigFieldValue]);
-
-    const sensors = useSensors(
-        useSensor(PointerSensor),
-    );
-
-    const handleDndEnd = useCallback((dragEndEvent: DragEndEvent) => {
-        const {
-            active,
-            over,
-        } = dragEndEvent;
-
-        const oldAttributes = storedConfig.dailyJournalAttributeOrder
-            ?? defaultConfigValue.dailyJournalAttributeOrder;
-
-        if (isNotDefined(active) || isNotDefined(over)) {
-            return;
+        if (!googleCalendarExpiresAt) {
+            return 'Connected to Google Calendar.';
         }
+        const expiresOn = new Date(googleCalendarExpiresAt).toLocaleString([], {
+            dateStyle: 'medium',
+            timeStyle: 'short',
+        });
+        return `Connected. Integration expires on ${expiresOn}.`;
+    }, [isGoogleCalendarConnected, googleCalendarExpiresAt]);
 
-        const newAttributes = [...oldAttributes];
-        const sourceIndex = newAttributes.findIndex(({ key }) => active.id === key);
-        const destinationIndex = newAttributes.findIndex(({ key }) => over.id === key);
-
-        if (sourceIndex === -1 || destinationIndex === -1) {
-            return;
-        }
-
-        const [removedItem] = newAttributes.splice(sourceIndex, 1);
-        // NOTE: We can assert removedItem is not undefined as sourceIndex is already checked for -1
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        newAttributes.splice(destinationIndex, 0, removedItem!);
-
-        setConfigFieldValue(newAttributes, 'dailyJournalAttributeOrder');
-    }, [setConfigFieldValue, storedConfig.dailyJournalAttributeOrder]);
+    const addedDescriptions = useMemo(() => {
+        const list: string[] = [];
+        dayWorkItems.forEach((item) => {
+            if (item.description) {
+                list.push(item.description.trim().toLowerCase());
+            }
+        });
+        return list;
+    }, [dayWorkItems]);
 
     return (
-        <div
-            className={styles.startSidebar}
-        >
+        <div className={styles.startSidebar}>
             <MonthlyCalendar
-                componentRef={calendarComponentRef}
                 selectedDate={selectedDate}
-                initialYear={selectedDate ? new Date(selectedDate).getFullYear() : year}
-                initialMonth={selectedDate ? new Date(selectedDate).getMonth() : month}
                 onDateClick={setSelectedDate}
+                lastEditedAt={lastEditedAt}
             />
-            <div className={styles.attributes}>
-                <h4>Ordering</h4>
-                <div className={styles.attributeList}>
-                    <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragEnd={handleDndEnd}
-                    >
-                        <SortableContext
-                            items={storedConfig.dailyJournalAttributeOrder.map(
-                                ({ key }) => ({ id: key }),
-                            )}
-                            strategy={verticalListSortingStrategy}
-                        >
-                            {storedConfig.dailyJournalAttributeOrder.map((attribute) => (
-                                <SortableItem
-                                    key={attribute.key}
-                                    attribute={attribute}
-                                />
-                            ))}
-                        </SortableContext>
-                    </DndContext>
-                </div>
-            </div>
-            <div className={styles.grouping}>
-                <h4>
-                    Grouping
-                </h4>
-                <RadioInput
-                    name="groupLevel"
-                    label="Grouping Level"
-                    value={storedConfig.dailyJournalGrouping.groupLevel}
-                    onChange={updateJournalGrouping}
-                    options={numericOptions.slice(
-                        0,
-                        storedConfig.dailyJournalAttributeOrder.length,
-                    )}
-                    keySelector={numericOptionKeySelector}
-                    labelSelector={numericOptionLabelSelector}
-                />
-                <RadioInput
-                    name="joinLevel"
-                    label="Title Join Level"
-                    value={storedConfig.dailyJournalGrouping.joinLevel}
-                    onChange={updateJournalGrouping}
-                    options={numericOptions.slice(0, storedConfig.dailyJournalGrouping.groupLevel)}
-                    keySelector={numericOptionKeySelector}
-                    labelSelector={numericOptionLabelSelector}
-                />
-            </div>
-            <Link
-                to="settings"
-                variant="quaternary"
+            <Suspense
+                fallback={(
+                    <DefaultMessage
+                        compact
+                        filtered={false}
+                        empty={false}
+                        errored={false}
+                        pending
+                        pendingMessage="Searching the universe"
+                    />
+                )}
             >
-                Other Settings
-            </Link>
+                <DayEventsAndCalendar
+                    selectedDate={selectedDate}
+                    addedDescriptions={addedDescriptions}
+                    onWorkItemCreateFromCalendar={onWorkItemCreateFromCalendar}
+                />
+            </Suspense>
+            <div className={styles.bottomActions}>
+                <Button
+                    name={undefined}
+                    onClick={onShortcutsClick}
+                    title="Show shortcuts"
+                    variant="tertiary"
+                    icons={<RiTerminalBoxLine />}
+                >
+                    Shortcuts
+                </Button>
+                {isGoogleCalendarAvailable && (
+                    <Button
+                        name={undefined}
+                        title={googleCalendarStatusMessage}
+                        onClick={isGoogleCalendarConnected
+                            ? disconnectGoogleCalendar
+                            : connectGoogleCalendar}
+                        variant="tertiary"
+                        icons={<RiGoogleFill />}
+                    >
+                        {isGoogleCalendarConnected ? 'Disconnect' : 'Connect'}
+                    </Button>
+                )}
+            </div>
         </div>
     );
 }

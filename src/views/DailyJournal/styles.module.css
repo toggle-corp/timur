@@ -1,87 +1,54 @@
 .daily-journal {
     position: relative;
 
-    .last-saved-status {
-        display: flex;
-        position: fixed;
-        right: var(--spacing-md);
-        bottom: var(--spacing-md);
-        align-items: center;
-        transition: .5s opacity ease-in-out;
-        opacity: 0;
-        border-radius: 0.5rem;
-        background-color: var(--color-quaternary);
-        padding: var(--spacing-2xs) var(--spacing-sm);
-        color: var(--color-text-light);
-        gap: var(--spacing-xs);
-
-        .timur-icon {
-            height: 1rem;
-        }
-
-        &.active {
-            opacity: 1;
-
-            .timur-icon {
-                animation: shake-it-off 2.2s ease-in infinite;
-            }
-        }
-    }
-
-    .bottom-actions {
-        display: flex;
-        gap: var(--spacing-sm);
-    }
-
     .content {
         display: flex;
         flex-direction: column;
         gap: var(--spacing-lg);
+    }
+
+    .fab {
+        position: sticky;
+        bottom: var(--spacing-lg);
+        align-self: flex-end;
+        z-index: 1;
+        /* NOTE: pushes the FAB to the bottom of .content even when entries don't fill the column, so it stays at the bottom edge instead of riding up under sparse content. */
+        margin-top: auto;
+        box-shadow: var(--box-shadow-lg);
+
+        @media screen and (max-width: 900px) {
+            &.start-sidebar-shown {
+                display: none;
+            }
+        }
     }
 }
 
 .date-navigation {
     display: flex;
     width: 100%;
-    gap: var(--spacing-xs);
-
-    .warning-badge {
-        display: flex;
-        flex-shrink: 0;
-        border: 1px solid var(--color-separator);
-        border-radius: var(--border-radius-lg);
-        padding: var(--spacing-2xs) var(--spacing-sm);
-        gap: var(--spacing-xs);
-    }
+    gap: var(--spacing-sm);
 
     .spacer {
         flex-grow: 1;
     }
-}
 
-@keyframes shake-it-off {
-    10% {
-        transform: rotate(0);
+    .separator {
+        align-self: center;
+        background-color: var(--color-separator);
+        width: var(--width-separator-sm);
+        height: 1.5rem;
     }
-    20% {
-        transform: rotate(-160deg);
+
+    .mobile-only {
+        @media screen and (min-width: 900px) {
+            display: none;
+        }
     }
-    30% {
-        transform: rotate(-160deg) translateY(2px);
-    }
-    35% {
-        transform: rotate(-160deg) translateY(-2px);
-    }
-    50% {
-        transform: rotate(-160deg) translateY(2px);
-    }
-    55% {
-        transform: rotate(-160deg) translateY(-2px);
-    }
-    70% {
-        transform: rotate(-160deg) translateY(0);
-    }
-    80% {
-        transform: rotate(0);
+
+    .desktop-only {
+        @media screen and (max-width: 900px) {
+            display: none;
+        }
     }
 }

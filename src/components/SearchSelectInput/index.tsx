@@ -186,7 +186,7 @@ function SearchSelectInput<
 
             if (sortFunction) {
                 return [
-                    ...rankedSearchOnList(initiallySelected, searchInputValue, labelSelector),
+                    ...sortFunction(initiallySelected, searchInputValue, labelSelector),
                     ...sortFunction(initiallyNotSelected, searchInputValue, labelSelector),
                 ];
             }

@@ -1,0 +1,28 @@
+.bottom-nav {
+    display: none;
+
+    @media screen and (max-width: 900px) {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+        justify-content: space-around;
+        border-top: var(--width-separator-sm) solid var(--color-separator);
+        background-color: var(--color-foreground);
+        padding-bottom: env(safe-area-inset-bottom);
+        height: var(--height-bottom-nav);
+    }
+
+    .nav-item {
+        display: flex;
+        font-size: var(--font-size-xl);
+
+        &.active {
+            color: var(--color-primary-text);
+            font-weight: var(--font-weight-bold);
+        }
+    }
+
+    .user-menu {
+        font-size: var(--font-size-xl);
+    }
+}

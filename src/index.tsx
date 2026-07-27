@@ -1,3 +1,4 @@
+import './themes.css';
 import './index.css';
 
 import React, { useEffect } from 'react';
@@ -8,43 +9,19 @@ import {
     useLocation,
     useNavigationType,
 } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import * as Sentry from '@sentry/react';
 import { isNotDefined } from '@togglecorp/fujs';
-import { cacheExchange } from '@urql/exchange-graphcache';
-import {
-    Client as UrqlClient,
-    fetchExchange,
-    Provider as UrqlProvider,
-} from 'urql';
 
 import { Component as TemplateView } from '#components/TemplateView';
 
 import App from './App/index.tsx';
-import PwaPrompt from './PwaPrompt/index.tsx';
+import { bootstrapTheme } from './App/providers/ThemeProvider.tsx';
+
+bootstrapTheme();
 
 const webappRootId = 'webapp-root';
 const webappRootElement = document.getElementById(webappRootId);
-
-const gqlClient = new UrqlClient({
-    url: `${import.meta.env.APP_GRAPHQL_DOMAIN}/graphql/`,
-    exchanges: [cacheExchange({
-        keys: {
-            PrivateQuery: () => null,
-            PublicQuery: () => null,
-            AppEnumCollection: () => null,
-            DailyStandUpType: () => null,
-            AppEnumCollectionTimeEntryType: (item) => String(item.key),
-            AppEnumCollectionTimeEntryStatus: (item) => String(item.key),
-            AppEnumCollectionJournalLeaveType: (item) => String(item.key),
-            AppEnumCollectionJournalWfhType: (item) => String(item.key),
-            DjangoImageType: (item) => String(item.url),
-        },
-    }), fetchExchange],
-    fetchOptions: () => ({
-        credentials: 'include',
-    }),
-    requestPolicy: 'network-only',
-});
 
 const dsn = import.meta.env.APP_SENTRY_DSN;
 if (dsn) {
@@ -84,7 +61,7 @@ if (isNotDefined(webappRootElement)) {
     // eslint-disable-next-line no-console
     console.error(`Could not find html element with id '${webappRootId}'`);
 } else {
-    ReactDOM.createRoot(webappRootElement).render(
+    const component = (
         <React.StrictMode>
             <Sentry.ErrorBoundary
                 fallback={(
@@ -101,11 +78,11 @@ if (isNotDefined(webappRootElement)) {
                 )}
                 showDialog
             >
-                <PwaPrompt />
-                <UrqlProvider value={gqlClient}>
+                <GoogleOAuthProvider clientId={import.meta.env.APP_GOOGLE_OAUTH_CLIENT_ID ?? ''}>
                     <App />
-                </UrqlProvider>
+                </GoogleOAuthProvider>
             </Sentry.ErrorBoundary>
-        </React.StrictMode>,
+        </React.StrictMode>
     );
+    ReactDOM.createRoot(webappRootElement).render(component);
 }

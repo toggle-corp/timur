@@ -2,7 +2,7 @@
     display: flex;
     padding: 0 var(--spacing-2xs);
     line-height: 1;
-    color: var(--color-text-light);
+    color: var(--color-text-muted);
     font-size: var(--font-size-xs);
     gap: var(--spacing-xs);
 
@@ -11,6 +11,6 @@
     }
 
     .required {
-        color: var(--color-primary);
+        color: var(--color-primary-text);
     }
 }

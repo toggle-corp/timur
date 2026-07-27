@@ -50,6 +50,7 @@ const dateFormatter = new Intl.DateTimeFormat(
 const NOTE = gql`
     query Note($date: Date!) {
         private {
+            id
             journal(date: $date) {
                 id
                 date
@@ -77,7 +78,7 @@ const UPDATE_NOTE = gql`
 `;
 
 interface Props {
-    dialogOpenTriggerRef: React.MutableRefObject<(() => void) | undefined>;
+    dialogOpenTriggerRef: React.RefObject<(() => void) | undefined>;
     editingMode: EditingMode,
     date: string,
 }
@@ -181,12 +182,12 @@ function AddNoteDialog(props: Props) {
         Vim.defineEx('q', undefined, exitHandler);
         Vim.defineEx('x', undefined, saveAndQuitHandler);
 
-        // TODO: We need to only defineEx for this particular codemirror
-        // instance
         return () => {
-            Vim.defineEx('w', undefined, undefined);
-            Vim.defineEx('q', undefined, undefined);
-            Vim.defineEx('x', undefined, undefined);
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            const noop = () => {};
+            Vim.defineEx('w', undefined, noop);
+            Vim.defineEx('q', undefined, noop);
+            Vim.defineEx('x', undefined, noop);
         };
     }, [showDialog, handleSave]);
 
@@ -202,6 +203,7 @@ function AddNoteDialog(props: Props) {
             className={styles.updateNoteDialog}
             escapeDisabled={editingMode === 'vim'}
             size="auto-height"
+            closeOnOutsideClick
         >
             <CodeMirror
                 ref={refs}
@@ -218,7 +220,7 @@ function AddNoteDialog(props: Props) {
                     title="Close note dialog"
                     name={undefined}
                     onClick={handleModalClose}
-                    variant="quaternary"
+                    variant="tertiary"
                 >
                     Close
                 </Button>

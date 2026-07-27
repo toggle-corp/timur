@@ -15,7 +15,7 @@ function useThrottledValue<T>(
 
     const latestValue = useRef(input);
 
-    const timeoutRef = useRef<number>();
+    const timeoutRef = useRef<number | undefined>(undefined);
 
     useEffect(
         () => {

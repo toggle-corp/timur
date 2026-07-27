@@ -1,6 +1,6 @@
 # -------------------------- Dev ---------------------------------------
 
-FROM node:18-bullseye AS dev
+FROM node:24-bullseye AS dev
 
 RUN apt-get update -y \
     && apt-get install -y --no-install-recommends git \
@@ -33,6 +33,8 @@ ENV APP_SENTRY_DSN=https://xyzl@sentry.example.com/123
 # We're using raw web-app-serve placeholder values here to treat them as dynamic values
 ENV APP_UMAMI_SRC=WEB_APP_SERVE_PLACEHOLDER__APP_UMAMI_SRC
 ENV APP_UMAMI_ID=WEB_APP_SERVE_PLACEHOLDER__APP_UMAMI_ID
+
+ENV APP_GOOGLE_OAUTH_CLIENT_ID=000000000000-pvc00000000000000000000000000000.apps.googleusercontent.com
 
 # NOTE: Static env variables:
 # These env variables are used during build

@@ -56,6 +56,7 @@ const dateFormatter = new Intl.DateTimeFormat(
 const AVAILABILITY = gql`
     query Availability($date: Date!) {
         private {
+            id
             journal(date: $date) {
                 id
                 date
@@ -86,14 +87,16 @@ const UPDATE_JOURNAL = gql`
 `;
 
 interface Props {
-    dialogOpenTriggerRef: React.MutableRefObject<(() => void) | undefined>;
+    dialogOpenTriggerRef: React.RefObject<(() => void) | undefined>;
     date: string;
+    onAvailabilityChange: () => void;
 }
 
 function AvailabilityDialog(props: Props) {
     const {
         dialogOpenTriggerRef,
         date,
+        onAvailabilityChange,
     } = props;
 
     const [showDialog, setShowDialog] = useState(false);
@@ -168,9 +171,10 @@ function AvailabilityDialog(props: Props) {
                 leaveType: dialogState.leaveType ?? null,
                 wfhType: dialogState.wfhType ?? null,
             });
+            onAvailabilityChange();
             handleModalClose();
         },
-        [date, dialogState, handleModalClose, updateAvailability],
+        [date, dialogState, handleModalClose, updateAvailability, onAvailabilityChange],
     );
 
     // FIXME: Use memo
@@ -220,6 +224,7 @@ function AvailabilityDialog(props: Props) {
             heading={`${formattedDate} availability`}
             contentClassName={styles.modalContent}
             className={styles.availabilityDialog}
+            closeOnOutsideClick
         >
             <RadioInput
                 name="leaveType"
@@ -248,7 +253,7 @@ function AvailabilityDialog(props: Props) {
                     title="Cancel update availability"
                     name={undefined}
                     onClick={handleModalClose}
-                    variant="quaternary"
+                    variant="tertiary"
                 >
                     Cancel
                 </Button>
