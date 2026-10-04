@@ -10,6 +10,9 @@
     --color-info: #0277bd;
     --color-info-text: #01579b;
 
+    --color-warning: #f9a825;
+    --color-warning-text: #9a6700;
+
     --color-backdrop: #00000080;
 
     /* Categorical chip colors */
@@ -198,6 +201,9 @@
 
     --color-info: #29b6f6;
     --color-info-text: #81d4fa;
+
+    --color-warning: #ffca28;
+    --color-warning-text: #ffe082;
 
     --color-backdrop: #000000a6;
 
