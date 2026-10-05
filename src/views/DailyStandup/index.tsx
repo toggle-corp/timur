@@ -37,6 +37,7 @@ import useUrlQueryState from '#hooks/useUrlQueryState';
 
 import DeadlineSection from './DeadlineSection';
 import EndSection from './EndSection';
+import OccupancySection from './OccupancySection';
 import ProjectSection from './ProjectSection';
 import StartSection from './StartSection';
 
@@ -126,10 +127,15 @@ export function Component() {
                 next: allProjectsData[0]!.id,
                 project: undefined,
             },
-            end: {
+            occupancy: {
                 // NOTE: This is safe because allProjectsData.length has been checked
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 prev: allProjectsData[allProjectsData.length - 1]!.id,
+                next: 'end',
+                project: undefined,
+            },
+            end: {
+                prev: 'occupancy',
                 next: undefined,
                 project: undefined,
             },
@@ -140,7 +146,7 @@ export function Component() {
                 const currentMap = {
                     // NOTE: This is safe because boundary for allProjectsData has been checked
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    next: index === (allProjectsData.length - 1) ? 'end' : allProjectsData[index + 1]!.id,
+                    next: index === (allProjectsData.length - 1) ? 'occupancy' : allProjectsData[index + 1]!.id,
                     // NOTE: This is safe because boundary for allProjectsData has been checked
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     prev: index === 0 ? 'deadlines' : allProjectsData[index - 1]!.id,
@@ -168,6 +174,14 @@ export function Component() {
             setUrlQuery({
                 project: undefined,
                 page: 'deadlines',
+            });
+            return;
+        }
+
+        if (pageId === 'occupancy') {
+            setUrlQuery({
+                project: undefined,
+                page: 'occupancy',
             });
             return;
         }
@@ -202,6 +216,7 @@ export function Component() {
             'start',
             'deadlines',
             ...allProjectsData.map((project) => project.id),
+            'occupancy',
             'end',
         ];
     }, [allProjectsResponse?.data]);
@@ -327,11 +342,18 @@ export function Component() {
                         totalSlides={totalSlides}
                     />
                 )}
-                {mapId !== 'start' && mapId !== 'end' && mapId !== 'deadlines' && (
+                {mapId !== 'start' && mapId !== 'end' && mapId !== 'deadlines' && mapId !== 'occupancy' && (
                     <ProjectSection
                         project={projectsMap?.[mapId]?.project}
                         date={selectedDate}
                         projectId={mapId}
+                        currentSlide={currentSlide}
+                        totalSlides={totalSlides}
+                    />
+                )}
+                {mapId === 'occupancy' && (
+                    <OccupancySection
+                        date={selectedDate}
                         currentSlide={currentSlide}
                         totalSlides={totalSlides}
                     />
