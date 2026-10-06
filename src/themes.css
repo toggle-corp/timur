@@ -10,9 +10,6 @@
     --color-info: #0277bd;
     --color-info-text: #01579b;
 
-    --color-warning: #f9a825;
-    --color-warning-text: #9a6700;
-
     --color-backdrop: #00000080;
 
     /* Categorical chip colors */
@@ -63,6 +60,7 @@
     --color-focus: #dee8c8;
 
     --color-heatmap-low: #c45332;
+    --color-heatmap-mid: #a87a0a;
     --color-heatmap-high: #6e8b3e;
 }
 
@@ -94,6 +92,7 @@
     --color-focus: #dce0e8;
 
     --color-heatmap-low: #d20f39;
+    --color-heatmap-mid: #c47a12;
     --color-heatmap-high: #40a02b;
 }
 
@@ -125,6 +124,7 @@
     --color-focus: #d5c4a1;
 
     --color-heatmap-low: #9d0006;
+    --color-heatmap-mid: #b57614;
     --color-heatmap-high: #79740e;
 }
 
@@ -156,6 +156,7 @@
     --color-focus: #dcdcdc;
 
     --color-heatmap-low: #cc241d;
+    --color-heatmap-mid: #cc7a0a;
     --color-heatmap-high: #218871;
 }
 
@@ -187,6 +188,7 @@
     --color-focus: #ddd6b8;
 
     --color-heatmap-low: #dc322f;
+    --color-heatmap-mid: #b58900;
     --color-heatmap-high: #859900;
 }
 
@@ -201,9 +203,6 @@
 
     --color-info: #29b6f6;
     --color-info-text: #81d4fa;
-
-    --color-warning: #ffca28;
-    --color-warning-text: #ffe082;
 
     --color-backdrop: #000000a6;
 
@@ -253,6 +252,7 @@
         --color-focus: #404d2e;
 
         --color-heatmap-low: #db7657;
+        --color-heatmap-mid: #d9a441;
         --color-heatmap-high: #aebd55;
     }
 
@@ -284,6 +284,7 @@
         --color-focus: #45475a;
 
         --color-heatmap-low: #f38ba8;
+        --color-heatmap-mid: #f9e2af;
         --color-heatmap-high: #a6e3a1;
     }
 
@@ -315,6 +316,7 @@
         --color-focus: #504945;
 
         --color-heatmap-low: #fb4934;
+        --color-heatmap-mid: #fabd2f;
         --color-heatmap-high: #b8bb26;
     }
 
@@ -346,6 +348,7 @@
         --color-focus: #49483e;
 
         --color-heatmap-low: #f92672;
+        --color-heatmap-mid: #e6db74;
         --color-heatmap-high: #a6e22e;
     }
 
@@ -377,6 +380,7 @@
         --color-focus: #134c5b;
 
         --color-heatmap-low: #dc322f;
+        --color-heatmap-mid: #b58900;
         --color-heatmap-high: #859900;
     }
 }

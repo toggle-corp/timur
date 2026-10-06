@@ -12,7 +12,7 @@ import styles from './styles.module.css';
 interface UserItem {
     id: string;
     displayPicture?: string | null;
-    displayName?: string | null;
+    displayName: string;
     leave?: JournalLeaveTypeEnum | null;
     workFromHome?: JournalWorkFromHomeTypeEnum | null;
 }
@@ -35,7 +35,7 @@ function UsersList(props: Props) {
             <DisplayPicture
                 className={styles.displayPicture}
                 imageUrl={user.displayPicture}
-                displayName={user.displayName ?? 'Hari Bahadur'}
+                displayName={user.displayName}
             />
             <div
                 className={_cs(
@@ -45,7 +45,7 @@ function UsersList(props: Props) {
                         && styles.unavailable,
                 )}
             >
-                {user.displayName ?? 'Hari Bahadur'}
+                {user.displayName}
                 {' '}
                 <AvailabilityIndicator
                     wfhType={user.workFromHome}

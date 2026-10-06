@@ -39,6 +39,7 @@ const gqlClient = new UrqlClient({
             PublicQuery: () => null,
             AppEnumCollection: () => null,
             DailyStandUpType: () => null,
+            DailyStandUpOccupancyUserDayType: () => null,
             DailyHoursType: () => null,
             AppEnumCollectionTimeEntryType: (item) => String(item.key),
             AppEnumCollectionTimeEntryStatus: (item) => String(item.key),
