@@ -1,86 +1,54 @@
 .occupancy-section {
-    .content {
-        display: flex;
-        align-self: stretch;
-        flex-direction: column;
-        flex-grow: 1;
-        padding: var(--spacing-lg);
-        overflow: auto;
-        gap: var(--spacing-lg);
+    padding: var(--spacing-lg);
 
-        @media screen and (max-width: 900px) {
-            padding: unset;
-        }
+    @media screen and (max-width: 900px) {
+        padding: unset;
     }
 
-    .header {
+    .summary {
         display: flex;
         align-items: flex-end;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        gap: var(--spacing-md);
+        flex-direction: column;
+        gap: var(--spacing-xs);
 
-        .heading-section {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-2xs);
-
-            .heading {
-                color: var(--color-primary-text);
-                font-size: var(--font-size-3xl);
-                font-weight: var(--font-weight-light);
-            }
-
-            .range {
-                color: var(--color-text-muted);
-                font-size: var(--font-size-xl);
-            }
+        .missing-summary {
+            color: var(--color-heatmap-low);
+            font-weight: var(--font-weight-bold);
         }
 
-        .summary {
+        .recent-missing-summary {
+            color: var(--color-heatmap-mid);
+            font-weight: var(--font-weight-bold);
+        }
+
+        .legend {
             display: flex;
-            align-items: flex-end;
-            flex-direction: column;
-            gap: var(--spacing-xs);
+            flex-wrap: wrap;
+            color: var(--color-text-muted);
+            font-size: var(--font-size-sm);
+            gap: var(--spacing-md);
 
-            .missing-summary {
-                color: var(--color-heatmap-low);
-                font-weight: var(--font-weight-bold);
-            }
-
-            .recent-missing-summary {
-                color: var(--color-warning-text);
-                font-weight: var(--font-weight-bold);
-            }
-
-            .legend {
+            .legend-item {
                 display: flex;
-                flex-wrap: wrap;
-                color: var(--color-text-muted);
-                font-size: var(--font-size-sm);
-                gap: var(--spacing-md);
+                align-items: center;
+                gap: var(--spacing-xs);
+            }
 
-                .legend-item {
-                    display: flex;
-                    align-items: center;
-                    gap: var(--spacing-xs);
-                }
-
-                .swatch {
-                    display: inline-flex;
-                    position: relative;
-                    align-items: center;
-                    justify-content: center;
-                    border-radius: var(--border-radius-sm);
-                    background-color: var(--color-foreground);
-                    width: 1.4em;
-                    height: 1.4em;
-                }
+            .swatch {
+                display: inline-flex;
+                position: relative;
+                align-items: center;
+                justify-content: center;
+                border-radius: var(--border-radius-sm);
+                background-color: var(--color-foreground);
+                width: 1.4em;
+                height: 1.4em;
             }
         }
     }
 
     .table-container {
+        align-self: stretch;
         /* Keep the table from widening the page; it scrolls instead */
         contain: inline-size;
         transition: opacity var(--duration-transition-medium) ease-in-out 100ms;
@@ -182,7 +150,7 @@
                 }
 
                 &.has-recent-missing {
-                    color: var(--color-warning-text);
+                    color: var(--color-heatmap-mid);
                     font-weight: var(--font-weight-bold);
                 }
             }
@@ -217,12 +185,15 @@
         font-size: var(--font-size-sm);
 
         &.high {
-            /* stylelint-disable-next-line csstools/value-no-unknown-custom-properties */
-            background-color: color-mix(in srgb, var(--color-heatmap-high) calc(var(--occupancy-strength) * 0.4), transparent);
+            background-color: color-mix(in srgb, var(--color-heatmap-high) 30%, transparent);
+        }
+
+        &.mid {
+            background-color: color-mix(in srgb, var(--color-heatmap-mid) 30%, transparent);
         }
 
         &.low {
-            background-color: color-mix(in srgb, var(--color-heatmap-low) 25%, transparent);
+            background-color: color-mix(in srgb, var(--color-heatmap-low) 30%, transparent);
         }
     }
 
@@ -247,14 +218,5 @@
             border-color: transparent var(--color-text-muted) transparent transparent;
             content: '';
         }
-    }
-
-    .footer {
-        display: flex;
-        justify-content: space-between;
-        margin-top: auto;
-        color: var(--color-text-muted);
-        font-size: var(--font-size-md);
-        gap: var(--spacing-sm);
     }
 }

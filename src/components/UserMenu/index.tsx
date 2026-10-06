@@ -84,13 +84,13 @@ function UserMenu(props: Props) {
                 <DisplayPicture
                     className={styles.displayPicture}
                     imageUrl={userAuth.displayPicture}
-                    displayName={userAuth.displayName ?? userAuth.email}
+                    displayName={userAuth.displayName}
                 />
             )}
             title="Show user actions"
         >
             <div className={styles.greetings}>
-                {userAuth.displayName ?? 'Hari Bahadur'}
+                {userAuth.displayName}
             </div>
             {userAuth.isStaff && (
                 <DropdownMenuItem
