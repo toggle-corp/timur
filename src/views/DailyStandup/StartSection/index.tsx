@@ -8,7 +8,6 @@ import {
 } from 'urql';
 
 import DefaultMessage from '#components/DefaultMessage';
-import SlideCounter from '#components/SlideCounter';
 import StandupConductors from '#components/StandupConductors';
 import UsersList from '#components/UsersList';
 import {
@@ -17,10 +16,9 @@ import {
     type UsersAvailabilityQuery,
     type UsersAvailabilityQueryVariables,
 } from '#generated/types/graphql';
-import useCurrentDate from '#hooks/useCurrentDate';
-import { formatDateTime } from '#utils/common';
 
 import Slide from '../Slide';
+import SlideFooter from '../SlideFooter';
 
 import styles from './styles.module.css';
 
@@ -95,7 +93,6 @@ function StartSection(props: Props) {
             leave: user.leaveToday,
             workFromHome: user.workFromHomeToday,
         })) ?? [];
-    const todayDate = useCurrentDate();
 
     return (
         <Slide
@@ -114,13 +111,10 @@ function StartSection(props: Props) {
                     <div className={styles.subSections}>
                         <StandupConductors />
                     </div>
-                    <div className={styles.currentTime}>
-                        <span>{formatDateTime(todayDate)}</span>
-                        <SlideCounter
-                            current={currentSlide}
-                            total={totalSlides}
-                        />
-                    </div>
+                    <SlideFooter
+                        currentSlide={currentSlide}
+                        totalSlides={totalSlides}
+                    />
                 </>
             )}
             secondaryHeading="Out of office"

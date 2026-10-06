@@ -1,86 +1,56 @@
 .occupancy-section {
-    .content {
+    padding: var(--spacing-lg);
+
+    @media screen and (max-width: 900px) {
+        padding: unset;
+    }
+
+    .summary {
         display: flex;
-        align-self: stretch;
+        align-items: flex-end;
         flex-direction: column;
-        flex-grow: 1;
-        padding: var(--spacing-lg);
-        overflow: auto;
-        gap: var(--spacing-lg);
+        /* Keeps it at the right edge when the header wraps */
+        margin-left: auto;
+        gap: var(--spacing-xs);
 
         @media screen and (max-width: 900px) {
-            padding: unset;
+            align-items: flex-start;
+            flex-basis: 100%;
+        }
+
+        .missing-summary {
+            color: var(--color-heatmap-low-text);
+            font-weight: var(--font-weight-bold);
+        }
+
+        .recent-missing-summary {
+            color: var(--color-heatmap-mid-text);
+            font-weight: var(--font-weight-bold);
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            color: var(--color-text-muted);
+            font-size: var(--font-size-sm);
+            gap: var(--spacing-md);
+
+            .legend-item {
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-xs);
+            }
         }
     }
 
-    .header {
-        display: flex;
-        align-items: flex-end;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        gap: var(--spacing-md);
-
-        .heading-section {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-2xs);
-
-            .heading {
-                color: var(--color-primary-text);
-                font-size: var(--font-size-3xl);
-                font-weight: var(--font-weight-light);
-            }
-
-            .range {
-                color: var(--color-text-muted);
-                font-size: var(--font-size-xl);
-            }
-        }
-
-        .summary {
-            display: flex;
-            align-items: flex-end;
-            flex-direction: column;
-            gap: var(--spacing-xs);
-
-            .missing-summary {
-                color: var(--color-heatmap-low);
-                font-weight: var(--font-weight-bold);
-            }
-
-            .recent-missing-summary {
-                color: var(--color-warning-text);
-                font-weight: var(--font-weight-bold);
-            }
-
-            .legend {
-                display: flex;
-                flex-wrap: wrap;
-                color: var(--color-text-muted);
-                font-size: var(--font-size-sm);
-                gap: var(--spacing-md);
-
-                .legend-item {
-                    display: flex;
-                    align-items: center;
-                    gap: var(--spacing-xs);
-                }
-
-                .swatch {
-                    display: inline-flex;
-                    position: relative;
-                    align-items: center;
-                    justify-content: center;
-                    border-radius: var(--border-radius-sm);
-                    background-color: var(--color-foreground);
-                    width: 1.4em;
-                    height: 1.4em;
-                }
-            }
-        }
+    .message {
+        align-self: stretch;
     }
 
     .table-container {
+        align-self: stretch;
+        /* overflow: auto lets it shrink below its rows; the slide scrolls instead */
+        flex-shrink: 0;
         /* Keep the table from widening the page; it scrolls instead */
         contain: inline-size;
         transition: opacity var(--duration-transition-medium) ease-in-out 100ms;
@@ -124,7 +94,6 @@
         .date-heading {
             .weekday {
                 display: block;
-                opacity: 0.7;
                 font-size: var(--font-size-xs);
             }
         }
@@ -177,12 +146,12 @@
                 font-size: var(--font-size-sm);
 
                 &.has-missing {
-                    color: var(--color-heatmap-low);
+                    color: var(--color-heatmap-low-text);
                     font-weight: var(--font-weight-bold);
                 }
 
                 &.has-recent-missing {
-                    color: var(--color-warning-text);
+                    color: var(--color-heatmap-mid-text);
                     font-weight: var(--font-weight-bold);
                 }
             }
@@ -209,27 +178,46 @@
     }
 
     .cell {
+        --occupancy-color: transparent;
+
         position: relative;
         border-radius: var(--border-radius-sm);
+        background-color: color-mix(in srgb, var(--occupancy-color) 30%, transparent);
         padding: var(--spacing-2xs) 0;
         min-width: 2rem;
         text-align: center;
+        color: var(--color-heatmap-text);
         font-size: var(--font-size-sm);
 
         &.high {
-            /* stylelint-disable-next-line csstools/value-no-unknown-custom-properties */
-            background-color: color-mix(in srgb, var(--color-heatmap-high) calc(var(--occupancy-strength) * 0.4), transparent);
+            --occupancy-color: var(--color-heatmap-high);
+        }
+
+        &.mid {
+            --occupancy-color: var(--color-heatmap-mid);
         }
 
         &.low {
-            background-color: color-mix(in srgb, var(--color-heatmap-low) 25%, transparent);
+            --occupancy-color: var(--color-heatmap-low);
         }
+    }
+
+    /* NOTE: Defined before .missing and .leave so that they override the background */
+    .swatch {
+        display: inline-flex;
+        position: relative;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--border-radius-sm);
+        background-color: var(--color-foreground);
+        width: 1.4em;
+        height: 1.4em;
     }
 
     .missing {
         box-shadow: inset 0 0 0 2px var(--color-heatmap-low);
         background-color: color-mix(in srgb, var(--color-heatmap-low) 35%, transparent);
-        color: var(--color-heatmap-low);
+        color: var(--color-heatmap-on-low);
         font-weight: var(--font-weight-bold);
     }
 
@@ -244,17 +232,8 @@
             right: 0;
             border-width: 0 0.5rem 0.5rem 0;
             border-style: solid;
-            border-color: transparent var(--color-text-muted) transparent transparent;
+            border-color: transparent var(--color-heatmap-text) transparent transparent;
             content: '';
         }
-    }
-
-    .footer {
-        display: flex;
-        justify-content: space-between;
-        margin-top: auto;
-        color: var(--color-text-muted);
-        font-size: var(--font-size-md);
-        gap: var(--spacing-sm);
     }
 }

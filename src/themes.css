@@ -10,9 +10,6 @@
     --color-info: #0277bd;
     --color-info-text: #01579b;
 
-    --color-warning: #f9a825;
-    --color-warning-text: #9a6700;
-
     --color-backdrop: #00000080;
 
     /* Categorical chip colors */
@@ -62,7 +59,12 @@
 
     --color-focus: #dee8c8;
 
+    --color-heatmap-text: var(--color-text);
     --color-heatmap-low: #c45332;
+    --color-heatmap-low-text: #bf4e2d;
+    --color-heatmap-on-low: #992b01;
+    --color-heatmap-mid: #a87a0a;
+    --color-heatmap-mid-text: #926a09;
     --color-heatmap-high: #6e8b3e;
 }
 
@@ -93,7 +95,12 @@
 
     --color-focus: #dce0e8;
 
+    --color-heatmap-text: var(--color-text);
     --color-heatmap-low: #d20f39;
+    --color-heatmap-low-text: var(--color-heatmap-low);
+    --color-heatmap-on-low: #8e0222;
+    --color-heatmap-mid: #c47a12;
+    --color-heatmap-mid-text: #995f0e;
     --color-heatmap-high: #40a02b;
 }
 
@@ -124,7 +131,12 @@
 
     --color-focus: #d5c4a1;
 
+    --color-heatmap-text: var(--color-text);
     --color-heatmap-low: #9d0006;
+    --color-heatmap-low-text: var(--color-heatmap-low);
+    --color-heatmap-on-low: #820306;
+    --color-heatmap-mid: #b57614;
+    --color-heatmap-mid-text: #946110;
     --color-heatmap-high: #79740e;
 }
 
@@ -155,7 +167,12 @@
 
     --color-focus: #dcdcdc;
 
+    --color-heatmap-text: var(--color-text);
     --color-heatmap-low: #cc241d;
+    --color-heatmap-low-text: var(--color-heatmap-low);
+    --color-heatmap-on-low: #980004;
+    --color-heatmap-mid: #cc7a0a;
+    --color-heatmap-mid-text: #9f5f08;
     --color-heatmap-high: #218871;
 }
 
@@ -186,7 +203,12 @@
 
     --color-focus: #ddd6b8;
 
+    --color-heatmap-text: #435860;
     --color-heatmap-low: #dc322f;
+    --color-heatmap-low-text: #d52a29;
+    --color-heatmap-on-low: #a0010e;
+    --color-heatmap-mid: #b58900;
+    --color-heatmap-mid-text: #8b6900;
     --color-heatmap-high: #859900;
 }
 
@@ -201,9 +223,6 @@
 
     --color-info: #29b6f6;
     --color-info-text: #81d4fa;
-
-    --color-warning: #ffca28;
-    --color-warning-text: #ffe082;
 
     --color-backdrop: #000000a6;
 
@@ -252,7 +271,12 @@
 
         --color-focus: #404d2e;
 
+        --color-heatmap-text: var(--color-text);
         --color-heatmap-low: #db7657;
+        --color-heatmap-low-text: var(--color-heatmap-low);
+        --color-heatmap-on-low: #fea98e;
+        --color-heatmap-mid: #d9a441;
+        --color-heatmap-mid-text: #d9a441;
         --color-heatmap-high: #aebd55;
     }
 
@@ -283,7 +307,12 @@
 
         --color-focus: #45475a;
 
+        --color-heatmap-text: #e2e9ff;
         --color-heatmap-low: #f38ba8;
+        --color-heatmap-low-text: var(--color-heatmap-low);
+        --color-heatmap-on-low: #fec8d5;
+        --color-heatmap-mid: #f9e2af;
+        --color-heatmap-mid-text: #f9e2af;
         --color-heatmap-high: #a6e3a1;
     }
 
@@ -314,7 +343,12 @@
 
         --color-focus: #504945;
 
+        --color-heatmap-text: var(--color-text);
         --color-heatmap-low: #fb4934;
+        --color-heatmap-low-text: #ff7c68;
+        --color-heatmap-on-low: #feb3a5;
+        --color-heatmap-mid: #fabd2f;
+        --color-heatmap-mid-text: #fabd2f;
         --color-heatmap-high: #b8bb26;
     }
 
@@ -345,7 +379,12 @@
 
         --color-focus: #49483e;
 
+        --color-heatmap-text: var(--color-text);
         --color-heatmap-low: #f92672;
+        --color-heatmap-low-text: #fe819d;
+        --color-heatmap-on-low: #fea9b9;
+        --color-heatmap-mid: #e6db74;
+        --color-heatmap-mid-text: #e6db74;
         --color-heatmap-high: #a6e22e;
     }
 
@@ -376,7 +415,12 @@
 
         --color-focus: #134c5b;
 
+        --color-heatmap-text: #aec0c2;
         --color-heatmap-low: #dc322f;
+        --color-heatmap-low-text: #fe6b5f;
+        --color-heatmap-on-low: #ff8579;
+        --color-heatmap-mid: #b58900;
+        --color-heatmap-mid-text: #bc9519;
         --color-heatmap-high: #859900;
     }
 }

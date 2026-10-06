@@ -4,7 +4,10 @@ import {
     _cs,
     compareNumber,
     compareString,
+    decodeDate,
     isNotDefined,
+    listToGroupList,
+    mapToList,
 } from '@togglecorp/fujs';
 import {
     gql,
@@ -13,16 +16,13 @@ import {
 
 import DefaultMessage from '#components/DefaultMessage';
 import DisplayPicture from '#components/DisplayPicture';
-import SlideCounter from '#components/SlideCounter';
 import {
     type DailyStandupOccupancyQuery,
     type DailyStandupOccupancyQueryVariables,
-    type JournalLeaveTypeEnum,
 } from '#generated/types/graphql';
-import useCurrentDate from '#hooks/useCurrentDate';
-import { formatDateTime } from '#utils/common';
 
 import Slide from '../Slide';
+import SlideFooter from '../SlideFooter';
 
 import styles from './styles.module.css';
 
@@ -52,6 +52,7 @@ const DAILY_STANDUP_OCCUPANCY_QUERY = gql`
                             date
                             hours
                             leave
+                            leaveDisplay
                             occupancy
                         }
                     }
@@ -61,12 +62,6 @@ const DAILY_STANDUP_OCCUPANCY_QUERY = gql`
     }
 `;
 
-// NOTE: Parsing manually to avoid the UTC shift of new Date('YYYY-MM-DD')
-function parseDate(value: string) {
-    const [year, month, day] = value.split('-').map(Number);
-    return new Date(year ?? 0, (month ?? 1) - 1, day ?? 1);
-}
-
 const monthFormatter = new Intl.DateTimeFormat(undefined, { month: 'short' });
 const weekdayFormatter = new Intl.DateTimeFormat(undefined, { weekday: 'narrow' });
 const fullDateFormatter = new Intl.DateTimeFormat(undefined, {
@@ -74,23 +69,25 @@ const fullDateFormatter = new Intl.DateTimeFormat(undefined, {
     month: 'short',
     day: 'numeric',
 });
+const rangeFormatter = new Intl.DateTimeFormat(undefined, {
+    month: 'short',
+    day: 'numeric',
+});
 
 function formatRange(startDate: string, endDate: string) {
-    const formatter = new Intl.DateTimeFormat(undefined, {
-        month: 'short',
-        day: 'numeric',
-    });
-    return `${formatter.format(parseDate(startDate))} – ${formatter.format(parseDate(endDate))}`;
+    return rangeFormatter.formatRange(decodeDate(startDate), decodeDate(endDate));
 }
 
-// ISO 8601 week number
-function getWeekNumber(date: Date) {
+// ISO 8601 week number and the year the week belongs to
+function getIsoWeek(date: Date) {
     const value = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
     const weekday = value.getUTCDay() || 7;
     // Thursday decides which year the week belongs to
     value.setUTCDate(value.getUTCDate() + 4 - weekday);
-    const yearStart = Date.UTC(value.getUTCFullYear(), 0, 1);
-    return Math.ceil(((value.getTime() - yearStart) / 86400000 + 1) / 7);
+    const year = value.getUTCFullYear();
+    const yearStart = Date.UTC(year, 0, 1);
+    const week = Math.ceil(((value.getTime() - yearStart) / 86400000 + 1) / 7);
+    return { year, week };
 }
 
 interface DateGroup {
@@ -100,34 +97,44 @@ interface DateGroup {
     span: number;
 }
 
+// NOTE: dates must be sorted so that each group is contiguous
 function groupDates(
     dates: string[],
-    getKey: (date: Date, value: string) => string,
+    getKey: (date: Date) => string,
     getLabel: (date: Date) => string,
-) {
-    return dates.reduce<DateGroup[]>(
-        (acc, value) => {
-            const dateValue = parseDate(value);
-            const key = getKey(dateValue, value);
-            const last = acc[acc.length - 1];
-            if (last && last.key === key) {
-                last.span += 1;
-            } else {
-                acc.push({
-                    key,
-                    label: getLabel(dateValue),
-                    firstDate: value,
-                    span: 1,
-                });
-            }
-            return acc;
+): DateGroup[] {
+    const datesByKey = listToGroupList(
+        dates,
+        (value) => getKey(decodeDate(value)),
+    );
+
+    return mapToList(
+        datesByKey,
+        (groupedDates, key) => {
+            // NOTE: listToGroupList only creates groups with at least one item
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const firstDate = groupedDates[0]!;
+            return {
+                key,
+                label: getLabel(decodeDate(firstDate)),
+                firstDate,
+                span: groupedDates.length,
+            };
         },
-        [],
     );
 }
 
 // Missing counts for these many most recent working days are shown as a warning
 const RECENT_DAYS_COUNT = 2;
+const RECENT_DAYS_LABEL = `last ${RECENT_DAYS_COUNT} working days`;
+
+// NOTE: Users are sorted by descending severity
+const SEVERITY = {
+    upToDate: 0,
+    recentMissing: 1,
+    olderMissing: 2,
+} as const;
+type Severity = typeof SEVERITY[keyof typeof SEVERITY];
 
 type Boundary = 'month' | 'week' | undefined;
 
@@ -145,24 +152,21 @@ function isMissing(day: OccupancyDay) {
     return isNotDefined(day.occupancy);
 }
 
-function getLeaveLabel(leave: JournalLeaveTypeEnum | null | undefined) {
-    if (leave === 'FULL') {
-        return 'Leave';
+function getOccupancyClassName(percent: number) {
+    if (percent < 33) {
+        return styles.low;
     }
-    if (leave === 'FIRST_HALF') {
-        return 'Leave (first half)';
+    if (percent < 66) {
+        return styles.mid;
     }
-    if (leave === 'SECOND_HALF') {
-        return 'Leave (second half)';
-    }
-    return undefined;
+    return styles.high;
 }
 
 function getCellTitle(displayName: string, day: OccupancyDay) {
     const parts = [
         displayName,
-        fullDateFormatter.format(parseDate(day.date)),
-        getLeaveLabel(day.leave),
+        fullDateFormatter.format(decodeDate(day.date as string)),
+        day.leaveDisplay && `${day.leaveDisplay} leave`,
         isNotDefined(day.hours) ? 'No entries' : `${day.hours}h`,
         isNotDefined(day.occupancy) ? undefined : `${Math.round(day.occupancy * 100)}%`,
     ];
@@ -215,12 +219,9 @@ function OccupancyCell(props: CellProps) {
                 styles.cell,
                 boundaryClassName,
                 day.leave && styles.halfLeave,
-                day.occupancy < 0.5 ? styles.low : styles.high,
+                getOccupancyClassName(percent),
             )}
             title={title}
-            style={{
-                ['--occupancy-strength' as string]: `${Math.min(day.occupancy, 1) * 100}%`,
-            }}
         >
             {percent}
         </td>
@@ -249,14 +250,12 @@ function OccupancySection(props: Props) {
         requestPolicy: 'cache-and-network',
     });
 
-    const todayDate = useCurrentDate();
-
     const occupancy = occupancyResponse.data?.private.dailyStandup.occupancy;
 
     const months = useMemo(
         () => groupDates(
             occupancy?.dates ?? [],
-            (_, value) => value.substring(0, 7),
+            (dateValue) => `${dateValue.getFullYear()}-${dateValue.getMonth()}`,
             (dateValue) => monthFormatter.format(dateValue),
         ),
         [occupancy?.dates],
@@ -265,8 +264,11 @@ function OccupancySection(props: Props) {
     const weeks = useMemo(
         () => groupDates(
             occupancy?.dates ?? [],
-            (dateValue) => `${dateValue.getFullYear()}-${getWeekNumber(dateValue)}`,
-            (dateValue) => `W${getWeekNumber(dateValue)}`,
+            (dateValue) => {
+                const { year, week } = getIsoWeek(dateValue);
+                return `${year}-${week}`;
+            },
+            (dateValue) => `W${getIsoWeek(dateValue).week}`,
         ),
         [occupancy?.dates],
     );
@@ -296,225 +298,217 @@ function OccupancySection(props: Props) {
             .map((item) => {
                 const missingDays = item.days.filter(isMissing);
                 const hasOlderMissing = missingDays.some((day) => !recentDates.has(day.date));
-                let missingSeverity = 2;
+                let severity: Severity = SEVERITY.upToDate;
                 if (hasOlderMissing) {
-                    missingSeverity = 0;
+                    severity = SEVERITY.olderMissing;
                 } else if (missingDays.length > 0) {
-                    missingSeverity = 1;
+                    severity = SEVERITY.recentMissing;
                 }
                 return {
                     ...item,
-                    displayName: item.user.displayName ?? `User#${item.user.id}`,
                     missingCount: missingDays.length,
-                    // 0: older days missing, 1: only recent days missing, 2: nothing missing
-                    missingSeverity,
+                    severity,
                     firstMissingDate: missingDays[0]?.date,
                 };
             })
             .sort((foo, bar) => (
-                compareNumber(foo.missingSeverity, bar.missingSeverity)
+                compareNumber(foo.severity, bar.severity, -1)
                 || compareNumber(foo.missingCount, bar.missingCount, -1)
                 || compareString(foo.firstMissingDate, bar.firstMissingDate)
-                || compareString(foo.displayName, bar.displayName)
+                || compareString(foo.user.displayName, bar.user.displayName)
             )),
         [occupancy?.users, recentDates],
     );
 
-    const usersWithMissing = sortedUsers.filter((item) => item.missingSeverity === 0).length;
-    const usersWithRecentMissing = sortedUsers
-        .filter((item) => item.missingSeverity === 1).length;
+    const usersWithMissing = sortedUsers.filter(
+        (item) => item.severity === SEVERITY.olderMissing,
+    ).length;
+    const usersWithRecentMissing = sortedUsers.filter(
+        (item) => item.severity === SEVERITY.recentMissing,
+    ).length;
+    const more = usersWithMissing > 0 ? ' more' : '';
     const isEmpty = sortedUsers.length === 0 || (occupancy?.dates.length ?? 0) === 0;
 
     return (
         <Slide
             className={styles.occupancySection}
             variant="general"
+            heading="Is your Timur up to date?"
+            description={occupancy && formatRange(occupancy.startDate, occupancy.endDate)}
+            headerActions={(
+                <div className={styles.summary}>
+                    {!isEmpty && usersWithMissing > 0 && (
+                        <span className={styles.missingSummary}>
+                            {usersWithMissing === 1
+                                ? '1 person has days without entries or leave'
+                                : `${usersWithMissing} people have days without entries or leave`}
+                        </span>
+                    )}
+                    {!isEmpty && usersWithRecentMissing > 0 && (
+                        <span className={styles.recentMissingSummary}>
+                            {usersWithRecentMissing === 1
+                                ? `1${more} person is only missing the ${RECENT_DAYS_LABEL}`
+                                : `${usersWithRecentMissing}${more} people are only missing the ${RECENT_DAYS_LABEL}`}
+                        </span>
+                    )}
+                    {!isEmpty && usersWithMissing + usersWithRecentMissing === 0 && (
+                        <span>Everyone is up to date!</span>
+                    )}
+                    <div className={styles.legend}>
+                        <span className={styles.legendItem}>
+                            <span className={_cs(styles.swatch, styles.missing)}>?</span>
+                            No entries
+                        </span>
+                        <span className={styles.legendItem}>
+                            <span className={_cs(styles.swatch, styles.leave)}>
+                                <FcLandscape />
+                            </span>
+                            Leave
+                        </span>
+                        <span className={styles.legendItem}>
+                            <span className={_cs(styles.swatch, styles.halfLeave)} />
+                            Half leave
+                        </span>
+                        <span className={styles.legendItem}>
+                            % of expected hours
+                        </span>
+                    </div>
+                </div>
+            )}
+            footer={(
+                <SlideFooter
+                    currentSlide={currentSlide}
+                    totalSlides={totalSlides}
+                />
+            )}
         >
-            <div className={styles.content}>
-                <header className={styles.header}>
-                    <div className={styles.headingSection}>
-                        <h2 className={styles.heading}>
-                            Is your Timur up to date?
-                        </h2>
-                        {occupancy && (
-                            <div className={styles.range}>
-                                {formatRange(occupancy.startDate, occupancy.endDate)}
-                            </div>
-                        )}
-                    </div>
-                    <div className={styles.summary}>
-                        {!isEmpty && usersWithMissing > 0 && (
-                            <span className={styles.missingSummary}>
-                                {usersWithMissing === 1
-                                    ? '1 person has days without entries or leave'
-                                    : `${usersWithMissing} people have days without entries or leave`}
-                            </span>
-                        )}
-                        {!isEmpty && usersWithRecentMissing > 0 && (
-                            <span className={styles.recentMissingSummary}>
-                                {usersWithRecentMissing === 1
-                                    ? '1 more person is only missing the last couple of days'
-                                    : `${usersWithRecentMissing} more people are only missing the last couple of days`}
-                            </span>
-                        )}
-                        {!isEmpty && usersWithMissing + usersWithRecentMissing === 0 && (
-                            <span>Everyone is up to date!</span>
-                        )}
-                        <div className={styles.legend}>
-                            <span className={styles.legendItem}>
-                                <span className={_cs(styles.swatch, styles.missing)}>?</span>
-                                No entries
-                            </span>
-                            <span className={styles.legendItem}>
-                                <span className={_cs(styles.swatch, styles.leave)}>
-                                    <FcLandscape />
-                                </span>
-                                Leave
-                            </span>
-                            <span className={styles.legendItem}>
-                                <span className={_cs(styles.swatch, styles.halfLeave)} />
-                                Half leave
-                            </span>
-                            <span className={styles.legendItem}>
-                                % of 7h
-                            </span>
-                        </div>
-                    </div>
-                </header>
-                {!isEmpty && (
-                    <div
-                        className={_cs(
-                            styles.tableContainer,
-                            occupancyResponse.fetching && styles.loading,
-                        )}
-                    >
-                        <table className={styles.table}>
-                            <thead>
-                                <tr>
+            {!isEmpty && (
+                <div
+                    className={_cs(
+                        styles.tableContainer,
+                        occupancyResponse.fetching && styles.loading,
+                    )}
+                >
+                    <table className={styles.table}>
+                        <thead>
+                            <tr>
+                                <th
+                                    className={styles.user}
+                                    rowSpan={3}
+                                >
+                                    <div className={styles.userContent}>
+                                        <span className={styles.userHeading}>
+                                            Team member
+                                        </span>
+                                        <span className={styles.missingHeading}>
+                                            Missing
+                                        </span>
+                                    </div>
+                                </th>
+                                {months.map((month) => (
                                     <th
-                                        className={styles.user}
-                                        rowSpan={3}
+                                        key={month.key}
+                                        className={_cs(
+                                            styles.groupHeading,
+                                            getBoundaryClassName(boundaries[month.firstDate]),
+                                        )}
+                                        colSpan={month.span}
                                     >
-                                        <div className={styles.userContent}>
-                                            <span className={styles.userHeading}>
-                                                Team member
+                                        {month.label}
+                                    </th>
+                                ))}
+                            </tr>
+                            <tr>
+                                {weeks.map((week) => (
+                                    <th
+                                        key={week.key}
+                                        className={_cs(
+                                            styles.groupHeading,
+                                            styles.weekHeading,
+                                            getBoundaryClassName(boundaries[week.firstDate]),
+                                        )}
+                                        colSpan={week.span}
+                                    >
+                                        {week.label}
+                                    </th>
+                                ))}
+                            </tr>
+                            <tr>
+                                {occupancy?.dates.map((value: string) => {
+                                    const dateValue = decodeDate(value);
+                                    return (
+                                        <th
+                                            key={value}
+                                            className={_cs(
+                                                styles.dateHeading,
+                                                getBoundaryClassName(boundaries[value]),
+                                            )}
+                                        >
+                                            <span className={styles.weekday}>
+                                                {weekdayFormatter.format(dateValue)}
                                             </span>
-                                            <span className={styles.missingHeading}>
-                                                Missing
+                                            <span>
+                                                {dateValue.getDate()}
+                                            </span>
+                                        </th>
+                                    );
+                                })}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {sortedUsers.map((item) => (
+                                <tr key={item.id}>
+                                    <th className={styles.user}>
+                                        <div className={styles.userContent}>
+                                            <DisplayPicture
+                                                className={styles.displayPicture}
+                                                imageUrl={item.user.displayPicture}
+                                                displayName={item.user.displayName}
+                                            />
+                                            <span
+                                                className={styles.displayName}
+                                                title={item.user.displayName}
+                                            >
+                                                {item.user.displayName}
+                                            </span>
+                                            <span
+                                                className={_cs(
+                                                    styles.missingCount,
+                                                    item.severity === SEVERITY.olderMissing
+                                                        && styles.hasMissing,
+                                                    item.severity === SEVERITY.recentMissing
+                                                        && styles.hasRecentMissing,
+                                                )}
+                                            >
+                                                {item.missingCount > 0 ? item.missingCount : '✓'}
                                             </span>
                                         </div>
                                     </th>
-                                    {months.map((month) => (
-                                        <th
-                                            key={month.key}
-                                            className={_cs(
-                                                styles.groupHeading,
-                                                getBoundaryClassName(boundaries[month.firstDate]),
-                                            )}
-                                            colSpan={month.span}
-                                        >
-                                            {month.label}
-                                        </th>
+                                    {item.days.map((day) => (
+                                        <OccupancyCell
+                                            key={day.date}
+                                            displayName={item.user.displayName}
+                                            day={day}
+                                            boundary={boundaries[day.date]}
+                                        />
                                     ))}
                                 </tr>
-                                <tr>
-                                    {weeks.map((week) => (
-                                        <th
-                                            key={week.key}
-                                            className={_cs(
-                                                styles.groupHeading,
-                                                styles.weekHeading,
-                                                getBoundaryClassName(boundaries[week.firstDate]),
-                                            )}
-                                            colSpan={week.span}
-                                        >
-                                            {week.label}
-                                        </th>
-                                    ))}
-                                </tr>
-                                <tr>
-                                    {occupancy?.dates.map((value) => {
-                                        const dateValue = parseDate(value);
-                                        return (
-                                            <th
-                                                key={value}
-                                                className={_cs(
-                                                    styles.dateHeading,
-                                                    getBoundaryClassName(boundaries[value]),
-                                                )}
-                                            >
-                                                <span className={styles.weekday}>
-                                                    {weekdayFormatter.format(dateValue)}
-                                                </span>
-                                                <span>
-                                                    {dateValue.getDate()}
-                                                </span>
-                                            </th>
-                                        );
-                                    })}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {sortedUsers.map((item) => (
-                                    <tr key={item.id}>
-                                        <th className={styles.user}>
-                                            <div className={styles.userContent}>
-                                                <DisplayPicture
-                                                    className={styles.displayPicture}
-                                                    imageUrl={item.user.displayPicture}
-                                                    displayName={item.displayName}
-                                                />
-                                                <span
-                                                    className={styles.displayName}
-                                                    title={item.displayName}
-                                                >
-                                                    {item.displayName}
-                                                </span>
-                                                <span
-                                                    className={_cs(
-                                                        styles.missingCount,
-                                                        item.missingSeverity === 0
-                                                            && styles.hasMissing,
-                                                        item.missingSeverity === 1
-                                                            && styles.hasRecentMissing,
-                                                    )}
-                                                >
-                                                    {item.missingCount > 0 ? item.missingCount : '✓'}
-                                                </span>
-                                            </div>
-                                        </th>
-                                        {item.days.map((day) => (
-                                            <OccupancyCell
-                                                key={day.date}
-                                                displayName={item.displayName}
-                                                day={day}
-                                                boundary={boundaries[day.date]}
-                                            />
-                                        ))}
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-                <DefaultMessage
-                    compact
-                    filtered={false}
-                    empty={isEmpty}
-                    pending={isEmpty && occupancyResponse.fetching}
-                    errored={!!occupancyResponse.error}
-                    pendingMessage="Crunching the numbers"
-                    errorMessage="Something went sideways!"
-                    emptyMessage="No working days to show yet!"
-                />
-                <footer className={styles.footer}>
-                    <span>{formatDateTime(todayDate)}</span>
-                    <SlideCounter
-                        current={currentSlide}
-                        total={totalSlides}
-                    />
-                </footer>
-            </div>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+            <DefaultMessage
+                className={styles.message}
+                compact
+                filtered={false}
+                empty={isEmpty}
+                pending={isEmpty && occupancyResponse.fetching}
+                errored={!!occupancyResponse.error}
+                pendingMessage="Crunching the numbers"
+                errorMessage="Something went sideways!"
+                emptyMessage="No working days to show yet!"
+            />
         </Slide>
     );
 }
