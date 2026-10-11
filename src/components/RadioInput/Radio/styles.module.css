@@ -1,7 +1,19 @@
 .radio {
     --cursor: default;
+    position: relative;
     cursor: var(--cursor);
     width: fit-content;
+
+    &::before {
+        position: absolute;
+        content: '';
+        inset: var(--inset-target--min);
+    }
+
+    /* Stacked radios grow for real so their hit areas do not overlap */
+    @media (pointer: coarse) {
+        padding-block: var(--padding-target--min);
+    }
 
     .icon {
         transition: var(--duration-transition-medium) color ease-in-out;

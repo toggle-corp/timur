@@ -61,6 +61,7 @@ function BottomNav(props: Props) {
             {navItems.map((item) => (
                 <Link
                     key={item.to}
+                    className={styles.navCell}
                     to={item.to}
                     title={item.label}
                     linkElementClassName={_cs(

@@ -200,6 +200,17 @@
     }
 }
 
+.toggle-collapsed-button {
+    /* Button clips its overflow, which would clip the enlarged hit area */
+    overflow: visible;
+
+    &::before {
+        position: absolute;
+        content: '';
+        inset: var(--inset-target--min);
+    }
+}
+
 .sidebar-icon {
     font-size: var(--font-size-xl);
 }

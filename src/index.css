@@ -117,6 +117,17 @@
 
     --height-navbar: calc(4rem + env(safe-area-inset-top));
     --height-bottom-nav: calc(3.5rem + env(safe-area-inset-bottom));
+
+    /* WCAG 2.5.8 minimum for fine pointers, touch guidance for coarse */
+    --size-target-min: 1.5rem;
+    /* The percentage resolves where it is used, against the target's own box */
+    --inset-target--min: min(0px, (100% - var(--size-target-min)) / 2);
+    /* Grows a single-line row to the target height, with 1lh resolved where it is used */
+    --padding-target--min: calc((var(--size-target-min) - 1lh) / 2);
+
+    @media (pointer: coarse) {
+        --size-target-min: 2.75rem;
+    }
 }
 
 html {

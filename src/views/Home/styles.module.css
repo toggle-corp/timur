@@ -19,7 +19,7 @@
 
             .grid {
                 display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(min(20rem, 100%), 1fr));
                 /* stylelint-disable-next-line declaration-property-value-no-unknown */
                 grid-template-rows: masonry;
                 gap: var(--spacing-lg);
