@@ -1,6 +1,7 @@
 import {
     RefObject,
     useCallback,
+    useId,
     useLayoutEffect,
     useMemo,
     useRef,
@@ -45,6 +46,7 @@ function Dialog(props: Props) {
     } = props;
 
     const dialogRef = useRef<HTMLDialogElement>(null);
+    const headingId = useId();
 
     useLayoutEffect(
         () => {
@@ -94,6 +96,7 @@ function Dialog(props: Props) {
             {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */}
             <dialog
                 ref={dialogRef}
+                aria-labelledby={headingId}
                 className={_cs(
                     className,
                     styles.dialog,
@@ -110,7 +113,10 @@ function Dialog(props: Props) {
                 {open && (
                     <>
                         <header className={styles.header}>
-                            <h4 className={styles.heading}>
+                            <h4
+                                id={headingId}
+                                className={styles.heading}
+                            >
                                 {heading}
                             </h4>
                             <Button

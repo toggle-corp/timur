@@ -1,6 +1,8 @@
 import {
     useCallback,
+    useEffect,
     useId,
+    useRef,
 } from 'react';
 import { _cs } from '@togglecorp/fujs';
 
@@ -48,16 +50,28 @@ function Checkbox<const NAME>(props: Props<NAME>) {
     } = props;
 
     const inputId = useId();
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(
+        () => {
+            if (inputRef.current) {
+                inputRef.current.indeterminate = !!indeterminate;
+            }
+        },
+        [indeterminate],
+    );
 
     const handleChange = useCallback(
         (e: React.FormEvent<HTMLInputElement>) => {
             const v = e.currentTarget.checked;
+            // A click clears the native flag, and React restores only `checked`
+            e.currentTarget.indeterminate = !!indeterminate;
             onChange(
                 invertedLogic ? !v : v,
                 name,
             );
         },
-        [name, onChange, invertedLogic],
+        [name, onChange, invertedLogic, indeterminate],
     );
 
     const checked = invertedLogic ? !value : value;
@@ -77,6 +91,7 @@ function Checkbox<const NAME>(props: Props<NAME>) {
             htmlFor={inputId}
         >
             <input
+                ref={inputRef}
                 id={inputId}
                 onChange={handleChange}
                 className={_cs(styles.input, inputClassName)}

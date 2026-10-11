@@ -20,6 +20,7 @@ export interface Props<
     OPTION_KEY extends OptionKey,
     OPTION,
 > {
+    id: string;
     optionContainerClassName?: string;
     contentRenderer: (props: Pick<RENDER_PROPS, Exclude<keyof RENDER_PROPS, 'containerClassName' | 'title'>>) => React.ReactNode;
     contentRendererParam: (key: OPTION_KEY, opt: OPTION) => RENDER_PROPS;
@@ -34,6 +35,7 @@ function GenericOption<
     OPTION,
 >(props: Props<RENDER_PROPS, OPTION_KEY, OPTION>) {
     const {
+        id,
         optionContainerClassName,
         contentRenderer,
         contentRendererParam,
@@ -77,6 +79,9 @@ function GenericOption<
 
     return (
         <RawButton
+            id={id}
+            role="option"
+            aria-selected={isFocused}
             elementRef={divRef}
             className={_cs(
                 styles.genericOption,
@@ -84,7 +89,10 @@ function GenericOption<
                 containerClassName,
             )}
             onClick={handleClick}
-            title={title}
+            // Screen readers announce a title as the description of every option,
+            // so it only names the analytics event
+            title=""
+            data-umami-event={title}
             name={optionKey}
             focused={isFocused}
         >

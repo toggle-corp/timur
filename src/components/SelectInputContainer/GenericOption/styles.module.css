@@ -6,6 +6,8 @@
     text-align: left;
 
     &:hover {
+        /* NOTE: Muted text lacks contrast on the hover surface */
+        --color-text-muted: var(--color-text);
         background-color: var(--color-focus);
     }
 }

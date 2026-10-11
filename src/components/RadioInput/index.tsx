@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import {
     _cs,
     isDefined,
@@ -10,7 +10,7 @@ import Radio, { Props as RadioProps } from './Radio';
 
 import styles from './styles.module.css';
 
-interface BaseProps<N, O, V, RRP extends RadioProps<V, N>> {
+interface BaseProps<N, O, V, RRP extends RadioProps<V, N>> extends Pick<React.AriaAttributes, 'aria-labelledby'> {
     className?: string;
     options: O[] | undefined;
     name: N;
@@ -84,7 +84,10 @@ function RadioInput<
         // required,
         onChange,
         // withAsterisk,
+        'aria-labelledby': ariaLabelledBy,
     } = props;
+
+    const labelId = useId();
 
     const handleRadioClick = React.useCallback((radioKey: V | undefined) => {
         if (readOnly) {
@@ -142,13 +145,18 @@ function RadioInput<
 
     return (
         <div
+            role="radiogroup"
+            aria-labelledby={ariaLabelledBy ?? (isDefined(label) ? labelId : undefined)}
             className={_cs(
                 styles.radioInput,
                 disabled && styles.disabled,
                 className,
             )}
         >
-            <div className={_cs(styles.label, labelContainerClassName)}>
+            <div
+                id={labelId}
+                className={_cs(styles.label, labelContainerClassName)}
+            >
                 {label}
             </div>
             <div className={_cs(styles.radioListContainer, listContainerClassName)}>

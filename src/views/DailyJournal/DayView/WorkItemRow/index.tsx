@@ -87,6 +87,11 @@ function defaultColorSelector<T>(_: T, i: number): readonly [string, string] {
     return colorscheme[i % colorscheme.length]!;
 }
 
+const statusLabel = 'Status';
+const descriptionLabel = 'Description';
+const typeLabel = 'Type';
+const hoursLabel = 'Hours';
+
 interface Props {
     className?: string;
     workItem: WorkItem;
@@ -288,6 +293,7 @@ function WorkItemRow(props: Props) {
                 workItem.status === 'DONE' && styles.done,
             )}
             name="status"
+            tooltip={statusLabel}
             indeterminate={workItem.status === 'DOING'}
             value={workItem.status === 'DONE'}
             onChange={handleStatusCheck}
@@ -296,6 +302,7 @@ function WorkItemRow(props: Props) {
         <SelectInput
             className={styles.status}
             name="status"
+            aria-label={statusLabel}
             options={enums?.enums?.TimeEntryStatus}
             keySelector={workItemStatusKeySelector}
             labelSelector={workItemStatusLabelSelector}
@@ -310,6 +317,7 @@ function WorkItemRow(props: Props) {
         <SelectInput
             className={styles.task}
             name="task"
+            aria-label="Task"
             options={taskList}
             keySelector={taskKeySelector}
             labelSelector={taskLabelSelector}
@@ -329,12 +337,13 @@ function WorkItemRow(props: Props) {
             )}
             inputElementRef={inputRef}
             name="description"
-            title="Description"
+            title={descriptionLabel}
+            aria-label={descriptionLabel}
             value={workItem.description}
             onChange={setFieldValue}
             onKeyDown={handleShortcuts}
             onBlur={handleDescriptionBlur}
-            placeholder="Description"
+            placeholder={descriptionLabel}
             compact={config.compactTextArea}
         />
     );
@@ -343,7 +352,8 @@ function WorkItemRow(props: Props) {
         <SelectInput
             className={_cs(styles.type, typeErrored && styles.erroredInput)}
             name="type"
-            placeholder="Type"
+            aria-label={typeLabel}
+            placeholder={typeLabel}
             options={enums?.enums.TimeEntryType}
             keySelector={workItemTypeKeySelector}
             labelSelector={workItemTypeLabelSelector}
@@ -357,7 +367,8 @@ function WorkItemRow(props: Props) {
         <DurationInput
             className={_cs(styles.hours, durationErrored && styles.erroredInput)}
             name="duration"
-            title="Hours"
+            title={hoursLabel}
+            aria-label={hoursLabel}
             value={workItem.duration}
             onChange={setFieldValue}
             placeholder="00:00"
