@@ -203,6 +203,7 @@ function StartSidebar(props: Props) {
             </Suspense>
             <div className={styles.bottomActions}>
                 <Button
+                    className={styles.desktopOnly}
                     name={undefined}
                     onClick={onShortcutsClick}
                     title="Show shortcuts"

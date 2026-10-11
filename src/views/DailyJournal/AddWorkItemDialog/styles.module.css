@@ -12,6 +12,7 @@
             .task {
                 display: flex;
                 align-items: center;
+                width: 100%;
                 text-align: left;
                 gap: var(--spacing-sm);
 

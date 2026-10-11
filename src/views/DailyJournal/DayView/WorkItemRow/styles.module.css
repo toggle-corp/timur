@@ -74,7 +74,8 @@
             }
         }
 
-        &:not(:focus-within) {
+        /* NOTE: An open popover keeps the row expanded as focus briefly leaves the row on tap */
+        &:not(:focus-within, :has(:popover-open)) {
             .compact-options,
             .task,
             .type,

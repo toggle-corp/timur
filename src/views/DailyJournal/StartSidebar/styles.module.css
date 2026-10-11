@@ -12,8 +12,10 @@
         margin-top: auto;
         gap: var(--spacing-sm);
 
-        @media screen and (max-width: 900px) {
-            display: none;
+        .desktop-only {
+            @media screen and (max-width: 900px) {
+                display: none;
+            }
         }
     }
 }
