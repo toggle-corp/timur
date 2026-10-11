@@ -165,7 +165,7 @@ function getOccupancyClassName(percent: number) {
 function getCellTitle(displayName: string, day: OccupancyDay) {
     const parts = [
         displayName,
-        fullDateFormatter.format(decodeDate(day.date as string)),
+        fullDateFormatter.format(decodeDate(day.date)),
         day.leaveDisplay && `${day.leaveDisplay} leave`,
         isNotDefined(day.hours) ? 'No entries' : `${day.hours}h`,
         isNotDefined(day.occupancy) ? undefined : `${Math.round(day.occupancy * 100)}%`,
@@ -434,7 +434,7 @@ function OccupancySection(props: Props) {
                                 ))}
                             </tr>
                             <tr>
-                                {occupancy?.dates.map((value: string) => {
+                                {occupancy?.dates.map((value) => {
                                     const dateValue = decodeDate(value);
                                     return (
                                         <th
