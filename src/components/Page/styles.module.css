@@ -155,6 +155,32 @@
         }
     }
 
+    @media (prefers-reduced-motion: reduce) {
+        .main {
+            transition: none;
+        }
+
+        &.start-sidebar-visible .start-aside,
+        &.end-sidebar-visible .end-aside {
+            animation-name: fade-in;
+        }
+
+        /* The content reflows at once, so a fading sidebar would ghost over it */
+        &.start-sidebar-collapsed .start-aside,
+        &.end-sidebar-collapsed .end-aside {
+            display: none;
+        }
+    }
+
+    @keyframes fade-in {
+        0% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+
     @keyframes slide-in-from-right {
         0% {
             transform: translateX(100%);

@@ -7,6 +7,10 @@
     .icon {
         animation: run var(--duration-animation-fast) ease-in-out infinite;
         font-size: var(--font-size-xl);
+
+        @media (prefers-reduced-motion: reduce) {
+            animation: none;
+        }
     }
 
     .line {

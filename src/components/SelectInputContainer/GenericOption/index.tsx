@@ -58,7 +58,9 @@ function GenericOption<
         () => {
             if (focusedKey && focusedKey.key === optionKey && !focusedKey.mouse && divRef.current) {
                 divRef.current.scrollIntoView({
-                    behavior: 'smooth',
+                    behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+                        ? 'auto'
+                        : 'smooth',
                     block: 'center',
                 });
             }

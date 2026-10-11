@@ -26,6 +26,11 @@
             animation: ellipsis 1.4s linear infinite;
             text-align: left;
             content: '';
+
+            @media (prefers-reduced-motion: reduce) {
+                animation: none;
+                content: '...';
+            }
         }
     }
 
