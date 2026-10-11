@@ -39,7 +39,7 @@
     .user-menu,
     .user-menu > a {
         /* Targets span the bar edge to edge, so the focus ring is drawn inside them */
-        outline-offset: calc(-1 * var(--width-separator-md));
+        outline-offset: var(--outline-offset-inset);
 
         /* The content container grows to fill the target, so the icon is centred inside it */
         > * {

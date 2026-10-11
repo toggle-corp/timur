@@ -104,6 +104,10 @@
 
             .drag-handle {
                 cursor: grab;
+
+                &:focus-visible {
+                    outline: var(--width-separator-md) solid var(--color-focus-ring);
+                }
             }
 
             &:hover {

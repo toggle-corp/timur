@@ -57,8 +57,8 @@
             }
         }
 
-        &:focus-within {
-            outline: var(--width-separator-md) solid var(--color-focus);
+        &:has(:focus-visible) {
+            outline: var(--width-separator-md) solid var(--color-focus-ring);
             outline-offset: var(--spacing-2xs);
         }
 

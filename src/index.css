@@ -81,6 +81,8 @@
     --width-separator-lg: 4pt;
     --width-separator-xl: 8pt;
 
+    --outline-offset-inset: calc(-1 * var(--width-separator-md));
+
     --width-page-content--max: 84rem;
 
     --border-radius-none: 0;

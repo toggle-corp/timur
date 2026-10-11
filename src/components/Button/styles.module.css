@@ -82,6 +82,7 @@
     &.primary {
         --color-background: var(--color-primary);
         --color-text: var(--color-on-primary);
+        outline-offset: var(--width-separator-md);
 
         &.disabled {
             filter: saturate(50%);
@@ -97,6 +98,7 @@
     &.secondary {
         --color-background: var(--color-secondary);
         --color-text: var(--color-on-secondary);
+        outline-offset: var(--width-separator-md);
 
         &.disabled {
             filter: saturate(50%);
@@ -131,13 +133,14 @@
 
         &:not(.disabled) {
             &:hover {
-                --color-text: var(--color-primary);
+                --color-text: var(--color-primary-text);
             }
         }
     }
 
     &.dropdown-item {
         display: flex;
+        outline-offset: var(--outline-offset-inset);
         width: 100%;
         text-align: left;
         --border-radius: unset;
