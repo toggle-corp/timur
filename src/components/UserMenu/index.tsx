@@ -6,6 +6,7 @@ import {
     RiAdminLine,
     RiLoginBoxLine,
     RiLogoutBoxLine,
+    RiTeamLine,
 } from 'react-icons/ri';
 import {
     isDefined,
@@ -102,6 +103,13 @@ function UserMenu(props: Props) {
                     Admin Panel
                 </DropdownMenuItem>
             )}
+            <DropdownMenuItem
+                type="link"
+                to="timesheets"
+                icons={<RiTeamLine />}
+            >
+                Timesheets
+            </DropdownMenuItem>
             <DropdownMenuItem
                 type="button"
                 name={undefined}

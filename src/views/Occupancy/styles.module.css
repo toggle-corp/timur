@@ -1,0 +1,218 @@
+.occupancy {
+    --person-panel-width: 26rem;
+
+    .person-panel {
+        width: min(var(--person-panel-width), 100%);
+    }
+
+    /* NOTE: The pill shape of the buttons, with the pressed view lifted onto the surface */
+    .view-switch {
+        display: inline-flex;
+        align-self: flex-start;
+        border-radius: var(--border-radius-full);
+        background-color: var(--color-primary-bg-subtle);
+        padding: var(--spacing-3xs);
+        max-width: 100%;
+        overflow-x: auto;
+        gap: var(--spacing-3xs);
+
+        .view-option {
+            transition: background-color var(--duration-transition-fast) ease-out, color var(--duration-transition-fast) ease-out;
+            border-radius: var(--border-radius-full);
+            padding: var(--spacing-xs) var(--spacing-md);
+            white-space: nowrap;
+            color: var(--color-text-muted);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+
+            &:hover {
+                color: var(--color-primary-text);
+            }
+
+            &[aria-pressed="true"] {
+                box-shadow: var(--box-shadow-xs);
+                background-color: var(--color-foreground);
+                color: var(--color-primary-text);
+            }
+        }
+    }
+
+    .heatmap {
+        @media screen and (max-width: 900px) {
+            --occupancy-heatmap-name-width: 6.5rem;
+        }
+    }
+
+    .content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-lg);
+        padding: var(--spacing-lg);
+
+        @media screen and (max-width: 900px) {
+            padding: unset;
+        }
+
+        /* NOTE: Keeps the days clear of the person panel */
+        &.with-panel {
+            @media screen and (min-width: 901px) {
+                padding-right: calc(var(--person-panel-width) + var(--spacing-lg));
+            }
+        }
+    }
+
+    .header {
+        display: flex;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: var(--spacing-md);
+
+        .heading-section {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-2xs);
+
+            .heading {
+                color: var(--color-primary-text);
+                font-size: var(--font-size-3xl);
+                font-weight: var(--font-weight-light);
+            }
+
+            .data-as-of {
+                color: var(--color-text-muted);
+                font-size: var(--font-size-sm);
+            }
+        }
+    }
+
+    .summary-heading {
+        position: relative;
+        vertical-align: bottom;
+        text-align: right;
+        white-space: nowrap;
+        color: var(--color-text-muted);
+        font-size: var(--font-size-xs);
+
+        .tooltip {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            z-index: 2;
+            margin-top: var(--spacing-3xs);
+            border: var(--width-separator-sm) solid var(--color-separator);
+            border-radius: var(--border-radius-md);
+            box-shadow: 0 var(--spacing-3xs) var(--spacing-sm) var(--color-separator);
+            background-color: var(--color-surface-raised);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            width: max-content;
+            max-width: 14rem;
+            text-align: left;
+            white-space: normal;
+            color: var(--color-text);
+            font-size: var(--font-size-sm);
+        }
+
+        /* NOTE: The button title covers hover */
+        &:has(:focus-visible) .tooltip {
+            display: block;
+        }
+    }
+
+    /* NOTE: Right-aligned with the counts below it */
+    .sort-button {
+        font-weight: inherit;
+    }
+
+    .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    .summary-heading,
+    .summary-cell {
+        padding-inline: var(--spacing-xs);
+
+        &:nth-child(1 of .summary-heading, .summary-cell) {
+            border-left: var(--width-separator-sm) solid var(--color-separator);
+            padding-left: var(--spacing-sm);
+        }
+    }
+
+    /* NOTE: A long project name is cut short, with the full name in the text and on hover */
+    .top-project-cell {
+        .top-project {
+            display: inline-flex;
+            white-space: pre;
+        }
+
+        .project-name {
+            max-width: 7rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    /* NOTE: The tints of the day cells, so a warning reads as mid occupancy and an alert as low */
+    .summary-cell {
+        --level-color: transparent;
+
+        background-color: color-mix(in srgb, var(--level-color) 30%, transparent);
+        text-align: right;
+        white-space: nowrap;
+        font-size: var(--font-size-sm);
+
+        &.high {
+            --level-color: var(--color-heatmap-high);
+        }
+
+        &.over {
+            --level-color: var(--color-heatmap-over);
+        }
+
+        &.mid,
+        &.warning {
+            --level-color: var(--color-heatmap-mid);
+        }
+
+        &.low,
+        &.alert {
+            --level-color: var(--color-heatmap-low);
+        }
+    }
+
+    /* NOTE: After the summary cells, which align right */
+    .text-column {
+        text-align: left;
+    }
+
+    .events {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        color: var(--color-text-muted);
+        font-size: var(--font-size-sm);
+        gap: var(--spacing-xs) var(--spacing-lg);
+    }
+
+    .message {
+        align-self: stretch;
+    }
+}
+
+.actions {
+    display: flex;
+    width: 100%;
+    gap: var(--spacing-sm);
+
+    .spacer {
+        flex-grow: 1;
+    }
+}
