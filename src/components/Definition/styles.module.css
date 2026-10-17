@@ -1,0 +1,53 @@
+.definition {
+    display: inline-flex;
+
+    .trigger {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        /* NOTE: A 24px target around the small icon */
+        margin: calc(-1 * var(--spacing-2xs));
+        border: none;
+        border-radius: var(--border-radius-full);
+        background: none;
+        cursor: help;
+        padding: var(--spacing-2xs);
+        min-width: 1.5rem;
+        min-height: 1.5rem;
+        color: var(--color-text-muted);
+        font-size: var(--font-size-md);
+
+        &:focus-visible {
+            outline: var(--width-separator-md) solid var(--color-focus-ring);
+        }
+    }
+
+    /* NOTE: Placed against the nearest positioned ancestor, so that it stays inside narrow screens */
+    .tooltip {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        z-index: 1;
+        margin-top: var(--spacing-3xs);
+        border: var(--width-separator-sm) solid var(--color-separator);
+        border-radius: var(--border-radius-md);
+        box-shadow: 0 var(--spacing-3xs) var(--spacing-sm) var(--color-separator);
+        background-color: var(--color-surface-raised);
+        padding: var(--spacing-xs) var(--spacing-sm);
+        color: var(--color-text);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-normal);
+    }
+
+    &:hover .tooltip,
+    &:focus-within .tooltip,
+    &.open .tooltip {
+        display: block;
+    }
+
+    &.closed .tooltip {
+        display: none;
+    }
+}

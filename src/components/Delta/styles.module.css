@@ -1,0 +1,36 @@
+.delta {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+    font-variant-numeric: tabular-nums;
+    gap: var(--spacing-4xs);
+
+    .icon {
+        flex-shrink: 0;
+    }
+
+    /* NOTE: The period after the change stays muted */
+    &.better {
+        color: var(--color-success-text);
+    }
+
+    &.worse {
+        color: var(--color-error-text);
+    }
+
+    .compared-to {
+        white-space: pre;
+        color: var(--color-text-muted);
+    }
+
+    .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        white-space: nowrap;
+        clip-path: inset(50%);
+    }
+}
