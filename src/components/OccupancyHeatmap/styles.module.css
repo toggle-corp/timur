@@ -1,0 +1,365 @@
+.event-marker {
+    color: var(--color-primary-text);
+    font-size: var(--font-size-xs);
+}
+
+.occupancy-heatmap {
+    align-self: stretch;
+    /* overflow: auto lets it shrink below its rows; the parent scrolls instead */
+    flex-shrink: 0;
+    /* Keep the table from widening the page; it scrolls instead */
+    contain: inline-size;
+    transition: opacity var(--duration-transition-medium) ease-in-out 100ms;
+    border: var(--width-separator-sm) solid var(--color-separator);
+    border-radius: var(--border-radius-lg);
+    background-color: var(--color-foreground);
+    padding: var(--spacing-md);
+    overflow: auto;
+
+    &.loading {
+        opacity: 0.5;
+    }
+
+    /* NOTE: A grid gives every day an equal share of the width; tracks come from the component */
+    .table {
+        --grid-gap: 2px;
+
+        display: grid;
+        width: max-content;
+        min-width: 100%;
+        font-variant-numeric: tabular-nums;
+        gap: var(--grid-gap);
+
+        thead,
+        tbody,
+        tr {
+            display: contents;
+        }
+
+        th,
+        td {
+            align-content: center;
+        }
+
+        th {
+            font-weight: var(--font-weight-normal);
+        }
+
+        th[rowspan='3'] {
+            grid-row: span 3;
+            align-content: end;
+        }
+
+        .group-heading,
+        .date-heading {
+            text-align: center;
+            color: var(--color-text-muted);
+            font-size: var(--font-size-sm);
+        }
+
+        .group-heading {
+            padding-left: var(--spacing-2xs);
+            text-align: left;
+
+            /* NOTE: A short week's label overflows instead of widening its days */
+            .group-label {
+                display: block;
+                width: 0;
+                white-space: nowrap;
+            }
+        }
+
+        .week-heading {
+            font-size: var(--font-size-xs);
+        }
+
+        .date-heading {
+            .weekday {
+                display: block;
+                font-size: var(--font-size-xs);
+            }
+
+            .event-marker {
+                display: block;
+                margin: 0 auto;
+            }
+
+            &.non-working {
+                border-radius: var(--border-radius-sm);
+                background-color: color-mix(in srgb, var(--color-separator) 50%, transparent);
+            }
+        }
+
+        .user {
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            background-color: var(--color-foreground);
+            padding-right: var(--spacing-sm);
+            text-align: left;
+            white-space: nowrap;
+
+            /* NOTE: Above the sticky body names, which a heading tooltip can overlap */
+            thead & {
+                z-index: 2;
+            }
+
+            .user-content {
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-xs);
+            }
+
+            .user-heading {
+                flex-grow: 1;
+                color: var(--color-text-muted);
+                font-size: var(--font-size-sm);
+            }
+
+            .display-picture {
+                flex-shrink: 0;
+                width: 1.5rem;
+                height: 1.5rem;
+            }
+
+            .user-button {
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-xs);
+                text-align: left;
+            }
+
+            .display-name {
+                width: var(--occupancy-heatmap-name-width, 9rem);
+                overflow: hidden;
+                text-overflow: ellipsis;
+                font-size: var(--font-size-sm);
+            }
+        }
+
+        .month-spacer {
+            background: linear-gradient(var(--color-separator-strong), var(--color-separator-strong)) center / 2px 100% no-repeat;
+        }
+    }
+
+    /* NOTE: The separator matches the surface in some palettes, and muted text falls under 4.5:1 on any fill */
+    &.with-group-bands .table .group-heading {
+        border-radius: var(--border-radius-sm);
+        background-color: var(--color-heatmap-empty);
+        padding: var(--spacing-2xs) 0;
+        color: var(--color-heatmap-text);
+
+        /* NOTE: Overflows both sides equally, so a one-day week stays as wide as its days */
+        .group-label {
+            display: flex;
+            justify-content: center;
+            margin-inline: auto;
+        }
+    }
+
+    /* NOTE: The bands sit as far apart as two weeks, whose boundary track is BOUNDARY_TRACK in dateGroup */
+    &.with-group-bands .table .week-heading {
+        margin-top: calc(var(--spacing-sm) + var(--grid-gap));
+    }
+
+    &.without-group-headings .table thead th {
+        align-content: end;
+    }
+
+    /* NOTE: The blank column below marks a non-working day */
+    &.with-group-bands .table .date-heading.non-working {
+        background-color: transparent;
+    }
+
+    &.with-group-bands .table .date-heading:is(.non-working, .event-day) {
+        color: var(--color-heatmap-on-low);
+    }
+}
+
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+    gap: var(--spacing-md);
+
+    .legend-title {
+        font-weight: var(--font-weight-semibold);
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+    }
+}
+
+.cell,
+.swatch {
+    --occupancy-color: transparent;
+    --cell-fill: color-mix(in srgb, var(--occupancy-color) 30%, transparent);
+
+    &.high {
+        --occupancy-color: var(--color-heatmap-high);
+    }
+
+    &.mid {
+        --occupancy-color: var(--color-heatmap-mid);
+    }
+
+    &.low {
+        --occupancy-color: var(--color-heatmap-low);
+    }
+}
+
+.cell {
+    position: relative;
+    border-radius: var(--border-radius-sm);
+    background-color: var(--cell-fill);
+    padding: var(--spacing-2xs) var(--spacing-3xs);
+    text-align: center;
+    color: var(--color-heatmap-text);
+    font-size: var(--font-size-sm);
+}
+
+.cell-link {
+    position: absolute;
+    border-radius: inherit;
+    inset: 0;
+
+    &:hover,
+    &:focus-visible {
+        outline: var(--width-separator-md) solid var(--color-focus-ring);
+    }
+}
+
+/* NOTE: Defined before .missing so that it overrides the background */
+.swatch {
+    display: inline-flex;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius-sm);
+    /* NOTE: The fills are light tints, so an edge keeps each swatch visible */
+    box-shadow: inset 0 0 0 1px var(--color-text-muted);
+    background-color: var(--color-foreground);
+    width: 1.4em;
+    height: 1.4em;
+
+    &:is(.low, .mid, .high) {
+        background-color: var(--cell-fill);
+    }
+}
+
+.off-day {
+    background-color: var(--color-heatmap-empty);
+}
+
+.missing {
+    --cell-stroke: inset 0 0 0 2px var(--color-heatmap-low);
+    --cell-fill: color-mix(in srgb, var(--color-heatmap-low) 35%, transparent);
+
+    box-shadow: var(--cell-stroke);
+    background-color: var(--cell-fill);
+    color: var(--color-heatmap-on-low);
+    font-weight: var(--font-weight-bold);
+}
+
+/* NOTE: Neutral, as the day may still be logged */
+.pending {
+    outline: var(--width-separator-sm) dashed var(--color-text-muted);
+    outline-offset: calc(-1 * var(--width-separator-sm));
+    background-color: var(--color-heatmap-empty);
+
+    .pending-icon {
+        vertical-align: middle;
+        color: var(--color-text-muted);
+    }
+}
+
+/* NOTE: A hue of its own, apart from the occupancy steps */
+.leave {
+    background-color: var(--color-heatmap-leave-fill);
+}
+
+/* NOTE: A darker green than the high step, with a stronger fill */
+.over {
+    --cell-fill: color-mix(in srgb, var(--color-heatmap-over) 50%, transparent);
+
+    background-color: var(--cell-fill);
+}
+
+/* NOTE: The leave half takes the leave colour and the other half keeps the cell's own fill, with a surface line between */
+.first-half-leave,
+.second-half-leave {
+    --half-leave-fill: var(--color-heatmap-leave-fill) calc(50% - 1px), var(--color-foreground) calc(50% - 1px) calc(50% + 1px), var(--cell-fill, transparent) calc(50% + 1px);
+}
+
+.first-half-leave {
+    background: linear-gradient(to right, var(--half-leave-fill));
+}
+
+.second-half-leave {
+    background: linear-gradient(to left, var(--half-leave-fill));
+}
+
+/* NOTE: Centred between the digits' baseline, a quarter em above the line's bottom, and the cell's bottom */
+.work-from-home-marks {
+    display: flex;
+    position: absolute;
+    top: calc(50% + 0.5lh - 0.25em);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+
+    .legend & {
+        position: static;
+    }
+}
+
+/* NOTE: Shapes as well as colours, so the halves read apart without colour */
+.home-mark,
+.office-mark {
+    width: 4px;
+    height: 4px;
+}
+
+.home-mark {
+    border-radius: 50%;
+    background-color: var(--color-wfh);
+}
+
+.office-mark {
+    background-color: var(--color-office);
+}
+
+/* NOTE: In the text colour, which every fill keeps readable */
+.late-mark {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-top: 0.4em solid var(--color-heatmap-text);
+    border-left: 0.4em solid transparent;
+    border-top-right-radius: var(--border-radius-sm);
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+/* NOTE: Rows are display: contents, so each cell carries the dimming */
+.dimmed {
+    /* NOTE: The sticky name cell stays opaque, so days scrolled under it stay hidden */
+    > :not([aria-hidden], .user),
+    > .user > * {
+        opacity: 0.5;
+    }
+}

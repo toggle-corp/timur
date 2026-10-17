@@ -31,6 +31,14 @@
     --cs-6-bg: #faecd1;
     --cs-7-fg: #813a0e;
     --cs-7-bg: #fae1d1;
+
+    /* Billable is the accent, non-billable recedes */
+    --color-billable: var(--color-secondary);
+    --color-non-billable: var(--color-separator-strong);
+
+    --color-heatmap-leave-fill: color-mix(in srgb, var(--color-heatmap-leave) 30%, var(--color-foreground));
+    /* Non-working days without entries */
+    --color-heatmap-empty: color-mix(in srgb, var(--color-heatmap-neutral) 35%, var(--color-foreground));
 }
 
 :root,
@@ -68,6 +76,12 @@
     --color-heatmap-mid: #a87a0a;
     --color-heatmap-mid-text: #926a09;
     --color-heatmap-high: #6e8b3e;
+    --color-heatmap-leave: #303fcd;
+    --color-heatmap-neutral: #d7d5cf;
+    --color-heatmap-hours: #4b5f2a;
+    --color-heatmap-over: #557022;
+    --color-wfh: #a3301a;
+    --color-office: #2b5b94;
 }
 
 [data-light-palette="catppuccin"] {
@@ -103,6 +117,12 @@
     --color-heatmap-mid: #c47a12;
     --color-heatmap-mid-text: #995f0e;
     --color-heatmap-high: #40a02b;
+    --color-heatmap-leave: #443ff9;
+    --color-heatmap-neutral: #d4d6dc;
+    --color-heatmap-hours: #80a9f9;
+    --color-heatmap-over: #3fae27;
+    --color-wfh: #b80d32;
+    --color-office: #0652e0;
 }
 
 [data-light-palette="gruvbox"] {
@@ -138,6 +158,12 @@
     --color-heatmap-mid: #b57614;
     --color-heatmap-mid-text: #946110;
     --color-heatmap-high: #79740e;
+    --color-heatmap-leave: #4c40c3;
+    --color-heatmap-neutral: #d8d1c4;
+    --color-heatmap-hours: #734b0d;
+    --color-heatmap-over: #625c00;
+    --color-wfh: #9d0006;
+    --color-office: #005b6c;
 }
 
 [data-light-palette="monokai"] {
@@ -173,6 +199,12 @@
     --color-heatmap-mid: #cc7a0a;
     --color-heatmap-mid-text: #9f5f08;
     --color-heatmap-high: #218871;
+    --color-heatmap-leave: #6e09fb;
+    --color-heatmap-neutral: #d5d4d5;
+    --color-heatmap-hours: #944100;
+    --color-heatmap-over: #006f59;
+    --color-wfh: #a70c0b;
+    --color-office: #1e539b;
 }
 
 [data-light-palette="solarized"] {
@@ -208,6 +240,12 @@
     --color-heatmap-mid: #b58900;
     --color-heatmap-mid-text: #8b6900;
     --color-heatmap-high: #859900;
+    --color-heatmap-leave: #5c47fb;
+    --color-heatmap-neutral: #d1d5cf;
+    --color-heatmap-hours: #39cbc0;
+    --color-heatmap-over: #8fa600;
+    --color-wfh: #b52a27;
+    --color-office: #1f5f9e;
 }
 
 :root[data-theme="dark"] {
@@ -275,6 +313,12 @@
         --color-heatmap-mid: #d9a441;
         --color-heatmap-mid-text: var(--color-heatmap-mid);
         --color-heatmap-high: #aebd55;
+        --color-heatmap-leave: #4976d3;
+        --color-heatmap-neutral: #4e4b45;
+        --color-heatmap-hours: #7f8c36;
+        --color-heatmap-over: #4a5400;
+        --color-wfh: #ff9a80;
+        --color-office: #9cbcf0;
     }
 
     &[data-dark-palette="catppuccin"] {
@@ -309,6 +353,12 @@
         --color-heatmap-on-low: #fec8d5;
         --color-heatmap-mid: #f9e2af;
         --color-heatmap-high: #a6e3a1;
+        --color-heatmap-leave: #8f7cf0;
+        --color-heatmap-neutral: #4e5165;
+        --color-heatmap-hours: #3b83f7;
+        --color-heatmap-over: #316a2f;
+        --color-wfh: #ffaecb;
+        --color-office: #9fcbff;
     }
 
     &[data-dark-palette="gruvbox"] {
@@ -343,6 +393,12 @@
         --color-heatmap-on-low: #feb3a5;
         --color-heatmap-mid: #fabd2f;
         --color-heatmap-high: #b8bb26;
+        --color-heatmap-leave: #6178e9;
+        --color-heatmap-neutral: #5c554d;
+        --color-heatmap-hours: #b37f04;
+        --color-heatmap-over: #545200;
+        --color-wfh: #ffa78f;
+        --color-office: #a2c5b7;
     }
 
     &[data-dark-palette="monokai"] {
@@ -377,6 +433,12 @@
         --color-heatmap-on-low: #fea9b9;
         --color-heatmap-mid: #e6db74;
         --color-heatmap-high: #a6e22e;
+        --color-heatmap-leave: #8c28f7;
+        --color-heatmap-neutral: #5d5a4b;
+        --color-heatmap-hours: #d97602;
+        --color-heatmap-over: #386900;
+        --color-wfh: #ffb4d3;
+        --color-office: #85d5fd;
     }
 
     &[data-dark-palette="solarized"] {
@@ -413,5 +475,11 @@
         --color-heatmap-mid: #b58900;
         --color-heatmap-mid-text: #bc9519;
         --color-heatmap-high: #859900;
+        --color-heatmap-leave: #604bfe;
+        --color-heatmap-neutral: #2a5059;
+        --color-heatmap-hours: #19615c;
+        --color-heatmap-over: #364300;
+        --color-wfh: #ff7a6e;
+        --color-office: #6fa8e8;
     }
 }

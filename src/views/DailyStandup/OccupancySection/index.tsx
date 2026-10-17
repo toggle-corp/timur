@@ -1,13 +1,11 @@
 import { useMemo } from 'react';
-import { FcLandscape } from 'react-icons/fc';
+import { RiCalendarLine } from 'react-icons/ri';
 import {
     _cs,
     compareNumber,
     compareString,
     decodeDate,
     isNotDefined,
-    listToGroupList,
-    mapToList,
 } from '@togglecorp/fujs';
 import {
     gql,
@@ -15,7 +13,11 @@ import {
 } from 'urql';
 
 import DefaultMessage from '#components/DefaultMessage';
-import DisplayPicture from '#components/DisplayPicture';
+import Link from '#components/Link';
+import OccupancyHeatmap, {
+    type OccupancyDay,
+    OccupancyLegend,
+} from '#components/OccupancyHeatmap';
 import {
     type DailyStandupOccupancyQuery,
     type DailyStandupOccupancyQueryVariables,
@@ -25,10 +27,6 @@ import Slide from '../Slide';
 import SlideFooter from '../SlideFooter';
 
 import styles from './styles.module.css';
-
-type OccupancyDay = NonNullable<
-    DailyStandupOccupancyQuery['private']['dailyStandup']['occupancy']
->['users'][number]['days'][number];
 
 const DAILY_STANDUP_OCCUPANCY_QUERY = gql`
     query DailyStandupOccupancy($date: Date!) {
@@ -62,13 +60,6 @@ const DAILY_STANDUP_OCCUPANCY_QUERY = gql`
     }
 `;
 
-const monthFormatter = new Intl.DateTimeFormat(undefined, { month: 'short' });
-const weekdayFormatter = new Intl.DateTimeFormat(undefined, { weekday: 'narrow' });
-const fullDateFormatter = new Intl.DateTimeFormat(undefined, {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-});
 const rangeFormatter = new Intl.DateTimeFormat(undefined, {
     month: 'short',
     day: 'numeric',
@@ -76,52 +67,6 @@ const rangeFormatter = new Intl.DateTimeFormat(undefined, {
 
 function formatRange(startDate: string, endDate: string) {
     return rangeFormatter.formatRange(decodeDate(startDate), decodeDate(endDate));
-}
-
-// ISO 8601 week number and the year the week belongs to
-function getIsoWeek(date: Date) {
-    const value = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-    const weekday = value.getUTCDay() || 7;
-    // Thursday decides which year the week belongs to
-    value.setUTCDate(value.getUTCDate() + 4 - weekday);
-    const year = value.getUTCFullYear();
-    const yearStart = Date.UTC(year, 0, 1);
-    const week = Math.ceil(((value.getTime() - yearStart) / 86400000 + 1) / 7);
-    return { year, week };
-}
-
-interface DateGroup {
-    key: string;
-    label: string;
-    firstDate: string;
-    span: number;
-}
-
-// NOTE: dates must be sorted so that each group is contiguous
-function groupDates(
-    dates: string[],
-    getKey: (date: Date) => string,
-    getLabel: (date: Date) => string,
-): DateGroup[] {
-    const datesByKey = listToGroupList(
-        dates,
-        (value) => getKey(decodeDate(value)),
-    );
-
-    return mapToList(
-        datesByKey,
-        (groupedDates, key) => {
-            // NOTE: listToGroupList only creates groups with at least one item
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const firstDate = groupedDates[0]!;
-            return {
-                key,
-                label: getLabel(decodeDate(firstDate)),
-                firstDate,
-                span: groupedDates.length,
-            };
-        },
-    );
 }
 
 // Missing counts for these many most recent working days are shown as a warning
@@ -136,96 +81,13 @@ const SEVERITY = {
 } as const;
 type Severity = typeof SEVERITY[keyof typeof SEVERITY];
 
-type Boundary = 'month' | 'week' | undefined;
-
-function getBoundaryClassName(boundary: Boundary) {
-    if (boundary === 'month') {
-        return _cs(styles.weekStart, styles.monthStart);
-    }
-    if (boundary === 'week') {
-        return styles.weekStart;
-    }
-    return undefined;
-}
-
 function isMissing(day: OccupancyDay) {
     return isNotDefined(day.occupancy);
 }
 
-function getOccupancyClassName(percent: number) {
-    if (percent < 33) {
-        return styles.low;
-    }
-    if (percent < 66) {
-        return styles.mid;
-    }
-    return styles.high;
-}
-
-function getCellTitle(displayName: string, day: OccupancyDay) {
-    const parts = [
-        displayName,
-        fullDateFormatter.format(decodeDate(day.date)),
-        day.leaveDisplay && `${day.leaveDisplay} leave`,
-        isNotDefined(day.hours) ? 'No entries' : `${day.hours}h`,
-        isNotDefined(day.occupancy) ? undefined : `${Math.round(day.occupancy * 100)}%`,
-    ];
-    return parts.filter(Boolean).join(' · ');
-}
-
-interface CellProps {
-    displayName: string;
-    day: OccupancyDay;
-    boundary: Boundary;
-}
-
-function OccupancyCell(props: CellProps) {
-    const {
-        displayName,
-        day,
-        boundary,
-    } = props;
-
-    const title = getCellTitle(displayName, day);
-    const boundaryClassName = getBoundaryClassName(boundary);
-
-    if (day.leave === 'FULL') {
-        return (
-            <td
-                className={_cs(styles.cell, boundaryClassName, styles.leave)}
-                title={title}
-            >
-                <FcLandscape />
-            </td>
-        );
-    }
-
-    if (isNotDefined(day.occupancy)) {
-        return (
-            <td
-                className={_cs(styles.cell, boundaryClassName, styles.missing)}
-                title={title}
-            >
-                ?
-            </td>
-        );
-    }
-
-    const percent = Math.round(day.occupancy * 100);
-
-    return (
-        <td
-            className={_cs(
-                styles.cell,
-                boundaryClassName,
-                day.leave && styles.halfLeave,
-                getOccupancyClassName(percent),
-            )}
-            title={title}
-        >
-            {percent}
-        </td>
-    );
+// The first week of a month shows the whole previous month, which starts on its 1st
+function getMonthlyViewMonth(startDate: string, date: string) {
+    return (decodeDate(startDate).getDate() === 1 ? startDate : date).slice(0, 7);
 }
 
 interface Props {
@@ -251,42 +113,6 @@ function OccupancySection(props: Props) {
     });
 
     const occupancy = occupancyResponse.data?.private.dailyStandup.occupancy;
-
-    const months = useMemo(
-        () => groupDates(
-            occupancy?.dates ?? [],
-            (dateValue) => `${dateValue.getFullYear()}-${dateValue.getMonth()}`,
-            (dateValue) => monthFormatter.format(dateValue),
-        ),
-        [occupancy?.dates],
-    );
-
-    const weeks = useMemo(
-        () => groupDates(
-            occupancy?.dates ?? [],
-            (dateValue) => {
-                const { year, week } = getIsoWeek(dateValue);
-                return `${year}-${week}`;
-            },
-            (dateValue) => `W${getIsoWeek(dateValue).week}`,
-        ),
-        [occupancy?.dates],
-    );
-
-    // Dates where a new month or week starts, excluding the first column
-    const boundaries = useMemo(
-        () => {
-            const value: Record<string, Boundary> = {};
-            weeks.slice(1).forEach((week) => {
-                value[week.firstDate] = 'week';
-            });
-            months.slice(1).forEach((month) => {
-                value[month.firstDate] = 'month';
-            });
-            return value;
-        },
-        [months, weeks],
-    );
 
     const recentDates = useMemo(
         () => new Set((occupancy?.dates ?? []).slice(-RECENT_DAYS_COUNT)),
@@ -334,7 +160,20 @@ function OccupancySection(props: Props) {
             className={styles.occupancySection}
             variant="general"
             heading="Is your Timur up to date?"
-            description={occupancy && formatRange(occupancy.startDate, occupancy.endDate)}
+            description={occupancy && (
+                <div className={styles.description}>
+                    {formatRange(occupancy.startDate, occupancy.endDate)}
+                    <Link
+                        className={styles.monthlyViewLink}
+                        to="timesheets"
+                        urlParams={{ month: getMonthlyViewMonth(occupancy.startDate, date) }}
+                        variant="transparent"
+                        icons={<RiCalendarLine />}
+                    >
+                        Monthly view
+                    </Link>
+                </div>
+            )}
             headerActions={(
                 <div className={styles.summary}>
                     {!isEmpty && usersWithMissing > 0 && (
@@ -354,25 +193,7 @@ function OccupancySection(props: Props) {
                     {!isEmpty && usersWithMissing + usersWithRecentMissing === 0 && (
                         <span>Everyone is up to date!</span>
                     )}
-                    <div className={styles.legend}>
-                        <span className={styles.legendItem}>
-                            <span className={_cs(styles.swatch, styles.missing)}>?</span>
-                            No entries
-                        </span>
-                        <span className={styles.legendItem}>
-                            <span className={_cs(styles.swatch, styles.leave)}>
-                                <FcLandscape />
-                            </span>
-                            Leave
-                        </span>
-                        <span className={styles.legendItem}>
-                            <span className={_cs(styles.swatch, styles.halfLeave)} />
-                            Half leave
-                        </span>
-                        <span className={styles.legendItem}>
-                            % of expected hours
-                        </span>
-                    </div>
+                    <OccupancyLegend />
                 </div>
             )}
             footer={(
@@ -383,120 +204,36 @@ function OccupancySection(props: Props) {
             )}
         >
             {!isEmpty && (
-                <div
-                    className={_cs(
-                        styles.tableContainer,
-                        occupancyResponse.fetching && styles.loading,
+                <OccupancyHeatmap
+                    label="Occupancy"
+                    withGroupBands
+                    dates={occupancy?.dates ?? []}
+                    rows={sortedUsers.map((item) => ({
+                        key: item.id,
+                        displayName: item.user.displayName,
+                        displayPicture: item.user.displayPicture,
+                        days: item.days,
+                        labelSuffix: (
+                            <span
+                                className={_cs(
+                                    styles.missingCount,
+                                    item.severity === SEVERITY.olderMissing
+                                        && styles.hasMissing,
+                                    item.severity === SEVERITY.recentMissing
+                                        && styles.hasRecentMissing,
+                                )}
+                            >
+                                {item.missingCount > 0 ? item.missingCount : '✓'}
+                            </span>
+                        ),
+                    }))}
+                    labelSuffixHeading={(
+                        <span className={styles.missingHeading}>
+                            Missing
+                        </span>
                     )}
-                >
-                    <table className={styles.table}>
-                        <thead>
-                            <tr>
-                                <th
-                                    className={styles.user}
-                                    rowSpan={3}
-                                >
-                                    <div className={styles.userContent}>
-                                        <span className={styles.userHeading}>
-                                            Team member
-                                        </span>
-                                        <span className={styles.missingHeading}>
-                                            Missing
-                                        </span>
-                                    </div>
-                                </th>
-                                {months.map((month) => (
-                                    <th
-                                        key={month.key}
-                                        className={_cs(
-                                            styles.groupHeading,
-                                            getBoundaryClassName(boundaries[month.firstDate]),
-                                        )}
-                                        colSpan={month.span}
-                                    >
-                                        {month.label}
-                                    </th>
-                                ))}
-                            </tr>
-                            <tr>
-                                {weeks.map((week) => (
-                                    <th
-                                        key={week.key}
-                                        className={_cs(
-                                            styles.groupHeading,
-                                            styles.weekHeading,
-                                            getBoundaryClassName(boundaries[week.firstDate]),
-                                        )}
-                                        colSpan={week.span}
-                                    >
-                                        {week.label}
-                                    </th>
-                                ))}
-                            </tr>
-                            <tr>
-                                {occupancy?.dates.map((value) => {
-                                    const dateValue = decodeDate(value);
-                                    return (
-                                        <th
-                                            key={value}
-                                            className={_cs(
-                                                styles.dateHeading,
-                                                getBoundaryClassName(boundaries[value]),
-                                            )}
-                                        >
-                                            <span className={styles.weekday}>
-                                                {weekdayFormatter.format(dateValue)}
-                                            </span>
-                                            <span>
-                                                {dateValue.getDate()}
-                                            </span>
-                                        </th>
-                                    );
-                                })}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {sortedUsers.map((item) => (
-                                <tr key={item.id}>
-                                    <th className={styles.user}>
-                                        <div className={styles.userContent}>
-                                            <DisplayPicture
-                                                className={styles.displayPicture}
-                                                imageUrl={item.user.displayPicture}
-                                                displayName={item.user.displayName}
-                                            />
-                                            <span
-                                                className={styles.displayName}
-                                                title={item.user.displayName}
-                                            >
-                                                {item.user.displayName}
-                                            </span>
-                                            <span
-                                                className={_cs(
-                                                    styles.missingCount,
-                                                    item.severity === SEVERITY.olderMissing
-                                                        && styles.hasMissing,
-                                                    item.severity === SEVERITY.recentMissing
-                                                        && styles.hasRecentMissing,
-                                                )}
-                                            >
-                                                {item.missingCount > 0 ? item.missingCount : '✓'}
-                                            </span>
-                                        </div>
-                                    </th>
-                                    {item.days.map((day) => (
-                                        <OccupancyCell
-                                            key={day.date}
-                                            displayName={item.user.displayName}
-                                            day={day}
-                                            boundary={boundaries[day.date]}
-                                        />
-                                    ))}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                    loading={occupancyResponse.fetching}
+                />
             )}
             <DefaultMessage
                 className={styles.message}
