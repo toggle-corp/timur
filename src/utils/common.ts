@@ -35,6 +35,27 @@ export function getNewId(): string {
     return ulid();
 }
 
+const hoursFormatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 });
+
+export function formatHours(hours: number) {
+    return `${hoursFormatter.format(hours)}h`;
+}
+
+const shareFormatter = new Intl.NumberFormat(undefined, {
+    style: 'percent',
+    maximumFractionDigits: 0,
+});
+const MIN_SHARE = 0.01;
+
+// A share too small to round to a whole percent shows as below one percent
+export function formatShare(share: number) {
+    return share > 0 && share < MIN_SHARE
+        ? `<${shareFormatter.format(MIN_SHARE)}`
+        : shareFormatter.format(share);
+}
+
+export const NON_WORKING_DAY_LABEL = 'Non-working day';
+
 export function getDurationString(totalMinutes: number) {
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
