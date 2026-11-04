@@ -26,6 +26,8 @@ import {
 import {
     addDays,
     formatHours,
+    NO_HOURS_EXPECTED_LABEL,
+    NO_HOURS_LABEL,
     NON_WORKING_DAY_LABEL,
 } from '#utils/common';
 import {
@@ -68,7 +70,6 @@ const occupancySteps = [
 ];
 
 const MISSING_MARK = 'X';
-const MISSING_LABEL = 'No hours';
 const MISSING_LEGEND_LABEL = 'Missing';
 const LEAVE_LABEL = 'Leave';
 const HALF_LEAVE_LABEL = 'Half leave';
@@ -170,7 +171,7 @@ function getCellTitle(displayName: string, day: OccupancyDay) {
         fullDateFormatter.format(decodeDate(day.date)),
         day.leaveDisplay && `${day.leaveDisplay} leave`,
         day.workFromHome && workFromHomeLabels[day.workFromHome],
-        isNotDefined(day.hours) ? MISSING_LABEL : `${day.hours}h`,
+        isNotDefined(day.hours) ? NO_HOURS_LABEL : `${day.hours}h`,
         day.entries ? `${day.entries} ${day.entries === 1 ? 'entry' : 'entries'}` : undefined,
         isNotDefined(day.occupancy) ? undefined : `${Math.round(day.occupancy * 100)}%`,
         isDefined(day.lateByDays) && !day.loggedDuringStandup
@@ -273,8 +274,8 @@ function OccupancyCell(props: CellProps) {
         return (
             <td
                 className={styles.cell}
-                title={`${title} · No hours expected`}
-                aria-label="No hours expected"
+                title={`${title} · ${NO_HOURS_EXPECTED_LABEL}`}
+                aria-label={NO_HOURS_EXPECTED_LABEL}
             />
         );
     }
@@ -301,7 +302,7 @@ function OccupancyCell(props: CellProps) {
             <td
                 className={_cs(styles.cell, styles.missing, halfLeaveClassName)}
                 title={title}
-                aria-label={MISSING_LABEL}
+                aria-label={NO_HOURS_LABEL}
             >
                 <span aria-hidden>
                     {MISSING_MARK}

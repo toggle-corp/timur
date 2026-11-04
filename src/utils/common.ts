@@ -66,6 +66,11 @@ export function formatShare(share: number | null | undefined) {
 
 export const NON_WORKING_DAY_LABEL = 'Non-working day';
 
+export const NO_HOURS_LABEL = 'No hours';
+
+// Before someone joined or after they left
+export const NO_HOURS_EXPECTED_LABEL = 'No hours expected';
+
 export function getDurationString(totalMinutes: number) {
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
