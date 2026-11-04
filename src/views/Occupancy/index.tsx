@@ -289,8 +289,11 @@ function ViewSwitch(props: ViewSwitchProps) {
     );
 }
 
+// The byte order mark tells Excel the file is UTF-8, which it otherwise misreads
+const UTF8_BOM = '\ufeff';
+
 function downloadCsv(fileName: string, content: string) {
-    const url = URL.createObjectURL(new Blob([content], { type: 'text/csv' }));
+    const url = URL.createObjectURL(new Blob([UTF8_BOM, content], { type: 'text/csv;charset=utf-8' }));
     const anchor = document.createElement('a');
     anchor.href = url;
     anchor.download = fileName;
