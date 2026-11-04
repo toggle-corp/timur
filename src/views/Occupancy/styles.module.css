@@ -1,10 +1,6 @@
 .occupancy {
     --person-panel-width: 26rem;
 
-    .person-panel {
-        width: min(var(--person-panel-width), 100%);
-    }
-
     /* NOTE: The pill shape of the buttons, with the pressed view lifted onto the surface */
     .view-switch {
         display: inline-flex;

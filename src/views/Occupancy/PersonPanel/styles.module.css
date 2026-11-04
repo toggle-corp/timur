@@ -9,6 +9,7 @@
     border-left: var(--width-separator-sm) solid var(--color-separator);
     box-shadow: var(--box-shadow-xl);
     background-color: var(--color-foreground);
+    width: var(--person-panel-width, 26rem);
 
     @media screen and (max-width: 900px) {
         border-left: none;

@@ -703,7 +703,6 @@ export function Component() {
             )}
             {selectedUser && dateRange && (
                 <PersonPanel
-                    className={styles.personPanel}
                     person={selectedUser}
                     period={description}
                     endDate={dateRange.endDate}
