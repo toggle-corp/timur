@@ -6,7 +6,6 @@ import {
     RiAdminLine,
     RiLoginBoxLine,
     RiLogoutBoxLine,
-    RiTeamLine,
 } from 'react-icons/ri';
 import {
     isDefined,
@@ -26,6 +25,7 @@ import {
     LogoutMutation,
     LogoutMutationVariables,
 } from '#generated/types/graphql';
+import { timesheetsSection } from '#utils/navigation';
 
 import styles from './styles.module.css';
 
@@ -105,10 +105,10 @@ function UserMenu(props: Props) {
             )}
             <DropdownMenuItem
                 type="link"
-                to="timesheets"
-                icons={<RiTeamLine />}
+                to={timesheetsSection.to}
+                icons={<timesheetsSection.icon />}
             >
-                Timesheets
+                {timesheetsSection.label}
             </DropdownMenuItem>
             <DropdownMenuItem
                 type="button"
