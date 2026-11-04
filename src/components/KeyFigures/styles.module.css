@@ -62,7 +62,6 @@
             /* NOTE: The definition takes the figure's width, which is now only as wide as its text */
             [role='tooltip'] {
                 min-width: min(18rem, calc(100vw - 2 * var(--spacing-lg)));
-                white-space: normal;
             }
         }
 

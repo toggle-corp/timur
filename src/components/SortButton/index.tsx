@@ -5,6 +5,7 @@ import {
 import { _cs } from '@togglecorp/fujs';
 
 import Button from '#components/Button';
+import { tooltipSurfaceClassName } from '#components/TooltipSurface';
 import { visuallyHiddenClassName } from '#components/VisuallyHidden';
 
 import styles from './styles.module.css';
@@ -92,7 +93,7 @@ function SortButton<const KEY>(props: Props<KEY>) {
             </Button>
             {description && (
                 <span
-                    className={styles.tooltip}
+                    className={_cs(styles.tooltip, tooltipSurfaceClassName)}
                     aria-hidden
                 >
                     {description}

@@ -31,14 +31,6 @@
         left: 0;
         z-index: 1;
         margin-top: var(--spacing-3xs);
-        border: var(--width-separator-sm) solid var(--color-separator);
-        border-radius: var(--border-radius-md);
-        box-shadow: 0 var(--spacing-3xs) var(--spacing-sm) var(--color-separator);
-        background-color: var(--color-surface-raised);
-        padding: var(--spacing-xs) var(--spacing-sm);
-        color: var(--color-text);
-        font-size: var(--font-size-sm);
-        font-weight: var(--font-weight-normal);
     }
 
     &:hover .tooltip,

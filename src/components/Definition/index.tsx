@@ -6,6 +6,8 @@ import {
 import { RiInformationLine } from 'react-icons/ri';
 import { _cs } from '@togglecorp/fujs';
 
+import { tooltipSurfaceClassName } from '#components/TooltipSurface';
+
 import styles from './styles.module.css';
 
 // Shown on hover and keyboard focus; a tap or click pins it, Escape hides it
@@ -61,7 +63,7 @@ function Definition(props: Props) {
                 <RiInformationLine aria-hidden />
             </button>
             <span
-                className={styles.tooltip}
+                className={_cs(styles.tooltip, tooltipSurfaceClassName)}
                 id={id}
                 role="tooltip"
             >
