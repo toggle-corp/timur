@@ -97,7 +97,6 @@
 
     --color-focus: #dce0e8;
 
-    --color-heatmap-text: var(--color-text);
     --color-heatmap-low: #d20f39;
     --color-heatmap-low-text: var(--color-heatmap-low);
     --color-heatmap-on-low: #8e0222;
@@ -133,7 +132,6 @@
 
     --color-focus: #d5c4a1;
 
-    --color-heatmap-text: var(--color-text);
     --color-heatmap-low: #9d0006;
     --color-heatmap-low-text: var(--color-heatmap-low);
     --color-heatmap-on-low: #820306;
@@ -169,7 +167,6 @@
 
     --color-focus: #dcdcdc;
 
-    --color-heatmap-text: var(--color-text);
     --color-heatmap-low: #cc241d;
     --color-heatmap-low-text: var(--color-heatmap-low);
     --color-heatmap-on-low: #980004;
@@ -205,7 +202,6 @@
 
     --color-focus: #ddd6b8;
 
-    --color-heatmap-text: var(--color-text);
     --color-heatmap-low: #dc322f;
     --color-heatmap-low-text: #d52a29;
     --color-heatmap-on-low: #a0010e;
@@ -273,12 +269,11 @@
 
         --color-focus: #404d2e;
 
-        --color-heatmap-text: var(--color-text);
         --color-heatmap-low: #db7657;
         --color-heatmap-low-text: var(--color-heatmap-low);
         --color-heatmap-on-low: #fea98e;
         --color-heatmap-mid: #d9a441;
-        --color-heatmap-mid-text: #d9a441;
+        --color-heatmap-mid-text: var(--color-heatmap-mid);
         --color-heatmap-high: #aebd55;
     }
 
@@ -311,10 +306,8 @@
 
         --color-heatmap-text: #e2e9ff;
         --color-heatmap-low: #f38ba8;
-        --color-heatmap-low-text: var(--color-heatmap-low);
         --color-heatmap-on-low: #fec8d5;
         --color-heatmap-mid: #f9e2af;
-        --color-heatmap-mid-text: #f9e2af;
         --color-heatmap-high: #a6e3a1;
     }
 
@@ -345,12 +338,10 @@
 
         --color-focus: #504945;
 
-        --color-heatmap-text: var(--color-text);
         --color-heatmap-low: #fb4934;
         --color-heatmap-low-text: #ff7c68;
         --color-heatmap-on-low: #feb3a5;
         --color-heatmap-mid: #fabd2f;
-        --color-heatmap-mid-text: #fabd2f;
         --color-heatmap-high: #b8bb26;
     }
 
@@ -381,12 +372,10 @@
 
         --color-focus: #49483e;
 
-        --color-heatmap-text: var(--color-text);
         --color-heatmap-low: #f92672;
         --color-heatmap-low-text: #fe819d;
         --color-heatmap-on-low: #fea9b9;
         --color-heatmap-mid: #e6db74;
-        --color-heatmap-mid-text: #e6db74;
         --color-heatmap-high: #a6e22e;
     }
 
