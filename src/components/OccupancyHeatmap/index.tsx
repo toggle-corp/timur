@@ -72,6 +72,7 @@ const MISSING_MARK = 'X';
 const MISSING_LABEL = 'No hours';
 const MISSING_LEGEND_LABEL = 'Missing';
 const LEAVE_LABEL = 'Leave';
+const HALF_LEAVE_LABEL = 'Half leave';
 const LATE_LABEL = 'Logged late';
 const PENDING_LABEL = 'Not due yet';
 const PENDING_DESCRIPTION = 'Not due yet, before the logging deadline';
@@ -385,6 +386,10 @@ export function OccupancyLegend(props: LegendProps) {
             <LegendItem
                 swatchClassName={_cs(styles.swatch, styles.leave)}
                 label={LEAVE_LABEL}
+            />
+            <LegendItem
+                swatchClassName={_cs(styles.swatch, styles.firstHalfLeave)}
+                label={HALF_LEAVE_LABEL}
             />
             {withWorkFromHome && (
                 Object.entries(workFromHomeLabels) as [JournalWorkFromHomeTypeEnum, string][]
