@@ -86,7 +86,7 @@
 
             &.non-working {
                 border-radius: var(--border-radius-sm);
-                background-color: color-mix(in srgb, var(--color-separator) 50%, transparent);
+                background-color: var(--color-non-working-fill);
             }
         }
 

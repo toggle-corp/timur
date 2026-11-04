@@ -42,6 +42,7 @@
     /* A darker green than the high step, with a stronger fill */
     --color-heatmap-over-fill: color-mix(in srgb, var(--color-heatmap-over) 50%, var(--color-foreground));
     --color-heatmap-leave-fill: color-mix(in srgb, var(--color-heatmap-leave) 30%, var(--color-foreground));
+    --color-non-working-fill: color-mix(in srgb, var(--color-separator) 50%, transparent);
     /* Non-working days without entries */
     --color-heatmap-empty: color-mix(in srgb, var(--color-heatmap-neutral) 35%, var(--color-foreground));
 }
