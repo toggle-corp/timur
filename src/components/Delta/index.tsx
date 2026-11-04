@@ -8,6 +8,7 @@ import {
     isNotDefined,
 } from '@togglecorp/fujs';
 
+import { visuallyHiddenClassName } from '#components/VisuallyHidden';
 import {
     type DeltaBetter,
     type DeltaUnit,
@@ -44,7 +45,7 @@ function Delta(props: Props) {
 
     const delta = getDelta(current, previous, unit);
     const comparedToLabel = (
-        <span className={hideComparedTo ? styles.visuallyHidden : styles.comparedTo}>
+        <span className={hideComparedTo ? visuallyHiddenClassName : styles.comparedTo}>
             {isNotDefined(delta) ? ` in ${comparedTo}` : ` vs ${comparedTo}`}
         </span>
     );
@@ -79,7 +80,7 @@ function Delta(props: Props) {
             )}
             {formatDelta(delta, unit)}
             {outcome && (
-                <span className={styles.visuallyHidden}>
+                <span className={visuallyHiddenClassName}>
                     {`, ${outcome}`}
                 </span>
             )}

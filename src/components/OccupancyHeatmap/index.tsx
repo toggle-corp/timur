@@ -17,6 +17,7 @@ import {
 
 import DisplayPicture from '#components/DisplayPicture';
 import RawButton from '#components/RawButton';
+import { visuallyHiddenClassName } from '#components/VisuallyHidden';
 import {
     type JournalLeaveTypeEnum,
     type JournalWorkFromHomeTypeEnum,
@@ -133,7 +134,7 @@ function LateMark(props: { date: string, lateByDays: number | null | undefined }
                 className={styles.lateMark}
                 aria-hidden
             />
-            <span className={styles.visuallyHidden}>
+            <span className={visuallyHiddenClassName}>
                 {`, ${getLateText(date, lateByDays).toLowerCase()}`}
             </span>
         </>
@@ -202,7 +203,7 @@ function CellLink(props: { href: string | undefined, label: string }) {
             target="_blank"
             rel="noopener noreferrer"
         >
-            <span className={styles.visuallyHidden}>
+            <span className={visuallyHiddenClassName}>
                 {`${label}, open the day in admin`}
             </span>
         </a>
@@ -568,7 +569,7 @@ function OccupancyHeatmap(props: Props) {
                         {dateValue.getDate()}
                     </span>
                     {isNonWorking && (
-                        <span className={styles.visuallyHidden}>
+                        <span className={visuallyHiddenClassName}>
                             {NON_WORKING_DAY_LABEL}
                         </span>
                     )}

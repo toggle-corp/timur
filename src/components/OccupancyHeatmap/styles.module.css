@@ -342,15 +342,6 @@
     border-top-right-radius: var(--border-radius-sm);
 }
 
-.visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-}
-
 /* NOTE: Rows are display: contents, so each cell carries the dimming */
 .dimmed {
     /* NOTE: The sticky name cell stays opaque, so days scrolled under it stay hidden */

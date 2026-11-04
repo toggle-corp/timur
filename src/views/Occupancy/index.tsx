@@ -33,6 +33,7 @@ import OccupancyHeatmap, { OccupancyLegend } from '#components/OccupancyHeatmap'
 import Page from '#components/Page';
 import Portal from '#components/Portal';
 import RawButton from '#components/RawButton';
+import { visuallyHiddenClassName } from '#components/VisuallyHidden';
 import DateContext from '#contexts/date';
 import NavbarContext from '#contexts/navbar';
 import UserContext from '#contexts/user';
@@ -345,7 +346,7 @@ function SortButton(props: SortButtonProps) {
                 {description ? (
                     <>
                         <span aria-hidden>{label}</span>
-                        <span className={styles.visuallyHidden}>{description}</span>
+                        <span className={visuallyHiddenClassName}>{description}</span>
                     </>
                 ) : label}
             </Button>
