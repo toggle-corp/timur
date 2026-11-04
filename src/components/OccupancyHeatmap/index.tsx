@@ -23,7 +23,6 @@ import {
     type JournalLeaveTypeEnum,
     type JournalWorkFromHomeTypeEnum,
 } from '#generated/types/graphql';
-import useKeybind from '#hooks/useKeybind';
 import {
     addDays,
     formatHours,
@@ -497,17 +496,6 @@ function OccupancyHeatmap(props: Props) {
         },
         [selectedRowKey, onSelectedRowKeyChange],
     );
-
-    const handleKeyDown = useCallback(
-        (event: KeyboardEvent) => {
-            if (event.key === 'Escape' && isDefined(selectedRowKey)) {
-                onSelectedRowKeyChange?.(undefined);
-            }
-        },
-        [selectedRowKey, onSelectedRowKeyChange],
-    );
-
-    useKeybind(handleKeyDown);
 
     const gridTemplateColumns = [
         'max-content',

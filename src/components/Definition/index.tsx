@@ -1,6 +1,7 @@
 import {
-    useEffect,
+    useCallback,
     useId,
+    useRef,
     useState,
 } from 'react';
 import { RiInformationLine } from 'react-icons/ri';
@@ -8,6 +9,7 @@ import { _cs } from '@togglecorp/fujs';
 
 import RawButton from '#components/RawButton';
 import { tooltipSurfaceClassName } from '#components/TooltipSurface';
+import useKeybind from '#hooks/useKeybind';
 
 import styles from './styles.module.css';
 
@@ -26,26 +28,34 @@ function Definition(props: Props) {
     } = props;
 
     const id = useId();
+    const elementRef = useRef<HTMLSpanElement>(null);
     const [state, setState] = useState<State>('auto');
 
     const reopen = () => setState((value) => (value === 'closed' ? 'auto' : value));
 
-    // Escape also hides a definition shown on hover, without focus
-    useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {
+    // Escape also hides a definition shown on hover, without focus, and then goes no further
+    const handleKeyDown = useCallback(
+        (event: KeyboardEvent) => {
+            if (event.key !== 'Escape' || event.defaultPrevented) {
+                return;
+            }
+            const shown = state === 'open'
+                || (state === 'auto' && !!elementRef.current?.matches(':hover, :focus-within'));
+            if (shown) {
+                event.preventDefault();
                 setState('closed');
             }
-        };
-        document.addEventListener('keydown', handleKeyDown);
-        return () => document.removeEventListener('keydown', handleKeyDown);
-    }, []);
+        },
+        [state],
+    );
+    useKeybind(handleKeyDown, { capture: true });
 
     const label = `Definition of ${term}`;
 
     return (
         <span
-            // NOTE: Escape hides every definition, so a new hover or focus shows it again
+            ref={elementRef}
+            // NOTE: Escape hides the definition, so a new hover or focus shows it again
             onMouseEnter={reopen}
             onFocus={reopen}
             className={_cs(

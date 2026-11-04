@@ -280,7 +280,8 @@ function PersonPanel(props: Props) {
 
     const handleKeyDown = useCallback(
         (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {
+            if (event.key === 'Escape' && !event.defaultPrevented) {
+                event.preventDefault();
                 onClose();
             }
         },
