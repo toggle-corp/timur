@@ -5,7 +5,6 @@ import {
     compareNumber,
     compareString,
     decodeDate,
-    isNotDefined,
 } from '@togglecorp/fujs';
 import {
     gql,
@@ -14,10 +13,8 @@ import {
 
 import DefaultMessage from '#components/DefaultMessage';
 import Link from '#components/Link';
-import OccupancyHeatmap, {
-    type OccupancyDay,
-    OccupancyLegend,
-} from '#components/OccupancyHeatmap';
+import OccupancyHeatmap, { OccupancyLegend } from '#components/OccupancyHeatmap';
+import { isMissingDay } from '#components/OccupancyHeatmap/utils';
 import {
     type DailyStandupOccupancyQuery,
     type DailyStandupOccupancyQueryVariables,
@@ -52,6 +49,7 @@ const DAILY_STANDUP_OCCUPANCY_QUERY = gql`
                             leave
                             leaveDisplay
                             occupancy
+                            expectedHours
                         }
                     }
                 }
@@ -80,10 +78,6 @@ const SEVERITY = {
     olderMissing: 2,
 } as const;
 type Severity = typeof SEVERITY[keyof typeof SEVERITY];
-
-function isMissing(day: OccupancyDay) {
-    return isNotDefined(day.occupancy);
-}
 
 // The first week of a month shows the whole previous month, which starts on its 1st
 function getMonthlyViewMonth(startDate: string, date: string) {
@@ -122,7 +116,7 @@ function OccupancySection(props: Props) {
     const sortedUsers = useMemo(
         () => (occupancy?.users ?? [])
             .map((item) => {
-                const missingDays = item.days.filter(isMissing);
+                const missingDays = item.days.filter((day) => isMissingDay(day));
                 const hasOlderMissing = missingDays.some((day) => !recentDates.has(day.date));
                 let severity: Severity = SEVERITY.upToDate;
                 if (hasOlderMissing) {

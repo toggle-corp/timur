@@ -295,6 +295,7 @@ function OccupancyCell(props: CellProps) {
         );
     }
 
+    // NOTE: Reached on the days that isMissingDay counts
     if (isNotDefined(day.occupancy)) {
         return (
             <td

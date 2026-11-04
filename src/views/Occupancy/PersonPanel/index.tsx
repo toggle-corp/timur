@@ -9,7 +9,6 @@ import {
     _cs,
     decodeDate,
     isDefined,
-    isNotDefined,
 } from '@togglecorp/fujs';
 import {
     gql,
@@ -21,6 +20,7 @@ import AdminLink from '#components/AdminLink';
 import Button from '#components/Button';
 import DisplayPicture from '#components/DisplayPicture';
 import { type OccupancyDay } from '#components/OccupancyHeatmap';
+import { isMissingDay } from '#components/OccupancyHeatmap/utils';
 import {
     type OccupancyPersonQuery,
     type OccupancyPersonQueryVariables,
@@ -298,12 +298,6 @@ function PersonPanel(props: Props) {
         (month) => month.startDate >= TREND_START_DATE,
     );
 
-    // Same as the cells marked as having no hours
-    const isMissing = (day: OccupancyDay) => (
-        isNotDefined(day.occupancy)
-        && (day.expectedHours ?? 0) > 0
-        && !day.isPending
-    );
     const entriesItem = (date: string, label: string) => ({
         date,
         label,
@@ -315,7 +309,7 @@ function PersonPanel(props: Props) {
         href: getAdminDayUrl('journal/journal', user.id, date),
     });
     const missingDates = days
-        .filter(isMissing)
+        .filter((day) => isMissingDay(day))
         .map((day) => entriesItem(day.date, formatDate(day.date)));
     const lateDays = days.flatMap((day) => {
         if (day.loggedDuringStandup) {
