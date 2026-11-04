@@ -48,7 +48,6 @@
 
     .summary-heading {
         position: relative;
-        vertical-align: bottom;
         text-align: right;
         white-space: nowrap;
         color: var(--color-text-muted);
@@ -112,16 +111,11 @@
     .events {
         display: flex;
         flex-wrap: wrap;
-        margin: 0;
         padding: 0;
         list-style: none;
         color: var(--color-text-muted);
         font-size: var(--font-size-sm);
         gap: var(--spacing-xs) var(--spacing-lg);
-    }
-
-    .message {
-        align-self: stretch;
     }
 }
 

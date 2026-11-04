@@ -37,15 +37,9 @@
             gap: var(--spacing-3xs);
 
             .heading {
-                margin: 0;
+                outline-offset: var(--spacing-3xs);
                 color: var(--color-text);
                 font-size: var(--font-size-xl);
-                font-weight: var(--font-weight-semibold);
-
-                &:focus-visible {
-                    outline: var(--width-separator-md) solid var(--color-focus-ring);
-                    outline-offset: var(--spacing-3xs);
-                }
             }
 
             .period {
@@ -76,16 +70,13 @@
         gap: var(--spacing-xs);
 
         .section-heading {
-            margin: 0;
             color: var(--color-text);
             font-size: var(--font-size-md);
-            font-weight: var(--font-weight-semibold);
         }
     }
 
     .none,
     .note {
-        margin: 0;
         color: var(--color-text-muted);
         font-size: var(--font-size-sm);
     }
@@ -93,7 +84,6 @@
     .dates {
         display: flex;
         flex-wrap: wrap;
-        margin: 0;
         padding: 0;
         list-style: none;
         font-size: var(--font-size-sm);
@@ -104,7 +94,6 @@
     .entries {
         display: flex;
         flex-direction: column;
-        margin: 0;
         padding: 0;
         list-style: none;
         font-size: var(--font-size-sm);
@@ -140,7 +129,6 @@
         display: grid;
         grid-auto-columns: minmax(0, 1fr);
         grid-auto-flow: column;
-        margin: 0;
         padding: 0;
         list-style: none;
         gap: var(--spacing-xs);
@@ -207,7 +195,6 @@
             border-bottom: var(--width-separator-sm) solid var(--color-separator);
             padding: var(--spacing-3xs) 0;
             text-align: right;
-            font-weight: var(--font-weight-normal);
         }
 
         thead th {

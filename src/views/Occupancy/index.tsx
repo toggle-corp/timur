@@ -623,7 +623,6 @@ export function Component() {
                 />
             )}
             <DefaultMessage
-                className={styles.message}
                 compact
                 filtered={false}
                 empty={isEmpty}

@@ -41,10 +41,6 @@
             align-content: center;
         }
 
-        th {
-            font-weight: var(--font-weight-normal);
-        }
-
         th[rowspan='3'] {
             grid-row: span 3;
             align-content: end;
@@ -212,8 +208,7 @@
     border-radius: inherit;
     inset: 0;
 
-    &:hover,
-    &:focus-visible {
+    &:hover {
         outline: var(--width-separator-md) solid var(--color-focus-ring);
     }
 }
