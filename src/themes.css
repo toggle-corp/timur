@@ -36,6 +36,11 @@
     --color-billable: var(--color-secondary);
     --color-non-billable: var(--color-separator-strong);
 
+    --color-heatmap-low-fill: color-mix(in srgb, var(--color-heatmap-low) 30%, var(--color-foreground));
+    --color-heatmap-mid-fill: color-mix(in srgb, var(--color-heatmap-mid) 30%, var(--color-foreground));
+    --color-heatmap-high-fill: color-mix(in srgb, var(--color-heatmap-high) 30%, var(--color-foreground));
+    /* A darker green than the high step, with a stronger fill */
+    --color-heatmap-over-fill: color-mix(in srgb, var(--color-heatmap-over) 50%, var(--color-foreground));
     --color-heatmap-leave-fill: color-mix(in srgb, var(--color-heatmap-leave) 30%, var(--color-foreground));
     /* Non-working days without entries */
     --color-heatmap-empty: color-mix(in srgb, var(--color-heatmap-neutral) 35%, var(--color-foreground));

@@ -196,19 +196,22 @@
 
 .cell,
 .swatch {
-    --occupancy-color: transparent;
-    --cell-fill: color-mix(in srgb, var(--occupancy-color) 30%, transparent);
+    --cell-fill: transparent;
 
     &.high {
-        --occupancy-color: var(--color-heatmap-high);
+        --cell-fill: var(--color-heatmap-high-fill);
     }
 
     &.mid {
-        --occupancy-color: var(--color-heatmap-mid);
+        --cell-fill: var(--color-heatmap-mid-fill);
     }
 
     &.low {
-        --occupancy-color: var(--color-heatmap-low);
+        --cell-fill: var(--color-heatmap-low-fill);
+    }
+
+    &.over {
+        --cell-fill: var(--color-heatmap-over-fill);
     }
 }
 
@@ -246,7 +249,7 @@
     width: 1.4em;
     height: 1.4em;
 
-    &:is(.low, .mid, .high) {
+    &:is(.low, .mid, .high, .over) {
         background-color: var(--cell-fill);
     }
 }
@@ -280,13 +283,6 @@
 /* NOTE: A hue of its own, apart from the occupancy steps */
 .leave {
     background-color: var(--color-heatmap-leave-fill);
-}
-
-/* NOTE: A darker green than the high step, with a stronger fill */
-.over {
-    --cell-fill: color-mix(in srgb, var(--color-heatmap-over) 50%, transparent);
-
-    background-color: var(--cell-fill);
 }
 
 /* NOTE: The leave half takes the leave colour and the other half keeps the cell's own fill, with a surface line between */

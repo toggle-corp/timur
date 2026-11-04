@@ -160,29 +160,26 @@
 
     /* NOTE: The tints of the day cells, so a warning reads as mid occupancy and an alert as low */
     .summary-cell {
-        --level-color: transparent;
-
-        background-color: color-mix(in srgb, var(--level-color) 30%, transparent);
         text-align: right;
         white-space: nowrap;
         font-size: var(--font-size-sm);
 
         &.high {
-            --level-color: var(--color-heatmap-high);
+            background-color: var(--color-heatmap-high-fill);
         }
 
         &.over {
-            --level-color: var(--color-heatmap-over);
+            background-color: var(--color-heatmap-over-fill);
         }
 
         &.mid,
         &.warning {
-            --level-color: var(--color-heatmap-mid);
+            background-color: var(--color-heatmap-mid-fill);
         }
 
         &.low,
         &.alert {
-            --level-color: var(--color-heatmap-low);
+            background-color: var(--color-heatmap-low-fill);
         }
     }
 
