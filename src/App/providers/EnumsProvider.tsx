@@ -30,10 +30,6 @@ const ENUMS_QUERY = gql`
                 key
                 label
             }
-            UserDepartment {
-                key
-                label
-            }
         }
         private {
             id
