@@ -42,7 +42,9 @@ import {
 } from '#generated/types/graphql';
 import useUrlQueryState from '#hooks/useUrlQueryState';
 import { getAdminDayUrl } from '#utils/admin';
+import { formatNumber } from '#utils/common';
 import {
+    formatMonth,
     getMonth,
     parseMonth,
 } from '#utils/month';
@@ -198,17 +200,12 @@ const OCCUPANCY_QUERY = gql`
     }
 `;
 
-const monthFormatter = new Intl.DateTimeFormat(undefined, {
-    month: 'long',
-    year: 'numeric',
-});
 const dateFormatter = new Intl.DateTimeFormat(undefined, {
     month: 'short',
     day: 'numeric',
 });
 const shortMonthFormatter = new Intl.DateTimeFormat(undefined, { month: 'short' });
 const shortMonthYearFormatter = new Intl.DateTimeFormat(undefined, { month: 'short', year: 'numeric' });
-const numberFormatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 });
 
 const TOP_PROJECT_KEY: SortKey = 'topProject';
 
@@ -250,7 +247,7 @@ function SummaryCells(props: { summary: OccupancySummary, columns: SummaryColumn
                         key={column.key}
                         className={_cs(styles.summaryCell, level && styles[level])}
                     >
-                        {typeof value === 'number' ? numberFormatter.format(value) : '-'}
+                        {typeof value === 'number' ? formatNumber(value) : '-'}
                     </td>
                 );
             })}
@@ -536,7 +533,7 @@ export function Component() {
     const upToDate = dateRange && month === currentMonth
         ? dateFormatter.format(decodeDate(dateRange.endDate))
         : undefined;
-    let description = monthFormatter.format(decodeDate(`${month}-01`));
+    let description = formatMonth(month);
     if (upToDate) {
         description = `${description}, up to ${upToDate}`;
     }

@@ -1,4 +1,7 @@
-import { encodeDate } from '@togglecorp/fujs';
+import {
+    decodeDate,
+    encodeDate,
+} from '@togglecorp/fujs';
 
 import { addDays } from '#utils/common';
 
@@ -6,6 +9,15 @@ const MONTH_PATTERN = /^\d{4}-(0[1-9]|1[0-2])$/;
 
 export function getMonth(date: string) {
     return date.slice(0, 7);
+}
+
+const monthFormatter = new Intl.DateTimeFormat(undefined, {
+    month: 'long',
+    year: 'numeric',
+});
+
+export function formatMonth(month: string) {
+    return monthFormatter.format(decodeDate(`${month}-01`));
 }
 
 export function addMonths(month: string, count: number) {

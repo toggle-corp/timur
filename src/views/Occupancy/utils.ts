@@ -12,7 +12,9 @@ import {
 import {
     addDays,
     formatHours,
+    formatNumber,
     formatShare,
+    NO_FIGURE,
 } from '#utils/common';
 import {
     getMonth,
@@ -320,9 +322,6 @@ interface KeyFigureTotals {
     nonWorkingDayHours: number;
 }
 
-const NO_FIGURE = 'n/a';
-const countFormatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 });
-
 // The summary strip: totals of everyone listed, against the previous period
 export function getKeyFigures(
     totals: KeyFigureTotals,
@@ -333,7 +332,7 @@ export function getKeyFigures(
             key: 'occupancy',
             view: 'occupancy',
             label: 'Occupancy',
-            value: isDefined(totals.occupancy) ? formatShare(totals.occupancy) : NO_FIGURE,
+            value: formatShare(totals.occupancy),
             current: totals.occupancy,
             previous: previous.occupancy,
             unit: 'points',
@@ -344,7 +343,7 @@ export function getKeyFigures(
             key: 'missingDays',
             view: 'timeliness',
             label: 'Missing days',
-            value: countFormatter.format(totals.missingDays),
+            value: formatNumber(totals.missingDays),
             current: totals.missingDays,
             previous: previous.missingDays,
             unit: 'count',
@@ -355,7 +354,7 @@ export function getKeyFigures(
             key: 'missingPeople',
             view: 'timeliness',
             label: 'People with missing days',
-            value: countFormatter.format(totals.missingPeople),
+            value: formatNumber(totals.missingPeople),
             current: totals.missingPeople,
             previous: previous.missingPeople,
             unit: 'count',
@@ -366,7 +365,7 @@ export function getKeyFigures(
             key: 'lateShare',
             view: 'timeliness',
             label: 'Logged late',
-            value: isDefined(totals.lateShare) ? formatShare(totals.lateShare) : NO_FIGURE,
+            value: formatShare(totals.lateShare),
             current: totals.lateShare,
             previous: previous.lateShare,
             unit: 'points',
@@ -377,7 +376,7 @@ export function getKeyFigures(
             key: 'standupDays',
             view: 'timeliness',
             label: 'During standup',
-            value: countFormatter.format(totals.standupDays),
+            value: formatNumber(totals.standupDays),
             current: totals.standupDays,
             previous: previous.standupDays,
             unit: 'count',
@@ -388,7 +387,7 @@ export function getKeyFigures(
             key: 'leaveDays',
             view: 'occupancy',
             label: 'Leave days',
-            value: countFormatter.format(totals.leaveDays),
+            value: formatNumber(totals.leaveDays),
             current: totals.leaveDays,
             previous: previous.leaveDays,
             unit: 'count',
@@ -399,7 +398,7 @@ export function getKeyFigures(
             key: 'workFromHomeDays',
             view: 'occupancy',
             label: 'WFH days',
-            value: countFormatter.format(totals.workFromHomeDays),
+            value: formatNumber(totals.workFromHomeDays),
             current: totals.workFromHomeDays,
             previous: previous.workFromHomeDays,
             unit: 'count',
@@ -410,7 +409,7 @@ export function getKeyFigures(
             key: 'leaveConflictDays',
             view: 'quality',
             label: 'Full leave days with hours',
-            value: countFormatter.format(totals.leaveConflictDays),
+            value: formatNumber(totals.leaveConflictDays),
             current: totals.leaveConflictDays,
             previous: previous.leaveConflictDays,
             unit: 'count',
@@ -432,9 +431,7 @@ export function getKeyFigures(
             key: 'longEntryShare',
             view: 'quality',
             label: 'Long entries',
-            value: isDefined(totals.longEntryShare)
-                ? formatShare(totals.longEntryShare)
-                : NO_FIGURE,
+            value: formatShare(totals.longEntryShare),
             current: totals.longEntryShare,
             previous: previous.longEntryShare,
             unit: 'points',
@@ -445,9 +442,7 @@ export function getKeyFigures(
             key: 'vagueEntryShare',
             view: 'quality',
             label: 'Vague entries',
-            value: isDefined(totals.vagueEntryShare)
-                ? formatShare(totals.vagueEntryShare)
-                : NO_FIGURE,
+            value: formatShare(totals.vagueEntryShare),
             current: totals.vagueEntryShare,
             previous: previous.vagueEntryShare,
             unit: 'points',

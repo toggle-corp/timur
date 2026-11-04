@@ -35,10 +35,17 @@ export function getNewId(): string {
     return ulid();
 }
 
-const hoursFormatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 });
+// Shown in place of a figure that has no value, such as a share of nothing
+export const NO_FIGURE = 'n/a';
+
+const numberFormatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 });
+
+export function formatNumber(value: number) {
+    return numberFormatter.format(value);
+}
 
 export function formatHours(hours: number) {
-    return `${hoursFormatter.format(hours)}h`;
+    return `${formatNumber(hours)}h`;
 }
 
 const shareFormatter = new Intl.NumberFormat(undefined, {
@@ -48,7 +55,10 @@ const shareFormatter = new Intl.NumberFormat(undefined, {
 const MIN_SHARE = 0.01;
 
 // A share too small to round to a whole percent shows as below one percent
-export function formatShare(share: number) {
+export function formatShare(share: number | null | undefined) {
+    if (isNotDefined(share)) {
+        return NO_FIGURE;
+    }
     return share > 0 && share < MIN_SHARE
         ? `<${shareFormatter.format(MIN_SHARE)}`
         : shareFormatter.format(share);

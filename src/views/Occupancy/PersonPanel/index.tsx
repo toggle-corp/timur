@@ -30,7 +30,9 @@ import { getAdminDayUrl } from '#utils/admin';
 import {
     addDays,
     formatHours,
+    formatNumber,
     formatShare,
+    NO_FIGURE,
 } from '#utils/common';
 
 import {
@@ -69,7 +71,6 @@ const MAX_TREND_OCCUPANCY = 1.5;
 
 const dateFormatter = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
 const monthFormatter = new Intl.DateTimeFormat(undefined, { month: 'short' });
-const countFormatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 });
 
 const halfLabels: Record<string, string> = {
     FIRST_HALF: 'first half',
@@ -81,20 +82,16 @@ function formatDate(date: string) {
 }
 
 function formatDays(count: number) {
-    return `${countFormatter.format(count)} ${count === 1 ? 'day' : 'days'}`;
+    return `${formatNumber(count)} ${count === 1 ? 'day' : 'days'}`;
 }
 
 // Without the sign, so that a year of labels fits; the heading carries the unit
 function formatPercentNumber(value: number | null | undefined) {
-    return isDefined(value) ? countFormatter.format(Math.round(value * 100)) : 'n/a';
+    return isDefined(value) ? formatNumber(Math.round(value * 100)) : NO_FIGURE;
 }
 
 function formatDayCount(value: number | null | undefined) {
-    return countFormatter.format(value ?? 0);
-}
-
-function formatPercent(value: number | null | undefined) {
-    return isDefined(value) ? formatShare(value) : 'n/a';
+    return formatNumber(value ?? 0);
 }
 
 interface DateItem {
@@ -377,7 +374,7 @@ function PersonPanel(props: Props) {
                         {user.displayName}
                     </h2>
                     <div className={styles.period}>
-                        {`${period} · ${formatPercent(summary.occupancy)} occupancy`}
+                        {`${period} · ${formatShare(summary.occupancy)} occupancy`}
                     </div>
                 </div>
                 <Button
@@ -405,7 +402,7 @@ function PersonPanel(props: Props) {
                         {[
                             `Logged late · ${formatDays(summary.lateDays)}`,
                             isDefined(summary.lateShare) && `${formatShare(summary.lateShare)} of days due`,
-                            summary.standupDays > 0 && `${countFormatter.format(summary.standupDays)} during standup`,
+                            summary.standupDays > 0 && `${formatNumber(summary.standupDays)} during standup`,
                         ].filter(Boolean).join(', ')}
                     </h3>
                     <DateList
@@ -572,7 +569,7 @@ function PersonPanel(props: Props) {
                                     <tr key={item.project.id}>
                                         <th scope="row">{item.project.name}</th>
                                         <td>{formatHours(item.hours)}</td>
-                                        <td>{formatPercent(item.share)}</td>
+                                        <td>{formatShare(item.share)}</td>
                                     </tr>
                                 ))}
                                 {otherProjects.length > 0 && (
@@ -583,8 +580,8 @@ function PersonPanel(props: Props) {
                                         <td>{formatHours(otherHours)}</td>
                                         <td>
                                             {summary.hours > 0
-                                                ? formatPercent(otherHours / summary.hours)
-                                                : 'n/a'}
+                                                ? formatShare(otherHours / summary.hours)
+                                                : NO_FIGURE}
                                         </td>
                                     </tr>
                                 )}
