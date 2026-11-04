@@ -71,10 +71,6 @@
         border-spacing: 2px;
         font-variant-numeric: tabular-nums;
 
-        th {
-            font-weight: var(--font-weight-normal);
-        }
-
         .group-heading,
         .date-heading {
             text-align: center;

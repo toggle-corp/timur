@@ -199,6 +199,10 @@ h5 {
     font-size: var(--font-size-md);
 }
 
+th {
+    font-weight: var(--font-weight-normal);
+}
+
 p {
     margin: 0;
 }
