@@ -176,24 +176,6 @@
     }
 }
 
-.legend {
-    display: flex;
-    flex-wrap: wrap;
-    color: var(--color-text-muted);
-    font-size: var(--font-size-sm);
-    gap: var(--spacing-md);
-
-    .legend-title {
-        font-weight: var(--font-weight-semibold);
-    }
-
-    .legend-item {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-xs);
-    }
-}
-
 .cell,
 .swatch {
     --cell-fill: transparent;
@@ -238,16 +220,9 @@
 
 /* NOTE: Defined before .missing so that it overrides the background */
 .swatch {
-    display: inline-flex;
-    position: relative;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--border-radius-sm);
     /* NOTE: The fills are light tints, so an edge keeps each swatch visible */
     box-shadow: inset 0 0 0 1px var(--color-text-muted);
     background-color: var(--color-foreground);
-    width: 1.4em;
-    height: 1.4em;
 
     &:is(.low, .mid, .high, .over) {
         background-color: var(--cell-fill);

@@ -16,6 +16,7 @@ import {
 } from '@togglecorp/fujs';
 
 import DisplayPicture from '#components/DisplayPicture';
+import Legend, { LegendItem } from '#components/Legend';
 import RawButton from '#components/RawButton';
 import { visuallyHiddenClassName } from '#components/VisuallyHidden';
 import {
@@ -358,87 +359,62 @@ export function OccupancyLegend(props: LegendProps) {
     } = props;
 
     return (
-        <div className={_cs(styles.legend, className)}>
-            <span className={styles.legendTitle}>
-                Day cells show occupancy:
-            </span>
+        <Legend
+            className={_cs(styles.legend, className)}
+            heading="Day cells show occupancy:"
+        >
             {occupancySteps.map((step) => (
-                <span
+                <LegendItem
                     key={step.label}
-                    className={styles.legendItem}
-                >
-                    <span
-                        className={_cs(styles.swatch, step.className)}
-                        aria-hidden
-                    />
-                    {step.label}
-                </span>
-            ))}
-            <span className={styles.legendItem}>
-                <span
-                    className={_cs(styles.swatch, styles.missing)}
-                    aria-hidden
-                >
-                    {MISSING_MARK}
-                </span>
-                {MISSING_LEGEND_LABEL}
-            </span>
-            {withPending && (
-                <span className={styles.legendItem}>
-                    <span
-                        className={_cs(styles.swatch, styles.pending)}
-                        aria-hidden
-                    >
-                        <RiTimeLine className={styles.pendingIcon} />
-                    </span>
-                    {PENDING_LABEL}
-                </span>
-            )}
-            <span className={styles.legendItem}>
-                <span
-                    className={_cs(styles.swatch, styles.leave)}
-                    aria-hidden
+                    swatchClassName={_cs(styles.swatch, step.className)}
+                    label={step.label}
                 />
-                {LEAVE_LABEL}
-            </span>
+            ))}
+            <LegendItem
+                swatchClassName={_cs(styles.swatch, styles.missing)}
+                swatchContent={MISSING_MARK}
+                label={MISSING_LEGEND_LABEL}
+            />
+            {withPending && (
+                <LegendItem
+                    swatchClassName={_cs(styles.swatch, styles.pending)}
+                    swatchContent={<RiTimeLine className={styles.pendingIcon} />}
+                    label={PENDING_LABEL}
+                />
+            )}
+            <LegendItem
+                swatchClassName={_cs(styles.swatch, styles.leave)}
+                label={LEAVE_LABEL}
+            />
             {withWorkFromHome && (
                 Object.entries(workFromHomeLabels) as [JournalWorkFromHomeTypeEnum, string][]
             ).map(([workFromHome, workFromHomeLabel]) => (
-                <span
+                <LegendItem
                     key={workFromHome}
-                    className={styles.legendItem}
-                >
-                    <WorkFromHomeMarks workFromHome={workFromHome} />
-                    {workFromHomeLabel}
-                </span>
+                    icon={<WorkFromHomeMarks workFromHome={workFromHome} />}
+                    label={workFromHomeLabel}
+                />
             ))}
             {withLateLogging && (
-                <span className={styles.legendItem}>
-                    <span
-                        className={styles.swatch}
-                        aria-hidden
-                    >
-                        <span className={styles.lateMark} />
-                    </span>
-                    {LATE_LABEL}
-                </span>
+                <LegendItem
+                    swatchClassName={styles.swatch}
+                    swatchContent={<span className={styles.lateMark} />}
+                    label={LATE_LABEL}
+                />
             )}
             {withNonWorkingDays && (
-                <span className={styles.legendItem}>
-                    <span
-                        className={_cs(styles.swatch, styles.offDay)}
-                        aria-hidden
-                    />
-                    {NON_WORKING_DAY_LABEL}
-                </span>
+                <LegendItem
+                    swatchClassName={_cs(styles.swatch, styles.offDay)}
+                    label={NON_WORKING_DAY_LABEL}
+                />
             )}
             {withEvents && (
-                <span className={styles.legendItem}>
-                    <RiFlag2Fill className={styles.eventMarker} />
-                    Event
-                </span>
+                <LegendItem
+                    icon={<RiFlag2Fill className={styles.eventMarker} />}
+                    label="Event"
+                />
             )}
-        </div>
+        </Legend>
     );
 }
 
