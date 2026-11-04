@@ -6,6 +6,7 @@ import {
 import { RiInformationLine } from 'react-icons/ri';
 import { _cs } from '@togglecorp/fujs';
 
+import RawButton from '#components/RawButton';
 import { tooltipSurfaceClassName } from '#components/TooltipSurface';
 
 import styles from './styles.module.css';
@@ -40,6 +41,8 @@ function Definition(props: Props) {
         return () => document.removeEventListener('keydown', handleKeyDown);
     }, []);
 
+    const label = `Definition of ${term}`;
+
     return (
         <span
             // NOTE: Escape hides every definition, so a new hover or focus shows it again
@@ -51,17 +54,19 @@ function Definition(props: Props) {
                 state === 'closed' && styles.closed,
             )}
         >
-            <button
+            <RawButton
                 className={styles.trigger}
-                type="button"
-                aria-label={`Definition of ${term}`}
+                name={undefined}
+                title={label}
+                hideTitle
+                aria-label={label}
                 aria-describedby={id}
                 aria-expanded={state === 'open'}
                 onClick={() => setState((value) => (value === 'open' ? 'closed' : 'open'))}
                 onBlur={() => setState('auto')}
             >
                 <RiInformationLine aria-hidden />
-            </button>
+            </RawButton>
             <span
                 className={_cs(styles.tooltip, tooltipSurfaceClassName)}
                 id={id}

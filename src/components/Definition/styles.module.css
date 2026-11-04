@@ -3,22 +3,16 @@
 
     .trigger {
         display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        /* NOTE: A 24px target around the small icon */
-        margin: calc(-1 * var(--spacing-2xs));
-        border: none;
         border-radius: var(--border-radius-full);
-        background: none;
         cursor: help;
-        padding: var(--spacing-2xs);
-        min-width: 1.5rem;
-        min-height: 1.5rem;
         color: var(--color-text-muted);
         font-size: var(--font-size-md);
 
-        &:focus-visible {
-            outline: var(--width-separator-md) solid var(--color-focus-ring);
+        /* NOTE: The target grows to the minimum size around the small icon */
+        &::before {
+            position: absolute;
+            content: '';
+            inset: var(--inset-target--min);
         }
     }
 
