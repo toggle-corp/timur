@@ -10,6 +10,10 @@ import {
     type OccupancyStep,
 } from '#components/OccupancyHeatmap/utils';
 import {
+    type SortDirection,
+    type SortState,
+} from '#components/SortButton';
+import {
     addDays,
     formatHours,
     formatNumber,
@@ -503,10 +507,8 @@ export function buildOccupancyCsv(dates: string[], rows: CsvRow[]) {
 }
 
 export type SortKey = 'name' | SummaryKey;
-export type SortDirection = 'asc' | 'desc';
-
 // Kept out of the URL
-export const DEFAULT_SORT: { key: SortKey, direction: SortDirection } = {
+export const DEFAULT_SORT: SortState<SortKey> = {
     key: 'name',
     direction: 'asc',
 };

@@ -89,36 +89,6 @@
         white-space: nowrap;
         color: var(--color-text-muted);
         font-size: var(--font-size-xs);
-
-        .tooltip {
-            display: none;
-            position: absolute;
-            top: 100%;
-            right: 0;
-            z-index: 2;
-            margin-top: var(--spacing-3xs);
-            border: var(--width-separator-sm) solid var(--color-separator);
-            border-radius: var(--border-radius-md);
-            box-shadow: 0 var(--spacing-3xs) var(--spacing-sm) var(--color-separator);
-            background-color: var(--color-surface-raised);
-            padding: var(--spacing-xs) var(--spacing-sm);
-            width: max-content;
-            max-width: 14rem;
-            text-align: left;
-            white-space: normal;
-            color: var(--color-text);
-            font-size: var(--font-size-sm);
-        }
-
-        /* NOTE: The button title covers hover */
-        &:has(:focus-visible) .tooltip {
-            display: block;
-        }
-    }
-
-    /* NOTE: Right-aligned with the counts below it */
-    .sort-button {
-        font-weight: inherit;
     }
 
     .summary-heading,

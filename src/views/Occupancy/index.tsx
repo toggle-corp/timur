@@ -5,11 +5,7 @@ import {
     useMemo,
     useRef,
 } from 'react';
-import {
-    RiArrowDownSLine,
-    RiArrowUpSLine,
-    RiDownloadLine,
-} from 'react-icons/ri';
+import { RiDownloadLine } from 'react-icons/ri';
 import {
     useLocation,
     useParams,
@@ -33,7 +29,10 @@ import OccupancyHeatmap, { OccupancyLegend } from '#components/OccupancyHeatmap'
 import Page from '#components/Page';
 import Portal from '#components/Portal';
 import RawButton from '#components/RawButton';
-import { visuallyHiddenClassName } from '#components/VisuallyHidden';
+import SortButton, {
+    getAriaSort,
+    getNextSort,
+} from '#components/SortButton';
 import DateContext from '#contexts/date';
 import NavbarContext from '#contexts/navbar';
 import UserContext from '#contexts/user';
@@ -63,7 +62,6 @@ import {
     OCCUPANCY_VIEWS,
     type OccupancySummary,
     type OccupancyView,
-    type SortDirection,
     type SortKey,
     sortOccupancyRows,
     SUMMARY_COLUMNS,
@@ -293,75 +291,6 @@ function ViewSwitch(props: ViewSwitchProps) {
     );
 }
 
-function getAriaSort(active: boolean, direction: SortDirection) {
-    if (!active) {
-        return undefined;
-    }
-    return direction === 'asc' ? 'ascending' : 'descending';
-}
-
-// Leaves a leading abbreviation such as WFH as it is
-function lowerFirst(text: string) {
-    if (text.charAt(1) !== text.charAt(1).toLowerCase()) {
-        return text;
-    }
-    return text.charAt(0).toLowerCase() + text.slice(1);
-}
-
-interface SortButtonProps {
-    sortKey: SortKey;
-    label: string;
-    // Read in place of a short label, and shown on hover and keyboard focus
-    description?: string;
-    active: boolean;
-    direction: SortDirection;
-    onClick: (key: SortKey) => void;
-}
-
-function SortButton(props: SortButtonProps) {
-    const {
-        sortKey,
-        label,
-        description,
-        active,
-        direction,
-        onClick,
-    } = props;
-
-    let icon;
-    if (active) {
-        icon = direction === 'asc' ? <RiArrowUpSLine /> : <RiArrowDownSLine />;
-    }
-
-    return (
-        <>
-            <Button
-                className={styles.sortButton}
-                name={sortKey}
-                onClick={onClick}
-                variant="transparent"
-                title={`Sort by ${lowerFirst(description ?? label)}`}
-                actions={icon}
-            >
-                {description ? (
-                    <>
-                        <span aria-hidden>{label}</span>
-                        <span className={visuallyHiddenClassName}>{description}</span>
-                    </>
-                ) : label}
-            </Button>
-            {description && (
-                <span
-                    className={styles.tooltip}
-                    aria-hidden
-                >
-                    {description}
-                </span>
-            )}
-        </>
-    );
-}
-
 function downloadCsv(fileName: string, content: string) {
     const url = URL.createObjectURL(new Blob([content], { type: 'text/csv' }));
     const anchor = document.createElement('a');
@@ -457,13 +386,9 @@ export function Component() {
 
     const handleSortClick = useCallback(
         (key: SortKey) => {
-            if (visibleSort.key === key) {
-                setSort({ key, direction: visibleSort.direction === 'asc' ? 'desc' : 'asc' });
-                return;
-            }
             const isText = key === 'name'
                 || SUMMARY_COLUMNS.find((column) => column.key === key)?.isText;
-            setSort({ key, direction: isText ? 'asc' : 'desc' });
+            setSort(getNextSort(visibleSort, key, isText ? 'asc' : 'desc'));
         },
         [setSort, visibleSort],
     );
@@ -632,7 +557,7 @@ export function Component() {
                     dates={occupancy.dates}
                     userHeading={(
                         <SortButton
-                            sortKey="name"
+                            name="name"
                             label="Team member"
                             active={visibleSort.key === 'name'}
                             direction={visibleSort.direction}
@@ -665,7 +590,7 @@ export function Component() {
                             )}
                         >
                             <SortButton
-                                sortKey={column.key}
+                                name={column.key}
                                 label={column.label}
                                 description={column.description}
                                 active={visibleSort.key === column.key}
