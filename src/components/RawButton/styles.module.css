@@ -9,7 +9,6 @@
     font-family: inherit;
     font-size: inherit;
 
-    &:focus-visible,
     &.focused {
         outline: var(--width-separator-md) solid var(--color-focus-ring);
         /* outline-offset: var(--width-separator-md); */

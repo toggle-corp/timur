@@ -206,3 +206,8 @@ th {
 p {
     margin: 0;
 }
+
+/* Zero specificity, so a component can move or drop the ring */
+:where(:focus-visible) {
+    outline: var(--width-separator-md) solid var(--color-focus-ring);
+}

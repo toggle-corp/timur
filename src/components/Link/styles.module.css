@@ -44,10 +44,6 @@
         align-items: center;
         flex-grow: 1;
         text-decoration: var(--decoration);
-
-        &:focus-visible {
-            outline: var(--width-separator-md) solid var(--color-focus-ring);
-        }
     }
 
     .forward-icon {
