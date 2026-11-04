@@ -39,46 +39,10 @@
         }
     }
 
-    .content {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-lg);
-        padding: var(--spacing-lg);
-
-        @media screen and (max-width: 900px) {
-            padding: unset;
-        }
-
-        /* NOTE: Keeps the days clear of the person panel */
-        &.with-panel {
-            @media screen and (min-width: 901px) {
-                padding-right: calc(var(--person-panel-width) + var(--spacing-lg));
-            }
-        }
-    }
-
-    .header {
-        display: flex;
-        align-items: flex-end;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        gap: var(--spacing-md);
-
-        .heading-section {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-2xs);
-
-            .heading {
-                color: var(--color-primary-text);
-                font-size: var(--font-size-3xl);
-                font-weight: var(--font-weight-light);
-            }
-
-            .data-as-of {
-                color: var(--color-text-muted);
-                font-size: var(--font-size-sm);
-            }
+    /* NOTE: Keeps the days clear of the person panel */
+    .with-panel {
+        @media screen and (min-width: 901px) {
+            padding-right: var(--person-panel-width);
         }
     }
 
@@ -161,12 +125,6 @@
     }
 }
 
-.actions {
-    display: flex;
-    width: 100%;
-    gap: var(--spacing-sm);
-
-    .spacer {
-        flex-grow: 1;
-    }
+.export-button {
+    margin-inline-start: auto;
 }

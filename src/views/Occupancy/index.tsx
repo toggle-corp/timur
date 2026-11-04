@@ -27,14 +27,12 @@ import KeyFigures from '#components/KeyFigures';
 import MonthNavigation from '#components/MonthNavigation';
 import OccupancyHeatmap, { OccupancyLegend } from '#components/OccupancyHeatmap';
 import Page from '#components/Page';
-import Portal from '#components/Portal';
 import RawButton from '#components/RawButton';
 import SortButton, {
     getAriaSort,
     getNextSort,
 } from '#components/SortButton';
 import DateContext from '#contexts/date';
-import NavbarContext from '#contexts/navbar';
 import UserContext from '#contexts/user';
 import {
     type OccupancyQuery,
@@ -305,7 +303,6 @@ export function Component() {
     const { month: monthFromParams } = useParams<{ month: string | undefined }>();
     const { search } = useLocation();
     const { fullDate } = useContext(DateContext);
-    const { midActionsRef } = useContext(NavbarContext);
     const { userAuth } = useContext(UserContext);
 
     const currentMonth = getMonth(fullDate);
@@ -482,10 +479,20 @@ export function Component() {
         <Page
             documentTitle={`Timur - ${heading}`}
             className={styles.occupancy}
-            contentClassName={_cs(styles.content, selectedUser && styles.withPanel)}
-        >
-            <Portal container={midActionsRef}>
-                <div className={styles.actions}>
+            contentClassName={selectedUser ? styles.withPanel : undefined}
+            heading={heading}
+            description={(upToDate || occupancy?.dataAsOf) && [
+                upToDate && `Up to ${upToDate}`,
+                occupancy?.dataAsOf && `Last entry added ${dateFormatter.format(new Date(occupancy.dataAsOf))}`,
+            ].filter(Boolean).join(' · ')}
+            headerActions={!isEmpty && (
+                <ViewSwitch
+                    value={view}
+                    onChange={setView}
+                />
+            )}
+            navbarActions={(
+                <>
                     <MonthNavigation
                         to="timesheets"
                         month={month}
@@ -494,8 +501,8 @@ export function Component() {
                         urlSearch={search}
                         withShortcuts
                     />
-                    <div className={styles.spacer} />
                     <Button
+                        className={styles.exportButton}
                         name={undefined}
                         onClick={handleExportClick}
                         variant="tertiary"
@@ -505,29 +512,9 @@ export function Component() {
                     >
                         CSV
                     </Button>
-                </div>
-            </Portal>
-            <header className={styles.header}>
-                <div className={styles.headingSection}>
-                    <h1 className={styles.heading}>
-                        {heading}
-                    </h1>
-                    {(upToDate || occupancy?.dataAsOf) && (
-                        <div className={styles.dataAsOf}>
-                            {[
-                                upToDate && `Up to ${upToDate}`,
-                                occupancy?.dataAsOf && `Last entry added ${dateFormatter.format(new Date(occupancy.dataAsOf))}`,
-                            ].filter(Boolean).join(' · ')}
-                        </div>
-                    )}
-                </div>
-                {!isEmpty && (
-                    <ViewSwitch
-                        value={view}
-                        onChange={setView}
-                    />
-                )}
-            </header>
+                </>
+            )}
+        >
             {!isEmpty && (
                 <KeyFigures
                     label={`Key figures, ${description}`}

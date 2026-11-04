@@ -240,6 +240,13 @@
     }
 }
 
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: var(--spacing-sm);
+}
+
 .sidebar-icon {
     font-size: var(--font-size-xl);
 }

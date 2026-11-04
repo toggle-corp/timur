@@ -19,6 +19,7 @@ import {
 import TinyGesture from 'tinygesture';
 
 import Button from '#components/Button';
+import PageHeader from '#components/PageHeader';
 import Portal from '#components/Portal';
 import NavbarContext from '#contexts/navbar';
 import SizeContext from '#contexts/size';
@@ -73,6 +74,13 @@ interface Props {
     contentContainerClassName?: string;
     onSwipeLeft?: () => void;
     onSwipeRight?: () => void;
+    // The page header, shown with a heading
+    heading?: React.ReactNode;
+    description?: React.ReactNode;
+    headerIcons?: React.ReactNode;
+    headerActions?: React.ReactNode;
+    // In the middle of the navbar, laid out in a row
+    navbarActions?: React.ReactNode;
 }
 
 function Page(props: Props) {
@@ -88,6 +96,11 @@ function Page(props: Props) {
         endAsideContainerClassName,
         onSwipeLeft,
         onSwipeRight,
+        heading,
+        description,
+        headerIcons,
+        headerActions,
+        navbarActions,
     } = props;
 
     const { screen } = useContext(SizeContext);
@@ -133,6 +146,7 @@ function Page(props: Props) {
 
     const {
         startActionsRef,
+        midActionsRef,
         endActionsRef,
     } = useContext(NavbarContext);
 
@@ -182,6 +196,13 @@ function Page(props: Props) {
                 className,
             )}
         >
+            {navbarActions && (
+                <Portal container={midActionsRef}>
+                    <div className={styles.navbarActions}>
+                        {navbarActions}
+                    </div>
+                </Portal>
+            )}
             {startAsideContent && (
                 <Portal container={startActionsRef}>
                     <Button
@@ -216,6 +237,14 @@ function Page(props: Props) {
             )}
             <main className={_cs(styles.main, contentContainerClassName)}>
                 <div className={_cs(styles.content, contentClassName)}>
+                    {heading && (
+                        <PageHeader
+                            heading={heading}
+                            description={description}
+                            icons={headerIcons}
+                            actions={headerActions}
+                        />
+                    )}
                     {children}
                 </div>
             </main>
