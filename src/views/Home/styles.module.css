@@ -1,9 +1,5 @@
 .home {
     .main-content {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-lg);
-
         .applications {
             display: flex;
             flex-direction: column;

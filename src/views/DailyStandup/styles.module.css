@@ -2,11 +2,7 @@
     overflow: auto;
 
     .page-content {
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1;
         background-color: var(--color-background);
-        gap: var(--spacing-lg);
         overflow: auto;
 
         .content {
