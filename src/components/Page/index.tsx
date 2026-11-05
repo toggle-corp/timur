@@ -30,7 +30,9 @@ import useSetFieldValue from '#hooks/useSetFieldValue';
 import styles from './styles.module.css';
 
 // NOTE: Swipes that start here edit a field or act on a dialog, not on the page behind it
-const NO_SWIPE_SELECTOR = 'input, textarea, select, [contenteditable], .cm-editor, dialog';
+const NO_SWIPE_SELECTOR = 'select, [contenteditable], .cm-editor, dialog';
+// A text field takes the swipe only while it is being edited
+const TEXT_FIELD_SELECTOR = 'input, textarea';
 
 // NOTE: A sideways drag inside a horizontal scroller pans it
 function isInSidewaysScroller(element: Element, container: Element) {
@@ -48,17 +50,35 @@ function isInSidewaysScroller(element: Element, container: Element) {
     return false;
 }
 
+function isBeingEdited(field: HTMLInputElement | HTMLTextAreaElement) {
+    if (field === document.activeElement) {
+        return true;
+    }
+    try {
+        return field.selectionStart !== field.selectionEnd;
+    } catch {
+        // NOTE: Inputs such as checkboxes have no text selection, and reading it throws
+        return false;
+    }
+}
+
+function canStartSwipe(target: EventTarget | null, container: Element) {
+    if (!(target instanceof Element)) {
+        return false;
+    }
+    if (target.closest(NO_SWIPE_SELECTOR) || isInSidewaysScroller(target, container)) {
+        return false;
+    }
+    const field = target.closest<HTMLInputElement | HTMLTextAreaElement>(TEXT_FIELD_SELECTOR);
+    return !field || !isBeingEdited(field);
+}
+
 // Swipe events carry the touchend, whose target is the element where the touch started
 function filterSwipe(container: Element, handler: () => void) {
     return (event: MouseEvent | TouchEvent) => {
-        const { target } = event;
-        if (
-            target instanceof Element
-            && (target.closest(NO_SWIPE_SELECTOR) || isInSidewaysScroller(target, container))
-        ) {
-            return;
+        if (canStartSwipe(event.target, container)) {
+            handler();
         }
-        handler();
     };
 }
 
