@@ -529,7 +529,7 @@ export function Component() {
                         onClick={handleExportClick}
                         variant="tertiary"
                         title="Download this month as CSV"
-                        disabled={isEmpty}
+                        disabled={isEmpty || occupancyResponse.fetching}
                         icons={<RiDownloadLine />}
                     >
                         CSV
@@ -540,6 +540,7 @@ export function Component() {
             {!isEmpty && (
                 <KeyFigures
                     label={`Key figures, ${description}`}
+                    loading={occupancyResponse.fetching}
                     figures={view === 'projects'
                         ? getTeamProjectFigures(occupancy.users, occupancy.summary.hours)
                         : getKeyFigures(

@@ -19,6 +19,7 @@ import AdminEditLink from '#components/AdminEditLink';
 import AdminLink from '#components/AdminLink';
 import Button from '#components/Button';
 import DisplayPicture from '#components/DisplayPicture';
+import { loadingFadeClassName } from '#components/LoadingFade';
 import { type OccupancyDay } from '#components/OccupancyHeatmap';
 import { isMissingDay } from '#components/OccupancyHeatmap/utils';
 import {
@@ -243,6 +244,8 @@ interface MonthTrendProps {
     // A line across the bars marks this value
     fullValue?: number;
     formatValue: (value: number | null | undefined) => string;
+    // Dims the bars while the months of another person load
+    loading?: boolean;
 }
 
 function MonthTrend(props: MonthTrendProps) {
@@ -251,11 +254,13 @@ function MonthTrend(props: MonthTrendProps) {
         max,
         fullValue,
         formatValue,
+        loading,
     } = props;
 
     return (
         <ol
-            className={styles.trend}
+            className={_cs(styles.trend, loadingFadeClassName)}
+            aria-busy={loading}
             style={isDefined(fullValue)
                 ? { '--full-height': fullValue / max } as React.CSSProperties
                 : undefined}
@@ -459,7 +464,10 @@ function PersonPanel(props: Props) {
                         emptyMessage="No leave"
                     />
                     {history && (
-                        <p className={styles.note}>
+                        <p
+                            className={_cs(styles.note, loadingFadeClassName)}
+                            aria-busy={personResponse.fetching}
+                        >
                             {`${formatDays(history.leaveDaysThisYear)} of leave in ${endDate.slice(0, 4)} up to ${formatDate(endDate)}, on working days`}
                         </p>
                     )}
@@ -531,6 +539,7 @@ function PersonPanel(props: Props) {
                                 max={chart.getMax(trendMonths)}
                                 fullValue={chart.fullValue}
                                 formatValue={chart.formatValue}
+                                loading={personResponse.fetching}
                             />
                         ) : (
                             <p className={styles.none}>

@@ -2,6 +2,7 @@ import { _cs } from '@togglecorp/fujs';
 
 import Definition from '#components/Definition';
 import Delta from '#components/Delta';
+import { loadingFadeClassName } from '#components/LoadingFade';
 import {
     type DeltaBetter,
     type DeltaUnit,
@@ -32,6 +33,8 @@ interface Props {
     comparedTo?: string;
     // Smaller figures that fit more to a row
     compact?: boolean;
+    // Dims the figures while new ones load
+    loading?: boolean;
 }
 
 function KeyFigures(props: Props) {
@@ -41,12 +44,19 @@ function KeyFigures(props: Props) {
         figures,
         comparedTo,
         compact,
+        loading,
     } = props;
 
     return (
         <section
-            className={_cs(styles.keyFigures, compact && styles.compact, className)}
+            className={_cs(
+                styles.keyFigures,
+                loadingFadeClassName,
+                compact && styles.compact,
+                className,
+            )}
             aria-label={label}
+            aria-busy={loading}
         >
             <dl className={styles.figures}>
                 {figures.map((figure) => (
