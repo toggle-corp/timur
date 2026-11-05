@@ -17,6 +17,7 @@ import {
 
 import DisplayPicture from '#components/DisplayPicture';
 import Legend, { LegendItem } from '#components/Legend';
+import { loadingFadeClassName } from '#components/LoadingFade';
 import RawButton from '#components/RawButton';
 import { visuallyHiddenClassName } from '#components/VisuallyHidden';
 import {
@@ -561,11 +562,12 @@ function OccupancyHeatmap(props: Props) {
         <div
             className={_cs(
                 styles.occupancyHeatmap,
-                loading && styles.loading,
+                loadingFadeClassName,
                 withGroupBands && styles.withGroupBands,
                 withoutGroupHeadings && styles.withoutGroupHeadings,
                 className,
             )}
+            aria-busy={loading}
         >
             <table
                 className={styles.table}

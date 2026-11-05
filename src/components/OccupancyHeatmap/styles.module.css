@@ -9,16 +9,11 @@
     flex-shrink: 0;
     /* Keep the table from widening the page; it scrolls instead */
     contain: inline-size;
-    transition: opacity var(--duration-transition-medium) ease-in-out 100ms;
     border: var(--width-separator-sm) solid var(--color-separator);
     border-radius: var(--border-radius-lg);
     background-color: var(--color-foreground);
     padding: var(--spacing-md);
     overflow: auto;
-
-    &.loading {
-        opacity: 0.5;
-    }
 
     /* NOTE: A grid gives every day an equal share of the width; tracks come from the component */
     .table {

@@ -24,6 +24,7 @@ import {
 import Button from '#components/Button';
 import DefaultMessage from '#components/DefaultMessage';
 import Indent from '#components/Indent';
+import { loadingFadeClassName } from '#components/LoadingFade';
 import EnumsContext from '#contexts/enums';
 import useFormattedRelativeDate from '#hooks/useFormattedRelativeDate';
 import useLocalStorage from '#hooks/useLocalStorage';
@@ -315,10 +316,8 @@ function DayView(props: Props) {
                 errorMessage="Can't find your entries"
             />
             <div
-                className={_cs(
-                    groupedItems.length > 0 && loading && styles.loading,
-                    styles.newGroup,
-                )}
+                className={_cs(loadingFadeClassName, styles.newGroup)}
+                aria-busy={groupedItems.length > 0 && loading}
             >
                 {groupedItems.map((groupedItem) => {
                     if (groupedItem.type === 'heading') {
