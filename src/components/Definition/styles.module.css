@@ -15,25 +15,4 @@
             inset: var(--inset-target--min);
         }
     }
-
-    /* NOTE: Placed against the nearest positioned ancestor, so that it stays inside narrow screens */
-    .tooltip {
-        display: none;
-        position: absolute;
-        top: 100%;
-        right: 0;
-        left: 0;
-        z-index: 1;
-        margin-top: var(--spacing-3xs);
-    }
-
-    &:hover .tooltip,
-    &:focus-within .tooltip,
-    &.open .tooltip {
-        display: block;
-    }
-
-    &.closed .tooltip {
-        display: none;
-    }
 }

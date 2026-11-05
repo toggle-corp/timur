@@ -1,23 +1,30 @@
 .popover {
-    --popup-width: 16rem;
-
     position: absolute;
-    margin: var(--spacing-sm);
-    border: var(--width-separator-sm) solid var(--color-separator-strong);
-    border-radius: var(--spacing-xs);
-    box-shadow: var(--box-shadow-xl);
-    background-color: var(--color-foreground);
-
-    width: var(--popup-width, auto);
-    min-width: anchor-size(width);
-    max-height: 40vh;
-    overflow: auto;
-
     position-visibility: anchors-visible;
     position-area: bottom;
     position-try-fallbacks: bottom, bottom left, bottom right, top, top left, top right;
 
     ::backdrop {
         display: none;
+    }
+
+    &.menu {
+        --popup-width: 16rem;
+
+        margin: var(--spacing-sm);
+        border: var(--width-separator-sm) solid var(--color-separator-strong);
+        border-radius: var(--spacing-xs);
+        box-shadow: var(--box-shadow-xl);
+        background-color: var(--color-foreground);
+        width: var(--popup-width, auto);
+        min-width: anchor-size(width);
+        max-height: 40vh;
+        overflow: auto;
+    }
+
+    &.tooltip {
+        margin: var(--spacing-2xs);
+        width: max-content;
+        max-width: min(18rem, calc(100vw - 2 * var(--spacing-sm)));
     }
 }

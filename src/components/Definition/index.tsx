@@ -5,10 +5,9 @@ import {
     useState,
 } from 'react';
 import { RiInformationLine } from 'react-icons/ri';
-import { _cs } from '@togglecorp/fujs';
 
+import Popup from '#components/Popup';
 import RawButton from '#components/RawButton';
-import { tooltipSurfaceClassName } from '#components/TooltipSurface';
 import useKeybind from '#hooks/useKeybind';
 
 import styles from './styles.module.css';
@@ -28,43 +27,42 @@ function Definition(props: Props) {
     } = props;
 
     const id = useId();
-    const elementRef = useRef<HTMLSpanElement>(null);
+    const triggerRef = useRef<HTMLButtonElement>(null);
     const [state, setState] = useState<State>('auto');
+    const [hovered, setHovered] = useState(false);
+    const [focused, setFocused] = useState(false);
 
-    const reopen = () => setState((value) => (value === 'closed' ? 'auto' : value));
+    const shown = state === 'open' || (state === 'auto' && (hovered || focused));
 
-    // Escape also hides a definition shown on hover, without focus, and then goes no further
+    // Escape hides a definition shown on hover or focus too, and then goes no further
     const handleKeyDown = useCallback(
         (event: KeyboardEvent) => {
-            if (event.key !== 'Escape' || event.defaultPrevented) {
+            if (event.key !== 'Escape' || event.defaultPrevented || !shown) {
                 return;
             }
-            const shown = state === 'open'
-                || (state === 'auto' && !!elementRef.current?.matches(':hover, :focus-within'));
-            if (shown) {
-                event.preventDefault();
-                setState('closed');
-            }
+            event.preventDefault();
+            setState('closed');
         },
-        [state],
+        [shown],
     );
     useKeybind(handleKeyDown, { capture: true });
+
+    // NOTE: Escape hides the definition, so a new hover or focus shows it again
+    const reopen = () => setState((value) => (value === 'closed' ? 'auto' : value));
 
     const label = `Definition of ${term}`;
 
     return (
-        <span
-            ref={elementRef}
-            // NOTE: Escape hides the definition, so a new hover or focus shows it again
-            onMouseEnter={reopen}
-            onFocus={reopen}
-            className={_cs(
-                styles.definition,
-                state === 'open' && styles.open,
-                state === 'closed' && styles.closed,
-            )}
+        <div
+            className={styles.definition}
+            onMouseEnter={() => {
+                reopen();
+                setHovered(true);
+            }}
+            onMouseLeave={() => setHovered(false)}
         >
             <RawButton
+                elementRef={triggerRef}
                 className={styles.trigger}
                 name={undefined}
                 title={label}
@@ -73,18 +71,27 @@ function Definition(props: Props) {
                 aria-describedby={id}
                 aria-expanded={state === 'open'}
                 onClick={() => setState((value) => (value === 'open' ? 'closed' : 'open'))}
-                onBlur={() => setState('auto')}
+                onFocus={() => {
+                    reopen();
+                    setFocused(true);
+                }}
+                onBlur={() => {
+                    setFocused(false);
+                    setState('auto');
+                }}
             >
                 <RiInformationLine aria-hidden />
             </RawButton>
-            <span
-                className={_cs(styles.tooltip, tooltipSurfaceClassName)}
+            <Popup
                 id={id}
                 role="tooltip"
+                variant="tooltip"
+                parentRef={triggerRef}
+                open={shown}
             >
                 {children}
-            </span>
-        </span>
+            </Popup>
+        </div>
     );
 }
 
