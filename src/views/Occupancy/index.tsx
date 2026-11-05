@@ -34,7 +34,6 @@ import SortButton, {
     getNextSort,
 } from '#components/SortButton';
 import DateContext from '#contexts/date';
-import UserContext from '#contexts/user';
 import {
     type OccupancyQuery,
     type OccupancyQueryVariables,
@@ -308,7 +307,6 @@ export function Component() {
     const { month: monthFromParams } = useParams<{ month: string | undefined }>();
     const { search } = useLocation();
     const { fullDate } = useContext(DateContext);
-    const { userAuth } = useContext(UserContext);
 
     const currentMonth = getMonth(fullDate);
     const month = parseMonth(monthFromParams, fullDate);
@@ -561,7 +559,7 @@ export function Component() {
                     label={`Timesheets, ${description}`}
                     withGroupBands
                     withoutGroupHeadings
-                    getDayHref={userAuth?.isStaff ? getTimeEntriesDayHref : undefined}
+                    getDayHref={getTimeEntriesDayHref}
                     selectedRowKey={selectedUserId}
                     onSelectedRowKeyChange={setSelectedUserId}
                     dates={occupancy.dates}

@@ -15,6 +15,7 @@ import {
     isNotDefined,
 } from '@togglecorp/fujs';
 
+import AdminLink from '#components/AdminLink';
 import DisplayPicture from '#components/DisplayPicture';
 import Legend, { LegendItem } from '#components/Legend';
 import { loadingFadeClassName } from '#components/LoadingFade';
@@ -199,17 +200,17 @@ function CellLink(props: { href: string | undefined, label: string }) {
     if (!href) {
         return null;
     }
+    // NOTE: Without a title of its own, the link shows the cell's title on hover
     return (
-        <a
+        <AdminLink
             className={styles.cellLink}
             href={href}
-            target="_blank"
-            rel="noopener noreferrer"
+            fallback={null}
         >
             <span className={visuallyHiddenClassName}>
                 {`${label}, open the day in admin`}
             </span>
-        </a>
+        </AdminLink>
     );
 }
 
