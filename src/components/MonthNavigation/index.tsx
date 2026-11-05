@@ -1,41 +1,21 @@
-import { useContext } from 'react';
 import {
     RiArrowLeftSLine,
     RiArrowRightSLine,
     RiCalendarEventLine,
 } from 'react-icons/ri';
-import { useNavigate } from 'react-router-dom';
 
-import Link, {
-    type Props as LinkProps,
-    resolvePath,
-} from '#components/Link';
-import RouteContext from '#contexts/route';
+import Link from '#components/Link';
 import useKeybind from '#hooks/useKeybind';
-import {
-    addMonths,
-    getMonthSearch,
-} from '#utils/month';
+import { addMonths } from '#utils/month';
 
-type InternalLinkProps = Extract<LinkProps, { external?: never }>;
+import useMonthNavigation, { type MonthNavigationOptions } from './useMonthNavigation';
 
-type Props = {
-    to: NonNullable<InternalLinkProps['to']>;
-    urlParams?: InternalLinkProps['urlParams'];
+type Props = MonthNavigationOptions & {
     month: string;
-    // The latest month that can be shown, and the default
-    currentMonth: string;
     currentMonthTitle?: string;
     // Ctrl+Shift with the left, right and down arrows, as in the journal
     withShortcuts?: boolean;
-} & ({
-    // The month goes in this path parameter, and urlSearch is kept
-    monthPathParam: string;
-    urlSearch?: string;
-} | {
-    monthPathParam?: never;
-    urlSearch?: never;
-});
+};
 
 const shortcuts = {
     previous: { key: 'ArrowLeft', symbol: '←' },
@@ -47,35 +27,15 @@ const shortcuts = {
 function MonthNavigation(props: Props) {
     const {
         to,
-        urlParams,
         month,
         currentMonth,
         currentMonthTitle = 'Jump to this month',
-        monthPathParam,
-        urlSearch,
         withShortcuts,
     } = props;
 
-    const routes = useContext(RouteContext);
-    const navigate = useNavigate();
+    const { getMonthLinkProps, goToMonth } = useMonthNavigation(props);
 
     const nextMonth = addMonths(month, 1);
-
-    const getMonthLinkProps = (target: string) => {
-        if (monthPathParam) {
-            return {
-                urlParams: {
-                    ...urlParams,
-                    [monthPathParam]: target === currentMonth ? undefined : target,
-                },
-                urlSearch,
-            };
-        }
-        return {
-            urlParams,
-            urlSearch: getMonthSearch(target, currentMonth),
-        };
-    };
 
     // Undefined where the link is disabled
     const shortcutTargets: Record<string, string | undefined> = {
@@ -92,13 +52,8 @@ function MonthNavigation(props: Props) {
         event.preventDefault();
         event.stopPropagation();
         const target = shortcutTargets[event.key];
-        if (!target) {
-            return;
-        }
-        const linkProps = getMonthLinkProps(target);
-        const { resolvedPath } = resolvePath(to, routes, linkProps.urlParams);
-        if (resolvedPath) {
-            navigate({ pathname: resolvedPath, search: linkProps.urlSearch });
+        if (target) {
+            goToMonth(target);
         }
     };
 
