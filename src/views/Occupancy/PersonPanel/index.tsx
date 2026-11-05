@@ -190,6 +190,51 @@ interface PersonPanelData {
     }[];
 }
 
+type HistoryMonth = NonNullable<
+    OccupancyPersonQuery['private']['occupancyPerson']
+>['months'][number];
+
+// Charts of the person's history, one section each
+const TREND_CHARTS: {
+    key: string,
+    heading: string,
+    getValue: (month: HistoryMonth) => number | null | undefined,
+    // Bars above this are drawn at the top
+    getMax: (months: HistoryMonth[]) => number,
+    fullValue?: number,
+    formatValue: (value: number | null | undefined) => string,
+}[] = [
+    {
+        key: 'occupancy',
+        heading: 'Occupancy by month, %',
+        getValue: (month) => month.occupancy,
+        getMax: () => MAX_TREND_OCCUPANCY,
+        fullValue: 1,
+        formatValue: formatPercentNumber,
+    },
+    {
+        key: 'lateShare',
+        heading: 'Logged late by month, %',
+        getValue: (month) => month.lateShare,
+        getMax: () => 1,
+        formatValue: formatPercentNumber,
+    },
+    {
+        key: 'leaveDays',
+        heading: 'Leave days by month',
+        getValue: (month) => month.leaveDays,
+        getMax: (months) => Math.max(1, ...months.map((month) => month.leaveDays)),
+        formatValue: formatDayCount,
+    },
+    {
+        key: 'workFromHomeDays',
+        heading: 'WFH days by month',
+        getValue: (month) => month.workFromHomeDays,
+        getMax: (months) => Math.max(1, ...months.map((month) => month.workFromHomeDays)),
+        formatValue: formatDayCount,
+    },
+];
+
 interface MonthTrendProps {
     // Oldest first, ending with the current month
     months: { startDate: string, value?: number | null }[];
@@ -469,83 +514,31 @@ function PersonPanel(props: Props) {
                         {`Entries with ${VAGUE_DESCRIPTION}`}
                     </p>
                 </section>
-                <section className={styles.section}>
-                    <h3 className={styles.sectionHeading}>
-                        Occupancy by month, %
-                    </h3>
-                    {trendMonths ? (
-                        <MonthTrend
-                            months={trendMonths.map((month) => ({
-                                startDate: month.startDate,
-                                value: month.occupancy,
-                            }))}
-                            max={MAX_TREND_OCCUPANCY}
-                            fullValue={1}
-                            formatValue={formatPercentNumber}
-                        />
-                    ) : (
-                        <p className={styles.none}>
-                            {personResponse.error ? 'Could not load the months' : 'Loading'}
-                        </p>
-                    )}
-                </section>
-                <section className={styles.section}>
-                    <h3 className={styles.sectionHeading}>
-                        Logged late by month, %
-                    </h3>
-                    {trendMonths ? (
-                        <MonthTrend
-                            months={trendMonths.map((month) => ({
-                                startDate: month.startDate,
-                                value: month.lateShare,
-                            }))}
-                            max={1}
-                            formatValue={formatPercentNumber}
-                        />
-                    ) : (
-                        <p className={styles.none}>
-                            {personResponse.error ? 'Could not load the months' : 'Loading'}
-                        </p>
-                    )}
-                </section>
-                <section className={styles.section}>
-                    <h3 className={styles.sectionHeading}>
-                        Leave days by month
-                    </h3>
-                    {trendMonths ? (
-                        <MonthTrend
-                            months={trendMonths.map((month) => ({
-                                startDate: month.startDate,
-                                value: month.leaveDays,
-                            }))}
-                            max={Math.max(1, ...trendMonths.map((month) => month.leaveDays))}
-                            formatValue={formatDayCount}
-                        />
-                    ) : (
-                        <p className={styles.none}>
-                            {personResponse.error ? 'Could not load the months' : 'Loading'}
-                        </p>
-                    )}
-                </section>
-                <section className={styles.section}>
-                    <h3 className={styles.sectionHeading}>
-                        WFH days by month
-                    </h3>
-                    {trendMonths ? (
-                        <MonthTrend
-                            months={trendMonths.map((month) => ({
-                                startDate: month.startDate,
-                                value: month.workFromHomeDays,
-                            }))}
-                            max={Math.max(1, ...trendMonths.map((month) => month.workFromHomeDays))}
-                            formatValue={formatDayCount}
-                        />
-                    ) : (
-                        <p className={styles.none}>
-                            {personResponse.error ? 'Could not load the months' : 'Loading'}
-                        </p>
-                    )}
-                </section>
+                {TREND_CHARTS.map((chart) => (
+                    <section
+                        key={chart.key}
+                        className={styles.section}
+                    >
+                        <h3 className={styles.sectionHeading}>
+                            {chart.heading}
+                        </h3>
+                        {trendMonths ? (
+                            <MonthTrend
+                                months={trendMonths.map((month) => ({
+                                    startDate: month.startDate,
+                                    value: chart.getValue(month),
+                                }))}
+                                max={chart.getMax(trendMonths)}
+                                fullValue={chart.fullValue}
+                                formatValue={chart.formatValue}
+                            />
+                        ) : (
+                            <p className={styles.none}>
+                                {personResponse.error ? 'Could not load the months' : 'Loading'}
+                            </p>
+                        )}
+                    </section>
+                ))}
                 <section className={styles.section}>
                     <h3 className={styles.sectionHeading}>
                         {`Projects · ${projects.length}`}
