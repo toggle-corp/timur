@@ -25,6 +25,7 @@ import Button from '#components/Button';
 import DefaultMessage from '#components/DefaultMessage';
 import KeyFigures from '#components/KeyFigures';
 import MonthNavigation from '#components/MonthNavigation';
+import useMonthNavigation from '#components/MonthNavigation/useMonthNavigation';
 import OccupancyHeatmap, { OccupancyLegend } from '#components/OccupancyHeatmap';
 import Page from '#components/Page';
 import RawButton from '#components/RawButton';
@@ -42,6 +43,7 @@ import useUrlQueryState from '#hooks/useUrlQueryState';
 import { getAdminDayUrl } from '#utils/admin';
 import { formatNumber } from '#utils/common';
 import {
+    addMonths,
     formatMonth,
     getMonth,
     parseMonth,
@@ -364,6 +366,21 @@ export function Component() {
         ? sort
         : DEFAULT_SORT;
 
+    const { goToMonth } = useMonthNavigation({
+        to: 'timesheets',
+        currentMonth,
+        monthPathParam: 'month',
+        urlSearch: search,
+    });
+    const nextMonth = addMonths(month, 1);
+    const handleSwipeLeft = useCallback(() => goToMonth(nextMonth), [goToMonth, nextMonth]);
+    const handleSwipeRight = useCallback(
+        () => goToMonth(addMonths(month, -1)),
+        [goToMonth, month],
+    );
+    // The person panel sits in the page content, so a swipe would carry it along
+    const canSwipe = isNotDefined(selectedUserId);
+
     const handlePanelClose = useCallback(
         () => setSelectedUserId(undefined),
         [setSelectedUserId],
@@ -483,6 +500,8 @@ export function Component() {
             documentTitle={`Timur - ${heading}`}
             className={styles.occupancy}
             contentClassName={selectedUser ? styles.withPanel : undefined}
+            onSwipeLeft={canSwipe && nextMonth <= currentMonth ? handleSwipeLeft : undefined}
+            onSwipeRight={canSwipe ? handleSwipeRight : undefined}
             heading={heading}
             description={(upToDate || occupancy?.dataAsOf) && [
                 upToDate && `Up to ${upToDate}`,
