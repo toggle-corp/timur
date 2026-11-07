@@ -370,18 +370,14 @@ function PersonPanel(props: Props) {
         }
         return [];
     });
-    const leaveDays = days
-        .filter((day) => isDefined(day.leave))
-        .map((day) => {
-            const half = day.leave ? halfLabels[day.leave] : undefined;
-            return journalItem(day.date, half ? `${formatDate(day.date)} (${half})` : formatDate(day.date));
-        });
-    const workFromHomeDays = days
-        .filter((day) => isDefined(day.workFromHome))
-        .map((day) => {
-            const half = day.workFromHome ? halfLabels[day.workFromHome] : undefined;
-            return journalItem(day.date, half ? `${formatDate(day.date)} (${half})` : formatDate(day.date));
-        });
+    const halfDayItem = (date: string, type: string) => {
+        const half = halfLabels[type];
+        return journalItem(date, half ? `${formatDate(date)} (${half})` : formatDate(date));
+    };
+    const leaveDays = days.flatMap((day) => (day.leave ? [halfDayItem(day.date, day.leave)] : []));
+    const workFromHomeDays = days.flatMap((day) => (
+        day.workFromHome ? [halfDayItem(day.date, day.workFromHome)] : []
+    ));
     const hoursByDate = new Map(days.map((day) => [day.date, day.hours]));
     const longDays = longDates.map((date) => {
         const hours = hoursByDate.get(date);
