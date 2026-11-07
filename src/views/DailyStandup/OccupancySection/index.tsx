@@ -168,14 +168,14 @@ function OccupancySection(props: Props) {
             headerActions={(
                 <div className={styles.summary}>
                     {!isEmpty && usersWithMissing > 0 && (
-                        <span className={styles.missingSummary}>
+                        <span className={styles.hasMissing}>
                             {usersWithMissing === 1
                                 ? '1 person has days without entries or leave'
                                 : `${usersWithMissing} people have days without entries or leave`}
                         </span>
                     )}
                     {!isEmpty && usersWithRecentMissing > 0 && (
-                        <span className={styles.recentMissingSummary}>
+                        <span className={styles.hasRecentMissing}>
                             {usersWithRecentMissing === 1
                                 ? `1${more} person is only missing the ${RECENT_DAYS_LABEL}`
                                 : `${usersWithRecentMissing}${more} people are only missing the ${RECENT_DAYS_LABEL}`}

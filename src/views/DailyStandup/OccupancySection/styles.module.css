@@ -28,16 +28,6 @@
             align-items: flex-start;
             flex-basis: 100%;
         }
-
-        .missing-summary {
-            color: var(--color-heatmap-low-text);
-            font-weight: var(--font-weight-bold);
-        }
-
-        .recent-missing-summary {
-            color: var(--color-heatmap-mid-text);
-            font-weight: var(--font-weight-bold);
-        }
     }
 
     .message {
@@ -54,15 +44,16 @@
         text-align: right;
         color: var(--color-text-muted);
         font-size: var(--font-size-sm);
+    }
 
-        &.has-missing {
-            color: var(--color-heatmap-low-text);
-            font-weight: var(--font-weight-bold);
-        }
+    /* NOTE: After .missing-count, so that these colours win */
+    .has-missing {
+        color: var(--color-heatmap-low-text);
+        font-weight: var(--font-weight-bold);
+    }
 
-        &.has-recent-missing {
-            color: var(--color-heatmap-mid-text);
-            font-weight: var(--font-weight-bold);
-        }
+    .has-recent-missing {
+        color: var(--color-heatmap-mid-text);
+        font-weight: var(--font-weight-bold);
     }
 }
