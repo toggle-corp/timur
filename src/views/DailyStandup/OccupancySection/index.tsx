@@ -20,6 +20,7 @@ import {
     type DailyStandupOccupancyQueryVariables,
 } from '#generated/types/graphql';
 import { shortDateFormatter } from '#utils/common';
+import { getMonth } from '#utils/month';
 
 import Slide from '../Slide';
 import SlideFooter from '../SlideFooter';
@@ -77,7 +78,7 @@ type Severity = typeof SEVERITY[keyof typeof SEVERITY];
 
 // The first week of a month shows the whole previous month, which starts on its 1st
 function getMonthlyViewMonth(startDate: string, date: string) {
-    return (decodeDate(startDate).getDate() === 1 ? startDate : date).slice(0, 7);
+    return getMonth(decodeDate(startDate).getDate() === 1 ? startDate : date);
 }
 
 interface Props {
