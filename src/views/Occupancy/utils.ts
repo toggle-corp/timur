@@ -121,7 +121,7 @@ interface ProjectShare {
     share?: number | null;
 }
 
-interface ProjectHours {
+export interface ProjectHours {
     project: { id: string, name: string };
     hours: number;
     share?: number | null;

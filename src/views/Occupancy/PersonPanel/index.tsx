@@ -40,6 +40,7 @@ import {
 
 import {
     LONG_ENTRY_HOURS,
+    type ProjectHours,
     TREND_START_DATE,
     VAGUE_DESCRIPTION,
 } from '../utils';
@@ -183,11 +184,7 @@ interface PersonPanelData {
     };
     longDates: string[];
     flaggedEntries: FlaggedEntry[];
-    projects: {
-        project: { id: string, name: string };
-        hours: number;
-        share?: number | null;
-    }[];
+    projects: ProjectHours[];
 }
 
 type HistoryMonth = NonNullable<
