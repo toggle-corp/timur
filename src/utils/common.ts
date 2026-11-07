@@ -10,6 +10,8 @@ import {
 } from 'match-sorter';
 import { ulid } from 'ulidx';
 
+import { type JournalWorkFromHomeTypeEnum } from '#generated/types/graphql';
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Func = (...args:any[]) => any;
 export function isCallable<T, X extends Func>(value: T | X): value is X {
@@ -71,6 +73,13 @@ export const weekdayDateFormatter = new Intl.DateTimeFormat(undefined, {
     day: 'numeric',
 });
 export const shortMonthFormatter = new Intl.DateTimeFormat(undefined, { month: 'short' });
+
+// In the order of the occupancy legend
+export const workFromHomeLabels: Record<JournalWorkFromHomeTypeEnum, string> = {
+    FIRST_HALF: 'First half WFH',
+    FULL: 'WFH',
+    SECOND_HALF: 'Second half WFH',
+};
 
 export const NON_WORKING_DAY_LABEL = 'Non-working day';
 

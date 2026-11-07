@@ -33,6 +33,7 @@ import {
     NON_WORKING_DAY_LABEL,
     shortDateFormatter,
     weekdayDateFormatter,
+    workFromHomeLabels,
 } from '#utils/common';
 import {
     type DayBoundary,
@@ -87,13 +88,6 @@ const WORKING_HOURS_PER_DAY = 7;
 const halfLeaveClassNames: Partial<Record<JournalLeaveTypeEnum, string>> = {
     FIRST_HALF: styles.firstHalfLeave,
     SECOND_HALF: styles.secondHalfLeave,
-};
-
-// In legend order
-const workFromHomeLabels: Record<JournalWorkFromHomeTypeEnum, string> = {
-    FIRST_HALF: 'First half WFH',
-    FULL: 'WFH',
-    SECOND_HALF: 'Second half WFH',
 };
 
 // Whether the first and the second half of the day were worked from home

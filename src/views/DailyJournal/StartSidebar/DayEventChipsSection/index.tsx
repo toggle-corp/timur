@@ -14,9 +14,9 @@ import Pill from '#components/Pill';
 import {
     type DayEventsAndDeadlinesQuery,
     type JournalLeaveTypeEnum,
-    type JournalWorkFromHomeTypeEnum,
 } from '#generated/types/graphql';
 import { type GoogleCalendarEvent } from '#hooks/useGoogleCalendar';
+import { workFromHomeLabels } from '#utils/common';
 
 import styles from './styles.module.css';
 
@@ -34,19 +34,6 @@ function leaveTypeLabel(type: JournalLeaveTypeEnum) {
         return 'Second half leave';
     }
     return 'Leave';
-}
-
-function wfhTypeLabel(type: JournalWorkFromHomeTypeEnum) {
-    if (type === 'FULL') {
-        return 'WFH';
-    }
-    if (type === 'FIRST_HALF') {
-        return 'First half WFH';
-    }
-    if (type === 'SECOND_HALF') {
-        return 'Second half WFH';
-    }
-    return 'WFH';
 }
 
 interface Chip {
@@ -92,7 +79,7 @@ function DayEventChipsSection(props: Props) {
             ? [{
                 key: `wfh-${wfhType}`,
                 icon: <FcHome />,
-                name: wfhTypeLabel(wfhType),
+                name: workFromHomeLabels[wfhType],
             }]
             : [];
 
