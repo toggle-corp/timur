@@ -40,7 +40,11 @@ import {
 } from '#generated/types/graphql';
 import useUrlQueryState from '#hooks/useUrlQueryState';
 import { getAdminDayUrl } from '#utils/admin';
-import { formatNumber } from '#utils/common';
+import {
+    formatNumber,
+    shortDateFormatter,
+    shortMonthFormatter,
+} from '#utils/common';
 import {
     addMonths,
     formatMonth,
@@ -198,11 +202,6 @@ const OCCUPANCY_QUERY = gql`
     }
 `;
 
-const dateFormatter = new Intl.DateTimeFormat(undefined, {
-    month: 'short',
-    day: 'numeric',
-});
-const shortMonthFormatter = new Intl.DateTimeFormat(undefined, { month: 'short' });
 const shortMonthYearFormatter = new Intl.DateTimeFormat(undefined, { month: 'short', year: 'numeric' });
 
 const TOP_PROJECT_KEY: SortKey = 'topProject';
@@ -472,7 +471,7 @@ export function Component() {
 
     // The current month runs up to yesterday
     const upToDate = dateRange && month === currentMonth
-        ? dateFormatter.format(decodeDate(dateRange.endDate))
+        ? shortDateFormatter.format(decodeDate(dateRange.endDate))
         : undefined;
     let description = formatMonth(month);
     if (upToDate) {
@@ -489,7 +488,7 @@ export function Component() {
         const { startDate, endDate } = occupancy.previous;
         // A part of the current month compares with the same days of the previous one
         comparedTo = month === currentMonth
-            ? dateFormatter.formatRange(decodeDate(startDate), decodeDate(endDate))
+            ? shortDateFormatter.formatRange(decodeDate(startDate), decodeDate(endDate))
             : shortMonthFormatter.format(decodeDate(startDate));
     }
 
@@ -503,7 +502,7 @@ export function Component() {
             heading={heading}
             description={(upToDate || occupancy?.dataAsOf) && [
                 upToDate && `Up to ${upToDate}`,
-                occupancy?.dataAsOf && `Last entry added ${dateFormatter.format(new Date(occupancy.dataAsOf))}`,
+                occupancy?.dataAsOf && `Last entry added ${shortDateFormatter.format(new Date(occupancy.dataAsOf))}`,
             ].filter(Boolean).join(' · ')}
             headerActions={!isEmpty && (
                 <ViewSwitch
@@ -625,7 +624,7 @@ export function Component() {
                 <ul className={styles.events}>
                     {occupancy.miscEvents.map((event) => (
                         <li key={event.id}>
-                            {dateFormatter.formatRange(
+                            {shortDateFormatter.formatRange(
                                 decodeDate(event.startDate),
                                 decodeDate(event.endDate),
                             )}

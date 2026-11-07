@@ -31,6 +31,8 @@ import {
     NO_HOURS_EXPECTED_LABEL,
     NO_HOURS_LABEL,
     NON_WORKING_DAY_LABEL,
+    shortDateFormatter,
+    weekdayDateFormatter,
 } from '#utils/common';
 import {
     type DayBoundary,
@@ -80,11 +82,6 @@ const PENDING_LABEL = 'Not due yet';
 const PENDING_DESCRIPTION = 'Not due yet, before the logging deadline';
 // Matches WORKING_HOURS_PER_DAY in the backend occupancy
 const WORKING_HOURS_PER_DAY = 7;
-const fullDateFormatter = new Intl.DateTimeFormat(undefined, {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-});
 
 // The side of the cell that the leave takes
 const halfLeaveClassNames: Partial<Record<JournalLeaveTypeEnum, string>> = {
@@ -119,8 +116,6 @@ function WorkFromHomeMarks(props: { workFromHome: JournalWorkFromHomeTypeEnum })
         </span>
     );
 }
-
-const shortDateFormatter = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
 
 function getLateText(date: string, lateByDays: number) {
     return `Logged late, first entry on ${shortDateFormatter.format(decodeDate(addDays(date, lateByDays)))}`;
@@ -170,7 +165,7 @@ function getOccupancyClassName(percent: number, isNonWorking: boolean | undefine
 function getCellTitle(displayName: string, day: OccupancyDay) {
     const parts = [
         displayName,
-        fullDateFormatter.format(decodeDate(day.date)),
+        weekdayDateFormatter.format(decodeDate(day.date)),
         day.leaveDisplay && `${day.leaveDisplay} leave`,
         day.workFromHome && workFromHomeLabels[day.workFromHome],
         isNotDefined(day.hours) ? NO_HOURS_LABEL : `${day.hours}h`,

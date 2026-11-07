@@ -34,6 +34,8 @@ import {
     formatNumber,
     formatShare,
     NO_FIGURE,
+    shortDateFormatter,
+    shortMonthFormatter,
 } from '#utils/common';
 
 import {
@@ -70,16 +72,13 @@ const TOP_PROJECTS = 5;
 // Bars above this are drawn at the top, so that one long month keeps the others readable
 const MAX_TREND_OCCUPANCY = 1.5;
 
-const dateFormatter = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
-const monthFormatter = new Intl.DateTimeFormat(undefined, { month: 'short' });
-
 const halfLabels: Record<string, string> = {
     FIRST_HALF: 'first half',
     SECOND_HALF: 'second half',
 };
 
 function formatDate(date: string) {
-    return dateFormatter.format(decodeDate(date));
+    return shortDateFormatter.format(decodeDate(date));
 }
 
 function formatDays(count: number) {
@@ -286,7 +285,7 @@ function MonthTrend(props: MonthTrendProps) {
                             />
                         </span>
                         <span className={styles.monthLabel}>
-                            {monthFormatter.format(decodeDate(month.startDate))}
+                            {shortMonthFormatter.format(decodeDate(month.startDate))}
                         </span>
                     </li>
                 );

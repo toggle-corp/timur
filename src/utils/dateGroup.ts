@@ -4,6 +4,8 @@ import {
     mapToList,
 } from '@togglecorp/fujs';
 
+import { shortMonthFormatter } from '#utils/common';
+
 const weekdayFormatter = new Intl.DateTimeFormat(undefined, { weekday: 'short' });
 const WEEKDAY_LENGTH = 2;
 
@@ -68,13 +70,11 @@ export function groupDatesByIsoWeek(dates: string[]) {
     );
 }
 
-const monthFormatter = new Intl.DateTimeFormat(undefined, { month: 'short' });
-
 function groupDatesByMonth(dates: string[]) {
     return groupDates(
         dates,
         (dateValue) => `${dateValue.getFullYear()}-${dateValue.getMonth()}`,
-        (dateValue) => monthFormatter.format(dateValue),
+        (dateValue) => shortMonthFormatter.format(dateValue),
     );
 }
 

@@ -19,6 +19,7 @@ import {
     type DailyStandupOccupancyQuery,
     type DailyStandupOccupancyQueryVariables,
 } from '#generated/types/graphql';
+import { shortDateFormatter } from '#utils/common';
 
 import Slide from '../Slide';
 import SlideFooter from '../SlideFooter';
@@ -58,13 +59,8 @@ const DAILY_STANDUP_OCCUPANCY_QUERY = gql`
     }
 `;
 
-const rangeFormatter = new Intl.DateTimeFormat(undefined, {
-    month: 'short',
-    day: 'numeric',
-});
-
 function formatRange(startDate: string, endDate: string) {
-    return rangeFormatter.formatRange(decodeDate(startDate), decodeDate(endDate));
+    return shortDateFormatter.formatRange(decodeDate(startDate), decodeDate(endDate));
 }
 
 // Missing counts for these many most recent working days are shown as a warning

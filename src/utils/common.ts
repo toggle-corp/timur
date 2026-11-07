@@ -64,6 +64,14 @@ export function formatShare(share: number | null | undefined) {
         : shareFormatter.format(share);
 }
 
+export const shortDateFormatter = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
+export const weekdayDateFormatter = new Intl.DateTimeFormat(undefined, {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+});
+export const shortMonthFormatter = new Intl.DateTimeFormat(undefined, { month: 'short' });
+
 export const NON_WORKING_DAY_LABEL = 'Non-working day';
 
 export const NO_HOURS_LABEL = 'No hours';

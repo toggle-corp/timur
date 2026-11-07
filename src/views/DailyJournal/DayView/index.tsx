@@ -32,6 +32,7 @@ import {
     getDurationString,
     groupListByAttributes,
     sortByAttributes,
+    weekdayDateFormatter,
 } from '#utils/common';
 import {
     DailyJournalAttribute,
@@ -48,15 +49,6 @@ const dateFormatter = new Intl.DateTimeFormat(
     [],
     {
         year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        weekday: 'short',
-    },
-);
-
-const dateFormatterShort = new Intl.DateTimeFormat(
-    [],
-    {
         month: 'short',
         day: 'numeric',
         weekday: 'short',
@@ -214,7 +206,7 @@ function DayView(props: Props) {
     const date = new Date(selectedDate);
     const formattedDate = date.getMonth() === 0
         ? dateFormatter.format(date)
-        : dateFormatterShort.format(date);
+        : weekdayDateFormatter.format(date);
     const formattedRelativeDate = useFormattedRelativeDate(selectedDate);
 
     const totalHours = useMemo(
