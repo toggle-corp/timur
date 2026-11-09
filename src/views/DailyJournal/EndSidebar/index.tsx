@@ -128,28 +128,31 @@ function EndSidebar(props: Props) {
                                     const count = taskCountMapping?.[task.id] ?? 0;
 
                                     return (
-                                        <RawButton
-                                            className={styles.task}
+                                        <div
                                             role="listitem"
-                                            name={task.id}
-                                            onClick={onWorkItemCreate}
                                             key={task.id}
-                                            title="Add entry from sidebar"
                                         >
-                                            <span className={styles.taskName}>
-                                                {task.name}
-                                            </span>
-                                            {/*
-                                            <span className={styles.contractName}>
-                                                {contract.name}
-                                            </span>
-                                            */}
-                                            {count > 0 && (
-                                                <span className={styles.usageCount}>
-                                                    {count}
+                                            <RawButton
+                                                className={styles.task}
+                                                name={task.id}
+                                                onClick={onWorkItemCreate}
+                                                title="Add entry from sidebar"
+                                            >
+                                                <span className={styles.taskName}>
+                                                    {task.name}
                                                 </span>
-                                            )}
-                                        </RawButton>
+                                                {/*
+                                                <span className={styles.contractName}>
+                                                    {contract.name}
+                                                </span>
+                                                */}
+                                                {count > 0 && (
+                                                    <span className={styles.usageCount}>
+                                                        {count}
+                                                    </span>
+                                                )}
+                                            </RawButton>
+                                        </div>
                                     );
                                 })}
                             </div>

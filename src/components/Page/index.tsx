@@ -28,6 +28,39 @@ import useSetFieldValue from '#hooks/useSetFieldValue';
 
 import styles from './styles.module.css';
 
+// NOTE: Swipes that start here edit a field or act on a dialog, not on the page behind it
+const NO_SWIPE_SELECTOR = 'input, textarea, select, [contenteditable], .cm-editor, dialog';
+
+// NOTE: A sideways drag inside a horizontal scroller pans it
+function isInSidewaysScroller(element: Element, container: Element) {
+    let current: Element | null = element;
+    while (current && current !== container) {
+        const { overflowX } = getComputedStyle(current);
+        if (
+            (overflowX === 'auto' || overflowX === 'scroll')
+            && current.scrollWidth > current.clientWidth
+        ) {
+            return true;
+        }
+        current = current.parentElement;
+    }
+    return false;
+}
+
+// Swipe events carry the touchend, whose target is the element where the touch started
+function filterSwipe(container: Element, handler: () => void) {
+    return (event: MouseEvent | TouchEvent) => {
+        const { target } = event;
+        if (
+            target instanceof Element
+            && (target.closest(NO_SWIPE_SELECTOR) || isInSidewaysScroller(target, container))
+        ) {
+            return;
+        }
+        handler();
+    };
+}
+
 interface Props {
     className?: string;
     documentTitle: string;
@@ -106,22 +139,26 @@ function Page(props: Props) {
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (isNotDefined(containerRef.current)) {
+        const container = containerRef.current;
+        if (isNotDefined(container)) {
             return undefined;
         }
         const gesture = new TinyGesture(
-            containerRef.current,
+            container,
             {
                 mouseSupport: false,
                 velocityThreshold: 1,
             },
         );
-        const swipeLeftListener = isDefined(onSwipeLeft) ? gesture.on('swipeleft', onSwipeLeft) : undefined;
-        const swipeRightListener = isDefined(onSwipeRight) ? gesture.on('swiperight', onSwipeRight) : undefined;
+        if (isDefined(onSwipeLeft)) {
+            gesture.on('swipeleft', filterSwipe(container, onSwipeLeft));
+        }
+        if (isDefined(onSwipeRight)) {
+            gesture.on('swiperight', filterSwipe(container, onSwipeRight));
+        }
 
         return () => {
-            swipeLeftListener?.cancel();
-            swipeRightListener?.cancel();
+            gesture.destroy();
         };
     }, [onSwipeLeft, onSwipeRight]);
 
@@ -187,6 +224,7 @@ function Page(props: Props) {
                     <Button
                         name={!endSidebarShown}
                         onClick={handleEndSidebarToggle}
+                        className={styles.toggleCollapsedButton}
                         variant="transparent"
                         title="Toggle right pane"
                     >

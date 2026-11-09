@@ -1,5 +1,7 @@
 import {
     useCallback,
+    useEffect,
+    useId,
     useMemo,
     useRef,
     useState,
@@ -45,6 +47,18 @@ function DropdownMenu(props: Props) {
     } = props;
 
     const [showDropdown, setShowDropdown] = useState(false);
+    const popupId = useId();
+
+    useEffect(
+        () => {
+            if (showDropdown) {
+                document.getElementById(popupId)
+                    ?.querySelector<HTMLElement>('a[href], button:enabled')
+                    ?.focus();
+            }
+        },
+        [showDropdown, popupId],
+    );
 
     const handleMenuClick: NonNullable<ButtonProps<undefined>['onClick']> = useCallback(
         () => {
@@ -74,6 +88,10 @@ function DropdownMenu(props: Props) {
             <Button
                 name={undefined}
                 title={title}
+                // The popup holds mixed content navigated with Tab, which is the dialog pattern
+                aria-haspopup="dialog"
+                aria-expanded={showDropdown}
+                aria-controls={popupId}
                 className={_cs(
                     styles.dropdownMenu,
                     showDropdown && activeClassName,
@@ -99,6 +117,9 @@ function DropdownMenu(props: Props) {
                 {label}
             </Button>
             <Popup
+                id={popupId}
+                role="dialog"
+                aria-label={title}
                 parentRef={newButtonRef}
                 className={_cs(styles.dropdownContent, popupClassName)}
                 open={showDropdown}

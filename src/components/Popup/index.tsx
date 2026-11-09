@@ -11,7 +11,7 @@ import {
 
 import styles from './styles.module.css';
 
-interface Props {
+interface Props extends Pick<React.HTMLAttributes<HTMLDivElement>, 'id' | 'role' | 'aria-label'> {
     className?: string;
     children?: React.ReactNode;
     parentRef: React.RefObject<HTMLElement | null>;
@@ -26,6 +26,7 @@ function Popup(props: Props) {
         parentRef,
         open,
         setOpen,
+        ...otherProps
     } = props;
 
     const anchorName = useMemo(() => `anchor_${randomString(8)}`, []);
@@ -74,6 +75,8 @@ function Popup(props: Props) {
 
     return (
         <div
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            {...otherProps}
             popover="auto"
             ref={popoverRef}
             style={{

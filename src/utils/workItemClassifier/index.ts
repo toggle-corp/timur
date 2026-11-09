@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import {
-    isDefined,
     listToGroupList,
     listToMap,
     mapToList,
@@ -69,7 +68,7 @@ function buildSubstituteMap(
         ...data.private.contractors.items.map((c) => c.name),
     ]);
     const userNames = unique(
-        data.private.users.items.map((u) => u.displayName).filter(isDefined),
+        data.private.users.items.map((u) => u.displayName),
     );
 
     // Priority: project, client, then colleague.

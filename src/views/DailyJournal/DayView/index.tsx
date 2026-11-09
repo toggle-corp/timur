@@ -357,7 +357,7 @@ function DayView(props: Props) {
                                         <img
                                             className={styles.icon}
                                             src={currentIcon.url}
-                                            alt={headingText}
+                                            alt=""
                                         />
                                     )}
                                     {headingText}
@@ -419,7 +419,7 @@ function DayView(props: Props) {
                                                     <img
                                                         className={styles.icon}
                                                         src={currentIcon.url}
-                                                        alt={currentLabel}
+                                                        alt=""
                                                     />
                                                 )}
                                                 <div>{currentLabel}</div>

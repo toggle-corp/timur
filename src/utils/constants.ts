@@ -60,7 +60,7 @@ export const paletteOptions: PaletteOption[] = [
         key: 'terracotta',
         label: 'Terracotta',
         swatches: {
-            light: { background: '#fafaf0', primary: '#c45332', secondary: '#6e8b3e' },
+            light: { background: '#fafaf0', primary: '#bd4c2b', secondary: '#6e8b3e' },
             dark: { background: '#1c1b17', primary: '#db7657', secondary: '#aebd55' },
         },
     },
@@ -76,7 +76,7 @@ export const paletteOptions: PaletteOption[] = [
         key: 'gruvbox',
         label: 'Gruvbox',
         swatches: {
-            light: { background: '#fbf1c7', primary: '#d65d0e', secondary: '#b57614' },
+            light: { background: '#fbf1c7', primary: '#db6218', secondary: '#b57614' },
             dark: { background: '#282828', primary: '#fe8019', secondary: '#fabd2f' },
         },
     },
@@ -84,16 +84,16 @@ export const paletteOptions: PaletteOption[] = [
         key: 'monokai',
         label: 'Monokai',
         swatches: {
-            light: { background: '#f5f5f5', primary: '#ce4770', secondary: '#d75f00' },
-            dark: { background: '#272822', primary: '#f92672', secondary: '#fd971f' },
+            light: { background: '#f5f5f5', primary: '#bf3964', secondary: '#d75f00' },
+            dark: { background: '#272822', primary: '#fe4c81', secondary: '#fd971f' },
         },
     },
     {
         key: 'solarized',
         label: 'Solarized',
         swatches: {
-            light: { background: '#fdf6e3', primary: '#268bd2', secondary: '#2aa198' },
-            dark: { background: '#002b36', primary: '#268bd2', secondary: '#2aa198' },
+            light: { background: '#fdf6e3', primary: '#0473b6', secondary: '#2aa198' },
+            dark: { background: '#002b36', primary: '#3093da', secondary: '#2aa198' },
         },
     },
 ];

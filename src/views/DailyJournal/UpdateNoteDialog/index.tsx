@@ -14,7 +14,10 @@ import {
     vim,
 } from '@replit/codemirror-vim';
 import { githubLight } from '@uiw/codemirror-theme-github';
-import CodeMirror, { type ReactCodeMirrorRef } from '@uiw/react-codemirror';
+import CodeMirror, {
+    EditorView,
+    type ReactCodeMirrorRef,
+} from '@uiw/react-codemirror';
 import {
     gql,
     useMutation,
@@ -34,7 +37,10 @@ import { EditingMode } from '#utils/types';
 
 import styles from './styles.module.css';
 
-const extensionsWithoutVim = [markdown({ base: markdownLanguage })];
+const extensionsWithoutVim = [
+    markdown({ base: markdownLanguage }),
+    EditorView.contentAttributes.of({ 'aria-label': 'Note' }),
+];
 const extensionsWithVim = [...extensionsWithoutVim, vim()];
 
 const dateFormatter = new Intl.DateTimeFormat(

@@ -81,6 +81,8 @@
     --width-separator-lg: 4pt;
     --width-separator-xl: 8pt;
 
+    --outline-offset-inset: calc(-1 * var(--width-separator-md));
+
     --width-page-content--max: 84rem;
 
     --border-radius-none: 0;
@@ -117,6 +119,17 @@
 
     --height-navbar: calc(4rem + env(safe-area-inset-top));
     --height-bottom-nav: calc(3.5rem + env(safe-area-inset-bottom));
+
+    /* WCAG 2.5.8 minimum for fine pointers, touch guidance for coarse */
+    --size-target-min: 1.5rem;
+    /* The percentage resolves where it is used, against the target's own box */
+    --inset-target--min: min(0px, (100% - var(--size-target-min)) / 2);
+    /* Grows a single-line row to the target height, with 1lh resolved where it is used */
+    --padding-target--min: calc((var(--size-target-min) - 1lh) / 2);
+
+    @media (pointer: coarse) {
+        --size-target-min: 2.75rem;
+    }
 }
 
 html {
@@ -186,6 +199,15 @@ h5 {
     font-size: var(--font-size-md);
 }
 
+th {
+    font-weight: var(--font-weight-normal);
+}
+
 p {
     margin: 0;
+}
+
+/* Zero specificity, so a component can move or drop the ring */
+:where(:focus-visible) {
+    outline: var(--width-separator-md) solid var(--color-focus-ring);
 }

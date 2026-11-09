@@ -1,5 +1,6 @@
 import {
     useCallback,
+    useId,
     useMemo,
     useRef,
 } from 'react';
@@ -14,6 +15,7 @@ import {
 } from '@togglecorp/fujs';
 
 import Button from '#components/Button';
+import DefaultMessage from '#components/DefaultMessage';
 import InputContainer, { Props as InputContainerProps } from '#components/InputContainer';
 import List from '#components/List';
 import Popup from '#components/Popup';
@@ -73,9 +75,14 @@ export type SelectInputContainerProps<
         dropdownHidden?: boolean;
     }, OMISSION>
         & Omit<InputContainerProps, 'input' | 'htmlFor'>
+        & Pick<React.AriaAttributes, 'aria-label' | 'aria-labelledby'>
     );
 
 const emptyList: unknown[] = [];
+
+function getOptionId(listboxId: string, optionKey: OptionKey) {
+    return `${listboxId}-${optionKey}`;
+}
 
 // eslint-disable-next-line @typescript-eslint/ban-types, max-len
 function SelectInputContainer<
@@ -134,9 +141,12 @@ function SelectInputContainer<
         required,
         variant,
         dropdownHidden,
+        'aria-label': ariaLabel,
+        'aria-labelledby': ariaLabelledBy,
     } = props;
 
     const inputId = useMemo(() => `btn_${randomString(8)}`, []);
+    const listboxId = useId();
 
     const options = optionsFromProps ?? (emptyList as OPTION[]);
 
@@ -202,6 +212,7 @@ function SelectInputContainer<
 
     const optionListRendererParams = useCallback(
         (key: OPTION_KEY, option: OPTION) => ({
+            id: getOptionId(listboxId, key),
             contentRendererParam: optionRendererParams,
             option,
             optionKey: key,
@@ -212,6 +223,7 @@ function SelectInputContainer<
             optionContainerClassName: _cs(optionContainerClassName, styles.listItem),
         }),
         [
+            listboxId,
             focusedKey,
             handleOptionClick,
             onFocusedKeyChange,
@@ -302,6 +314,15 @@ function SelectInputContainer<
                         }}
                         id={inputId}
                         name={name}
+                        role="combobox"
+                        aria-label={ariaLabel}
+                        aria-labelledby={ariaLabelledBy}
+                        aria-autocomplete="list"
+                        aria-expanded={dropdownShownActual}
+                        aria-controls={dropdownShownActual ? listboxId : undefined}
+                        aria-activedescendant={dropdownShownActual && focusedKey
+                            ? getOptionId(listboxId, focusedKey.key)
+                            : undefined}
                         readOnly={readOnly}
                         disabled={disabled}
                         value={(dropdownShown || focused) ? searchText : valueDisplay}
@@ -323,27 +344,49 @@ function SelectInputContainer<
                     open={dropdownShown}
                     setOpen={onDropdownShownChange}
                 >
-                    <List<OPTION, OPTION_KEY, GenericOptionProps<RENDER_PROPS, OPTION_KEY, OPTION>>
-                        className={styles.list}
-                        messageClassName={styles.message}
-                        data={options}
-                        keySelector={optionKeySelector}
-                        renderer={GenericOption}
-                        rendererParams={optionListRendererParams}
-                        errored={optionsErrored}
-                        filtered={optionsFiltered}
-                        pending={optionsPending}
-                        pendingMessage="Fetching options"
-                        emptyMessage="No option available"
-                        filteredEmptyMessage="No option available for the search"
-                        errorMessage="Failed to load options"
-                        compact
-                    />
-                    {!optionsPending && !optionsErrored && !!infoMessage && (
-                        <div className={styles.infoMessage}>
-                            {infoMessage}
-                        </div>
-                    )}
+                    <div
+                        id={listboxId}
+                        role="listbox"
+                        aria-label={ariaLabel}
+                        aria-labelledby={ariaLabelledBy}
+                    >
+                        <List<
+                            OPTION,
+                            OPTION_KEY,
+                            GenericOptionProps<RENDER_PROPS, OPTION_KEY, OPTION>
+                        >
+                            className={styles.list}
+                            data={options}
+                            keySelector={optionKeySelector}
+                            renderer={GenericOption}
+                            rendererParams={optionListRendererParams}
+                            errored={optionsErrored}
+                            filtered={optionsFiltered}
+                            pending={optionsPending}
+                            withoutMessage
+                            compact
+                        />
+                    </div>
+                    <div role="status">
+                        <DefaultMessage
+                            className={styles.message}
+                            pending={optionsPending}
+                            filtered={optionsFiltered}
+                            empty={optionsCount === 0}
+                            errored={optionsErrored}
+                            compact
+                            pendingMessage="Fetching options"
+                            emptyMessage="No option available"
+                            filteredEmptyMessage="No option available for the search"
+                            errorMessage="Failed to load options"
+                            overlayPending
+                        />
+                        {!optionsPending && !optionsErrored && !!infoMessage && (
+                            <div className={styles.infoMessage}>
+                                {infoMessage}
+                            </div>
+                        )}
+                    </div>
                 </Popup>
             )}
         </>

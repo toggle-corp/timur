@@ -192,6 +192,7 @@ export function Component() {
                     icons={<RiSearchLine />}
                     value={searchText}
                     placeholder="Search"
+                    aria-label="Search"
                     onChange={setSearchText}
                 />
                 <div className={styles.grid}>

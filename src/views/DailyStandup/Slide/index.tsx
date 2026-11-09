@@ -16,7 +16,10 @@ interface SplitVariantProps {
 interface GeneralVariantProps {
     variant: 'general';
     heading?: React.ReactNode;
+    description?: React.ReactNode;
+    headerActions?: React.ReactNode;
     children?: React.ReactNode;
+    footer?: React.ReactNode;
 }
 
 type Props = {
@@ -40,16 +43,36 @@ function Slide(props: Props) {
         const {
             children,
             heading,
+            description,
+            headerActions,
+            footer,
         } = props;
 
         return (
             <section className={className}>
-                {heading && (
-                    <h2 className={styles.heading}>
-                        {heading}
-                    </h2>
+                {(heading || description || headerActions) && (
+                    <header className={styles.header}>
+                        <div className={styles.headingSection}>
+                            {heading && (
+                                <h2 className={styles.heading}>
+                                    {heading}
+                                </h2>
+                            )}
+                            {description && (
+                                <div className={styles.description}>
+                                    {description}
+                                </div>
+                            )}
+                        </div>
+                        {headerActions}
+                    </header>
                 )}
                 {children}
+                {footer && (
+                    <footer className={styles.footer}>
+                        {footer}
+                    </footer>
+                )}
             </section>
         );
     }

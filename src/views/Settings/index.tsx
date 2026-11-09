@@ -1,6 +1,7 @@
 import {
     useCallback,
     useContext,
+    useId,
     useMemo,
 } from 'react';
 import {
@@ -16,6 +17,7 @@ import {
     DndContext,
     DragEndEvent,
     DraggableAttributes,
+    KeyboardSensor,
     PointerSensor,
     useSensor,
     useSensors,
@@ -23,6 +25,7 @@ import {
 import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 import {
     SortableContext,
+    sortableKeyboardCoordinates,
     useSortable,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
@@ -136,6 +139,8 @@ function Item(props: ItemProps) {
         transitionStyle,
     } = props;
 
+    const { label } = dailyJournalAttributeDetails[attribute.key];
+
     return (
         <div
             className={className}
@@ -150,12 +155,13 @@ function Item(props: ItemProps) {
                 {...draggableAttributes}
                 // eslint-disable-next-line react/jsx-props-no-spreading
                 {...draggableListeners}
+                aria-label={label}
                 className={styles.dragHandle}
             >
                 <RiDraggable />
             </div>
             <div className={styles.label}>
-                {dailyJournalAttributeDetails[attribute.key].label}
+                {label}
             </div>
         </div>
     );
@@ -455,6 +461,12 @@ export function Component() {
     const location = useLocation();
     const navigate = useNavigate();
 
+    const groupLevelLabelId = useId();
+    const joinLevelLabelId = useId();
+    const defaultTaskStatusLabelId = useId();
+    const defaultTaskTypeLabelId = useId();
+    const editingModeLabelId = useId();
+
     const handleBackClick = useCallback((event: React.MouseEvent<HTMLAnchorElement>) => {
         if (location.key !== 'default') {
             event.preventDefault();
@@ -499,6 +511,12 @@ export function Component() {
 
     const sensors = useSensors(
         useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+            scrollBehavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+                ? 'auto'
+                : 'smooth',
+        }),
     );
 
     const handleQuickActionsChange = useCallback((value: boolean, name: WorkItemAction) => {
@@ -560,7 +578,13 @@ export function Component() {
                             Appearance
                         </h4>
                         <RadioInput
-                            label="Choose how light and dark modes are selected, then pick a color palette for each. ✨"
+                            label={(
+                                <>
+                                    Choose how light and dark modes are selected,
+                                    then pick a color palette for each.
+                                    <span aria-hidden>{' ✨'}</span>
+                                </>
+                            )}
                             name="themeMode"
                             options={themeModeOptions}
                             keySelector={themeModeKeySelector}
@@ -676,10 +700,14 @@ export function Component() {
                             </DndContext>
                         </div>
                         <div className={styles.description}>
-                            Choose which attributes are used for grouping ✨
+                            <span id={groupLevelLabelId}>
+                                Choose which attributes are used for grouping
+                            </span>
+                            {' ✨'}
                         </div>
                         <SelectInput
                             name="groupLevel"
+                            aria-labelledby={groupLevelLabelId}
                             value={storedConfig.dailyJournalGrouping.groupLevel}
                             onChange={updateJournalGrouping}
                             options={groupLevelOptions}
@@ -688,10 +716,14 @@ export function Component() {
                             nonClearable
                         />
                         <div className={styles.description}>
-                            Choose which groups are combined into a single heading ✨
+                            <span id={joinLevelLabelId}>
+                                Choose which groups are combined into a single heading
+                            </span>
+                            {' ✨'}
                         </div>
                         <SelectInput
                             name="joinLevel"
+                            aria-labelledby={joinLevelLabelId}
                             value={storedConfig.dailyJournalGrouping.joinLevel}
                             onChange={updateJournalGrouping}
                             options={joinLevelOptions}
@@ -700,7 +732,12 @@ export function Component() {
                             nonClearable
                         />
                         <RadioInput
-                            label="Choose how projects are sorted ✨"
+                            label={(
+                                <>
+                                    Choose how projects are sorted
+                                    <span aria-hidden>{' ✨'}</span>
+                                </>
+                            )}
                             name="projectSortOrder"
                             value={storedConfig.projectSortOrder}
                             onChange={setConfigFieldValue}
@@ -713,11 +750,15 @@ export function Component() {
                         <h4>
                             Create Entry
                         </h4>
-                        <div className={styles.description}>
+                        <div
+                            id={defaultTaskStatusLabelId}
+                            className={styles.description}
+                        >
                             Choose default status when a new entry is created
                         </div>
                         <SelectInput
                             name="defaultTaskStatus"
+                            aria-labelledby={defaultTaskStatusLabelId}
                             options={enums?.enums.TimeEntryStatus}
                             keySelector={workItemStatusKeySelector}
                             labelSelector={workItemStatusLabelSelector}
@@ -726,11 +767,15 @@ export function Component() {
                             value={storedConfig.defaultTaskStatus}
                             nonClearable
                         />
-                        <div className={styles.description}>
+                        <div
+                            id={defaultTaskTypeLabelId}
+                            className={styles.description}
+                        >
                             Choose default task when a new entry is created
                         </div>
                         <SelectInput
                             name="defaultTaskType"
+                            aria-labelledby={defaultTaskTypeLabelId}
                             options={enums?.enums.TimeEntryType}
                             keySelector={workItemTypeKeySelector}
                             labelSelector={workItemTypeLabelSelector}
@@ -744,11 +789,15 @@ export function Component() {
                         <h4>
                             Create Notes
                         </h4>
-                        <div className={styles.description}>
+                        <div
+                            id={editingModeLabelId}
+                            className={styles.description}
+                        >
                             Choose the editing mode for the editor
                         </div>
                         <RadioInput
                             name="editingMode"
+                            aria-labelledby={editingModeLabelId}
                             options={editingOptions}
                             keySelector={editingOptionKeySelector}
                             labelSelector={editingOptionLabelSelector}

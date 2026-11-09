@@ -11,7 +11,6 @@ import {
 
 import AdminEditLink from '#components/AdminEditLink';
 import DefaultMessage from '#components/DefaultMessage';
-import SlideCounter from '#components/SlideCounter';
 import UpcomingEventsList from '#components/UpcomingEventsList';
 import UsersList from '#components/UsersList';
 import {
@@ -20,10 +19,9 @@ import {
     DailyStandupQueryVariables,
     UserDepartmentTypeEnum,
 } from '#generated/types/graphql';
-import useCurrentDate from '#hooks/useCurrentDate';
-import { formatDateTime } from '#utils/common';
 
 import Slide from '../Slide';
+import SlideFooter from '../SlideFooter';
 
 import styles from './styles.module.css';
 
@@ -135,8 +133,6 @@ function ProjectSection(props: Props) {
         ? projectFromProps
         : stats?.project;
 
-    const todayDate = useCurrentDate();
-
     // FIXME: use memo
     const sortedUsers = [...(stats?.users ?? [])]
         .sort((foo, bar) => (
@@ -211,13 +207,10 @@ function ProjectSection(props: Props) {
                             </div>
                         )}
                     </div>
-                    <div className={styles.currentTime}>
-                        <span>{formatDateTime(todayDate)}</span>
-                        <SlideCounter
-                            current={currentSlide}
-                            total={totalSlides}
-                        />
-                    </div>
+                    <SlideFooter
+                        currentSlide={currentSlide}
+                        totalSlides={totalSlides}
+                    />
                 </>
             )}
             secondaryHeading="Team members"

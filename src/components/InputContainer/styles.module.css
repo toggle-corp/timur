@@ -38,7 +38,7 @@
     }
 
     &:focus-within {
-        outline: var(--width-separator-md) solid var(--color-focus);
+        outline: var(--width-separator-md) solid var(--color-focus-ring);
         &:not(.general) {
             outline-offset: var(--spacing-2xs);
         }

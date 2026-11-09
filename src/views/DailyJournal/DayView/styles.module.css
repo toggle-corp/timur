@@ -48,6 +48,15 @@
             opacity: 0.5;
         }
 
+        .icon {
+            flex-shrink: 0;
+            border-radius: 50%;
+            background-color: var(--color-foreground);
+            width: 0.8em;
+            height: 0.8em;
+            object-fit: contain;
+        }
+
         .nested-heading {
             display: flex;
             align-items: center;
@@ -63,12 +72,6 @@
             }
             &h4 {
                 margin-top: var(--spacing-sm);
-            }
-
-            .icon {
-                border-radius: 50%;
-                background-color: var(--color-foreground);
-                height: 0.8em;
             }
 
             &:first-child {
@@ -95,12 +98,6 @@
 
             &h4 {
                 margin-top: var(--spacing-sm);
-            }
-
-            .icon {
-                border-radius: 50%;
-                background-color: var(--color-foreground);
-                height: 0.8em;
             }
         }
 

@@ -6,6 +6,19 @@
     width: fit-content;
     gap: var(--spacing-sm);
 
+    &::before {
+        position: absolute;
+        content: '';
+        inset: var(--inset-target--min);
+    }
+
+    /* Labelled rows grow for real so stacked hit areas do not overlap */
+    @media (pointer: coarse) {
+        &:has(.content) {
+            padding-block: var(--padding-target--min);
+        }
+    }
+
     .input {
         position: absolute;
         opacity: 0;
@@ -19,8 +32,8 @@
         font-size: var(--font-size-lg);
     }
 
-    &:focus-within {
-        outline: var(--width-separator-md) solid var(--color-focus);
+    &:has(:focus-visible) {
+        outline: var(--width-separator-md) solid var(--color-focus-ring);
         outline-offset: var(--spacing-2xs);
     }
 

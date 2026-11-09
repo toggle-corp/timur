@@ -221,6 +221,31 @@ function Link(props: Props) {
                     </div>
                 );
             }
+            // Without an href the anchor is neither focusable nor followed on Enter
+            if (disabled) {
+                const {
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    href,
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    newTab,
+                    ...anchorProps
+                } = otherProps;
+                return (
+                    <a
+                        // eslint-disable-next-line react/jsx-props-no-spreading
+                        {...anchorProps}
+                        className={_cs(
+                            linkElementClassName,
+                            styles.linkElement,
+                            containerClassName,
+                        )}
+                        role="link"
+                        aria-disabled="true"
+                    >
+                        {content}
+                    </a>
+                );
+            }
             // eslint-disable-next-line react/destructuring-assignment
             if (props.external) {
                 // eslint-disable-next-line react/destructuring-assignment
@@ -268,6 +293,7 @@ function Link(props: Props) {
             linkElementClassName,
             containerClassName,
             content,
+            disabled,
             otherProps,
             toLink,
             // eslint-disable-next-line react/destructuring-assignment

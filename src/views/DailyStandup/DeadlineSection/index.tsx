@@ -5,17 +5,15 @@ import {
 } from 'urql';
 
 import DefaultMessage from '#components/DefaultMessage';
-import SlideCounter from '#components/SlideCounter';
 import StandupConductors from '#components/StandupConductors';
 import UpcomingEventsList from '#components/UpcomingEventsList';
 import {
     type DeadlinesAndEventsQuery,
     type DeadlinesAndEventsQueryVariables,
 } from '#generated/types/graphql';
-import useCurrentDate from '#hooks/useCurrentDate';
-import { formatDateTime } from '#utils/common';
 
 import Slide from '../Slide';
+import SlideFooter from '../SlideFooter';
 
 import styles from './styles.module.css';
 
@@ -71,8 +69,6 @@ function DeadlineSection(props: Props) {
 
     const isEmpty = (deadlines?.length ?? 0) + (events?.length ?? 0) === 0;
 
-    const todayDate = useCurrentDate();
-
     return (
         <Slide
             variant="split"
@@ -89,13 +85,10 @@ function DeadlineSection(props: Props) {
                     <div className={styles.subSections}>
                         <StandupConductors />
                     </div>
-                    <div className={styles.currentTime}>
-                        <span>{formatDateTime(todayDate)}</span>
-                        <SlideCounter
-                            current={currentSlide}
-                            total={totalSlides}
-                        />
-                    </div>
+                    <SlideFooter
+                        currentSlide={currentSlide}
+                        totalSlides={totalSlides}
+                    />
                 </>
             )}
             secondaryHeading="Deadlines & Events"

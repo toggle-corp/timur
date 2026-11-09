@@ -160,34 +160,37 @@ function AddWorkItemDialog(props: Props) {
                     const { project } = contract;
 
                     return (
-                        <RawButton
-                            className={styles.task}
+                        <div
                             role="listitem"
-                            name={task.id}
-                            onClick={handleWorkItemCreate}
                             key={task.id}
-                            title="Add entry from dialog"
                         >
-                            <DisplayPicture
-                                className={styles.displayPicture}
-                                imageUrl={project.logo?.url}
-                                displayName={project.name}
-                            />
-                            <div className={styles.details}>
-                                <div className={styles.meta}>
-                                    <div>
-                                        {project.name}
+                            <RawButton
+                                className={styles.task}
+                                name={task.id}
+                                onClick={handleWorkItemCreate}
+                                title="Add entry from dialog"
+                            >
+                                <DisplayPicture
+                                    className={styles.displayPicture}
+                                    imageUrl={project.logo?.url}
+                                    displayName={project.name}
+                                />
+                                <div className={styles.details}>
+                                    <div className={styles.meta}>
+                                        <div>
+                                            {project.name}
+                                        </div>
+                                        <div>
+                                            ›
+                                        </div>
+                                        <div>
+                                            {contract.name}
+                                        </div>
                                     </div>
-                                    <div>
-                                        ›
-                                    </div>
-                                    <div>
-                                        {contract.name}
-                                    </div>
+                                    {task.name}
                                 </div>
-                                {task.name}
-                            </div>
-                        </RawButton>
+                            </RawButton>
+                        </div>
                     );
                 })}
             </div>

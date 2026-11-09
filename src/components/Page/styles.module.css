@@ -17,7 +17,10 @@
         padding: var(--spacing-lg);
 
         .content {
+            display: flex;
+            flex-direction: column;
             flex-grow: 1;
+            gap: var(--spacing-lg);
             width: 100%;
         }
     }
@@ -155,6 +158,32 @@
         }
     }
 
+    @media (prefers-reduced-motion: reduce) {
+        .main {
+            transition: none;
+        }
+
+        &.start-sidebar-visible .start-aside,
+        &.end-sidebar-visible .end-aside {
+            animation-name: fade-in;
+        }
+
+        /* The content reflows at once, so a fading sidebar would ghost over it */
+        &.start-sidebar-collapsed .start-aside,
+        &.end-sidebar-collapsed .end-aside {
+            display: none;
+        }
+    }
+
+    @keyframes fade-in {
+        0% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+
     @keyframes slide-in-from-right {
         0% {
             transform: translateX(100%);
@@ -197,6 +226,17 @@
             transform: translateX(-100%);
             opacity: 0;
         }
+    }
+}
+
+.toggle-collapsed-button {
+    /* Button clips its overflow, which would clip the enlarged hit area */
+    overflow: visible;
+
+    &::before {
+        position: absolute;
+        content: '';
+        inset: var(--inset-target--min);
     }
 }
 

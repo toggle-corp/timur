@@ -630,7 +630,6 @@ export function Component() {
         <Page
             documentTitle="Timur - Daily Journal"
             className={styles.dailyJournal}
-            contentClassName={styles.content}
             startAsideContent={(
                 <StartSidebar
                     selectedDate={selectedDate}

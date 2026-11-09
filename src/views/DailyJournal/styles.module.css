@@ -1,12 +1,6 @@
 .daily-journal {
     position: relative;
 
-    .content {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-lg);
-    }
-
     .fab {
         position: sticky;
         bottom: var(--spacing-lg);

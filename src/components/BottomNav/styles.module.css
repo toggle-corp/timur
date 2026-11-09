@@ -3,17 +3,20 @@
 
     @media screen and (max-width: 900px) {
         display: flex;
-        align-items: center;
         flex-shrink: 0;
-        justify-content: space-around;
         border-top: var(--width-separator-sm) solid var(--color-separator);
         background-color: var(--color-foreground);
         padding-bottom: env(safe-area-inset-bottom);
         height: var(--height-bottom-nav);
     }
 
+    .nav-cell {
+        flex: 1;
+    }
+
     .nav-item {
         display: flex;
+        align-self: stretch;
         font-size: var(--font-size-xl);
 
         &.active {
@@ -23,6 +26,24 @@
     }
 
     .user-menu {
+        flex: 1;
         font-size: var(--font-size-xl);
+
+        /* Logged out, the menu is a Link, so its anchor stretches like a nav item */
+        > a {
+            align-self: stretch;
+        }
+    }
+
+    .nav-item,
+    .user-menu,
+    .user-menu > a {
+        /* Targets span the bar edge to edge, so the focus ring is drawn inside them */
+        outline-offset: var(--outline-offset-inset);
+
+        /* The content container grows to fill the target, so the icon is centred inside it */
+        > * {
+            justify-content: center;
+        }
     }
 }
