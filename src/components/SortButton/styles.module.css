@@ -1,0 +1,21 @@
+/* NOTE: Keeps the weight of the heading it sits in */
+.sort-button {
+    font-weight: inherit;
+}
+
+/* NOTE: Placed against the nearest positioned ancestor, such as the heading cell */
+.tooltip {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 2;
+    margin-top: var(--spacing-3xs);
+    width: max-content;
+    max-width: 14rem;
+}
+
+/* NOTE: The button title covers hover */
+.sort-button:focus-visible + .tooltip {
+    display: block;
+}

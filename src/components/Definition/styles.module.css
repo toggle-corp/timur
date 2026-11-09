@@ -1,0 +1,18 @@
+.definition {
+    display: inline-flex;
+
+    .trigger {
+        display: inline-flex;
+        border-radius: var(--border-radius-full);
+        cursor: help;
+        color: var(--color-text-muted);
+        font-size: var(--font-size-md);
+
+        /* NOTE: The target grows to the minimum size around the small icon */
+        &::before {
+            position: absolute;
+            content: '';
+            inset: var(--inset-target--min);
+        }
+    }
+}

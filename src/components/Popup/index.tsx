@@ -9,6 +9,8 @@ import {
     randomString,
 } from '@togglecorp/fujs';
 
+import { tooltipSurfaceClassName } from '#components/TooltipSurface';
+
 import styles from './styles.module.css';
 
 interface Props extends Pick<React.HTMLAttributes<HTMLDivElement>, 'id' | 'role' | 'aria-label'> {
@@ -17,6 +19,9 @@ interface Props extends Pick<React.HTMLAttributes<HTMLDivElement>, 'id' | 'role'
     parentRef: React.RefObject<HTMLElement | null>;
     open?: boolean;
     setOpen?: (isOpen: boolean) => void;
+    // A tooltip neither closes other popups nor closes on a click outside.
+    // Its owner shows and hides it.
+    variant?: 'menu' | 'tooltip';
 }
 
 function Popup(props: Props) {
@@ -26,6 +31,7 @@ function Popup(props: Props) {
         parentRef,
         open,
         setOpen,
+        variant = 'menu',
         ...otherProps
     } = props;
 
@@ -77,13 +83,14 @@ function Popup(props: Props) {
         <div
             // eslint-disable-next-line react/jsx-props-no-spreading
             {...otherProps}
-            popover="auto"
+            popover={variant === 'tooltip' ? 'manual' : 'auto'}
             ref={popoverRef}
             style={{
                 positionAnchor: `--${anchorName}`,
             }}
             className={_cs(
                 styles.popover,
+                variant === 'tooltip' ? _cs(styles.tooltip, tooltipSurfaceClassName) : styles.menu,
                 className,
             )}
         >

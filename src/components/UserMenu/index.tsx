@@ -25,6 +25,7 @@ import {
     LogoutMutation,
     LogoutMutationVariables,
 } from '#generated/types/graphql';
+import { timesheetsSection } from '#utils/navigation';
 
 import styles from './styles.module.css';
 
@@ -102,6 +103,13 @@ function UserMenu(props: Props) {
                     Admin Panel
                 </DropdownMenuItem>
             )}
+            <DropdownMenuItem
+                type="link"
+                to={timesheetsSection.to}
+                icons={<timesheetsSection.icon />}
+            >
+                {timesheetsSection.label}
+            </DropdownMenuItem>
             <DropdownMenuItem
                 type="button"
                 name={undefined}

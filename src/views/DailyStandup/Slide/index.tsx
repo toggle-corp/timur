@@ -1,5 +1,7 @@
 import { _cs } from '@togglecorp/fujs';
 
+import PageHeader from '#components/PageHeader';
+
 import styles from './styles.module.css';
 
 interface SplitVariantProps {
@@ -51,21 +53,13 @@ function Slide(props: Props) {
         return (
             <section className={className}>
                 {(heading || description || headerActions) && (
-                    <header className={styles.header}>
-                        <div className={styles.headingSection}>
-                            {heading && (
-                                <h2 className={styles.heading}>
-                                    {heading}
-                                </h2>
-                            )}
-                            {description && (
-                                <div className={styles.description}>
-                                    {description}
-                                </div>
-                            )}
-                        </div>
-                        {headerActions}
-                    </header>
+                    <PageHeader
+                        className={styles.header}
+                        heading={heading}
+                        headingLevel={2}
+                        description={description}
+                        actions={headerActions}
+                    />
                 )}
                 {children}
                 {footer && (

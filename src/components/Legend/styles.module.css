@@ -1,0 +1,47 @@
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+    gap: var(--spacing-md);
+
+    .heading {
+        font-weight: var(--font-weight-semibold);
+    }
+
+    .item {
+        display: flex;
+        align-items: center;
+    }
+
+    .swatch {
+        display: inline-flex;
+        position: relative;
+        align-items: center;
+        flex-shrink: 0;
+        justify-content: center;
+        border-radius: var(--border-radius-sm);
+    }
+
+    &.sm {
+        .item {
+            gap: var(--spacing-2xs);
+        }
+
+        .swatch {
+            width: 0.75rem;
+            height: 0.75rem;
+        }
+    }
+
+    &.md {
+        .item {
+            gap: var(--spacing-xs);
+        }
+
+        .swatch {
+            width: 1.4em;
+            height: 1.4em;
+        }
+    }
+}

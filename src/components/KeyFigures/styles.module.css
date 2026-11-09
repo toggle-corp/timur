@@ -1,0 +1,67 @@
+.key-figures {
+    .figures {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(12rem, 100%), 1fr));
+        margin: 0;
+        gap: var(--spacing-lg) var(--spacing-xl);
+
+        @media screen and (max-width: 900px) {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: var(--spacing-md);
+        }
+    }
+
+    .figure {
+        display: flex;
+        position: relative;
+        flex-direction: column;
+        gap: var(--spacing-3xs);
+
+        dd {
+            margin: 0;
+        }
+    }
+
+    .label {
+        display: flex;
+        align-items: center;
+        color: var(--color-text-muted);
+        font-size: var(--font-size-sm);
+        gap: var(--spacing-xs);
+    }
+
+    .value {
+        color: var(--color-text);
+        font-size: var(--font-size-2xl);
+        font-weight: var(--font-weight-semibold);
+    }
+
+    .detail {
+        color: var(--color-text-muted);
+        font-size: var(--font-size-sm);
+    }
+
+    /* NOTE: Each figure is as wide as its text, so a figure moves to the next row as a whole rather than wrapping its words */
+    &.compact {
+        .figures {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-md) var(--spacing-2xl);
+        }
+
+        .figure {
+            white-space: nowrap;
+
+            /* NOTE: A change line has an icon, so every line below the value takes its height */
+            > dd:not(.value) {
+                display: flex;
+                align-items: center;
+                min-height: calc(var(--font-size-sm) * 1.5);
+            }
+        }
+
+        .value {
+            font-size: var(--font-size-xl);
+        }
+    }
+}

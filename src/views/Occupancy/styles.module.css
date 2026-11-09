@@ -1,0 +1,124 @@
+.occupancy {
+    --person-panel-width: 26rem;
+
+    /* NOTE: The pill shape of the buttons, with the pressed view lifted onto the surface */
+    .view-switch {
+        display: inline-flex;
+        align-self: flex-start;
+        border-radius: var(--border-radius-full);
+        background-color: var(--color-primary-bg-subtle);
+        padding: var(--spacing-3xs);
+        max-width: 100%;
+        overflow-x: auto;
+        gap: var(--spacing-3xs);
+
+        .view-option {
+            transition: background-color var(--duration-transition-fast) ease-out, color var(--duration-transition-fast) ease-out;
+            border-radius: var(--border-radius-full);
+            padding: var(--spacing-xs) var(--spacing-md);
+            white-space: nowrap;
+            color: var(--color-text-muted);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+
+            &:hover {
+                color: var(--color-primary-text);
+            }
+
+            &[aria-pressed="true"] {
+                box-shadow: var(--box-shadow-xs);
+                background-color: var(--color-foreground);
+                color: var(--color-primary-text);
+            }
+        }
+    }
+
+    .heatmap {
+        @media screen and (max-width: 900px) {
+            --occupancy-heatmap-name-width: 6.5rem;
+        }
+    }
+
+    /* NOTE: Keeps the days clear of the person panel */
+    .with-panel {
+        @media screen and (min-width: 901px) {
+            padding-right: var(--person-panel-width);
+        }
+    }
+
+    .summary-heading {
+        position: relative;
+        text-align: right;
+        white-space: nowrap;
+        color: var(--color-text-muted);
+        font-size: var(--font-size-xs);
+    }
+
+    .summary-heading,
+    .summary-cell {
+        padding-inline: var(--spacing-xs);
+
+        &:nth-child(1 of .summary-heading, .summary-cell) {
+            border-left: var(--width-separator-sm) solid var(--color-separator);
+            padding-left: var(--spacing-sm);
+        }
+    }
+
+    /* NOTE: A long project name is cut short, with the full name in the text and on hover */
+    .top-project-cell {
+        .top-project {
+            display: inline-flex;
+            white-space: pre;
+        }
+
+        .project-name {
+            max-width: 7rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    /* NOTE: The tints of the day cells, so a warning reads as mid occupancy and an alert as low */
+    .summary-cell {
+        text-align: right;
+        white-space: nowrap;
+        font-size: var(--font-size-sm);
+
+        &.high {
+            background-color: var(--color-heatmap-high-fill);
+        }
+
+        &.over {
+            background-color: var(--color-heatmap-over-fill);
+        }
+
+        &.mid,
+        &.warning {
+            background-color: var(--color-heatmap-mid-fill);
+        }
+
+        &.low,
+        &.alert {
+            background-color: var(--color-heatmap-low-fill);
+        }
+    }
+
+    /* NOTE: After the summary cells, which align right */
+    .text-column {
+        text-align: left;
+    }
+
+    .events {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0;
+        list-style: none;
+        color: var(--color-text-muted);
+        font-size: var(--font-size-sm);
+        gap: var(--spacing-xs) var(--spacing-lg);
+    }
+}
+
+.export-button {
+    margin-inline-start: auto;
+}

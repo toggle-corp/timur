@@ -24,6 +24,7 @@ import {
 import Button from '#components/Button';
 import DefaultMessage from '#components/DefaultMessage';
 import Indent from '#components/Indent';
+import { loadingFadeClassName } from '#components/LoadingFade';
 import EnumsContext from '#contexts/enums';
 import useFormattedRelativeDate from '#hooks/useFormattedRelativeDate';
 import useLocalStorage from '#hooks/useLocalStorage';
@@ -31,6 +32,7 @@ import {
     getDurationString,
     groupListByAttributes,
     sortByAttributes,
+    weekdayDateFormatter,
 } from '#utils/common';
 import {
     DailyJournalAttribute,
@@ -47,15 +49,6 @@ const dateFormatter = new Intl.DateTimeFormat(
     [],
     {
         year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        weekday: 'short',
-    },
-);
-
-const dateFormatterShort = new Intl.DateTimeFormat(
-    [],
-    {
         month: 'short',
         day: 'numeric',
         weekday: 'short',
@@ -213,7 +206,7 @@ function DayView(props: Props) {
     const date = new Date(selectedDate);
     const formattedDate = date.getMonth() === 0
         ? dateFormatter.format(date)
-        : dateFormatterShort.format(date);
+        : weekdayDateFormatter.format(date);
     const formattedRelativeDate = useFormattedRelativeDate(selectedDate);
 
     const totalHours = useMemo(
@@ -315,10 +308,8 @@ function DayView(props: Props) {
                 errorMessage="Can't find your entries"
             />
             <div
-                className={_cs(
-                    groupedItems.length > 0 && loading && styles.loading,
-                    styles.newGroup,
-                )}
+                className={_cs(loadingFadeClassName, styles.newGroup)}
+                aria-busy={groupedItems.length > 0 && loading}
             >
                 {groupedItems.map((groupedItem) => {
                     if (groupedItem.type === 'heading') {

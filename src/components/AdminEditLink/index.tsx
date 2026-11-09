@@ -1,16 +1,22 @@
-import { useContext } from 'react';
+import AdminLink from '#components/AdminLink';
+import { getAdminUrl } from '#utils/admin';
 
-import UserContext from '#contexts/user';
+type AdminEntity = 'project' | 'deadline' | 'event' | 'contract' | 'timeEntry';
 
-import styles from './styles.module.css';
-
-type AdminEntity = 'project' | 'deadline' | 'event' | 'contract';
+const entityLabels: Record<AdminEntity, string> = {
+    project: 'project',
+    deadline: 'deadline',
+    event: 'event',
+    contract: 'contract',
+    timeEntry: 'time entry',
+};
 
 const entityAdminPath: Record<AdminEntity, string> = {
     project: 'project/project',
     deadline: 'project/deadline',
     event: 'common/event',
     contract: 'track/contract',
+    timeEntry: 'track/timeentry',
 };
 
 interface Props {
@@ -21,24 +27,14 @@ interface Props {
 
 function AdminEditLink(props: Props) {
     const { entity, id, children } = props;
-    const { userAuth } = useContext(UserContext);
-
-    if (!userAuth?.isStaff) {
-        return children;
-    }
-
-    const href = `${import.meta.env.APP_GRAPHQL_DOMAIN}/admin/${entityAdminPath[entity]}/${id}/change/`;
 
     return (
-        <a
-            className={styles.adminEditLink}
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            title={`Edit ${entity} in admin`}
+        <AdminLink
+            href={getAdminUrl(`${entityAdminPath[entity]}/${id}/change/`)}
+            title={`Edit ${entityLabels[entity]} in admin`}
         >
             {children}
-        </a>
+        </AdminLink>
     );
 }
 

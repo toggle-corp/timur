@@ -13,30 +13,7 @@
         gap: var(--spacing-lg);
 
         .header {
-            display: flex;
-            align-items: flex-end;
             align-self: stretch;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            gap: var(--spacing-md);
-
-            .heading-section {
-                display: flex;
-                flex-direction: column;
-                gap: var(--spacing-2xs);
-
-                .heading {
-                    overflow-wrap: break-word;
-                    color: var(--color-primary-text);
-                    font-size: var(--font-size-3xl);
-                    font-weight: var(--font-weight-light);
-                }
-
-                .description {
-                    color: var(--color-text-muted);
-                    font-size: var(--font-size-xl);
-                }
-            }
         }
 
         .footer {

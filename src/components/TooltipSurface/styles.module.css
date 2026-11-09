@@ -1,0 +1,13 @@
+/* NOTE: The shadow token stays dark in every palette, where a shadow from the separator would glow */
+.tooltip-surface {
+    border: var(--width-separator-sm) solid var(--color-separator);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--box-shadow-md);
+    background-color: var(--color-surface-raised);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    text-align: start;
+    white-space: normal;
+    color: var(--color-text);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-normal);
+}

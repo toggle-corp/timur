@@ -1,0 +1,11 @@
+.loading-fade {
+    transition: opacity var(--duration-transition-medium) ease-in-out 100ms;
+
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
+    }
+
+    &[aria-busy='true'] {
+        opacity: 0.5;
+    }
+}

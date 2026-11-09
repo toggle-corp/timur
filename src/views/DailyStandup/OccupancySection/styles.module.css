@@ -5,6 +5,17 @@
         padding: unset;
     }
 
+    .description {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--spacing-md);
+
+        .monthly-view-link {
+            font-size: var(--font-size-md);
+        }
+    }
+
     .summary {
         display: flex;
         align-items: flex-end;
@@ -17,219 +28,32 @@
             align-items: flex-start;
             flex-basis: 100%;
         }
-
-        .missing-summary {
-            color: var(--color-heatmap-low-text);
-            font-weight: var(--font-weight-bold);
-        }
-
-        .recent-missing-summary {
-            color: var(--color-heatmap-mid-text);
-            font-weight: var(--font-weight-bold);
-        }
-
-        .legend {
-            display: flex;
-            flex-wrap: wrap;
-            color: var(--color-text-muted);
-            font-size: var(--font-size-sm);
-            gap: var(--spacing-md);
-
-            .legend-item {
-                display: flex;
-                align-items: center;
-                gap: var(--spacing-xs);
-            }
-        }
     }
 
     .message {
         align-self: stretch;
     }
 
-    .table-container {
-        align-self: stretch;
-        /* overflow: auto lets it shrink below its rows; the slide scrolls instead */
-        flex-shrink: 0;
-        /* Keep the table from widening the page; it scrolls instead */
-        contain: inline-size;
-        transition: opacity var(--duration-transition-medium) ease-in-out 100ms;
-        border: var(--width-separator-sm) solid var(--color-separator);
-        border-radius: var(--border-radius-lg);
-        background-color: var(--color-foreground);
-        padding: var(--spacing-md);
-        overflow: auto;
-
-        &.loading {
-            opacity: 0.5;
-        }
+    .missing-heading {
+        color: var(--color-text-muted);
+        font-size: var(--font-size-xs);
     }
 
-    .table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 2px;
-        font-variant-numeric: tabular-nums;
-
-        .group-heading,
-        .date-heading {
-            text-align: center;
-            color: var(--color-text-muted);
-            font-size: var(--font-size-sm);
-        }
-
-        .group-heading {
-            padding-left: var(--spacing-2xs);
-            text-align: left;
-        }
-
-        .week-heading {
-            font-size: var(--font-size-xs);
-        }
-
-        .date-heading {
-            .weekday {
-                display: block;
-                font-size: var(--font-size-xs);
-            }
-        }
-
-        .user {
-            position: sticky;
-            left: 0;
-            z-index: 1;
-            background-color: var(--color-foreground);
-            padding-right: var(--spacing-sm);
-            width: 1%;
-            vertical-align: bottom;
-            text-align: left;
-            white-space: nowrap;
-
-            .user-content {
-                display: flex;
-                align-items: center;
-                gap: var(--spacing-xs);
-            }
-
-            .user-heading {
-                flex-grow: 1;
-                color: var(--color-text-muted);
-                font-size: var(--font-size-sm);
-            }
-
-            .missing-heading {
-                color: var(--color-text-muted);
-                font-size: var(--font-size-xs);
-            }
-
-            .display-picture {
-                flex-shrink: 0;
-                width: 1.5rem;
-                height: 1.5rem;
-            }
-
-            .display-name {
-                width: 9rem;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                font-size: var(--font-size-sm);
-            }
-
-            .missing-count {
-                width: 2rem;
-                text-align: right;
-                color: var(--color-text-muted);
-                font-size: var(--font-size-sm);
-
-                &.has-missing {
-                    color: var(--color-heatmap-low-text);
-                    font-weight: var(--font-weight-bold);
-                }
-
-                &.has-recent-missing {
-                    color: var(--color-heatmap-mid-text);
-                    font-weight: var(--font-weight-bold);
-                }
-            }
-        }
-
-        .week-start {
-            border-left: var(--spacing-sm) solid transparent;
-            background-clip: padding-box;
-        }
-
-        .month-start {
-            position: relative;
-
-            &::before {
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                left: calc(var(--spacing-sm) / -2 - 1px);
-                background-color: var(--color-separator-strong);
-                width: 2px;
-                content: '';
-            }
-        }
-    }
-
-    .cell {
-        --occupancy-color: transparent;
-
-        position: relative;
-        border-radius: var(--border-radius-sm);
-        background-color: color-mix(in srgb, var(--occupancy-color) 30%, transparent);
-        padding: var(--spacing-2xs) 0;
-        min-width: 2rem;
-        text-align: center;
-        color: var(--color-heatmap-text);
+    .missing-count {
+        width: 2rem;
+        text-align: right;
+        color: var(--color-text-muted);
         font-size: var(--font-size-sm);
-
-        &.high {
-            --occupancy-color: var(--color-heatmap-high);
-        }
-
-        &.mid {
-            --occupancy-color: var(--color-heatmap-mid);
-        }
-
-        &.low {
-            --occupancy-color: var(--color-heatmap-low);
-        }
     }
 
-    /* NOTE: Defined before .missing and .leave so that they override the background */
-    .swatch {
-        display: inline-flex;
-        position: relative;
-        align-items: center;
-        justify-content: center;
-        border-radius: var(--border-radius-sm);
-        background-color: var(--color-foreground);
-        width: 1.4em;
-        height: 1.4em;
-    }
-
-    .missing {
-        box-shadow: inset 0 0 0 2px var(--color-heatmap-low);
-        background-color: color-mix(in srgb, var(--color-heatmap-low) 35%, transparent);
-        color: var(--color-heatmap-on-low);
+    /* NOTE: After .missing-count, so that these colours win */
+    .has-missing {
+        color: var(--color-heatmap-low-text);
         font-weight: var(--font-weight-bold);
     }
 
-    .leave {
-        background-color: var(--color-background);
-    }
-
-    .half-leave {
-        &::after {
-            position: absolute;
-            top: 0;
-            right: 0;
-            border-width: 0 0.5rem 0.5rem 0;
-            border-style: solid;
-            border-color: transparent var(--color-heatmap-text) transparent transparent;
-            content: '';
-        }
+    .has-recent-missing {
+        color: var(--color-heatmap-mid-text);
+        font-weight: var(--font-weight-bold);
     }
 }

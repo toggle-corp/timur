@@ -15,6 +15,8 @@
         flex-grow: 1;
         transition: var(--duration-transition-medium) margin ease-in-out;
         padding: var(--spacing-lg);
+        /* NOTE: Content swiped sideways stays inside the page instead of widening it */
+        overflow-x: clip;
 
         .content {
             display: flex;
@@ -238,6 +240,13 @@
         content: '';
         inset: var(--inset-target--min);
     }
+}
+
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: var(--spacing-sm);
 }
 
 .sidebar-icon {

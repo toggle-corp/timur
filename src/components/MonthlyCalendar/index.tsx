@@ -27,7 +27,10 @@ import {
     type MonthlyCalendarDataQueryVariables,
 } from '#generated/types/graphql';
 import useDebouncedValue from '#hooks/useDebouncedValue';
-import { addDays } from '#utils/common';
+import {
+    addDays,
+    workFromHomeLabels,
+} from '#utils/common';
 
 import styles from './styles.module.css';
 
@@ -95,13 +98,6 @@ function leaveTypeLabel(type: JournalLeaveTypeEnum | null | undefined) {
     return undefined;
 }
 
-function wfhTypeLabel(type: JournalWorkFromHomeTypeEnum | null | undefined) {
-    if (type === 'FULL') return 'WFH';
-    if (type === 'FIRST_HALF') return 'First half WFH';
-    if (type === 'SECOND_HALF') return 'Second half WFH';
-    return undefined;
-}
-
 function getDatesInRange(startDate: string, endDate: string): string[] {
     const list: string[] = [];
     let cursor = startDate;
@@ -144,7 +140,7 @@ function getDateTooltip(dateStr: string, info: DateInfo | undefined): string {
     if (leaveLabel) {
         lines.push(leaveLabel);
     }
-    const wfhLabel = wfhTypeLabel(info?.wfhType);
+    const wfhLabel = info?.wfhType ? workFromHomeLabels[info.wfhType] : undefined;
     if (wfhLabel) {
         lines.push(wfhLabel);
     }

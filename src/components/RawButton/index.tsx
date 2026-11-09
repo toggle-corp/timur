@@ -13,6 +13,8 @@ export interface Props<N> extends Omit<React.HTMLProps<HTMLButtonElement>, 'ref'
     type?: 'button' | 'submit' | 'reset';
     focused?: boolean;
     title: string;
+    // The title then only names the analytics event, for a button that shows its own tooltip
+    hideTitle?: boolean;
 }
 
 function RawButton<const N>(props: Props<N>) {
@@ -26,6 +28,7 @@ function RawButton<const N>(props: Props<N>) {
         focused,
         type = 'button',
         title,
+        hideTitle,
         ...otherProps
     } = props;
 
@@ -48,7 +51,7 @@ function RawButton<const N>(props: Props<N>) {
             name={typeof name === 'string' ? name : undefined}
             // eslint-disable-next-line react/button-has-type
             type={type}
-            title={title}
+            title={hideTitle ? undefined : title}
             className={_cs(
                 styles.rawButton,
                 focused && styles.focused,

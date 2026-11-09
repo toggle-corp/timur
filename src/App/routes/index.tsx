@@ -80,6 +80,20 @@ const dailyStandup = customWrapRoute({
     },
 });
 
+const timesheets = customWrapRoute({
+    parent: rootLayout,
+    path: 'timesheets/:month?',
+    component: {
+        render: () => import('#views/Occupancy'),
+        props: {},
+    },
+    wrapperComponent: Auth,
+    context: {
+        title: 'Timesheets',
+        visibility: 'is-authenticated',
+    },
+});
+
 const settings = customWrapRoute({
     parent: rootLayout,
     path: 'daily-journal/settings',
@@ -101,6 +115,7 @@ const wrappedRoutes = {
     home,
     dailyJournal,
     dailyStandup,
+    timesheets,
     settings,
 };
 
