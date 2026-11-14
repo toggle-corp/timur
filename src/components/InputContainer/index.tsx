@@ -1,5 +1,9 @@
-import { _cs } from '@togglecorp/fujs';
+import {
+    _cs,
+    isDefined,
+} from '@togglecorp/fujs';
 
+import InputHint from '#components/InputHint';
 import InputLabel from '#components/InputLabel';
 import useBasicLayout from '#hooks/useBasicLayout';
 import { type SpacingType } from '#utils/types';
@@ -12,6 +16,7 @@ export interface Props {
     hintContainerClassName?: string;
     iconsContainerClassName?: string;
     disabled?: boolean;
+    error?: React.ReactNode;
     hint?: React.ReactNode;
     icons?: React.ReactNode;
     input: React.ReactNode;
@@ -36,6 +41,7 @@ function InputContainer(props: Props) {
         actions,
         className,
         disabled,
+        error,
         hint,
         icons,
         input,
@@ -80,6 +86,7 @@ function InputContainer(props: Props) {
                 variant === 'form' && styles.form,
                 variant === 'general' && styles.general,
                 disabled && styles.disabled,
+                isDefined(error) && styles.errored,
                 className,
             )}
         >
@@ -97,9 +104,14 @@ function InputContainer(props: Props) {
                 {inputSectionContent}
             </div>
             {hint && (
-                <div className={_cs(styles.inputHint, hintContainerClassName)}>
+                <InputHint className={hintContainerClassName}>
                     {hint}
-                </div>
+                </InputHint>
+            )}
+            {isDefined(error) && (
+                <InputHint error>
+                    {error}
+                </InputHint>
             )}
         </label>
     );

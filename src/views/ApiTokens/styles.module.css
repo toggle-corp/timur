@@ -1,0 +1,80 @@
+.api-tokens {
+    .main-content {
+        display: flex;
+        flex-direction: column;
+        max-width: 72rem;
+        gap: var(--spacing-md);
+
+        .page-head {
+            display: flex;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: var(--spacing-md);
+
+            .description {
+                margin-top: var(--spacing-2xs);
+                max-width: 60ch;
+                color: var(--color-text-muted);
+                font-size: var(--font-size-sm);
+            }
+
+            .head-actions {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: var(--spacing-sm);
+
+                .count {
+                    white-space: nowrap;
+                    color: var(--color-text-muted);
+                    font-size: var(--font-size-sm);
+
+                    strong {
+                        color: var(--color-text);
+                        font-weight: var(--font-weight-semibold);
+                    }
+                }
+            }
+        }
+
+        .tokens {
+            container: api-tokens / inline-size;
+
+            &.with-tokens {
+                border: var(--width-separator-sm) solid var(--color-separator);
+                border-radius: var(--border-radius-lg);
+                background-color: var(--color-foreground);
+            }
+
+            .head-row {
+                border-bottom: var(--width-separator-sm) solid var(--color-separator);
+                padding: var(--spacing-xs) var(--spacing-md);
+                color: var(--color-text-muted);
+                font-size: var(--font-size-xs);
+
+                @container api-tokens (max-width: 56rem) {
+                    display: none;
+                }
+            }
+
+            .message {
+                border: var(--width-separator-sm) dashed var(--color-separator-strong);
+                border-radius: var(--border-radius-lg);
+            }
+
+            .empty-description {
+                display: flex;
+                align-items: center;
+                flex-direction: column;
+                max-width: 44ch;
+                gap: var(--spacing-md);
+            }
+        }
+
+        .list-foot {
+            color: var(--color-text-muted);
+            font-size: var(--font-size-xs);
+        }
+    }
+}

@@ -4,6 +4,7 @@ import {
     isDefined,
 } from '@togglecorp/fujs';
 
+import InputHint from '#components/InputHint';
 import RawList from '#components/RawList';
 
 import Radio, { Props as RadioProps } from './Radio';
@@ -20,6 +21,7 @@ interface BaseProps<N, O, V, RRP extends RadioProps<V, N>> extends Pick<React.Ar
     descriptionSelector?: (option: O) => React.ReactNode;
     label?: React.ReactNode;
     hint?: React.ReactNode;
+    error?: React.ReactNode;
     labelContainerClassName?: string;
     hintContainerClassName?: string;
     listContainerClassName?: string;
@@ -75,6 +77,7 @@ function RadioInput<
         label,
         labelContainerClassName,
         hint,
+        error,
         hintContainerClassName,
         listContainerClassName,
         renderer = Radio,
@@ -168,9 +171,17 @@ function RadioInput<
                 />
             </div>
             {hint && (
-                <div className={_cs(styles.inputHint, hintContainerClassName)}>
+                <InputHint className={_cs(styles.inputHint, hintContainerClassName)}>
                     {hint}
-                </div>
+                </InputHint>
+            )}
+            {isDefined(error) && (
+                <InputHint
+                    className={styles.inputError}
+                    error
+                >
+                    {error}
+                </InputHint>
             )}
         </div>
     );

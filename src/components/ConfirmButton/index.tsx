@@ -11,6 +11,8 @@ import styles from './styles.module.css';
 export interface Props<N> extends ButtonProps<N> {
     confirmHeading: React.ReactNode;
     confirmDescription: React.ReactNode;
+    confirmLabel?: React.ReactNode;
+    confirmDisabled?: boolean;
     title: string;
 }
 
@@ -20,6 +22,8 @@ function ConfirmButton<const N>(props: Props<N>) {
         onClick,
         confirmHeading,
         confirmDescription,
+        confirmLabel = 'Confirm',
+        confirmDisabled,
         title,
         ...buttonProps
     } = props;
@@ -72,8 +76,9 @@ function ConfirmButton<const N>(props: Props<N>) {
                         title={`Confirm ${title}`}
                         onClick={onClick}
                         variant="primary"
+                        disabled={confirmDisabled}
                     >
-                        Confirm
+                        {confirmLabel}
                     </Button>
                 </div>
             </Dialog>

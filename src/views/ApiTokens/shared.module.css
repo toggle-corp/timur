@@ -1,0 +1,29 @@
+/* Styles shared by the API tokens page, its rows and its dialog */
+
+/* Columns of the token list, shared by the header row and the token rows */
+.token-grid {
+    display: grid;
+    grid-template-columns:
+        minmax(8rem, 1.4fr)
+        minmax(10rem, 2fr)
+        minmax(6rem, 0.8fr)
+        minmax(6rem, 0.9fr)
+        minmax(6rem, 0.8fr)
+        minmax(6.5rem, 0.9fr)
+        5.5rem;
+    gap: var(--spacing-md);
+
+    @container api-tokens (max-width: 56rem) {
+        grid-template-columns: 1fr auto;
+        gap: var(--spacing-xs) var(--spacing-md);
+    }
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    white-space: nowrap;
+    clip-path: inset(50%);
+}

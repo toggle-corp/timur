@@ -3,6 +3,7 @@ import { _cs } from '@togglecorp/fujs';
 import styles from './styles.module.css';
 
 interface Props {
+    id?: string;
     children?: React.ReactNode;
     className?: string;
     disabled?: boolean;
@@ -12,6 +13,7 @@ interface Props {
 
 function InputLabel(props: Props) {
     const {
+        id,
         children,
         className,
         disabled,
@@ -24,6 +26,7 @@ function InputLabel(props: Props) {
 
     return (
         <div
+            id={id}
             className={_cs(
                 styles.inputLabel,
                 disabled && styles.disabled,

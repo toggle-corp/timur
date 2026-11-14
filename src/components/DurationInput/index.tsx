@@ -32,6 +32,7 @@ function DurationInput<const T>(props: Props<T>) {
         actions,
         inputSectionClassName,
         icons,
+        error,
         hint,
         label,
         disabled,
@@ -119,6 +120,7 @@ function DurationInput<const T>(props: Props<T>) {
             actions={actions}
             className={className}
             disabled={disabled}
+            error={error}
             hint={hint}
             icons={icons}
             inputSectionClassName={inputSectionClassName}

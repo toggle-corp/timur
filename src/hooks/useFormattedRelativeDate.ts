@@ -16,7 +16,7 @@ import {
     toRelativeDate,
 } from '#utils/temporal';
 
-function useFormattedRelativeDate(dateLike: DateLike) {
+function useFormattedRelativeDate(dateLike: DateLike | null | undefined) {
     const [relativeDate, setRelativeDate] = useState<RelativeDate | undefined>(
         () => (isDefined(dateLike)
             ? toRelativeDate(dateLike)

@@ -98,6 +98,7 @@ function SelectInputContainer<
         actionsContainerClassName,
         className,
         disabled,
+        error,
         hint,
         hintContainerClassName,
         icons,
@@ -263,6 +264,7 @@ function SelectInputContainer<
                 actionsContainerClassName={actionsContainerClassName}
                 className={_cs(styles.selectInputContainer, className)}
                 disabled={disabled}
+                error={error}
                 hintContainerClassName={hintContainerClassName}
                 hint={hint}
                 iconsContainerClassName={iconsContainerClassName}

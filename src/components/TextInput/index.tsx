@@ -8,7 +8,7 @@ type InheritedProps<T> = (Omit<InputContainerProps, 'input' | 'htmlFor'> & Omit<
 interface Props<T> extends InheritedProps<T> {
     inputElementRef?: React.RefObject<HTMLInputElement | null>;
     inputClassName?: string;
-    type?: 'text' | 'password';
+    type?: 'text' | 'password' | 'date';
 }
 
 function TextInput<const T>(props: Props<T>) {
@@ -16,6 +16,7 @@ function TextInput<const T>(props: Props<T>) {
         actions,
         className,
         disabled,
+        error,
         hint,
         icons,
         inputClassName,
@@ -38,6 +39,7 @@ function TextInput<const T>(props: Props<T>) {
             className={className}
             actions={actions}
             disabled={disabled}
+            error={error}
             hint={hint}
             icons={icons}
             inputSectionClassName={inputSectionClassName}
