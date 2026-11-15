@@ -1,9 +1,13 @@
-import { useCallback } from 'react';
+import {
+    useCallback,
+    useContext,
+} from 'react';
 import { isDefined } from '@togglecorp/fujs';
 
 import Button, { Props as ButtonProps } from '#components/Button';
 import ConfirmButton, { Props as ConfirmButtonProps } from '#components/ConfirmButton';
 import Link, { Props as LinkProps } from '#components/Link';
+import DropdownMenuContext from '#contexts/dropdownMenu';
 
 type ButtonTypeProps<NAME> = Omit<ButtonProps<NAME>, 'type'> & {
     type: 'button';
@@ -25,6 +29,8 @@ function DropdownMenuItem<NAME>(props: Props<NAME>) {
         onClick,
     } = props;
 
+    const { closePopover } = useContext(DropdownMenuContext);
+
     const handleButtonClick = useCallback(
         (name: NAME, e: React.MouseEvent<HTMLButtonElement>) => {
             if (isDefined(onClick) && type !== 'link') {
@@ -39,14 +45,22 @@ function DropdownMenuItem<NAME>(props: Props<NAME>) {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             type: _,
             variant = 'dropdown-item',
+            onClick: onLinkClick,
             ...otherProps
         } = props;
+
+        // The link is still followed after the menu closes
+        const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+            onLinkClick?.(e);
+            closePopover();
+        };
 
         return (
             <Link
                 // eslint-disable-next-line react/jsx-props-no-spreading
                 {...otherProps}
                 variant={variant}
+                onClick={handleLinkClick}
             />
         );
     }

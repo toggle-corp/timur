@@ -14,6 +14,7 @@ function TextArea<const N>(props: Props<N>) {
         actions,
         className,
         disabled,
+        error,
         hint,
         icons,
         inputClassName,
@@ -39,6 +40,7 @@ function TextArea<const N>(props: Props<N>) {
             actions={actions}
             className={className}
             disabled={disabled}
+            error={error}
             hint={hint}
             icons={icons}
             inputSectionClassName={inputSectionClassName}

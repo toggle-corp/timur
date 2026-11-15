@@ -4,6 +4,7 @@ import {
 } from 'react';
 import {
     RiAdminLine,
+    RiKey2Line,
     RiLoginBoxLine,
     RiLogoutBoxLine,
 } from 'react-icons/ri';
@@ -102,6 +103,13 @@ function UserMenu(props: Props) {
                     Admin Panel
                 </DropdownMenuItem>
             )}
+            <DropdownMenuItem
+                type="link"
+                to="apiTokens"
+                icons={<RiKey2Line />}
+            >
+                API Tokens
+            </DropdownMenuItem>
             <DropdownMenuItem
                 type="button"
                 name={undefined}

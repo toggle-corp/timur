@@ -3,7 +3,10 @@ import {
     useState,
 } from 'react';
 
-function useCurrentDate() {
+const DEFAULT_INTERVAL_MS = 5000;
+
+// Current date, refreshed every `intervalMs`
+function useCurrentDate(intervalMs = DEFAULT_INTERVAL_MS) {
     const [dateStr, setDateStr] = useState(() => {
         const date = new Date();
         return date;
@@ -16,13 +19,13 @@ function useCurrentDate() {
                     const date = new Date();
                     setDateStr(date);
                 },
-                5000,
+                intervalMs,
             );
             return () => {
                 window.clearInterval(timeout);
             };
         },
-        [],
+        [intervalMs],
     );
     return dateStr;
 }

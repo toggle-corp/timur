@@ -32,9 +32,8 @@
         background-color: var(--color-background);
     }
 
-    .input-hint {
-        color: var(--color-text-muted);
-        font-size: var(--font-size-sm);
+    &.general.errored {
+        border-color: var(--color-error);
     }
 
     &:focus-within {

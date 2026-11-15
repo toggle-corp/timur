@@ -26,6 +26,8 @@ interface Props {
     size?: 'auto-height' | 'auto';
     escapeDisabled?: boolean;
     closeOnOutsideClick?: boolean;
+    // Hides the close button and ignores Esc and outside clicks
+    persistent?: boolean;
 
     focusElementRef?: RefObject<HTMLElement | null>;
 }
@@ -42,6 +44,7 @@ function Dialog(props: Props) {
         mode = 'center',
         escapeDisabled,
         closeOnOutsideClick,
+        persistent,
         size,
     } = props;
 
@@ -66,14 +69,20 @@ function Dialog(props: Props) {
     );
 
     const handleCancel: React.ReactEventHandler<HTMLDialogElement> = useCallback((e) => {
-        if (escapeDisabled) {
+        if (escapeDisabled || persistent) {
             e.preventDefault();
         }
-    }, [escapeDisabled]);
+    }, [escapeDisabled, persistent]);
 
     const handleClose = useCallback(() => {
+        // NOTE: Browsers skip the cancel event on a repeated Esc without user
+        // activation in between, so the dialog can close while still open here
+        if (persistent && open) {
+            dialogRef.current?.showModal();
+            return;
+        }
         onClose(false);
-    }, [onClose]);
+    }, [onClose, persistent, open]);
 
     const handleCloseButtonClick = useCallback((_: undefined, e: React.MouseEvent) => {
         e.stopPropagation();
@@ -83,10 +92,10 @@ function Dialog(props: Props) {
     const handleDialogClick = useCallback((e: React.MouseEvent<HTMLDialogElement>) => {
         // NOTE: When user clicks on the backdrop, the e.target will the the dialog
         // else, e.target will be the children of dialog component
-        if (closeOnOutsideClick && e.target === dialogRef.current) {
+        if (closeOnOutsideClick && !persistent && e.target === dialogRef.current) {
             onClose(false);
         }
-    }, [closeOnOutsideClick, onClose]);
+    }, [closeOnOutsideClick, persistent, onClose]);
 
     return (
         <DialogContext.Provider
@@ -119,15 +128,17 @@ function Dialog(props: Props) {
                             >
                                 {heading}
                             </h4>
-                            <Button
-                                className={styles.closeButton}
-                                name={undefined}
-                                onClick={handleCloseButtonClick}
-                                title="Close dialog"
-                                variant="transparent"
-                            >
-                                <RiCloseLine />
-                            </Button>
+                            {!persistent && (
+                                <Button
+                                    className={styles.closeButton}
+                                    name={undefined}
+                                    onClick={handleCloseButtonClick}
+                                    title="Close dialog"
+                                    variant="transparent"
+                                >
+                                    <RiCloseLine />
+                                </Button>
+                            )}
                         </header>
                         <div className={_cs(styles.content, contentClassName)}>
                             {children}

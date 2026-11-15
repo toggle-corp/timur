@@ -94,6 +94,20 @@ const settings = customWrapRoute({
     },
 });
 
+const apiTokens = customWrapRoute({
+    parent: rootLayout,
+    path: 'settings/api-tokens',
+    component: {
+        render: () => import('#views/ApiTokens'),
+        props: {},
+    },
+    wrapperComponent: Auth,
+    context: {
+        title: 'API Tokens',
+        visibility: 'is-authenticated',
+    },
+});
+
 const wrappedRoutes = {
     fourHundredFour,
     rootLayout,
@@ -102,6 +116,7 @@ const wrappedRoutes = {
     dailyJournal,
     dailyStandup,
     settings,
+    apiTokens,
 };
 
 export const unwrappedRoutes = unwrapRoute(Object.values(wrappedRoutes));

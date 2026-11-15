@@ -4,14 +4,7 @@ import {
     useId,
     useMemo,
 } from 'react';
-import {
-    RiArrowLeftLine,
-    RiDraggable,
-} from 'react-icons/ri';
-import {
-    useLocation,
-    useNavigate,
-} from 'react-router-dom';
+import { RiDraggable } from 'react-icons/ri';
 import {
     closestCenter,
     DndContext,
@@ -35,8 +28,8 @@ import {
     isNotDefined,
 } from '@togglecorp/fujs';
 
+import BackLink from '#components/BackLink';
 import Checkbox from '#components/Checkbox';
-import Link from '#components/Link';
 import Page from '#components/Page';
 import RadioInput from '#components/RadioInput';
 import SelectInput from '#components/SelectInput';
@@ -458,21 +451,11 @@ export function Component() {
     const [storedConfig, setStoredConfig] = useLocalStorage('timur-config');
     const setConfigFieldValue = useSetFieldValue(setStoredConfig);
 
-    const location = useLocation();
-    const navigate = useNavigate();
-
     const groupLevelLabelId = useId();
     const joinLevelLabelId = useId();
     const defaultTaskStatusLabelId = useId();
     const defaultTaskTypeLabelId = useId();
     const editingModeLabelId = useId();
-
-    const handleBackClick = useCallback((event: React.MouseEvent<HTMLAnchorElement>) => {
-        if (location.key !== 'default') {
-            event.preventDefault();
-            navigate(-1);
-        }
-    }, [location.key, navigate]);
 
     const updateJournalGrouping = useCallback((value: number, name: 'groupLevel' | 'joinLevel') => {
         const oldValue = storedConfig.dailyJournalGrouping
@@ -563,14 +546,9 @@ export function Component() {
             className={styles.settings}
             contentClassName={styles.mainContent}
         >
-            <Link
-                to="dailyJournal"
-                variant="tertiary"
-                icons={<RiArrowLeftLine />}
-                onClick={handleBackClick}
-            >
+            <BackLink>
                 Back to Journal
-            </Link>
+            </BackLink>
             <div className={styles.layout}>
                 <div className={styles.settingsColumn}>
                     <div className={styles.section}>

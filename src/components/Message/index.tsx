@@ -5,11 +5,13 @@ import {
 
 import styles from './styles.module.css';
 
-type MessageVariant = 'info' | 'error';
+type MessageVariant = 'info' | 'warning' | 'error';
 
-interface Props {
+interface Props extends Pick<React.HTMLAttributes<HTMLDivElement>, 'id' | 'role'> {
     className?: string;
     variant?: MessageVariant;
+    // Inline notice: a row with a tinted background and a border in the variant color
+    banner?: boolean;
     icon?: React.ReactNode;
     actions?: React.ReactNode;
     compact?: boolean;
@@ -26,7 +28,10 @@ interface Props {
 function Message(props: Props) {
     const {
         className,
+        id,
+        role,
         variant,
+        banner = false,
         icon,
         title,
         description,
@@ -43,10 +48,14 @@ function Message(props: Props) {
 
     return (
         <div
+            id={id}
+            role={role}
             className={_cs(
                 styles.message,
+                variant === 'warning' && styles.warning,
                 variant === 'error' && styles.errored,
                 compact && styles.compact,
+                banner && styles.banner,
                 className,
             )}
         >
